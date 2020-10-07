@@ -1,6 +1,6 @@
 # Raptor
 ### A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences
-[![build status](https://github.com/eseiler/raptor/workflows/Raptor%20CI/badge.svg?branch=master)](https://github.com/eseiler/raptor/actions)
+[![build status](https://github.com/seqan/raptor/workflows/Raptor%20CI/badge.svg?branch=master)](https://github.com/seqan/raptor/actions)
 
 ## Download and Installation
 
@@ -15,7 +15,7 @@ Refer to the [Seqan3 Setup Tutorial](https://docs.seqan.de/seqan/3-master-user/s
 <details><summary>Download current master branch</summary>
 
 ```bash
-git clone --recurse-submodules https://github.com/eseiler/raptor
+git clone --recurse-submodules https://github.com/seqan/raptor
 ```
 
 </details>
@@ -24,7 +24,7 @@ git clone --recurse-submodules https://github.com/eseiler/raptor
 
 E.g., for version `1.0.0`:
 ```bash
-git clone --branch raptor-1.0.0 --recurse-submodules https://github.com/eseiler/raptor
+git clone --branch raptor-1.0.0 --recurse-submodules https://github.com/seqan/raptor
 ```
 Or from within an existing repository
 ```bash
@@ -108,4 +108,4 @@ In your academic works (also comparisons and pipelines) please cite:
   * Seiler, E. et al. (2020). Raptor: A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences. Manuscript in submission.
 
 ### License
-Raptor is open source software. However, certain conditions apply when you (re-)distribute and/or modify Raptor, please see the [license](https://github.com/eseiler/raptor/blob/master/LICENSE.md).
+Raptor is open source software. However, certain conditions apply when you (re-)distribute and/or modify Raptor, please see the [license](https://github.com/seqan/raptor/blob/master/LICENSE.md).
