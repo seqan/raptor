@@ -1,17 +1,26 @@
-# Raptor
+# Raptor [![build status](https://github.com/seqan/raptor/workflows/Raptor%20CI/badge.svg?branch=master)](https://github.com/seqan/raptor/actions)
 ### A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences
-[![build status](https://github.com/seqan/raptor/workflows/Raptor%20CI/badge.svg?branch=master)](https://github.com/seqan/raptor/actions)
 
 ## Download and Installation
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/raptor/README.html)
 
-### Prerequisites
+```bash
+conda install -c bioconda -c conda-forge raptor
+```
+
+* There may be performance benefits when compiling from source, especially when using `-march=native` as compiler directive.
+* Raptor is compatible with macOS but, due to compiler restrictions, Raptor is not available for macOS on conda.
+
+### Quick Start without conda
+<details><summary>Prerequisites</summary>
+
 * CMake >= 3.8
 * GCC 7, 8, 9 or 10 (most recent minor version)
 * git
 
 Refer to the [Seqan3 Setup Tutorial](https://docs.seqan.de/seqan/3-master-user/setup.html) for more in depth information.
+</details>
 
-### Quick Start
 <details><summary>Download current master branch</summary>
 
 ```bash
@@ -43,6 +52,13 @@ make
 ```
 
 The binary can be found in `bin`.
+
+You may want to add the raptor executable yo your PATH:
+```
+export PATH=$(pwd)/bin:$PATH
+raptor --version
+```
+
 </details>
 
 ### Example Data and Usage
@@ -73,7 +89,7 @@ In the following, we will use the `64` data set.
 We can now build an index over all the bins:
 
 ```
-bin/raptor build --kmer 19 --window 23 --size 8m --output index.raptor $(seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63)
+raptor build --kmer 19 --window 23 --size 8m --output index.raptor $(seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63)
 # You can replace `$(seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63)` by `example_data/64/bins/bin_{00..63}.fasta` if your shell supports this syntax.
 # The equivalent command for 1,024 bins is `$(seq -f "example_data/1024/bins/bin_%04g.fasta" 0 1 1023)`
 ```
@@ -82,7 +98,7 @@ You may be prompted to enable or disable automatic update notifications. For que
 Afterwards, we can search for all reads from bin 1:
 
 ```
-bin/raptor search --kmer 19 --window 23 --error 2 --index index.raptor --query example_data/64/reads/mini.fastq --output search.output
+raptor search --kmer 19 --window 23 --error 2 --index index.raptor --query example_data/64/reads/mini.fastq --output search.output
 ```
 
 Each line of the output consists of the read ID (in the toy example these are numbers) and the corresponding bins in which they were found:
@@ -104,9 +120,9 @@ Each line of the output consists of the read ID (in the toy example these are nu
 
 For a list of options, see the help pages:
 ```console
-$ bin/raptor --help
-$ bin/raptor build --help
-$ bin/raptor search --help
+raptor --help
+raptor build --help
+raptor search --help
 ```
 
 ## Authorship and Copyright
