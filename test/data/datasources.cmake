@@ -4,7 +4,7 @@ include (cmake/app_datasources.cmake)
 
 declare_datasource (FILE example_data.tar.gz
                     URL https://ftp.imp.fu-berlin.de/pub/seiler/raptor/example_data.tar.gz
-                    URL_HASH SHA256=8f1f87adcda881549b8f5c8072c4e2d04c7739a4641644a885dd99b11b2a9179)
+                    URL_HASH SHA256=7c2e7bdbf573cfe2314c8255080a5d57d966722e8bfb53712e03d87ce463ff15)
 
 
 declare_datasource (FILE expected_results.tar.gz

@@ -67,29 +67,39 @@ example_data
 ```
 
 The `bins` folder contains a FASTA file for each bin and the `reads` directory contains a FASTQ file for each bin containing reads from the respective bin (with 2 errors).
-Additionally, `all.fastq` (concatenation of all FASTQ files) and `all10.fastq` (`all.fastq` repeated 10 times) are provided in the `reads` folder.
+Additionally, `mini.fastq` (5 reads of all bins), `all.fastq` (concatenation of all FASTQ files) and `all10.fastq` (`all.fastq` repeated 10 times) are provided in the `reads` folder.
 
 In the following, we will use the `64` data set.
 We can now build an index over all the bins:
 
 ```
-bin/raptor build --kmer 19 --window 23 --size 8m --output index.raptor example_data/64/bins/bin_{00..63}.fasta
+bin/raptor build --kmer 19 --window 23 --size 8m --output index.raptor $(seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63)
+# You can replace `$(seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63)` by `example_data/64/bins/bin_{00..63}.fasta` if your shell supports this syntax.
+# The equivalent command for 1,024 bins is `$(seq -f "example_data/1024/bins/bin_%04g.fasta" 0 1 1023)`
 ```
 You may be prompted to enable or disable automatic update notifications. For questions, please consult [the SeqAn documentation](https://github.com/seqan/seqan3/wiki/Update-Notifications).
 
 Afterwards, we can search for all reads from bin 1:
 
 ```
-bin/raptor search --kmer 19 --window 23 --error 2 --index index.raptor --query example_data/64/reads/bin_01.fastq --output search.output
+bin/raptor search --kmer 19 --window 23 --error 2 --index index.raptor --query example_data/64/reads/mini.fastq --output search.output
 ```
 
 Each line of the output consists of the read ID (in the toy example these are numbers) and the corresponding bins in which they were found:
 ```text
+0       0,
+1       0,
+2       0,
+3       0,
+4       0,
 16384   1,
-16385   1,
 ...
-32766   1,
-32767   1,
+1015812 62,
+1032192 63,
+1032193 63,
+1032194 63,
+1032195 63,
+1032196 63,
 ```
 
 For a list of options, see the help pages:
