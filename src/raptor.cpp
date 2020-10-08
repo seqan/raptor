@@ -181,7 +181,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.)";
     parser.info.short_copyright = "BSD 3-Clause License";
     parser.info.short_description = "A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences.";
     parser.info.url = "https://github.com/eseiler/raptor";
-    parser.info.version = "1.0.0";
+    parser.info.version = "1.0.1";
 }
 
 void init_top_level_parser(seqan3::argument_parser & parser)
