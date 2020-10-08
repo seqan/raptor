@@ -24,11 +24,11 @@ git clone --recurse-submodules https://github.com/seqan/raptor
 
 E.g., for version `1.0.0`:
 ```bash
-git clone --branch raptor-1.0.0 --recurse-submodules https://github.com/seqan/raptor
+git clone --branch raptor-v1.0.0 --recurse-submodules https://github.com/seqan/raptor
 ```
 Or from within an existing repository
 ```bash
-git checkout raptor-1.0.0
+git checkout raptor-v1.0.0
 ```
 </details>
 
