@@ -146,7 +146,8 @@ inline void init_shared_meta(seqan3::argument_parser & parser)
     parser.info.app_name = "Raptor";
     parser.info.author = "Enrico Seiler";
     parser.info.citation = "Seiler, E. et al. (2020). Raptor: A fast and space-efficient pre-filter for"
-                           " querying very large collections of nucleotide sequences. Manuscript in submission.";
+                           " querying very large collections of nucleotide sequences. bioRxiv 2020.10.08.330985. doi:"
+                           " https://doi.org/10.1101/2020.10.08.330985";
     parser.info.date = "21-09-2020";
     parser.info.email = "enrico.seiler@fu-berlin.de";
     parser.info.long_copyright = R"(BSD 3-Clause License
