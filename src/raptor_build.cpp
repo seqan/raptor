@@ -17,11 +17,10 @@ struct ibf_builder
     {
         using sequence_file_t = seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>>;
 
-        std::vector<sequence_file_t> technical_bins;
-        technical_bins.reserve(arguments->bins);
-
-        for (size_t i = 0; i < arguments->bins; ++i)
-            technical_bins.emplace_back(arguments->bin_path[i]);
+        auto technical_bins = std::views::iota(0u, arguments->bins)
+                            | std::views::transform( [&] (auto const i) {
+                                return sequence_file_t{arguments->bin_path[i]};
+                              });
 
         seqan3::ibf_config cfg{seqan3::bin_count{arguments->bins},
                                seqan3::bin_size{arguments->bits / arguments->parts},
