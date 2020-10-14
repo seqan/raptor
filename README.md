@@ -2,16 +2,22 @@
 ### A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences
 
 ## Download and Installation
+There may be performance benefits when compiling from source, especially when using `-march=native` as compiler directive.
+
+### Install with bioconda (Linux)
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/raptor/README.html)
 
 ```bash
 conda install -c bioconda -c conda-forge raptor
 ```
 
-* There may be performance benefits when compiling from source, especially when using `-march=native` as compiler directive.
-* Raptor is compatible with macOS but, due to compiler restrictions, Raptor is not available for macOS on conda.
+### Install with brew (Linux, macOS)
 
-### Quick Start without conda
+```bash
+brew install brewsci/bio/raptor
+```
+
+### Compile from source
 <details><summary>Prerequisites</summary>
 
 * CMake >= 3.8
