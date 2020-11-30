@@ -131,6 +131,21 @@ raptor build --help
 raptor search --help
 ```
 
+#### Preprocessing the input
+We offer the option to precompute the minimisers of the input files. This is useful to build indices of big datasets (in the range of several TiB) and also allows an estimation of the needed index size since the amount of minimisers is known.
+Follwing above example, we would change the build step as follows:
+
+First we precompute the minimisers and store them in a directory:
+```
+mkdir -p precomputed_minimisers
+raptor build --kmer 19 --window 23 --size 8m --compute-minimiser --output precomputed_minimisers/ $(seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63)
+```
+
+Then we run the build step again and use the computed minimisers as input:
+```
+raptor build --kmer 19 --window 23 --size 8m --output index.raptor $(seq -f "precomputed_minimisers/bin_%02g.minimiser" 0 1 63)
+```
+
 ## Authorship and Copyright
 Raptor is being developed by [Enrico Seiler](mailto:enrico.seiler@fu-berlin.de), but also incorporates much work from
 other members of [SeqAn](https://www.seqan.de).
