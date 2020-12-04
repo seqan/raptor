@@ -412,7 +412,7 @@ void run_search(seqan3::argument_parser & parser)
     else
         arguments.window_size = arguments.kmer_size;
 
-    arguments.treshold_was_set = parser.is_option_set("treshold");
+    arguments.treshold_was_set = parser.is_option_set("threshold");
 
     // ==========================================
     // Process --pattern.

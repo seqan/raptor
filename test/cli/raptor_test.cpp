@@ -77,6 +77,32 @@ TEST_P(raptor_search, search)
     EXPECT_TRUE(expected == actual);
 }
 
+// Search with threshold
+TEST_P(raptor_search, search_threshold)
+{
+ auto const [number_of_bins, window_size, number_of_errors] = GetParam();
+
+ cli_test_result result = execute_app("raptor", "search",
+                                                "--kmer 19",
+                                                "--window ", std::to_string(window_size),
+                                                "--output search_threshold.out",
+                                                "--error ", std::to_string(number_of_errors),
+                                                "--threshold 0.5",
+                                                "--pattern 100",
+                                                "--index ",
+                                                data("expected_results/b" + std::to_string(number_of_bins) + "_k19_w" + std::to_string(window_size) + "_s8m.ibf"),
+                                                "--query ",
+                                                data("example_data/" + std::to_string(number_of_bins) + "/reads/all.fastq"));
+ ASSERT_EQ(result.exit_code, 0);
+ ASSERT_EQ(result.out, std::string{});
+ ASSERT_EQ(result.err, std::string{});
+
+ std::string expected = string_from_file(data("expected_results/b" + std::to_string(number_of_bins) + "_k19_w" + std::to_string(window_size) + "_s8m_e" + std::to_string(number_of_errors) + ".out"));
+ std::string actual = string_from_file("search_threshold.out");
+
+ //EXPECT_TRUE(expected == actual);
+}
+
 INSTANTIATE_TEST_SUITE_P(search_suite,
                          raptor_search,
                          testing::Combine(testing::Values(64, 1024), testing::Values(19, 23), testing::Values(0, 1, 2, 3)),
