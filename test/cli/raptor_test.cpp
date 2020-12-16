@@ -19,7 +19,7 @@ inline std::string string_from_file(std::filesystem::path const & path, std::ios
 ///////////////////////////////////////////////// raptor build tests ///////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TEST_P(raptor_build, build)
+TEST_P(raptor_build, build_with_list)
 {
     auto const [number_of_bins, run_parallel] = GetParam();
 
@@ -37,6 +37,38 @@ TEST_P(raptor_build, build)
     std::string actual = string_from_file("index.ibf", std::ios::binary);
 
     EXPECT_TRUE(expected == actual);
+}
+
+TEST_P(raptor_build, build_with_file)
+{
+    auto const [number_of_bins, run_parallel] = GetParam();
+
+    {
+        std::string const expanded_bins = expand_bins(number_of_bins);
+        std::ofstream file{"raptor_cli_test.txt"};
+        auto split_bins = expanded_bins | std::views::split(' ') | ranges::view::transform([](auto &&rng) {return std::string_view(&*rng.begin(), ranges::distance(rng));});
+        for (auto && file_path : split_bins)
+        {
+            file << file_path << '\n';
+        }
+        file << '\n';
+    }
+
+    cli_test_result result = execute_app("raptor", "build",
+                                                   "--kmer 19",
+                                                   "--window 23",
+                                                   "--size 8m",
+                                                   "--threads ", run_parallel ? "2" : "1",
+                                                   "--output index.ibf", 
+                                                   "raptor_cli_test.txt");
+    ASSERT_EQ(result.exit_code, 0);
+    ASSERT_EQ(result.out, std::string{});
+    ASSERT_EQ(result.err, std::string{});
+
+    std::string expected = string_from_file(data("expected_results/b" + std::to_string(number_of_bins) + "_k19_w23_s8m.ibf"), std::ios::binary);
+    std::string actual = string_from_file("index.ibf", std::ios::binary);
+
+    ASSERT_TRUE(expected == actual);
 }
 
 INSTANTIATE_TEST_SUITE_P(build_suite,

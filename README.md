@@ -99,6 +99,13 @@ raptor build --kmer 19 --window 23 --size 8m --output index.raptor $(seq -f "exa
 # You can replace `$(seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63)` by `example_data/64/bins/bin_{00..63}.fasta` if your shell supports this syntax.
 # The equivalent command for 1,024 bins is `$(seq -f "example_data/1024/bins/bin_%04g.fasta" 0 1 1023)`
 ```
+
+You can also prepare a file that contains one file path per line (a line corresponds to a bin) and use this file as input:
+```
+seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63 > all_bin_paths.txt
+raptor build --kmer 19 --window 23 --size 8m --output another_index.raptor all_bin_paths.txt
+```
+
 You may be prompted to enable or disable automatic update notifications. For questions, please consult [the SeqAn documentation](https://github.com/seqan/seqan3/wiki/Update-Notifications).
 
 Afterwards, we can search for all reads from bin 1:
@@ -143,7 +150,16 @@ raptor build --kmer 19 --window 23 --size 8m --compute-minimiser --output precom
 
 Then we run the build step again and use the computed minimisers as input:
 ```
-raptor build --kmer 19 --window 23 --size 8m --output index.raptor $(seq -f "precomputed_minimisers/bin_%02g.minimiser" 0 1 63)
+raptor build --kmer 19 --window 23 --size 8m --output minimiser_index.raptor $(seq -f "precomputed_minimisers/bin_%02g.minimiser" 0 1 63)
+```
+
+Alternatively, you can also prepare a file that contains one file path per line (a line corresponds to a bin)
+and use this file as input for both cases:
+```
+seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63 > all_bin_paths.txt
+raptor build --kmer 19 --window 23 --size 8m --compute-minimiser --output precomputed_minimisers/ all_bin_paths.txt
+seq -f "precomputed_minimisers/bin_%02g.minimiser" 0 1 63 > all_minimiser_paths.txt
+raptor build --kmer 19 --window 23 --size 8m --output another_minimiser_index.raptor all_minimiser_paths.txt
 ```
 
 ## Authorship and Copyright

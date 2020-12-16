@@ -117,6 +117,22 @@ public:
             {
                 if (value.extension() == ".minimiser")
                     minimiser_file_validator(value);
+                else if (values.size() == 1u)
+                {
+                    std::ifstream list_of_files{value};
+                    std::string line;
+                    while (std::getline(list_of_files, line))
+                    {
+                        if (!line.empty())
+                        {
+                            std::filesystem::path bin_path{line};
+                            if (bin_path.extension() == ".minimiser")
+                                minimiser_file_validator(bin_path);
+                            else
+                                sequence_file_validator(bin_path);
+                        }
+                    }
+                }
                 else
                     throw exception;
             }
@@ -131,9 +147,10 @@ public:
 
     std::string get_help_page_message() const
     {
-        return "The input file must exist and read permissions must be granted. Valid file extensions are: [minimiser],"
-               " or [embl, fasta, fa, fna, ffn, faa, frn, fas, fastq, fq, genbank, gb, gbk, sam] possibly followed by: "
-               "[gz, bgzf, bz2].";
+        return "The input file must exist and read permissions must be granted. Valid file extensions for bin files are"
+               " : [minimiser], or [embl, fasta, fa, fna, ffn, faa, frn, fas, fastq, fq, genbank, gb, gbk, sam] "
+               "possibly followed by: [gz, bgzf, bz2]. All other extensions will be assumed to contain one line per"
+               " path to a bin.";
     }
 
 private:
@@ -229,7 +246,8 @@ inline void init_build_parser(seqan3::argument_parser & parser, build_arguments 
     init_shared_meta(parser);
     init_shared_options(parser, arguments);
     parser.add_positional_option(arguments.bin_path,
-                                 "Provide a list of input files. One file per bin. ",
+                                 "Provide a list of input files (one file per bin). Alternatively, provide a text file "
+                                 "containing the paths to the bins (one line per path to a bin). ",
                                  bin_validator{});
     parser.add_option(arguments.out_path,
                       '\0',
@@ -318,6 +336,34 @@ void run_build(seqan3::argument_parser & parser)
     build_arguments arguments{};
     init_build_parser(parser, arguments);
     try_parsing(parser);
+
+    // ==========================================
+    // Process bin_path
+    // ==========================================
+    if (arguments.bin_path.size() == 1u) // Either only one bin or a file containing bin paths
+    {
+        auto & file = arguments.bin_path[0];
+
+        if (file.extension() != ".minimiser")
+        {
+            try
+            {
+                seqan3::input_file_validator<seqan3::sequence_file_input<>> validator;
+                validator(file);
+            }
+            catch (seqan3::validation_error const & exception)
+            {
+                decltype(arguments.bin_path) new_values;
+                std::ifstream list_of_files{file};
+                std::string line;
+                while (std::getline(list_of_files, line))
+                    new_values.emplace_back(line);
+                while (new_values.back().empty())
+                    new_values.pop_back();
+                arguments.bin_path = std::move(new_values);
+            }
+        }
+    }
 
     // ==========================================
     // Various checks.
