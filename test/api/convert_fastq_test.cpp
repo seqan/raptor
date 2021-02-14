@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include <seqan3/test/expect_range_eq.hpp>
+
 #include "fastq_conversion.hpp"
 
 TEST(group1, out_empty)
@@ -9,7 +11,7 @@ TEST(group1, out_empty)
     testing::internal::CaptureStdout();
     convert_fastq(DATADIR"in.fastq", "");
     std::string std_cout = testing::internal::GetCapturedStdout();
-    EXPECT_EQ(expected, std_cout);
+    EXPECT_RANGE_EQ(expected, std_cout);
 }
 
 TEST(group1, out_not_empty)
@@ -30,6 +32,6 @@ TEST(group1, out_not_empty)
         ids.push_back(id);
         seqs.push_back(seq);
     }
-    EXPECT_EQ(seqs, expected_seqs);
-    EXPECT_EQ(ids, expected_ids);
+    EXPECT_RANGE_EQ(seqs, expected_seqs);
+    EXPECT_RANGE_EQ(ids, expected_ids);
 }

@@ -75,7 +75,7 @@ struct ibf_builder
     }
 
     auto ibf()
-        requires !compressed
+        requires (!compressed)
     {
         return construct();
     }
