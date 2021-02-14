@@ -46,7 +46,7 @@ TEST_P(raptor_build, build_with_file)
     {
         std::string const expanded_bins = expand_bins(number_of_bins);
         std::ofstream file{"raptor_cli_test.txt"};
-        auto split_bins = expanded_bins | std::views::split(' ') | ranges::view::transform([](auto &&rng) {return std::string_view(&*rng.begin(), ranges::distance(rng));});
+        auto split_bins = expanded_bins | std::views::split(' ') | std::views::transform([](auto &&rng) {return std::string_view(&*rng.begin(), std::ranges::distance(rng));});
         for (auto && file_path : split_bins)
         {
             file << file_path << '\n';
@@ -59,7 +59,7 @@ TEST_P(raptor_build, build_with_file)
                                                    "--window 23",
                                                    "--size 8m",
                                                    "--threads ", run_parallel ? "2" : "1",
-                                                   "--output index.ibf", 
+                                                   "--output index.ibf",
                                                    "raptor_cli_test.txt");
     ASSERT_EQ(result.exit_code, 0);
     ASSERT_EQ(result.out, std::string{});

@@ -1,12 +1,21 @@
 name: Raptor CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      # Push events to branches matching refs/heads/master
+      - 'master'
+  pull_request:
 
 env:
   CMAKE_VERSION: 3.18.3
-  DOXYGEN_VERSION: 1.8.20
+  DOXYGEN_VERSION: 1.9.1
   SEQAN3_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -ex {0}
 
 jobs:
   build:
@@ -17,88 +26,100 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "Unit gcc7 on Linux"
-            os: ubuntu-20.04
-            requires_toolchain: true
-            requires_ccache: true
-            cxx: "g++-7"
-            cc: "gcc-7"
-            build_type: Release
-
-          - name: "Unit gcc7 on macOS"
-            os: macos-10.15
-            requires_toolchain: true
-            requires_ccache: true
-            cxx: "g++-7"
-            cc: "gcc-7"
-            build_type: Release
-
-          - name: "Unit gcc8 on Linux"
-            os: ubuntu-20.04
-            requires_toolchain: true
-            requires_ccache: true
-            cxx: "g++-8"
-            cc: "gcc-8"
-            build_type: Release
-
-          - name: "Unit gcc8 on macOS"
-            os: macos-10.15
-            requires_toolchain: true
-            requires_ccache: true
-            cxx: "g++-8"
-            cc: "gcc-8"
-            build_type: Release
-
-          - name: "Unit gcc9 (c++2a) on Linux"
+          - name: "gcc9 (c++2a) on Linux"
             os: ubuntu-20.04
             requires_toolchain: true
             requires_ccache: true
             cxx: "g++-9"
             cc: "gcc-9"
+            build: unit
             build_type: Release
             cxx_flags: "-std=c++2a"
 
-          - name: "Unit gcc9 (c++2a) on macOS"
+          - name: "gcc9 (c++2a) on macOS"
             os: macos-10.15
             requires_toolchain: true
             requires_ccache: true
             cxx: "g++-9"
             cc: "gcc-9"
+            build: unit
             build_type: Release
             cxx_flags: "-std=c++2a"
 
-          - name: "Unit gcc10 (c++17) on Linux"
+          - name: "gcc10 (c++17) on Linux"
             os: ubuntu-20.04
             requires_toolchain: true
             requires_ccache: true
             cxx: "g++-10"
             cc: "gcc-10"
+            build: unit
             build_type: Release
             cxx_flags: "-std=c++17 -fconcepts"
 
-          - name: "Unit gcc10 (c++17) on macOS"
+          - name: "gcc10 (c++17) on macOS"
             os: macos-10.15
             requires_toolchain: true
             requires_ccache: true
             cxx: "g++-10"
             cc: "gcc-10"
+            build: unit
             build_type: Release
             cxx_flags: "-std=c++17 -fconcepts"
 
-          - name: "Unit gcc10 (c++20) on Linux"
+          - name: "gcc10 (c++20) on Linux"
             os: ubuntu-20.04
             requires_toolchain: true
             requires_ccache: true
             cxx: "g++-10"
             cc: "gcc-10"
+            build: unit
             build_type: Release
+            cxx_flags: "-std=c++20"
 
-          - name: "Unit gcc10 (c++20) on macOS"
+          - name: "gcc10 (c++20) on macOS"
             os: macos-10.15
             requires_toolchain: true
             requires_ccache: true
             cxx: "g++-10"
             cc: "gcc-10"
+            build: unit
+            build_type: Release
+            cxx_flags: "-std=c++20"
+
+          - name: "gcc8 on Linux"
+            os: ubuntu-20.04
+            requires_toolchain: true
+            requires_ccache: true
+            cxx: "g++-8"
+            cc: "gcc-8"
+            build: unit
+            build_type: Release
+
+          - name: "gcc8 on macOS"
+            os: macos-10.15
+            requires_toolchain: true
+            requires_ccache: true
+            cxx: "g++-8"
+            cc: "gcc-8"
+            build: unit
+            build_type: Release
+
+          - name: "gcc7 on Linux"
+            os: ubuntu-20.04
+            requires_toolchain: true
+            requires_ccache: true
+            cxx: "g++-7"
+            cc: "gcc-7"
+            build: unit
+            build_type: Release
+
+          - name: "gcc7 on macOS"
+            os: macos-10.15
+            requires_toolchain: true
+            requires_ccache: true
+            cxx: "g++-7"
+            cc: "gcc-7"
+            build: unit
             build_type: Release
 
           # - name: "Documentation"
@@ -121,7 +142,6 @@ jobs:
           key: ${{ runner.os }}-CMake_${{ env.CMAKE_VERSION }}
 
       - name: Setup CMake
-        shell: bash -ex {0}
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             OS="Linux"
@@ -133,22 +153,21 @@ jobs:
           tar -C /tmp/ -zxf /tmp/cmake-download/cmake-${CMAKE_VERSION}-${OS}-x86_64.tar.gz
           echo "/tmp/cmake-${CMAKE_VERSION}-${OS}-x86_64/bin" >> $GITHUB_PATH # Only available in subsequent steps!
 
-      # - name: Get cached Doxygen
-      #   if: matrix.build == 'documentation'
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: /tmp/doxygen-download
-      #     key: ${{ runner.os }}-Doxygen_${{ env.DOXYGEN_VERSION }}
+      - name: Get cached Doxygen
+        if: matrix.build == 'documentation'
+        uses: actions/cache@v2
+        with:
+          path: /tmp/doxygen-download
+          key: ${{ runner.os }}-Doxygen_${{ env.DOXYGEN_VERSION }}
 
-      # - name: Setup Doxygen
-      #   if: matrix.build == 'documentation'
-      #   shell: bash -ex {0}
-      #   run: |
-      #     sudo apt-get install texlive-font-utils ghostscript texlive-latex-extra graphviz libclang-9-dev libclang-cpp9 # graphviz for dot, latex to parse formulas, libclang for doxygen
-      #     mkdir -p /tmp/doxygen-download
-      #     wget --retry-connrefused --waitretry=30 --read-timeout=30 --timeout=30 --tries=20 --no-clobber --quiet --directory-prefix=/tmp/doxygen-download/ https://sourceforge.net/projects/doxygen/files/rel-${DOXYGEN_VERSION}/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz
-      #     tar -C /tmp/ -zxf /tmp/doxygen-download/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz
-      #     echo "/tmp/doxygen-${DOXYGEN_VERSION}/bin" >> $GITHUB_PATH # Only available in subsequent steps!
+      - name: Setup Doxygen
+        if: matrix.build == 'documentation'
+        run: |
+          sudo apt-get install texlive-font-utils ghostscript texlive-latex-extra graphviz libclang-9-dev libclang-cpp9 # graphviz for dot, latex to parse formulas, libclang for doxygen
+          mkdir -p /tmp/doxygen-download
+          wget --retry-connrefused --waitretry=30 --read-timeout=30 --timeout=30 --tries=20 --no-clobber --quiet --directory-prefix=/tmp/doxygen-download/ https://sourceforge.net/projects/doxygen/files/rel-${DOXYGEN_VERSION}/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz
+          tar -C /tmp/ -zxf /tmp/doxygen-download/doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz
+          echo "/tmp/doxygen-${DOXYGEN_VERSION}/bin" >> $GITHUB_PATH # Only available in subsequent steps!
 
       - name: Add package source
         if: matrix.requires_toolchain && runner.os == 'Linux'
@@ -157,7 +176,6 @@ jobs:
 
       - name: Install ccache
         if: matrix.requires_ccache
-        shell: bash -ex {0}
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             sudo apt-get install --yes ccache
@@ -167,7 +185,6 @@ jobs:
 
       - name: Install compiler ${{ matrix.cxx }}
         if: matrix.requires_toolchain
-        shell: bash -ex {0}
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             sudo apt-get install --yes ${{ matrix.cxx }}
@@ -177,27 +194,18 @@ jobs:
             brew link $cxx_macos_name
           fi
 
-      # - name: Install lcov
-      #   if: matrix.build == 'coverage'
-      #   shell: bash -ex {0}
-      #   run: |
-      #     sudo apt-get install --yes lcov
-      #     sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-7 100
-
-      - name: Prepare ccache
-        if: matrix.requires_ccache
-        id: ccache_prepare
-        shell: cmake -P {0}
+      - name: Install lcov
+        if: matrix.build == 'coverage'
         run: |
-          string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S")
-          message("::set-output name=timestamp::${current_date}")
+          sudo apt-get install --yes lcov
+          sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-7 100
 
-      - name: Load ccache
+      - name: Get cached build
         if: matrix.requires_ccache
         uses: actions/cache@v2
         with:
           path: .ccache
-          key: ${{ matrix.name }}-ccache-${{ github.ref }}-${{ steps.ccache_prepare.outputs.timestamp }}
+          key: ${{ matrix.name }}-ccache-${{ github.ref }}-${{ github.run_number }}
           # Restoring: From current branch, otherwise from base branch, otherwise from any branch.
           restore-keys: |
             ${{ matrix.name }}-ccache-${{ github.ref }}
@@ -216,12 +224,10 @@ jobs:
         env:
           CXX: ${{ matrix.cxx }}
           CC: ${{ matrix.cc }}
-        shell: bash -ex {0}
         run: |
           mkdir -p raptor-build
           cd raptor-build
           cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
-          make -j2 googletest
 
       - name: Build tests
         env:
@@ -230,33 +236,39 @@ jobs:
           CCACHE_COMPRESS: true
           CCACHE_COMPRESSLEVEL: 6
           CCACHE_MAXSIZE: 5G
-        shell: bash -ex {0}
         run: |
           ccache -p || true
           cd raptor-build
-          make -k -j2 api_test cli_test
-          ccache -s || true
+          if [[ "${{ matrix.build }}" =~ ^(documentation)$ ]]; then
+            make -k -j2 doc 2>doxygen_warnings.txt
+          else
+            make -k -j2
+          fi
 
       - name: Run tests
-        shell: bash -ex {0}
+        if: matrix.build != 'coverage' # Already ran by the make call
         run: |
           cd raptor-build
-          ctest . --output-on-failure
+          if [[ "${{ matrix.build }}" =~ ^(documentation)$ ]]; then
+            cat doxygen_warnings.txt && test ! -s doxygen_warnings.txt
+          else
+            ctest . -j2 --output-on-failure
+          fi
 
-      # - name: Submit coverage build
-      #   if: matrix.build == 'coverage'
-      #   shell: bash
-      #   run: bash <(curl -s https://codecov.io/bash) -f ./raptor-build/seqan3_coverage -R ./seqan3 || echo 'Codecov failed to upload'
+      - name: Submit coverage build
+        if: matrix.build == 'coverage'
+        shell: bash
+        run: bash <(curl -s https://codecov.io/bash) -f ./raptor-build/raptor_coverage -R ./raptor || echo 'Codecov failed to upload'
 
-      # - name: Package documentation
-      #   if: matrix.build == 'documentation'
-      #   continue-on-error: true
-      #   run: tar -zcf documentation.tar.gz raptor-build
+      - name: Package documentation
+        if: matrix.build == 'documentation'
+        continue-on-error: true
+        run: tar -zcf documentation.tar.gz raptor-build
 
-      # - name: Upload documentation
-      #   if: matrix.build == 'documentation'
-      #   continue-on-error: true
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: documentation
-      #     path: documentation.tar.gz
+      - name: Upload documentation
+        if: matrix.build == 'documentation'
+        continue-on-error: true
+        uses: actions/upload-artifact@v2
+        with:
+          name: documentation
+          path: documentation.tar.gz

@@ -47,7 +47,7 @@ struct ibf_builder
     }
 
     template <typename view_t = std::ranges::empty_view<int>>
-        requires !compressed
+        requires (!compressed)
     auto ibf(view_t && restrict_view = std::ranges::empty_view<int>())
     {
         assert(arguments != nullptr);
