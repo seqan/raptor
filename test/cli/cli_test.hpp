@@ -106,7 +106,7 @@ struct raptor : public cli_test
                                    std::to_string(bins) +
                                    "/bins" +
                                    "/bin_" +
-                                   std::string(std::to_string(bins).size() - std::to_string(i).size(), '0') + // prepend zeros
+                                   std::string(std::to_string(bins).size() - std::to_string(i).size(), '0') +
                                    std::to_string(i) +
                                    ".fasta";
             result += cli_test::data(filename);
