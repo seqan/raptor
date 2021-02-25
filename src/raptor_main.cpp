@@ -6,7 +6,7 @@ int main(int argc, char ** argv)
 {
     try // As long as the parser construction may throw for invalid subparsers.
     {
-        seqan3::argument_parser top_level_parser{"raptor", argc, argv, true, {"build", "search"}};
+        seqan3::argument_parser top_level_parser{"raptor", argc, argv, seqan3::update_notifications::on, {"build", "search"}};
         init_top_level_parser(top_level_parser);
 
         try_parsing(top_level_parser);
