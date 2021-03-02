@@ -1,83 +1,116 @@
 #include <seqan3/std/charconv>
 
 #include <seqan3/argument_parser/all.hpp>
+#include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
 #include <seqan3/io/sequence_file/input.hpp>
 #include <seqan3/range/views/minimiser_hash.hpp>
-#include <seqan3/search/dream_index/technical_binning_directory.hpp>
+#include <seqan3/range/views/chunk.hpp>
+#include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
 
 #include "shared.hpp"
 
-template <bool compressed>
-struct ibf_builder
+template <std::copy_constructible algorithm_t>
+void call_parallel_on_bins(algorithm_t && worker, build_arguments const & arguments)
 {
-    build_arguments const * const arguments;
+    size_t const chunk_size = std::clamp<size_t>(std::bit_ceil(arguments.bins / arguments.threads),
+                                                 8u,
+                                                 64u);
+    auto chunked_view = seqan3::views::zip(arguments.bin_path, std::views::iota(0u)) |
+                        seqan3::views::chunk(chunk_size);
+    seqan3::detail::execution_handler_parallel executioner{arguments.threads};
+    executioner.bulk_execute(std::move(worker), std::move(chunked_view), [](){});
+}
 
-    template <typename view_t = std::ranges::empty_view<int>>
-    auto construct(view_t && restrict_view = std::ranges::empty_view<int>())
-    {
-        using sequence_file_t = seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>>;
+template <bool compressed>
+class ibf_factory
+{
+public:
+    ibf_factory(build_arguments const & args) : arguments{args} {}
 
-        auto technical_bins = std::views::iota(0u, arguments->bins)
-                            | std::views::transform( [&] (auto const i) {
-                                return sequence_file_t{arguments->bin_path[i]};
-                              });
-
-        seqan3::ibf_config cfg{seqan3::bin_count{arguments->bins},
-                               seqan3::bin_size{arguments->bits / arguments->parts},
-                               seqan3::hash_function_count{arguments->hash},
-                               arguments->threads};
-
-        if constexpr (std::same_as<view_t, std::ranges::empty_view<int>>)
-        {
-            return seqan3::technical_binning_directory{std::move(technical_bins),
-                                                       seqan3::views::minimiser_hash(seqan3::ungapped{arguments->kmer_size},
-                                                                                     seqan3::window_size{arguments->window_size},
-                                                                                     seqan3::seed{adjust_seed(arguments->kmer_size)}),
-                                                       cfg};
-        }
-        else
-        {
-            return seqan3::technical_binning_directory{std::move(technical_bins),
-                                                       seqan3::views::minimiser_hash(seqan3::ungapped{arguments->kmer_size},
-                                                                                     seqan3::window_size{arguments->window_size},
-                                                                                     seqan3::seed{adjust_seed(arguments->kmer_size)})
-                                                           | restrict_view,
-                                                       cfg};
-        }
-    }
+    ibf_factory() = default;
+    ibf_factory(ibf_factory const &) = default;
+    ibf_factory(ibf_factory &&) = default;
+    ibf_factory & operator=(ibf_factory const &) = default;
+    ibf_factory & operator=(ibf_factory &&) = default;
+    ~ibf_factory() = default;
 
     template <typename view_t = std::ranges::empty_view<int>>
         requires (!compressed)
-    auto ibf(view_t && restrict_view = std::ranges::empty_view<int>())
+    auto ibf(view_t && hash_filter_view = std::ranges::empty_view<int>()) const
     {
-        assert(arguments != nullptr);
-        return construct(std::move(restrict_view));
+        return construct(std::move(hash_filter_view));
     }
 
     template <typename view_t = std::ranges::empty_view<int>>
         requires compressed
-    auto ibf(view_t && restrict_view = std::ranges::empty_view<int>())
+    auto ibf(view_t && hash_filter_view = std::ranges::empty_view<int>()) const
     {
-        assert(arguments != nullptr);
-        auto tmp = construct(std::move(restrict_view));
+        auto tmp = construct(std::move(hash_filter_view));
 
-        return seqan3::technical_binning_directory<seqan3::data_layout::compressed,
-                                                   typename decltype(tmp)::hash_adaptor_t,
-                                                   seqan3::dna4>{std::move(tmp)};
+        return seqan3::interleaved_bloom_filter<seqan3::data_layout::compressed>{std::move(tmp)};
+    }
+
+private:
+    build_arguments const arguments{};
+
+    template <typename view_t = std::ranges::empty_view<int>>
+    auto construct(view_t && hash_filter_view = std::ranges::empty_view<int>()) const
+    {
+        using sequence_file_t = seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>>;
+
+        seqan3::interleaved_bloom_filter<> ibf{seqan3::bin_count{arguments.bins},
+                                               seqan3::bin_size{arguments.bits / arguments.parts},
+                                               seqan3::hash_function_count{arguments.hash}};
+
+        if constexpr (std::same_as<view_t, std::ranges::empty_view<int>>)
+        {
+            auto worker = [&] (auto && zipped_view, auto &&)
+            {
+                auto hash_view = seqan3::views::minimiser_hash(seqan3::ungapped{arguments.kmer_size},
+                                                               seqan3::window_size{arguments.window_size},
+                                                               seqan3::seed{adjust_seed(arguments.kmer_size)});
+
+                for (auto && [file_name, bin_number] : zipped_view)
+                    for (auto && [seq] : sequence_file_t{file_name})
+                        for (auto && value : seq | hash_view)
+                            ibf.emplace(value, seqan3::bin_index{bin_number});
+            };
+
+            call_parallel_on_bins(worker, arguments);
+        }
+        else
+        {
+            auto worker = [&] (auto && zipped_view, auto &&)
+            {
+                auto hash_view = seqan3::views::minimiser_hash(seqan3::ungapped{arguments.kmer_size},
+                                                               seqan3::window_size{arguments.window_size},
+                                                               seqan3::seed{adjust_seed(arguments.kmer_size)})
+                                 | hash_filter_view;
+
+                for (auto && [file_name, bin_number] : zipped_view)
+                    for (auto && [seq] : sequence_file_t{file_name})
+                        for (auto && value : seq | hash_view)
+                            ibf.emplace(value, seqan3::bin_index{bin_number});
+            };
+
+            call_parallel_on_bins(worker, arguments);
+        }
+
+        return ibf;
     }
 };
 
 template <bool compressed>
 void run_program(build_arguments const & arguments)
 {
-    ibf_builder<compressed> generator{&arguments};
+    ibf_factory<compressed> generator{arguments};
 
     if (arguments.parts == 1u)
     {
-        auto tbd = generator.ibf();
+        auto ibf = generator.ibf();
         std::ofstream os{arguments.out_path, std::ios::binary};
         cereal::BinaryOutputArchive oarchive{os};
-        oarchive(tbd);
+        oarchive(ibf);
     }
     else
     {
@@ -113,14 +146,37 @@ void run_program(build_arguments const & arguments)
             auto filter_view = std::views::filter([&] (auto && hash)
                 { return std::ranges::find(association[part], hash & mask) != association[part].end(); });
 
-            auto tbd = generator.ibf(filter_view);
+            auto ibf = generator.ibf(filter_view);
             std::filesystem::path out_path{arguments.out_path};
             out_path += "_" + std::to_string(part);
             std::ofstream os{out_path, std::ios::binary};
             cereal::BinaryOutputArchive oarchive{os};
-            oarchive(tbd);
+            oarchive(ibf);
         }
     }
+}
+
+inline bool check_for_fasta_format(std::vector<std::string> const & valid_extensions, std::string const & file_path)
+{
+
+    auto case_insensitive_string_ends_with = [&] (std::string_view str, std::string_view suffix)
+    {
+        size_t const suffix_length{suffix.size()};
+        size_t const str_length{str.size()};
+        return suffix_length > str_length ?
+               false :
+               std::ranges::equal(str.substr(str_length - suffix_length), suffix, [] (char const chr1, char const chr2)
+               {
+                   return std::tolower(chr1) == std::tolower(chr2);
+               });
+    };
+
+    auto case_insensitive_ends_with = [&] (std::string const & ext)
+    {
+        return case_insensitive_string_ends_with(file_path, ext);
+    };
+
+    return std::ranges::find_if(valid_extensions, case_insensitive_ends_with) != valid_extensions.end();
 }
 
 inline void compute_minimisers(build_arguments const & arguments)
@@ -138,14 +194,15 @@ inline void compute_minimisers(build_arguments const & arguments)
     std::array<uint64_t, 4> const cutoff_bounds{314'572'800, 524'288'000, 1'073'741'824, 3'221'225'472};
 
 
-    auto worker = [&] (auto && file_range, auto &&)
+    auto worker = [&] (auto && zipped_view, auto &&)
         {
             std::unordered_map<uint64_t, uint8_t> minimiser_table{};
             uint64_t count{0};
             uint16_t cutoff{default_cutoff};
 
-            for (auto && file_name : file_range)
+            for (auto && [file_name, bin_number] : zipped_view)
             {
+                (void) bin_number;
                 seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>> fin{file_name};
 
                 for (auto & [seq] : fin)
@@ -158,8 +215,9 @@ inline void compute_minimisers(build_arguments const & arguments)
                 // Since the curoffs are based on the filesize of a gzipped fastq file, we try account for the other cases:
                 // We multiply by two if we have fasta input.
                 // We divide by 3 if the input is not compressed.
-                bool const is_fasta = std::holds_alternative<seqan3::detail::sequence_file_input_format_exposer<seqan3::format_fasta>>(fin.format);
                 bool const is_compressed = file_name.extension() == ".gz" || file_name.extension() == ".bgzf" || file_name.extension() == ".bz2";
+                bool const is_fasta = is_compressed ? check_for_fasta_format(seqan3::format_fasta::file_extensions, file_name.stem())
+                                                    : check_for_fasta_format(seqan3::format_fasta::file_extensions, file_name.extension());
                 size_t const filesize = std::filesystem::file_size(file_name) * (is_fasta ? 2 : 1) / (is_compressed ? 1 : 3);
 
                 for (size_t k = 0; k < cutoff_bounds.size(); ++k)
@@ -185,9 +243,9 @@ inline void compute_minimisers(build_arguments const & arguments)
                 // Store header file
                 std::ofstream headerfile{arguments.out_path.string() + file_name.stem().string() + ".header"};
                 headerfile << static_cast<uint64_t>(arguments.kmer_size) << '\t'
-                        << arguments.window_size << '\t'
-                        << cutoff << '\t'
-                        << count << '\n';
+                           << arguments.window_size << '\t'
+                           << cutoff << '\t'
+                           << count << '\n';
 
                 count = 0;
                 cutoff = default_cutoff;
@@ -195,64 +253,44 @@ inline void compute_minimisers(build_arguments const & arguments)
             }
         };
 
-    size_t const chunk_size = std::ceil<size_t>(arguments.bin_path.size() / arguments.threads);
-    auto chunked_view = arguments.bin_path | seqan3::views::chunk(chunk_size);
-    seqan3::detail::execution_handler_parallel executioner{arguments.threads};
-    executioner.bulk_execute(worker, std::move(chunked_view), [](){});
+    call_parallel_on_bins(worker, arguments);
 }
 
 template <bool compressed>
 void build_from_binary(build_arguments const & arguments)
 {
-    seqan3::ibf_config cfg{seqan3::bin_count{arguments.bins},
-                           seqan3::bin_size{arguments.bits / arguments.parts},
-                           seqan3::hash_function_count{arguments.hash},
-                           arguments.threads};
-
-    seqan3::technical_binning_directory tbd{std::vector<std::vector<seqan3::dna4>>{},
-                                            seqan3::views::minimiser_hash(seqan3::ungapped{arguments.kmer_size},
-                                                                          seqan3::window_size{arguments.window_size},
-                                                                          seqan3::seed{adjust_seed(arguments.kmer_size)}),
-                                            cfg,
-                                            true};
+    seqan3::interleaved_bloom_filter<> ibf{seqan3::bin_count{arguments.bins},
+                                            seqan3::bin_size{arguments.bits / arguments.parts},
+                                            seqan3::hash_function_count{arguments.hash}};
 
     auto worker = [&] (auto && zipped_view, auto &&)
         {
             uint64_t read_number;
 
-            for (auto && [file_name, i] : zipped_view)
+            for (auto && [file_name, bin_number] : zipped_view)
             {
                 std::ifstream infile{file_name, std::ios::binary};
 
                 while(infile.read(reinterpret_cast<char*>(&read_number), sizeof(read_number)))
-                    tbd.emplace(read_number, seqan3::bin_index{i});
+                    ibf.emplace(read_number, seqan3::bin_index{bin_number});
             }
         };
 
-    // A single thread may handle between 8 and 64 bins.
-    size_t const chunk_size = std::clamp<size_t>(seqan3::detail::next_power_of_two(cfg.number_of_bins.get() / cfg.threads),
-                                                 8u,
-                                                 64u);
-    auto chunked_view = seqan3::views::zip(arguments.bin_path, std::views::iota(0u)) |
-                        seqan3::views::chunk(chunk_size);
-    seqan3::detail::execution_handler_parallel executioner{cfg.threads};
-    executioner.bulk_execute(worker, std::move(chunked_view), [](){});
+    call_parallel_on_bins(std::move(worker), arguments);
 
     if constexpr (compressed)
     {
-        seqan3::technical_binning_directory<seqan3::data_layout::compressed,
-                                            typename decltype(tbd)::hash_adaptor_t,
-                                            seqan3::dna4> ctbd{std::move(tbd)};
+        seqan3::interleaved_bloom_filter<seqan3::data_layout::compressed> cibf{std::move(ibf)};
 
         std::ofstream os{arguments.out_path, std::ios::binary};
         cereal::BinaryOutputArchive oarchive{os};
-        oarchive(ctbd);
+        oarchive(cibf);
     }
     else
     {
         std::ofstream os{arguments.out_path, std::ios::binary};
         cereal::BinaryOutputArchive oarchive{os};
-        oarchive(tbd);
+        oarchive(ibf);
     }
 }
 

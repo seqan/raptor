@@ -4,9 +4,10 @@
 
 #include <seqan3/io/sequence_file/input.hpp>
 #include <seqan3/range/views/async_input_buffer.hpp>
+#include <seqan3/range/views/chunk.hpp>
 #include <seqan3/range/views/minimiser_hash.hpp>
 #include <seqan3/range/views/zip.hpp>
-#include <seqan3/search/dream_index/technical_binning_directory.hpp>
+#include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
 
 #include <minimiser_model.hpp>
 #include <shared.hpp>
@@ -52,54 +53,15 @@ std::vector<size_t> compute_simple_model(search_arguments const & arguments)
     return precomp_thresholds;
 }
 
-template <bool compressed>
-struct ibf_builder
-{
-    search_arguments const * const arguments;
-
-    auto construct()
-    {
-        assert(arguments != nullptr);
-
-        seqan3::ibf_config cfg{seqan3::bin_count{64u},
-                               seqan3::bin_size{1024u},
-                               seqan3::hash_function_count{2u},
-                               1u};
-        auto view = seqan3::views::minimiser_hash(seqan3::ungapped{arguments->kmer_size},
-                                                  seqan3::window_size{arguments->window_size},
-                                                  seqan3::seed{adjust_seed(arguments->kmer_size)});
-        return seqan3::technical_binning_directory{std::vector<std::vector<seqan3::dna4>>{},
-                                                   std::move(view),
-                                                   cfg,
-                                                   true};
-    }
-
-    auto ibf()
-        requires (!compressed)
-    {
-        return construct();
-    }
-
-    auto ibf()
-        requires compressed
-    {
-        auto tmp = construct();
-
-        return seqan3::technical_binning_directory<seqan3::data_layout::compressed,
-                                                   typename decltype(tmp)::hash_adaptor_t,
-                                                   seqan3::dna4>{std::move(tmp)};
-    }
-};
-
 template <typename t>
-void load_ibf(t & tbd, search_arguments const & arguments, size_t const part, double & ibf_io_time)
+void load_ibf(t & ibf, search_arguments const & arguments, size_t const part, double & ibf_io_time)
 {
     std::filesystem::path ibf_file{arguments.ibf_file};
     ibf_file += "_" + std::to_string(part);
     std::ifstream is{ibf_file, std::ios::binary};
     cereal::BinaryInputArchive iarchive{is};
     auto start = std::chrono::high_resolution_clock::now();
-    iarchive(tbd);
+    iarchive(ibf);
     auto end = std::chrono::high_resolution_clock::now();
     ibf_io_time += std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
 }
@@ -128,10 +90,9 @@ inline void do_parallel(t && worker, size_t const num_records, size_t const thre
 template <bool compressed>
 void run_program_multiple(search_arguments const & arguments)
 {
-    using std::get;
-
-    ibf_builder<compressed> builder{&arguments};
-    auto tbd = builder.ibf();
+    constexpr seqan3::data_layout ibf_data_layout = compressed ? seqan3::data_layout::compressed :
+                                                                 seqan3::data_layout::uncompressed;
+    auto ibf = seqan3::interleaved_bloom_filter<ibf_data_layout>{};
 
     seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::id, seqan3::field::seq>> fin{arguments.query_file};
     using record_type = typename decltype(fin)::record_type;
@@ -153,7 +114,7 @@ void run_program_multiple(search_arguments const & arguments)
 
     auto cereal_worker = [&] ()
     {
-        load_ibf(tbd, arguments, 0, ibf_io_time);
+        load_ibf(ibf, arguments, 0, ibf_io_time);
     };
 
     for (auto && chunked_records : fin | seqan3::views::chunk((1ULL<<20)*10))
@@ -167,16 +128,21 @@ void run_program_multiple(search_arguments const & arguments)
         reads_io_time += std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
 
         std::vector<seqan3::counting_vector<uint16_t>> counts(records.size(),
-                                                              seqan3::counting_vector<uint16_t>(tbd.bin_count(), 0));
+                                                              seqan3::counting_vector<uint16_t>(ibf.bin_count(), 0));
 
         auto count_task = [&](size_t const start, size_t const end)
         {
-            auto counter = tbd.template counting_agent<uint16_t>();
+            auto counter = ibf.template counting_agent<uint16_t>();
             size_t counter_id = start;
+
+            auto hash_view = seqan3::views::minimiser_hash(seqan3::ungapped{arguments.kmer_size},
+                                                           seqan3::window_size{arguments.window_size},
+                                                           seqan3::seed{adjust_seed(arguments.kmer_size)});
 
             for (auto && [id, seq] : records | seqan3::views::slice(start, end))
             {
-                auto & result = counter.count_query(seq);
+                (void) id;
+                auto & result = counter.bulk_count(seq | hash_view);
                 counts[counter_id++] += result;
             }
         };
@@ -186,23 +152,36 @@ void run_program_multiple(search_arguments const & arguments)
 
         for (size_t const part : std::views::iota(1u, static_cast<unsigned int>(arguments.parts - 1)))
         {
-            load_ibf(tbd, arguments, part, ibf_io_time);
+            load_ibf(ibf, arguments, part, ibf_io_time);
             do_parallel(count_task, records.size(), arguments.threads, compute_time);
         }
 
-        load_ibf(tbd, arguments, arguments.parts - 1, ibf_io_time);
+        load_ibf(ibf, arguments, arguments.parts - 1, ibf_io_time);
         sync_out synced_out{arguments.out_file};
 
         auto output_task = [&](size_t const start, size_t const end)
         {
-            auto counter = tbd.template counting_agent<uint16_t>();
+            auto counter = ibf.template counting_agent<uint16_t>();
             size_t counter_id = start;
             std::string result_string{};
+            std::vector<uint64_t> minimiser;
+
+            auto hash_view = seqan3::views::minimiser_hash(seqan3::ungapped{arguments.kmer_size},
+                                                           seqan3::window_size{arguments.window_size},
+                                                           seqan3::seed{adjust_seed(arguments.kmer_size)});
 
             for (auto && [id, seq] : records | seqan3::views::slice(start, end))
             {
-                auto && [result, minimiser_count] = counter.count_query(seq, true);
-                counts[counter_id] += result;
+                minimiser.clear();
+                result_string.clear();
+                result_string += id;
+                result_string += '\t';
+
+                minimiser = seq | hash_view | seqan3::views::to<std::vector<uint64_t>>;
+                counts[counter_id] += counter.bulk_count(minimiser);
+                size_t const minimiser_count{minimiser.size()};
+                size_t current_bin{0};
+
 
                 size_t const threshold = arguments.treshold_was_set ?
                                             static_cast<size_t>(minimiser_count * arguments.threshold) :
@@ -213,11 +192,6 @@ void run_program_multiple(search_arguments const & arguments)
                                                                         max_number_of_minimisers -
                                                                             min_number_of_minimisers)] + 2;
 
-                result_string.clear();
-                result_string += id;
-                result_string += '\t';
-
-                size_t current_bin{0};
                 for (auto && count : counts[counter_id++])
                 {
                     if (count >= threshold)
@@ -252,8 +226,9 @@ void run_program_multiple(search_arguments const & arguments)
 template <bool compressed>
 void run_program_single(search_arguments const & arguments)
 {
-    ibf_builder<compressed> builder{&arguments};
-    auto tbd = builder.ibf();
+    constexpr seqan3::data_layout ibf_data_layout = compressed ? seqan3::data_layout::compressed :
+                                                                 seqan3::data_layout::uncompressed;
+    auto ibf = seqan3::interleaved_bloom_filter<ibf_data_layout>{};
 
     std::ifstream is{arguments.ibf_file, std::ios::binary};
     cereal::BinaryInputArchive iarchive{is};
@@ -265,7 +240,7 @@ void run_program_single(search_arguments const & arguments)
     auto cereal_worker = [&] ()
     {
         auto start = std::chrono::high_resolution_clock::now();
-        iarchive(tbd);
+        iarchive(ibf);
         auto end = std::chrono::high_resolution_clock::now();
         ibf_io_time += std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
     };
@@ -289,16 +264,24 @@ void run_program_single(search_arguments const & arguments)
 
     auto worker = [&] (size_t const start, size_t const end)
     {
-        auto counter = tbd.template counting_agent<uint16_t>();
+        auto counter = ibf.template counting_agent<uint16_t>();
         std::string result_string{};
+        std::vector<uint64_t> minimiser;
+
+        auto hash_view = seqan3::views::minimiser_hash(seqan3::ungapped{arguments.kmer_size},
+                                                       seqan3::window_size{arguments.window_size},
+                                                       seqan3::seed{adjust_seed(arguments.kmer_size)});
 
         for (auto && [id, seq] : records | seqan3::views::slice(start, end))
         {
+            minimiser.clear();
             result_string.clear();
             result_string += id;
             result_string += '\t';
 
-            auto && [result, minimiser_count] = counter.count_query(seq, true);
+            minimiser = seq | hash_view | seqan3::views::to<std::vector<uint64_t>>;
+            auto & result = counter.bulk_count(minimiser);
+            size_t const minimiser_count{minimiser.size()};
             size_t current_bin{0};
 
             size_t const threshold = arguments.treshold_was_set ?

@@ -1,5 +1,4 @@
 #include <seqan3/argument_parser/all.hpp>
-#include <seqan3/core/bit_manipulation.hpp>
 #include <seqan3/range/views/async_input_buffer.hpp>
 
 #include <raptor_build.hpp>
@@ -25,7 +24,7 @@ struct power_of_two_validator
 
     void operator() (option_value_type const & val) const
     {
-        if (!seqan3::detail::is_power_of_two(val))
+        if (!std::has_single_bit(val))
         {
             throw seqan3::validation_error{"The value must be a power of two."};
         }
@@ -219,25 +218,25 @@ inline void init_shared_options(seqan3::argument_parser & parser, arguments_t & 
                       '\0',
                       "window",
                       "Choose the window size.",
-                      seqan3::option_spec::DEFAULT,
+                      seqan3::option_spec::standard,
                       positive_integer_validator{});
     parser.add_option(arguments.kmer_size,
                       '\0',
                       "kmer",
                       "Choose the kmer size.",
-                      seqan3::option_spec::DEFAULT,
+                      seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{1, 32});
     parser.add_option(arguments.threads,
                       '\0',
                       "threads",
                       "Choose the number of threads.",
-                      seqan3::option_spec::DEFAULT,
+                      seqan3::option_spec::standard,
                       positive_integer_validator{});
     parser.add_option(arguments.parts,
                       '\0',
                       "parts",
                       "Splits the index in this many parts.",
-                      seqan3::option_spec::DEFAULT,
+                      seqan3::option_spec::standard,
                       power_of_two_validator{});
 }
 
@@ -253,18 +252,18 @@ inline void init_build_parser(seqan3::argument_parser & parser, build_arguments 
                       '\0',
                       "output",
                       "Provide an output filepath or an output directory if --compute-minimiser is used.",
-                      seqan3::option_spec::REQUIRED);
+                      seqan3::option_spec::required);
     parser.add_option(arguments.size,
                       '\0',
                       "size",
                       "Choose the size of the resulting IBF.",
-                      seqan3::option_spec::REQUIRED,
+                      seqan3::option_spec::required,
                       size_validator{"\\d+\\s{0,1}[k,m,g,t,K,M,G,T]"});
     parser.add_option(arguments.hash,
                       '\0',
                       "hash",
                       "Choose the number of hashes.",
-                      seqan3::option_spec::DEFAULT,
+                      seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{1, 5});
     parser.add_flag(arguments.compressed,
                     '\0',
@@ -284,37 +283,37 @@ inline void init_search_parser(seqan3::argument_parser & parser, search_argument
                       '\0',
                       "index",
                       "Provide a valid path to an IBF. Parts: Without suffix _0",
-                      seqan3::option_spec::REQUIRED,
+                      seqan3::option_spec::required,
                       seqan3::input_file_validator{});
     parser.add_option(arguments.query_file,
                       '\0',
                       "query",
                       "Provide a path to the query file.",
-                      seqan3::option_spec::REQUIRED,
+                      seqan3::option_spec::required,
                       seqan3::input_file_validator<seqan3::sequence_file_input<>>{});
     parser.add_option(arguments.out_file,
                       '\0',
                       "output",
                       "Please provide a valid path to the output.",
-                      seqan3::option_spec::REQUIRED,
+                      seqan3::option_spec::required,
                       seqan3::output_file_validator{});
     parser.add_option(arguments.errors,
                       '\0',
                       "error",
                       "Choose the number of errors.",
-                      seqan3::option_spec::DEFAULT,
+                      seqan3::option_spec::standard,
                       positive_integer_validator{true});
     parser.add_option(arguments.tau,
                       '\0',
                       "tau",
                       "Threshold for probabilistic models.",
-                      seqan3::option_spec::DEFAULT,
+                      seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{0, 1});
     parser.add_option(arguments.threshold,
                       '\0',
                       "threshold",
                       "If set, this threshold is used instead of the probabilistic models.",
-                      seqan3::option_spec::DEFAULT,
+                      seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{0, 1});
     parser.add_option(arguments.pattern_size,
                       '\0',
@@ -328,7 +327,7 @@ inline void init_search_parser(seqan3::argument_parser & parser, search_argument
                     '\0',
                     "time",
                     "Write timing file.",
-                    seqan3::option_spec::ADVANCED);
+                    seqan3::option_spec::advanced);
 }
 
 void run_build(seqan3::argument_parser & parser)
