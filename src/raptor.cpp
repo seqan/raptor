@@ -146,14 +146,44 @@ public:
 
     std::string get_help_page_message() const
     {
-        return "The input file must exist and read permissions must be granted. Valid file extensions for bin files are"
-               " : [minimiser], or [embl, fasta, fa, fna, ffn, faa, frn, fas, fastq, fq, genbank, gb, gbk, sam] "
-               "possibly followed by: [gz, bgzf, bz2]. All other extensions will be assumed to contain one line per"
-               " path to a bin.";
+        return seqan3::detail::to_string("The input file must exist and read permissions must be granted. Valid file "
+                                         "extensions for bin files are: [minimiser], or ", sequence_extensions,
+                                         #if defined(SEQAN3_HAS_BZIP2) || defined(SEQAN3_HAS_ZLIB)
+                                         " possibly followed by: ", compression_extensions, ". ",
+                                         #else
+                                         ". ",
+                                         #endif
+                                         "All other extensions will be assumed to contain one line per path to a bin.");
     }
 
 private:
-    seqan3::input_file_validator<seqan3::sequence_file_input<>> sequence_file_validator{};
+    std::vector<std::string> sequence_extensions{seqan3::detail::valid_file_extensions<typename seqan3::sequence_file_input<>::valid_formats>()};
+    std::vector<std::string> compression_extensions{[&] ()
+                             {
+                                 std::vector<std::string> result;
+                                 #ifdef SEQAN3_HAS_BZIP2
+                                     result.push_back("bz2");
+                                 #endif
+                                 #ifdef SEQAN3_HAS_ZLIB
+                                     result.push_back("gz");
+                                     result.push_back("bgzf");
+                                 #endif
+                                 return result;
+                             }()};
+    std::vector<std::string> combined_extensions{[&] ()
+                             {
+                                 if (compression_extensions.empty())
+                                    return sequence_extensions;
+                                 std::vector<std::string> result;
+                                 for (auto && sequence_extension : sequence_extensions)
+                                 {
+                                     result.push_back(sequence_extension);
+                                     for (auto && compression_extension : compression_extensions)
+                                         result.push_back(sequence_extension + std::string{'.'} + compression_extension);
+                                 }
+                                return result;
+                             }()};
+    seqan3::input_file_validator<> sequence_file_validator{{combined_extensions}};
     seqan3::input_file_validator<> minimiser_file_validator{{"minimiser"}};
 };
 
