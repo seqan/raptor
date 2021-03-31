@@ -140,7 +140,7 @@ raptor search --help
 
 #### Preprocessing the input
 We offer the option to precompute the minimisers of the input files. This is useful to build indices of big datasets (in the range of several TiB) and also allows an estimation of the needed index size since the amount of minimisers is known.
-Follwing above example, we would change the build step as follows:
+Following above example, we would change the build step as follows:
 
 First we precompute the minimisers and store them in a directory:
 ```
@@ -169,6 +169,9 @@ other members of [SeqAn](https://www.seqan.de).
 ### Citation
 In your academic works (also comparisons and pipelines) please cite:
   * Seiler, E. et al. (2020). Raptor: A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences. bioRxiv 2020.10.08.330985. doi: https://doi.org/10.1101/2020.10.08.330985
+
+### Supplementary
+The subdirectory `util` contains applications and scripts related to the paper.
 
 ### License
 Raptor is open source software. However, certain conditions apply when you (re-)distribute and/or modify Raptor, please see the [license](https://github.com/seqan/raptor/blob/master/LICENSE.md).
