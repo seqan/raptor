@@ -183,8 +183,10 @@ private:
                                  }
                                 return result;
                              }()};
-    seqan3::input_file_validator<> sequence_file_validator{{combined_extensions}};
     seqan3::input_file_validator<> minimiser_file_validator{{"minimiser"}};
+
+public:
+    seqan3::input_file_validator<> sequence_file_validator{{combined_extensions}};
 };
 
 inline void init_shared_meta(seqan3::argument_parser & parser)
@@ -377,8 +379,7 @@ void run_build(seqan3::argument_parser & parser)
         {
             try
             {
-                seqan3::input_file_validator<seqan3::sequence_file_input<>> validator;
-                validator(file);
+                bin_validator{}.sequence_file_validator(file);
             }
             catch (seqan3::validation_error const & exception)
             {
