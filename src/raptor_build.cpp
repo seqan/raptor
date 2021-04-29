@@ -1,4 +1,5 @@
 #include <seqan3/std/charconv>
+#include <robin_hood.h>
 
 #include <seqan3/argument_parser/all.hpp>
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
@@ -196,7 +197,7 @@ inline void compute_minimisers(build_arguments const & arguments)
 
     auto worker = [&] (auto && zipped_view, auto &&)
         {
-            std::unordered_map<uint64_t, uint8_t> minimiser_table{};
+            robin_hood::unordered_map<uint64_t, uint8_t> minimiser_table{};
             uint64_t count{0};
             uint16_t cutoff{default_cutoff};
 

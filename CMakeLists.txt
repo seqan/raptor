@@ -24,6 +24,9 @@ string (ASCII 27 Esc)
 set (FontBold "${Esc}[1m")
 set (FontReset "${Esc}[m")
 
+# Dependency: robin_hood
+add_subdirectory(lib/robin-hood-hashing)
+
 # Dependency: SeqAn3.
 find_package (SeqAn3 QUIET REQUIRED HINTS lib/seqan3/build_system)
 
