@@ -2,3 +2,6 @@
 	path = lib/seqan3
 	url = https://github.com/seqan/seqan3
 	branch = master
+[submodule "lib/robin-hood-hashing"]
+	path = lib/robin-hood-hashing
+	url = https://github.com/martinus/robin-hood-hashing.git

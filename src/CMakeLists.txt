@@ -9,6 +9,7 @@ cmake_minimum_required (VERSION 3.8)
 # raptor build
 add_library ("${PROJECT_NAME}_build_lib" STATIC raptor_build.cpp)
 target_link_libraries ("${PROJECT_NAME}_build_lib" PUBLIC seqan3::seqan3)
+target_link_libraries ("${PROJECT_NAME}_build_lib" PUBLIC robin_hood)
 target_include_directories ("${PROJECT_NAME}_build_lib" PUBLIC ../include)
 
 # the minimiser model will be used for raptor search
