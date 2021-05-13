@@ -1,5 +1,5 @@
 #include <seqan3/argument_parser/all.hpp>
-#include <seqan3/range/views/async_input_buffer.hpp>
+#include <seqan3/io/views/async_input_buffer.hpp>
 
 #include <raptor_build.hpp>
 #include <raptor_search.hpp>

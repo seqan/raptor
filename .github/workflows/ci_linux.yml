@@ -1,0 +1,137 @@
+name: CI on Linux
+
+on:
+  push:
+    branches:
+      # Push events to branches matching refs/heads/master
+      - 'master'
+  pull_request:
+
+env:
+  CMAKE_VERSION: 3.8.2
+  SEQAN3_NO_VERSION_CHECK: 1
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -ex {0}
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-20.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          # - name: "Coverage gcc11"
+          #   cxx: "g++-11"
+          #   cc: "gcc-11"
+          #   build: coverage
+          #   build_type: Coverage
+
+          - name: "gcc11"
+            cxx: "g++-11"
+            cc: "gcc-11"
+            build_type: Release
+
+          - name: "gcc10"
+            cxx: "g++-10"
+            cc: "gcc-10"
+            build_type: Release
+
+          - name: "gcc9 (c++2a)"
+            cxx: "g++-9"
+            cc: "gcc-9"
+            build_type: Release
+            cxx_flags: "-std=c++2a"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: src
+          fetch-depth: 2
+          submodules: recursive
+
+      - name: Add package source
+        run: bash ./src/lib/seqan3/.github/workflows/scripts/configure_apt.sh
+
+      - name: Install CMake
+        run: bash ./src/lib/seqan3/.github/workflows/scripts/install_cmake.sh
+
+      - name: Install ccache
+        run: sudo apt-get install --yes ccache
+
+      - name: Install compiler ${{ matrix.cxx }}
+        run: sudo apt-get install --yes ${{ matrix.cxx }}
+
+      - name: Install lcov
+        if: matrix.build == 'coverage'
+        run: |
+          sudo apt-get install --yes lcov
+          sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-11 100
+
+      - name: Load ccache
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.ref }}-${{ github.run_number }}
+          # Restoring: From current branch, otherwise from base branch, otherwise from any branch.
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.ref }}
+            ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.base_ref }}
+            ${{ runner.os }}-${{ matrix.name }}-ccache-
+
+      - name: Tool versions
+        run: |
+          env cmake --version
+          env ${{ matrix.cxx }} --version
+
+      - name: Configure tests
+        env:
+          CXX: ${{ matrix.cxx }}
+          CC: ${{ matrix.cc }}
+        run: |
+          mkdir build
+          cd build
+          cmake ../src -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
+
+      - name: Build tests
+        env:
+          CCACHE_BASEDIR: ${{ github.workspace }}
+          CCACHE_DIR: ${{ github.workspace }}/.ccache
+          CCACHE_COMPRESS: true
+          CCACHE_COMPRESSLEVEL: 6
+          CCACHE_MAXSIZE: 500M
+        run: |
+          ccache -p || true
+          cd build
+          make -k -j2 api_test cli_test
+          ccache -s || true
+
+      - name: Generate coverage baseline
+        if: matrix.build == 'coverage'
+        run: |
+          lcov --directory ./build/ --zerocounters
+          lcov --directory ./build/ --capture --initial --output-file ./build/coverage_report.baseline
+
+      - name: Run tests
+        run: |
+          cd build
+          ctest . -j2 --output-on-failure
+
+      - name: Generate coverage report
+        if: matrix.build == 'coverage'
+        run: |
+          lcov --directory ./build/ --capture --output-file ./build/coverage_report.captured
+          lcov -a ./build/coverage_report.baseline -a ./build/coverage_report.captured --output-file ./build/coverage_report.total
+          lcov --remove ./build/coverage_report.total '/usr/*' '${{ github.workspace }}/src/lib/*' '${{ github.workspace }}/src/test/*' '${{ github.workspace }}/build/vendor/*' --output-file ./build/coverage_report
+
+      - name: Submit coverage report
+        if: matrix.build == 'coverage'
+        uses: codecov/codecov-action@v1
+        with:
+          files: ${{ github.workspace }}/build/coverage_report
+          root_dir: ${{ github.workspace }}/src

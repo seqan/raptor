@@ -3,11 +3,11 @@
 #include <mutex>
 
 #include <seqan3/io/sequence_file/input.hpp>
-#include <seqan3/range/views/async_input_buffer.hpp>
-#include <seqan3/range/views/chunk.hpp>
-#include <seqan3/range/views/minimiser_hash.hpp>
-#include <seqan3/range/views/zip.hpp>
+#include <seqan3/io/views/async_input_buffer.hpp>
 #include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
+#include <seqan3/search/views/minimiser_hash.hpp>
+#include <seqan3/utility/views/chunk.hpp>
+#include <seqan3/utility/views/zip.hpp>
 
 #include <minimiser_model.hpp>
 #include <shared.hpp>
