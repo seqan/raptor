@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
 #include <cstdlib>               // system calls
 #include <seqan3/std/filesystem> // test directory creation

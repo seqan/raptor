@@ -58,6 +58,7 @@ function(declare_datasource)
         TEST_COMMAND ""
         PREFIX "${CMAKE_CURRENT_BINARY_DIR}/_datasources"
         DOWNLOAD_NO_EXTRACT 1 # extract archive files like .tar.gz.
+        DOWNLOAD_NO_PROGRESS 1 # do not report progress
         ${ARG_UNPARSED_ARGUMENTS}
     )
 endfunction()

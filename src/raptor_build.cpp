@@ -1,14 +1,16 @@
 #include <seqan3/std/charconv>
+#include <limits> // Needed for gcc11 robin_hood
+
 #include <robin_hood.h>
 
 #include <seqan3/argument_parser/all.hpp>
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
 #include <seqan3/io/sequence_file/input.hpp>
-#include <seqan3/range/views/minimiser_hash.hpp>
-#include <seqan3/range/views/chunk.hpp>
 #include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
+#include <seqan3/search/views/minimiser_hash.hpp>
+#include <seqan3/utility/views/chunk.hpp>
 
-#include "shared.hpp"
+#include <shared.hpp>
 
 template <std::copy_constructible algorithm_t>
 void call_parallel_on_bins(algorithm_t && worker, build_arguments const & arguments)

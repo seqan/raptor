@@ -4,7 +4,7 @@
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
 #include <seqan3/io/sequence_file/input.hpp>
 #include <seqan3/io/sequence_file/output.hpp>
-#include <seqan3/range/views/chunk.hpp>
+#include <seqan3/utility/views/chunk.hpp>
 
 #include <seqan3/core/debug_stream.hpp>
 

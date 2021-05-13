@@ -1,0 +1,133 @@
+name: CI misc
+
+on:
+  push:
+    branches:
+      # Push events to branches matching refs/heads/master
+      - 'master'
+  pull_request:
+
+env:
+  SEQAN3_NO_VERSION_CHECK: 1
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -ex {0}
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-20.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "Documentation"
+            build: documentation
+            build_threads: 2
+            test_threads: 2
+            cmake: 3.8.2
+            doxygen: 1.9.1
+            requires_toolchain: false
+            requires_ccache: false
+            skip_build_tests: true
+            skip_run_tests: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: src
+          fetch-depth: 2
+          submodules: recursive
+
+      - name: Add package source
+        run: bash ./src/lib/seqan3/.github/workflows/scripts/configure_apt.sh
+
+      - name: Install CMake
+        env:
+          BUILD: ${{ matrix.build }}
+          CMAKE_VERSION: ${{ matrix.cmake }}
+        run: bash ./src/lib/seqan3/.github/workflows/scripts/install_cmake.sh
+
+      - name: Install Doxygen
+        if: matrix.build == 'documentation'
+        env:
+          DOXYGEN_VERSION: ${{ matrix.doxygen }}
+        run: bash ./src/lib/seqan3/.github/workflows/scripts/install_doxygen.sh
+
+      - name: Install ccache
+        if: matrix.requires_ccache
+        run: sudo apt-get install --yes ccache
+
+      - name: Install compiler ${{ matrix.cxx }}
+        if: matrix.requires_toolchain
+        run: sudo apt-get install --yes ${{ matrix.cxx }}
+
+      - name: Load ccache
+        if: matrix.requires_ccache
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ matrix.name }}-ccache-${{ github.ref }}-${{ github.run_number }}
+          # Restoring: From current branch, otherwise from base branch, otherwise from any branch.
+          restore-keys: |
+            ${{ matrix.name }}-ccache-${{ github.ref }}
+            ${{ matrix.name }}-ccache-${{ github.base_ref }}
+            ${{ matrix.name }}-ccache-
+
+      - name: Tool versions
+        run: |
+          env cmake --version
+          env doxygen --version || true
+          env ${{ matrix.cxx }} --version || true
+
+      - name: Configure tests
+        env:
+          CXX: ${{ matrix.cxx }}
+          CC: ${{ matrix.cc }}
+        run: |
+          mkdir build
+          cd build
+          cmake ../src -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
+
+      - name: Build tests
+        if: ${{!matrix.skip_build_tests}}
+        env:
+          CCACHE_BASEDIR: ${{ github.workspace }}
+          CCACHE_DIR: ${{ github.workspace }}/.ccache
+          CCACHE_COMPRESS: true
+          CCACHE_COMPRESSLEVEL: 6
+          CCACHE_MAXSIZE: 500M
+        run: |
+          ccache -p || true
+          cd build
+          make -k -j${{ matrix.build_threads }}
+          ccache -s || true
+
+      - name: Run tests
+        if: ${{!matrix.skip_run_tests}}
+        run: |
+          cd build
+          if [[ "${{ matrix.build }}" =~ ^(documentation)$ ]]; then
+            make -k -j2 doc 2>doxygen_warnings.txt
+            cat doxygen_warnings.txt
+            test ! -s doxygen_warnings.txt
+          else
+            ctest . -j${{ matrix.test_threads }} --output-on-failure
+          fi
+
+      - name: Package documentation
+        if: matrix.build == 'documentation'
+        continue-on-error: true
+        run: tar -zcf documentation.tar.gz build
+
+      - name: Upload documentation
+        if: matrix.build == 'documentation'
+        continue-on-error: true
+        uses: actions/upload-artifact@v2
+        with:
+          name: documentation
+          path: documentation.tar.gz

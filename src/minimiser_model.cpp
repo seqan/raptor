@@ -13,9 +13,9 @@
 #include <random>
 #include <vector>
 
+#include <seqan3/alphabet/views/complement.hpp>
 #include <seqan3/core/concept/cereal.hpp>
-#include <seqan3/range/views/complement.hpp>
-#include <seqan3/range/views/kmer_hash.hpp>
+#include <seqan3/search/views/kmer_hash.hpp>
 
 #if SEQAN3_WITH_CEREAL
 #include <cereal/types/vector.hpp>
