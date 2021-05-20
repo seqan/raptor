@@ -95,26 +95,60 @@ protected:
 
 struct raptor : public cli_test
 {
-    std::string expand_bins(size_t const bins)
+    static inline std::string const repeat_bins(size_t const repetitions) noexcept
     {
+        if (repetitions == 0)
+            return cli_test::data("bin1.fa").string();
+
         std::string result{};
 
-        for (size_t i{0}; i < bins; ++i)
+        for (size_t i{0}; i < repetitions; ++i)
         {
-            std::string filename = "example_data/" +
-                                   std::to_string(bins) +
-                                   "/bins" +
-                                   "/bin_" +
-                                   std::string(std::to_string(bins).size() - std::to_string(i).size(), '0') +
-                                   std::to_string(i) +
-                                   ".fasta";
-            result += cli_test::data(filename);
+            result += cli_test::data("bin1.fa");
+            result += ' ';
+            result += cli_test::data("bin2.fa");
+            result += ' ';
+            result += cli_test::data("bin3.fa");
+            result += ' ';
+            result += cli_test::data("bin4.fa");
             result += ' ';
         }
 
         return result;
     }
+
+    static inline std::filesystem::path const ibf_path(size_t const number_of_repetitions, size_t const window_size) noexcept
+    {
+        std::string name{};
+        name += std::to_string(std::max<int>(1, number_of_repetitions * 4));
+        name += "bins";
+        name += std::to_string(window_size);
+        name += "window.ibf";
+        return cli_test::data(name);
+    }
+
+    static inline std::filesystem::path const search_result_path(size_t const number_of_repetitions, size_t const window_size, size_t const number_of_errors) noexcept
+    {
+        std::string name{};
+        name += std::to_string(std::max<int>(1, number_of_repetitions * 4));
+        name += "bins";
+        name += std::to_string(window_size);
+        name += "window";
+        name += std::to_string(number_of_errors);
+        name += "error.out";
+        return cli_test::data(name);
+    }
+
+    static inline std::string const string_from_file(std::filesystem::path const & path, std::ios_base::openmode const mode = std::ios_base::in)
+    {
+        std::ifstream file_stream(path, mode);
+        if (!file_stream.is_open())
+            throw std::logic_error{"Cannot open " + path.string()};
+        std::stringstream file_buffer;
+        file_buffer << file_stream.rdbuf();
+        return {file_buffer.str()};
+    }
 };
 
-struct raptor_build : public raptor, public testing::WithParamInterface<std::tuple<size_t, bool>> {};
+struct raptor_build : public raptor, public testing::WithParamInterface<std::tuple<size_t, size_t, bool>> {};
 struct raptor_search : public raptor, public testing::WithParamInterface<std::tuple<size_t, size_t, size_t>> {};
