@@ -1,5 +1,4 @@
 #include <seqan3/std/charconv>
-#include <limits> // Needed for gcc11 robin_hood
 
 #include <robin_hood.h>
 
