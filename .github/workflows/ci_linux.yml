@@ -25,11 +25,11 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          # - name: "Coverage gcc11"
-          #   cxx: "g++-11"
-          #   cc: "gcc-11"
-          #   build: coverage
-          #   build_type: Coverage
+          - name: "Coverage gcc11"
+            cxx: "g++-11"
+            cc: "gcc-11"
+            build: coverage
+            build_type: Coverage
 
           - name: "gcc11"
             cxx: "g++-11"

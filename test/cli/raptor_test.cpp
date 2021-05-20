@@ -5,39 +5,27 @@
 
 #include "cli_test.hpp"
 
-inline std::string string_from_file(std::filesystem::path const & path,
-                                    std::ios_base::openmode const mode = std::ios_base::in)
-{
-    std::ifstream file_stream(path, mode);
-    if (!file_stream.is_open())
-        throw std::logic_error{"Cannot open " + path.string()};
-    std::stringstream file_buffer;
-    file_buffer << file_stream.rdbuf();
-    return {file_buffer.str()};
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////// raptor build tests ///////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 TEST_P(raptor_build, build_with_list)
 {
-    auto const [number_of_bins, run_parallel] = GetParam();
+    auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
+    bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
 
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--kmer 19",
-                                                         "--window 23",
-                                                         "--size 8m",
+                                                         "--window ", std::to_string(window_size),
+                                                         "--size 64k",
                                                          "--threads ", run_parallel ? "2" : "1",
-                                                         "--output index.ibf", expand_bins(number_of_bins));
-    ASSERT_EQ(result.exit_code, 0);
-    ASSERT_EQ(result.out, std::string{});
-    ASSERT_EQ(result.err, std::string{});
+                                                         "--output index.ibf",
+                                                         repeat_bins(number_of_repeated_bins));
+    EXPECT_EQ(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{});
 
-    std::string const expected = string_from_file(data("expected_results/b" +
-                                                       std::to_string(number_of_bins) +
-                                                       "_k19_w23_s8m.ibf"),
-                                                  std::ios::binary);
+    std::string const expected = string_from_file(ibf_path(number_of_repeated_bins, window_size), std::ios::binary);
     std::string const actual = string_from_file("index.ibf", std::ios::binary);
 
     EXPECT_TRUE(expected == actual);
@@ -45,10 +33,11 @@ TEST_P(raptor_build, build_with_list)
 
 TEST_P(raptor_build, build_with_file)
 {
-    auto const [number_of_bins, run_parallel] = GetParam();
+    auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
+    bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
 
     {
-        std::string const expanded_bins = expand_bins(number_of_bins);
+        std::string const expanded_bins = repeat_bins(number_of_repeated_bins);
         std::ofstream file{"raptor_cli_test.txt"};
         auto split_bins = expanded_bins
                         | std::views::split(' ')
@@ -63,19 +52,16 @@ TEST_P(raptor_build, build_with_file)
 
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--kmer 19",
-                                                         "--window 23",
-                                                         "--size 8m",
+                                                         "--window ", std::to_string(window_size),
+                                                         "--size 64k",
                                                          "--threads ", run_parallel ? "2" : "1",
                                                          "--output index.ibf",
                                                          "raptor_cli_test.txt");
-    ASSERT_EQ(result.exit_code, 0);
-    ASSERT_EQ(result.out, std::string{});
-    ASSERT_EQ(result.err, std::string{});
+    EXPECT_EQ(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{});
 
-    std::string const expected = string_from_file(data("expected_results/b" +
-                                                       std::to_string(number_of_bins) +
-                                                       "_k19_w23_s8m.ibf"),
-                                                  std::ios::binary);
+    std::string const expected = string_from_file(ibf_path(number_of_repeated_bins, window_size), std::ios::binary);
     std::string const actual = string_from_file("index.ibf", std::ios::binary);
 
     EXPECT_TRUE(expected == actual);
@@ -83,11 +69,12 @@ TEST_P(raptor_build, build_with_file)
 
 INSTANTIATE_TEST_SUITE_P(build_suite,
                          raptor_build,
-                         testing::Combine(testing::Values(64, 1024), testing::Values(true, false)),
+                         testing::Combine(testing::Values(0, 16, 32), testing::Values(19, 23), testing::Values(true, false)),
                          [] (testing::TestParamInfo<raptor_build::ParamType> const & info)
                          {
-                             std::string name = std::to_string(std::get<0>(info.param)) + "bins_" +
-                                                (std::get<1>(info.param) ? "parallel" : "serial");
+                             std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
+                                                std::to_string(std::get<1>(info.param)) + "_window_" +
+                                                (std::get<2>(info.param) ? "parallel" : "serial");
                              return name;
                          });
 
@@ -97,81 +84,72 @@ INSTANTIATE_TEST_SUITE_P(build_suite,
 
 TEST_P(raptor_search, search)
 {
-    auto const [number_of_bins, window_size, number_of_errors] = GetParam();
+    auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
+
+    if (window_size == 23 && number_of_errors == 0)
+        GTEST_SKIP() << "Needs dynamic threshold correction";
 
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--kmer 19",
                                                          "--window ", std::to_string(window_size),
                                                          "--output search.out",
                                                          "--error ", std::to_string(number_of_errors),
-                                                         "--pattern 100",
-                                                         "--index ", data("expected_results/b" +
-                                                                          std::to_string(number_of_bins) +
-                                                                          "_k19_w" +
-                                                                          std::to_string(window_size) +
-                                                                          "_s8m.ibf"),
-                                                         "--query ", data("example_data/" +
-                                                                          std::to_string(number_of_bins) +
-                                                                          "/reads/all.fastq"));
-    ASSERT_EQ(result.exit_code, 0);
-    ASSERT_EQ(result.out, std::string{});
-    ASSERT_EQ(result.err, std::string{});
+                                                         "--index ", ibf_path(number_of_repeated_bins, window_size),
+                                                         "--query ", data("query.fq"));
+    EXPECT_EQ(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{});
 
-    std::string const expected = string_from_file(data("expected_results/b" +
-                                                       std::to_string(number_of_bins) +
-                                                       "_k19_w" +
-                                                       std::to_string(window_size) +
-                                                       "_s8m_e" +
-                                                       std::to_string(number_of_errors) +
-                                                       ".out"));
+    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins, window_size, number_of_errors), std::ios::binary);
     std::string const actual = string_from_file("search.out");
 
-    EXPECT_TRUE(expected == actual);
+    EXPECT_EQ(expected, actual);
 }
 
 // Search with threshold
 TEST_P(raptor_search, search_threshold)
 {
-    auto const [number_of_bins, window_size, number_of_errors] = GetParam();
+    auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
     cli_test_result const result = execute_app("raptor", "search",
                                                         "--kmer 19",
                                                         "--window ", std::to_string(window_size),
                                                         "--output search_threshold.out",
-                                                        "--error ", std::to_string(number_of_errors),
                                                         "--threshold 0.50",
-                                                        "--pattern 100",
-                                                        "--index ", data("expected_results/b" +
-                                                                         std::to_string(number_of_bins) +
-                                                                         "_k19_w" +
-                                                                         std::to_string(window_size) +
-                                                                         "_s8m.ibf"),
-                                                        "--query ", data("example_data/" +
-                                                                         std::to_string(number_of_bins) +
-                                                                         "/reads/all.fastq"));
-    ASSERT_EQ(result.exit_code, 0);
-    ASSERT_EQ(result.out, std::string{});
-    ASSERT_EQ(result.err, std::string{});
+                                                        "--index ", ibf_path(number_of_repeated_bins, window_size),
+                                                        "--query ", data("query.fq"));
+    EXPECT_EQ(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{});
 
-    std::string const expected = string_from_file(data("expected_results/b" +
-                                                       std::to_string(number_of_bins) +
-                                                       "_k19_w" +
-                                                       std::to_string(window_size) +
-                                                       "_s8m_e" +
-                                                       std::to_string(number_of_errors) +
-                                                       ".out"));
+    std::string const expected = [&] ()
+    {
+        std::string const bin_list = [&] ()
+        {
+            std::string result;
+            for (size_t i = 0; i < std::max<size_t>(1, number_of_repeated_bins * 4u); ++i)
+            {
+                result += std::to_string(i);
+                result += ',';
+            }
+            return result;
+        }();
+
+        return "query1\t" + bin_list + "\nquery2\t" + bin_list + "\nquery3\t" + bin_list + '\n';
+    }();
+
     std::string const actual = string_from_file("search_threshold.out");
 
-    // EXPECT_TRUE(expected == actual);
+    EXPECT_EQ(expected, actual);
 }
 
 INSTANTIATE_TEST_SUITE_P(search_suite,
                          raptor_search,
-                         testing::Combine(testing::Values(64, 1024), testing::Values(19, 23), testing::Values(0, 1, 2, 3)),
+                         testing::Combine(testing::Values(0, 16, 32), testing::Values(19, 23), testing::Values(0, 1)),
                          [] (testing::TestParamInfo<raptor_search::ParamType> const & info)
                          {
-                             std::string name = std::to_string(std::get<0>(info.param)) + "bins_" +
-                                                std::to_string(std::get<1>(info.param)) + "window_" +
-                                                std::to_string(std::get<2>(info.param)) + "error";
+                             std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
+                                                std::to_string(std::get<1>(info.param)) + "_window_" +
+                                                std::to_string(std::get<2>(info.param)) + "_error";
                              return name;
                          });
