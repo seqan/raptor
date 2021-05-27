@@ -30,22 +30,22 @@ declare_datasource (FILE query.fq
 
 declare_datasource (FILE 1bins19window.ibf
                     URL ${CMAKE_SOURCE_DIR}/test/data/1bins19window.ibf
-                    URL_HASH SHA256=43da478233d4131102d3757ea33c63892b566fc796110bd4be009dcaa44b1723)
+                    URL_HASH SHA256=33b55e33699f3ebe143cdd4fa11c8f9d62e526d0068aea8e6c296f89bd92af05)
 declare_datasource (FILE 1bins23window.ibf
                     URL ${CMAKE_SOURCE_DIR}/test/data/1bins23window.ibf
-                    URL_HASH SHA256=902dae7ba8809395924bfd9517cc287dc14aacbfd60381de45bc78168f662f1c)
+                    URL_HASH SHA256=35b415f46d6d22764fb1c4f0f3f09e21aeb920c65e47a87f8e53fe190912a0ff)
 declare_datasource (FILE 64bins19window.ibf
                     URL ${CMAKE_SOURCE_DIR}/test/data/64bins19window.ibf
-                    URL_HASH SHA256=7aab415ef05c942efe5ce5ec2600141b851bcde8170dad459a5c738fd7960a30)
+                    URL_HASH SHA256=02eddb5255bf193365cc59757c3c7c2fe6ed6c224a8bd369067fed0db8a29480)
 declare_datasource (FILE 64bins23window.ibf
                     URL ${CMAKE_SOURCE_DIR}/test/data/64bins23window.ibf
-                    URL_HASH SHA256=2a00d9fd2cf9865841b559219cb1896d33e8a20e77604906ba551e94fbdbed7f)
+                    URL_HASH SHA256=fa9631d4cf15dbcb7c941223b79ab8b59ce23a6b64929b295ae639a0cbfd1a7c)
 declare_datasource (FILE 128bins19window.ibf
                     URL ${CMAKE_SOURCE_DIR}/test/data/128bins19window.ibf
-                    URL_HASH SHA256=73c3c7edea4d0e8a78d98397605813da195df5fedbf2aa23e12b3ff9ee0462fa)
+                    URL_HASH SHA256=67386b6ff6d196d4cbfe36bc26c1eb9d39b377bcd9610cf01905d58f4fbd5d84)
 declare_datasource (FILE 128bins23window.ibf
                     URL ${CMAKE_SOURCE_DIR}/test/data/128bins23window.ibf
-                    URL_HASH SHA256=be6d52e1314fb85fbf4e919ba125dea6e4146ccddabceb7496fda9ad158671eb)
+                    URL_HASH SHA256=2f36e34f7e2462906efa28eb36dab007277ea7ea6f71252b47a60fa166be6c50)
 
 declare_datasource (FILE 1bins19window0error.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/1bins19window0error.out

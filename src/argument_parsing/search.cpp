@@ -71,14 +71,6 @@ void run_search(seqan3::argument_parser & parser)
     // Various checks.
     // ==========================================
 
-    if (parser.is_option_set("window"))
-    {
-        if (arguments.kmer_size > arguments.window_size)
-            throw seqan3::argument_parser_error{"The k-mer size cannot be bigger than the window size."};
-    }
-    else
-        arguments.window_size = arguments.kmer_size;
-
     arguments.treshold_was_set = parser.is_option_set("threshold");
 
     // ==========================================
@@ -94,6 +86,16 @@ void run_search(seqan3::argument_parser & parser)
         }
         std::sort(sequence_lengths.begin(), sequence_lengths.end());
         arguments.pattern_size = sequence_lengths[sequence_lengths.size()/2];
+    }
+
+    // ==========================================
+    // Read window and kmer size.
+    // ==========================================
+    {
+        std::ifstream is{arguments.ibf_file, std::ios::binary};
+        cereal::BinaryInputArchive iarchive{is};
+        iarchive(arguments.kmer_size);
+        iarchive(arguments.window_size);
     }
 
     // ==========================================

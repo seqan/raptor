@@ -14,18 +14,6 @@ void init_shared_options(seqan3::argument_parser & parser, arguments_t & argumen
 {
     static_assert(std::same_as<arguments_t, build_arguments> || std::same_as<arguments_t, search_arguments>);
 
-    parser.add_option(arguments.window_size,
-                      '\0',
-                      "window",
-                      "Choose the window size.",
-                      seqan3::option_spec::standard,
-                      positive_integer_validator{});
-    parser.add_option(arguments.kmer_size,
-                      '\0',
-                      "kmer",
-                      "Choose the kmer size.",
-                      seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{1, 32});
     parser.add_option(arguments.threads,
                       '\0',
                       "threads",

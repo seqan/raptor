@@ -12,6 +12,18 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
                                  "Provide a list of input files (one file per bin). Alternatively, provide a text file "
                                  "containing the paths to the bins (one line per path to a bin). ",
                                  bin_validator{});
+    parser.add_option(arguments.window_size,
+                      '\0',
+                      "window",
+                      "Choose the window size.",
+                      seqan3::option_spec::standard,
+                      positive_integer_validator{});
+    parser.add_option(arguments.kmer_size,
+                      '\0',
+                      "kmer",
+                      "Choose the kmer size.",
+                      seqan3::option_spec::standard,
+                      seqan3::arithmetic_range_validator{1, 32});
     parser.add_option(arguments.out_path,
                       '\0',
                       "output",
@@ -140,6 +152,18 @@ void run_build(seqan3::argument_parser & parser)
     std::from_chars(arguments.size.data(), arguments.size.data() + arguments.size.size() - 1, size);
     size *= multiplier;
     arguments.bits = size / (((arguments.bins + 63) >> 6) << 6);
+
+    // ==========================================
+    // Read w and k from minimiser header file
+    // ==========================================
+    if (std::filesystem::path header_file_path = arguments.bin_path[0]; header_file_path.extension() == ".minimiser")
+    {
+        header_file_path.replace_extension("header");
+        std::ifstream file_stream{header_file_path};
+        uint64_t kmer_size{};
+        file_stream >> kmer_size >> arguments.window_size;
+        arguments.kmer_size = kmer_size;
+    }
 
     // ==========================================
     // Dispatch

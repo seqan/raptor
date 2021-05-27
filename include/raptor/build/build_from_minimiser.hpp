@@ -1,7 +1,6 @@
 #pragma once
 
-#include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
-
+#include <raptor/build/store_index.hpp>
 #include <raptor/shared.hpp>
 
 namespace raptor
@@ -11,8 +10,8 @@ template <bool compressed>
 void build_from_minimiser(build_arguments const & arguments)
 {
     seqan3::interleaved_bloom_filter<> ibf{seqan3::bin_count{arguments.bins},
-                                            seqan3::bin_size{arguments.bits / arguments.parts},
-                                            seqan3::hash_function_count{arguments.hash}};
+                                           seqan3::bin_size{arguments.bits / arguments.parts},
+                                           seqan3::hash_function_count{arguments.hash}};
 
     auto worker = [&] (auto && zipped_view, auto &&)
         {
@@ -32,16 +31,11 @@ void build_from_minimiser(build_arguments const & arguments)
     if constexpr (compressed)
     {
         seqan3::interleaved_bloom_filter<seqan3::data_layout::compressed> cibf{std::move(ibf)};
-
-        std::ofstream os{arguments.out_path, std::ios::binary};
-        cereal::BinaryOutputArchive oarchive{os};
-        oarchive(cibf);
+        store_index(arguments.out_path, cibf, arguments);
     }
     else
     {
-        std::ofstream os{arguments.out_path, std::ios::binary};
-        cereal::BinaryOutputArchive oarchive{os};
-        oarchive(ibf);
+        store_index(arguments.out_path, ibf, arguments);
     }
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <raptor/build/ibf_factory.hpp>
+#include <raptor/build/store_index.hpp>
 
 namespace raptor
 {
@@ -13,9 +14,7 @@ void run_program(build_arguments const & arguments)
     if (arguments.parts == 1u)
     {
         auto ibf = generator();
-        std::ofstream os{arguments.out_path, std::ios::binary};
-        cereal::BinaryOutputArchive oarchive{os};
-        oarchive(ibf);
+        store_index(arguments.out_path, ibf, arguments);
     }
     else
     {
@@ -54,9 +53,7 @@ void run_program(build_arguments const & arguments)
             auto ibf = generator(filter_view);
             std::filesystem::path out_path{arguments.out_path};
             out_path += "_" + std::to_string(part);
-            std::ofstream os{out_path, std::ios::binary};
-            cereal::BinaryOutputArchive oarchive{os};
-            oarchive(ibf);
+            store_index(out_path, ibf, arguments);
         }
     }
 }
