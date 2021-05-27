@@ -1,5 +1,9 @@
 #include <seqan3/argument_parser/all.hpp>
 
+#include <argument_parsing/build.hpp>
+#include <argument_parsing/search.hpp>
+#include <argument_parsing/shared.hpp>
+#include <argument_parsing/top_level.hpp>
 #include <raptor.hpp>
 
 int main(int argc, char ** argv)
