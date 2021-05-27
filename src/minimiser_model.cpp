@@ -13,18 +13,16 @@
 #include <random>
 #include <vector>
 
+#include <cereal/types/vector.hpp>
+
 #include <seqan3/alphabet/views/complement.hpp>
 #include <seqan3/core/concept/cereal.hpp>
 #include <seqan3/search/views/kmer_hash.hpp>
 
-// TODO enforce cereal in seqan3 find
-#if SEQAN3_WITH_CEREAL
-#include <cereal/types/vector.hpp>
-#else
-#error "Cereal not found, make sure you cloned the project recursively."
-#endif
-
 #include <raptor/shared.hpp>
+
+namespace raptor
+{
 
 struct minimizer
 {
@@ -650,3 +648,5 @@ bool do_cerealisation_in(std::vector<size_t> & vec, search_arguments const & arg
     iarchive(vec);
     return true;
 }
+
+} // namespace raptor

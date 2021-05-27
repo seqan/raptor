@@ -3,6 +3,9 @@
 #include <seqan3/argument_parser/all.hpp>
 #include <seqan3/io/sequence_file/input.hpp>
 
+namespace raptor
+{
+
 struct power_of_two_validator
 {
     using option_value_type = size_t;
@@ -186,3 +189,5 @@ private:
 public:
     seqan3::input_file_validator<> sequence_file_validator{{combined_extensions}};
 };
+
+} // namespace raptor

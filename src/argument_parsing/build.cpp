@@ -1,6 +1,9 @@
 #include <raptor/argument_parsing/build.hpp>
 #include <raptor/build.hpp>
 
+namespace raptor
+{
+
 void init_build_parser(seqan3::argument_parser & parser, build_arguments & arguments)
 {
     init_shared_meta(parser);
@@ -143,3 +146,5 @@ void run_build(seqan3::argument_parser & parser)
     // ==========================================
     raptor_build(arguments);
 };
+
+} // namespace raptor

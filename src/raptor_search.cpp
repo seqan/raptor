@@ -12,6 +12,9 @@
 #include <raptor/minimiser_model.hpp>
 #include <raptor/shared.hpp>
 
+namespace raptor
+{
+
 class sync_out
 {
 public:
@@ -353,3 +356,5 @@ void raptor_search(search_arguments const & arguments)
 
     return;
 }
+
+} // namespace raptor

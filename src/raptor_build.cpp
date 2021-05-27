@@ -11,6 +11,9 @@
 
 #include <raptor/shared.hpp>
 
+namespace raptor
+{
+
 template <std::copy_constructible algorithm_t>
 void call_parallel_on_bins(algorithm_t && worker, build_arguments const & arguments)
 {
@@ -319,3 +322,5 @@ void raptor_build(build_arguments const & arguments)
         run_program<false>(arguments);
     return;
 }
+
+} // namespace raptor

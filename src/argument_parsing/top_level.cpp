@@ -1,5 +1,8 @@
 #include <raptor/argument_parsing/top_level.hpp>
 
+namespace raptor
+{
+
 void init_top_level_parser(seqan3::argument_parser & parser)
 {
     init_shared_meta(parser);
@@ -8,3 +11,5 @@ void init_top_level_parser(seqan3::argument_parser & parser)
 
     parser.info.examples = {"./raptor build --help", "./raptor search --help"};
 };
+
+} // namespace raptor

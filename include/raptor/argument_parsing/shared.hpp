@@ -3,6 +3,9 @@
 #include <raptor/argument_parsing/validators.hpp>
 #include <raptor/shared.hpp>
 
+namespace raptor
+{
+
 void init_shared_meta(seqan3::argument_parser & parser);
 void try_parsing(seqan3::argument_parser & parser);
 
@@ -36,3 +39,5 @@ void init_shared_options(seqan3::argument_parser & parser, arguments_t & argumen
                       seqan3::option_spec::standard,
                       power_of_two_validator{});
 }
+
+} // namespace raptor

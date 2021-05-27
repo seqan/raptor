@@ -1,5 +1,8 @@
 #include <raptor/argument_parsing/shared.hpp>
 
+namespace raptor
+{
+
 void init_shared_meta(seqan3::argument_parser & parser)
 {
     parser.info.app_name = "Raptor";
@@ -56,3 +59,5 @@ void try_parsing(seqan3::argument_parser & parser)
         std::exit(-1);
     }
 }
+
+} // namespace raptor
