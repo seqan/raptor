@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.8)
 ## CUSTOMISE
 
 # Define the application name and version.
-project (raptor VERSION 1.1.0)
+project (raptor VERSION 1.2.0)
 
 ## BUILD
 
@@ -25,6 +25,7 @@ set (FontBold "${Esc}[1m")
 set (FontReset "${Esc}[m")
 
 # Dependency: SeqAn3.
+set (SEQAN3_CEREAL ON CACHE BOOL "Require cereal to be present.")
 find_package (SeqAn3 QUIET REQUIRED HINTS lib/seqan3/build_system)
 
 # Use ccache.

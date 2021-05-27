@@ -1,9 +1,12 @@
+#pragma once
+
 #include <seqan3/std/filesystem>
 #include <vector>
 
 #include <seqan3/io/sequence_file/input.hpp>
 
-#pragma once
+namespace raptor
+{
 
 inline constexpr static uint64_t adjust_seed(uint8_t const kmer_size, uint64_t const seed = 0x8F3F73B5CF1C9ADEULL) noexcept
 {
@@ -61,3 +64,5 @@ struct search_arguments
     bool compressed{false};
     bool write_time{false};
 };
+
+} // namespace raptor
