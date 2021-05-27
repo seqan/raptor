@@ -19,7 +19,7 @@ for i in $(seq -f "$BIN_DIR/$BIN_NUMBER/bins/bin_%0${#BIN_NUMBER}g.fasta" 0 1 $(
 do
     cp $i $working_directory/bins/
 done
-cp $BIN_DIR/$BIN_NUMBER/reads_e$ERRORS_$READ_LENGTH/all.fastq $working_directory/reads/
+cp $BIN_DIR/$BIN_NUMBER/reads_e$ERRORS\_$READ_LENGTH/all.fastq $working_directory/reads/
 
 do_task () {
     ibf_filename=$working_directory/$w\_$k\_$SIZE.ibf # Does not contain HASH
