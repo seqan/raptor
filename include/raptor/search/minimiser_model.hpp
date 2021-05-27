@@ -1,5 +1,6 @@
 #pragma once
 
+#include <raptor/search/detail/helper.hpp>
 #include <raptor/shared.hpp>
 
 namespace raptor
