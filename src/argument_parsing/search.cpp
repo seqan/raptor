@@ -1,7 +1,7 @@
 #include <seqan3/io/views/async_input_buffer.hpp>
 
 #include <raptor/argument_parsing/search.hpp>
-#include <raptor/search.hpp>
+#include <raptor/search/search.hpp>
 
 namespace raptor
 {
