@@ -17,13 +17,14 @@
 #include <seqan3/core/concept/cereal.hpp>
 #include <seqan3/search/views/kmer_hash.hpp>
 
+// TODO enforce cereal in seqan3 find
 #if SEQAN3_WITH_CEREAL
 #include <cereal/types/vector.hpp>
 #else
 #error "Cereal not found, make sure you cloned the project recursively."
 #endif
 
-#include <shared.hpp>
+#include <raptor/shared.hpp>
 
 struct minimizer
 {

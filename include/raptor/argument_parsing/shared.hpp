@@ -1,7 +1,7 @@
 #pragma once
 
-#include <argument_parsing/validators.hpp>
-#include <shared.hpp>
+#include <raptor/argument_parsing/validators.hpp>
+#include <raptor/shared.hpp>
 
 void init_shared_meta(seqan3::argument_parser & parser);
 void try_parsing(seqan3::argument_parser & parser);

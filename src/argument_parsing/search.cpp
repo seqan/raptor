@@ -1,7 +1,7 @@
 #include <seqan3/io/views/async_input_buffer.hpp>
 
-#include <argument_parsing/search.hpp>
-#include <raptor_search.hpp>
+#include <raptor/argument_parsing/search.hpp>
+#include <raptor/search.hpp>
 
 void init_search_parser(seqan3::argument_parser & parser, search_arguments & arguments)
 {

@@ -1,5 +1,5 @@
-#include <argument_parsing/build.hpp>
-#include <raptor_build.hpp>
+#include <raptor/argument_parsing/build.hpp>
+#include <raptor/build.hpp>
 
 void init_build_parser(seqan3::argument_parser & parser, build_arguments & arguments)
 {

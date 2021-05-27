@@ -9,7 +9,7 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 #include <seqan3/utility/views/chunk.hpp>
 
-#include <shared.hpp>
+#include <raptor/shared.hpp>
 
 template <std::copy_constructible algorithm_t>
 void call_parallel_on_bins(algorithm_t && worker, build_arguments const & arguments)

@@ -9,8 +9,8 @@
 #include <seqan3/utility/views/chunk.hpp>
 #include <seqan3/utility/views/zip.hpp>
 
-#include <minimiser_model.hpp>
-#include <shared.hpp>
+#include <raptor/minimiser_model.hpp>
+#include <raptor/shared.hpp>
 
 class sync_out
 {
