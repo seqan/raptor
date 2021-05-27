@@ -12,7 +12,7 @@ void run_program(build_arguments const & arguments)
 
     if (arguments.parts == 1u)
     {
-        auto ibf = generator.ibf();
+        auto ibf = generator();
         std::ofstream os{arguments.out_path, std::ios::binary};
         cereal::BinaryOutputArchive oarchive{os};
         oarchive(ibf);
@@ -51,7 +51,7 @@ void run_program(build_arguments const & arguments)
             auto filter_view = std::views::filter([&] (auto && hash)
                 { return std::ranges::find(association[part], hash & mask) != association[part].end(); });
 
-            auto ibf = generator.ibf(filter_view);
+            auto ibf = generator(filter_view);
             std::filesystem::path out_path{arguments.out_path};
             out_path += "_" + std::to_string(part);
             std::ofstream os{out_path, std::ios::binary};
