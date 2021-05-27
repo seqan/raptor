@@ -232,16 +232,3 @@ TEST_F(raptor_search, output_wrong)
     EXPECT_EQ(result.err, std::string{"[Error] Validation failed for option --output: Cannot write "
                                       "\"foo/search.out\"!\n"});
 }
-
-TEST_F(raptor_search, kmer_window)
-{
-    cli_test_result const result = execute_app("raptor", "search",
-                                                         "--kmer 20",
-                                                         "--window 19",
-                                                         "--query ", data("query.fq"),
-                                                         "--index ", tmp_ibf_file.file_path,
-                                                         "--output search.out");
-    EXPECT_NE(result.exit_code, 0);
-    EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] The k-mer size cannot be bigger than the window size.\n"});
-}

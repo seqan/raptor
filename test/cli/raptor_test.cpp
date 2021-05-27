@@ -90,8 +90,6 @@ TEST_P(raptor_search, search)
         GTEST_SKIP() << "Needs dynamic threshold correction";
 
     cli_test_result const result = execute_app("raptor", "search",
-                                                         "--kmer 19",
-                                                         "--window ", std::to_string(window_size),
                                                          "--output search.out",
                                                          "--error ", std::to_string(number_of_errors),
                                                          "--index ", ibf_path(number_of_repeated_bins, window_size),
@@ -112,12 +110,10 @@ TEST_P(raptor_search, search_threshold)
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
     cli_test_result const result = execute_app("raptor", "search",
-                                                        "--kmer 19",
-                                                        "--window ", std::to_string(window_size),
-                                                        "--output search_threshold.out",
-                                                        "--threshold 0.50",
-                                                        "--index ", ibf_path(number_of_repeated_bins, window_size),
-                                                        "--query ", data("query.fq"));
+                                                         "--output search_threshold.out",
+                                                         "--threshold 0.50",
+                                                         "--index ", ibf_path(number_of_repeated_bins, window_size),
+                                                         "--query ", data("query.fq"));
     EXPECT_EQ(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});

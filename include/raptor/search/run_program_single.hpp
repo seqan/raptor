@@ -5,6 +5,7 @@
 
 #include <raptor/search/compute_simple_model.hpp>
 #include <raptor/search/do_parallel.hpp>
+#include <raptor/search/load_ibf.hpp>
 #include <raptor/search/sync_out.hpp>
 
 namespace raptor
@@ -17,19 +18,13 @@ void run_program_single(search_arguments const & arguments)
                                                                  seqan3::data_layout::uncompressed;
     auto ibf = seqan3::interleaved_bloom_filter<ibf_data_layout>{};
 
-    std::ifstream is{arguments.ibf_file, std::ios::binary};
-    cereal::BinaryInputArchive iarchive{is};
-
     double ibf_io_time{0.0};
     double reads_io_time{0.0};
     double compute_time{0.0};
 
     auto cereal_worker = [&] ()
     {
-        auto start = std::chrono::high_resolution_clock::now();
-        iarchive(ibf);
-        auto end = std::chrono::high_resolution_clock::now();
-        ibf_io_time += std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
+        load_ibf(ibf, arguments, ibf_io_time);
     };
     auto cereal_handle = std::async(std::launch::async, cereal_worker);
 
