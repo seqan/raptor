@@ -1,9 +1,9 @@
+#pragma once
+
 #include <seqan3/std/filesystem>
 #include <vector>
 
 #include <seqan3/io/sequence_file/input.hpp>
-
-#pragma once
 
 namespace raptor
 {

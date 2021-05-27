@@ -1,6 +1,6 @@
-#include <raptor/shared.hpp>
-
 #pragma once
+
+#include <raptor/shared.hpp>
 
 namespace raptor
 {
