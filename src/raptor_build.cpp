@@ -14,7 +14,7 @@ void raptor_build(build_arguments const & arguments)
         return;
     }
 
-    if (arguments.bin_path[0].extension() == ".minimiser")
+    if (arguments.bin_path[0][0].extension() == ".minimiser")
     {
         if (arguments.compressed)
             build_from_minimiser<true>(arguments);

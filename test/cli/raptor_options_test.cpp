@@ -56,7 +56,7 @@ TEST_F(raptor, no_subparser)
     std::string const expected
     {
         "[Error] You either forgot or misspelled the subcommand! Please specify which sub-program you want to use: one "
-        "of [build,search]. Use -h/--help for more information.\n"
+        "of [build,search,socks]. Use -h/--help for more information.\n"
     };
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
@@ -69,7 +69,7 @@ TEST_F(raptor, unknown_option)
     std::string const expected
     {
         "[Error] You either forgot or misspelled the subcommand! Please specify which sub-program you want to use: one "
-        "of [build,search]. Use -h/--help for more information.\n"
+        "of [build,search,socks]. Use -h/--help for more information.\n"
     };
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
@@ -80,7 +80,7 @@ TEST_F(raptor_build, output_missing)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8m",
-                                                         data("bin1.fa"));
+                                                         "dummy");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
@@ -91,7 +91,7 @@ TEST_F(raptor_build, output_wrong)
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8m",
                                                          "--output foo/out.ibf",
-                                                         data("bin1.fa"));
+                                                         "dummy");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Cannot write \"foo/out.ibf\"!\n"});
@@ -102,7 +102,7 @@ TEST_F(raptor_build, directory_missing)
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8m",
                                                          "--compute-minimiser",
-                                                         data("bin1.fa"));
+                                                         "dummy");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
@@ -114,7 +114,7 @@ TEST_F(raptor_build, directory_wrong)
                                                          "--size 8m",
                                                          "--compute-minimiser",
                                                          "--output foo/bar",
-                                                         data("bin1.fa"));
+                                                         "dummy");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Cannot create directory: \"foo/bar\"!\n"});
@@ -124,7 +124,7 @@ TEST_F(raptor_build, size_missing)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--output ./ibf.out",
-                                                         data("bin1.fa"));
+                                                         "dummy");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Option --size is required but not set.\n"});
@@ -135,7 +135,7 @@ TEST_F(raptor_build, size_wrong_space)
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8 m",
                                                          "--output ./ibf.out",
-                                                         data("bin1.fa"));
+                                                         "dummy");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Validation failed for option --size: Value 8 must be an integer "
@@ -147,7 +147,7 @@ TEST_F(raptor_build, size_wrong_suffix)
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8x",
                                                          "--output ibf.out",
-                                                         data("bin1.fa"));
+                                                         "dummy");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Validation failed for option --size: Value 8x must be an integer "
@@ -161,7 +161,7 @@ TEST_F(raptor_build, kmer_window)
                                                          "--window 19",
                                                          "--size 8m",
                                                          "--output ibf.out",
-                                                         data("bin1.fa"));
+                                                         "dummy");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] The k-mer size cannot be bigger than the window size.\n"});

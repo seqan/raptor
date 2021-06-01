@@ -8,10 +8,9 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
 {
     init_shared_meta(parser);
     init_shared_options(parser, arguments);
-    parser.add_positional_option(arguments.bin_path,
-                                 "Provide a list of input files (one file per bin). Alternatively, provide a text file "
-                                 "containing the paths to the bins (one line per path to a bin). ",
-                                 bin_validator{});
+    parser.add_positional_option(arguments.bin_file,
+                                 arguments.is_socks ? "File containing color and file names." :
+                                                      "File containing one file per line per bin.");
     parser.add_option(arguments.window_size,
                       '\0',
                       "window",
@@ -51,35 +50,59 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
                     "Computes minimisers using cutoffs from Mantis (Pandey et al.). Does not create the index.");
 }
 
-void run_build(seqan3::argument_parser & parser)
+void run_build(seqan3::argument_parser & parser, bool const is_socks)
 {
     build_arguments arguments{};
+    arguments.is_socks = is_socks;
     init_build_parser(parser, arguments);
     try_parsing(parser);
 
     // ==========================================
     // Process bin_path
     // ==========================================
-    if (arguments.bin_path.size() == 1u) // Either only one bin or a file containing bin paths
+    if (!arguments.is_socks) // Either only one bin or a file containing bin paths
     {
-        auto & file = arguments.bin_path[0];
+        std::ifstream istrm{arguments.bin_file};
+        std::string line;
+        std::vector<std::filesystem::path> tmp;
+        auto sequence_file_validator{bin_validator{}.sequence_file_validator};
 
-        if (file.extension() != ".minimiser")
+        while (std::getline(istrm, line))
         {
-            try
+            if (!line.empty())
             {
-                bin_validator{}.sequence_file_validator(file);
+                sequence_file_validator(line);
+                tmp.emplace_back(line);
+                arguments.bin_path.push_back(std::move(tmp));
+                tmp.clear();
             }
-            catch (seqan3::validation_error const & exception)
+        }
+    }
+    else
+    {
+        std::ifstream istrm{arguments.bin_file};
+        std::string line;
+        std::string color_name;
+        std::string file_name;
+        std::vector<std::filesystem::path> tmp;
+        auto sequence_file_validator{bin_validator{}.sequence_file_validator};
+
+        while (std::getline(istrm, line))
+        {
+            if (!line.empty())
             {
-                decltype(arguments.bin_path) new_values;
-                std::ifstream list_of_files{file};
-                std::string line;
-                while (std::getline(list_of_files, line))
-                    new_values.emplace_back(line);
-                while (new_values.back().empty())
-                    new_values.pop_back();
-                arguments.bin_path = std::move(new_values);
+                std::stringstream sstream{line};
+                sstream >> color_name;
+                while (std::getline(sstream, file_name, ' '))
+                {
+                    if (!file_name.empty())
+                    {
+                        sequence_file_validator(file_name);
+                        tmp.emplace_back(file_name);
+                    }
+                }
+                arguments.bin_path.push_back(std::move(tmp));
+                tmp.clear();
             }
         }
     }
@@ -156,7 +179,7 @@ void run_build(seqan3::argument_parser & parser)
     // ==========================================
     // Read w and k from minimiser header file
     // ==========================================
-    if (std::filesystem::path header_file_path = arguments.bin_path[0]; header_file_path.extension() == ".minimiser")
+    if (std::filesystem::path header_file_path = arguments.bin_path[0][0]; header_file_path.extension() == ".minimiser")
     {
         header_file_path.replace_extension("header");
         std::ifstream file_stream{header_file_path};
