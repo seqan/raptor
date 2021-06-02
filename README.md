@@ -18,7 +18,7 @@ brew install brewsci/bio/raptor
 ```
 
 ### Compile from source
-<details><summary>Prerequisites</summary>
+<details><summary>Prerequisites (click to expand)</summary>
 
 * CMake >= 3.8
 * GCC 9, 10 or 11 (most recent minor version)
@@ -27,7 +27,7 @@ brew install brewsci/bio/raptor
 Refer to the [Seqan3 Setup Tutorial](https://docs.seqan.de/seqan/3-master-user/setup.html) for more in depth information.
 </details>
 
-<details><summary>Download current master branch</summary>
+<details><summary>Download current master branch (click to expand)</summary>
 
 ```bash
 git clone --recurse-submodules https://github.com/seqan/raptor
@@ -35,7 +35,7 @@ git clone --recurse-submodules https://github.com/seqan/raptor
 
 </details>
 
-<details><summary>Download specific version</summary>
+<details><summary>Download specific version (click to expand)</summary>
 
 E.g., for version `1.0.0`:
 ```bash
@@ -47,7 +47,7 @@ git checkout raptor-v1.0.0
 ```
 </details>
 
-<details><summary>Building</summary>
+<details><summary>Building (click to expand)</summary>
 
 ```bash
 cd raptor
@@ -67,7 +67,7 @@ raptor --version
 
 </details>
 
-### Example Data and Usage
+## Example Data and Usage
 A toy data set can be found [here](https://ftp.imp.fu-berlin.de/pub/seiler/raptor/).
 
 ```bash
@@ -88,25 +88,21 @@ example_data
     └── reads
 ```
 
-The `bins` folder contains a FASTA file for each bin and the `reads` directory contains a FASTQ file for each bin containing reads from the respective bin (with 2 errors).
-Additionally, `mini.fastq` (5 reads of all bins), `all.fastq` (concatenation of all FASTQ files) and `all10.fastq` (`all.fastq` repeated 10 times) are provided in the `reads` folder.
+The `bins` folder contains a FASTA file for each bin and the `reads` directory contains a FASTQ file for each bin
+containing reads from the respective bin (with 2 errors).
+Additionally, `mini.fastq` (5 reads of all bins), `all.fastq` (concatenation of all FASTQ files) and `all10.fastq`
+(`all.fastq` repeated 10 times) are provided in the `reads` folder.
 
 In the following, we will use the `64` data set.
-We can now build an index over all the bins:
-
-```
-raptor build --kmer 19 --window 23 --size 8m --output index.raptor $(seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63)
-# You can replace `$(seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63)` by `example_data/64/bins/bin_{00..63}.fasta` if your shell supports this syntax.
-# The equivalent command for 1,024 bins is `$(seq -f "example_data/1024/bins/bin_%04g.fasta" 0 1 1023)`
-```
-
-You can also prepare a file that contains one file path per line (a line corresponds to a bin) and use this file as input:
+To build an index over all bins, we first prepare a file that contains one file path per line
+(a line corresponds to a bin) and use this file as input:
 ```
 seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63 > all_bin_paths.txt
 raptor build --kmer 19 --window 23 --size 8m --output another_index.raptor all_bin_paths.txt
 ```
 
-You may be prompted to enable or disable automatic update notifications. For questions, please consult [the SeqAn documentation](https://github.com/seqan/seqan3/wiki/Update-Notifications).
+You may be prompted to enable or disable automatic update notifications. For questions, please consult
+[the SeqAn documentation](https://github.com/seqan/seqan3/wiki/Update-Notifications).
 
 Afterwards, we can search for all reads from bin 1:
 
@@ -114,7 +110,8 @@ Afterwards, we can search for all reads from bin 1:
 raptor search --error 2 --index index.raptor --query example_data/64/reads/mini.fastq --output search.output
 ```
 
-Each line of the output consists of the read ID (in the toy example these are numbers) and the corresponding bins in which they were found:
+Each line of the output consists of the read ID (in the toy example these are numbers) and the corresponding bins in
+which they were found:
 ```text
 0       0,
 1       0,
@@ -138,28 +135,31 @@ raptor build --help
 raptor search --help
 ```
 
-#### Preprocessing the input
-We offer the option to precompute the minimisers of the input files. This is useful to build indices of big datasets (in the range of several TiB) and also allows an estimation of the needed index size since the amount of minimisers is known.
+### Preprocessing the input
+We offer the option to precompute the minimisers of the input files. This is useful to build indices of big datasets
+(in the range of several TiB) and also allows an estimation of the needed index size since the amount of minimisers is
+known.
 Following above example, we would change the build step as follows:
 
 First we precompute the minimisers and store them in a directory:
 ```
 mkdir -p precomputed_minimisers
-raptor build --kmer 19 --window 23 --size 8m --compute-minimiser --output precomputed_minimisers/ $(seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63)
+seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63 > all_bin_paths.txt
+raptor build --kmer 19 --window 23 --size 8m --compute-minimiser --output precomputed_minimisers/ all_bin_paths.txt
 ```
 
 Then we run the build step again and use the computed minimisers as input:
 ```
-raptor build --size 8m --output minimiser_index.raptor $(seq -f "precomputed_minimisers/bin_%02g.minimiser" 0 1 63)
-```
-
-Alternatively, you can also prepare a file that contains one file path per line (a line corresponds to a bin)
-and use this file as input for both cases:
-```
-seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63 > all_bin_paths.txt
-raptor build --kmer 19 --window 23 --size 8m --compute-minimiser --output precomputed_minimisers/ all_bin_paths.txt
 seq -f "precomputed_minimisers/bin_%02g.minimiser" 0 1 63 > all_minimiser_paths.txt
 raptor build --size 8m --output another_minimiser_index.raptor all_minimiser_paths.txt
+```
+
+### SOCKS interface
+We implement the core interface of [SOCKS](https://gitlab.ub.uni-bielefeld.de/gi/socks).
+For a list of options, see the help pages:
+```console
+raptor socks build --help
+raptor socks lookup-kmer --help
 ```
 
 ## Authorship and Copyright
