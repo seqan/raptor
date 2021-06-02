@@ -13,7 +13,8 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
     parser.add_option(arguments.ibf_file,
                       '\0',
                       "index",
-                      "Provide a valid path to an IBF. Parts: Without suffix _0",
+                      arguments.is_socks ? "Provide a valid path to an IBF." :
+                                           "Provide a valid path to an IBF. Parts: Without suffix _0",
                       seqan3::option_spec::required,
                       seqan3::input_file_validator{});
     parser.add_option(arguments.query_file,
@@ -32,24 +33,25 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
                       '\0',
                       "error",
                       "Choose the number of errors.",
-                      seqan3::option_spec::standard,
+                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
                       positive_integer_validator{true});
     parser.add_option(arguments.tau,
                       '\0',
                       "tau",
                       "Threshold for probabilistic models.",
-                      seqan3::option_spec::standard,
+                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{0, 1});
     parser.add_option(arguments.threshold,
                       '\0',
                       "threshold",
                       "If set, this threshold is used instead of the probabilistic models.",
-                      seqan3::option_spec::standard,
+                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{0, 1});
     parser.add_option(arguments.pattern_size,
                       '\0',
                       "pattern",
-                      "Choose the pattern size. Default: Use median of sequence lengths in query file.");
+                      "Choose the pattern size. Default: Use median of sequence lengths in query file.",
+                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
     parser.add_flag(arguments.compressed,
                     '\0',
                     "compressed",

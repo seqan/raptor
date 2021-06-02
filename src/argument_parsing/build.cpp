@@ -15,7 +15,7 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
                       '\0',
                       "window",
                       "Choose the window size.",
-                      seqan3::option_spec::standard,
+                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
                       positive_integer_validator{});
     parser.add_option(arguments.kmer_size,
                       '\0',
@@ -26,7 +26,8 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
     parser.add_option(arguments.out_path,
                       '\0',
                       "output",
-                      "Provide an output filepath or an output directory if --compute-minimiser is used.",
+                      arguments.is_socks ? "Provide an output filepath." :
+                                           "Provide an output filepath or an output directory if --compute-minimiser is used.",
                       seqan3::option_spec::required);
     parser.add_option(arguments.size,
                       '\0',
@@ -47,7 +48,8 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
     parser.add_flag(arguments.compute_minimiser,
                     '\0',
                     "compute-minimiser",
-                    "Computes minimisers using cutoffs from Mantis (Pandey et al.). Does not create the index.");
+                    "Computes minimisers using cutoffs from Mantis (Pandey et al.). Does not create the index.",
+                    arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
 }
 
 void run_build(seqan3::argument_parser & parser, bool const is_socks)
