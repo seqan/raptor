@@ -13,7 +13,8 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
     parser.add_option(arguments.ibf_file,
                       '\0',
                       "index",
-                      "Provide a valid path to an IBF. Parts: Without suffix _0",
+                      arguments.is_socks ? "Provide a valid path to an IBF." :
+                                           "Provide a valid path to an IBF. Parts: Without suffix _0",
                       seqan3::option_spec::required,
                       seqan3::input_file_validator{});
     parser.add_option(arguments.query_file,
@@ -21,7 +22,7 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
                       "query",
                       "Provide a path to the query file.",
                       seqan3::option_spec::required,
-                      seqan3::input_file_validator<seqan3::sequence_file_input<>>{});
+                      seqan3::input_file_validator{});
     parser.add_option(arguments.out_file,
                       '\0',
                       "output",
@@ -32,24 +33,25 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
                       '\0',
                       "error",
                       "Choose the number of errors.",
-                      seqan3::option_spec::standard,
+                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
                       positive_integer_validator{true});
     parser.add_option(arguments.tau,
                       '\0',
                       "tau",
                       "Threshold for probabilistic models.",
-                      seqan3::option_spec::standard,
+                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{0, 1});
     parser.add_option(arguments.threshold,
                       '\0',
                       "threshold",
                       "If set, this threshold is used instead of the probabilistic models.",
-                      seqan3::option_spec::standard,
+                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{0, 1});
     parser.add_option(arguments.pattern_size,
                       '\0',
                       "pattern",
-                      "Choose the pattern size. Default: Use median of sequence lengths in query file.");
+                      "Choose the pattern size. Default: Use median of sequence lengths in query file.",
+                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
     parser.add_flag(arguments.compressed,
                     '\0',
                     "compressed",
@@ -61,9 +63,10 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
                     seqan3::option_spec::advanced);
 }
 
-void run_search(seqan3::argument_parser & parser)
+void run_search(seqan3::argument_parser & parser, bool const is_socks)
 {
     search_arguments arguments{};
+    arguments.is_socks = is_socks;
     init_search_parser(parser, arguments);
     try_parsing(parser);
 
@@ -71,12 +74,17 @@ void run_search(seqan3::argument_parser & parser)
     // Various checks.
     // ==========================================
 
+    if (!arguments.is_socks)
+    {
+        seqan3::input_file_validator<seqan3::sequence_file_input<>>{}(arguments.query_file);
+    }
+
     arguments.treshold_was_set = parser.is_option_set("threshold");
 
     // ==========================================
     // Process --pattern.
     // ==========================================
-    if (!arguments.pattern_size)
+    if (!arguments.is_socks && !arguments.pattern_size)
     {
         std::vector<uint64_t> sequence_lengths{};
         seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>> query_in{arguments.query_file};
@@ -96,6 +104,8 @@ void run_search(seqan3::argument_parser & parser)
         cereal::BinaryInputArchive iarchive{is};
         iarchive(arguments.kmer_size);
         iarchive(arguments.window_size);
+        if (arguments.is_socks)
+            arguments.pattern_size = arguments.kmer_size;
     }
 
     // ==========================================

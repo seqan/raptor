@@ -9,28 +9,6 @@
 ///////////////////////////////////////////////// raptor build tests ///////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TEST_P(raptor_build, build_with_list)
-{
-    auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
-    bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
-
-    cli_test_result const result = execute_app("raptor", "build",
-                                                         "--kmer 19",
-                                                         "--window ", std::to_string(window_size),
-                                                         "--size 64k",
-                                                         "--threads ", run_parallel ? "2" : "1",
-                                                         "--output index.ibf",
-                                                         repeat_bins(number_of_repeated_bins));
-    EXPECT_EQ(result.exit_code, 0);
-    EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{});
-
-    std::string const expected = string_from_file(ibf_path(number_of_repeated_bins, window_size), std::ios::binary);
-    std::string const actual = string_from_file("index.ibf", std::ios::binary);
-
-    EXPECT_TRUE(expected == actual);
-}
-
 TEST_P(raptor_build, build_with_file)
 {
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
@@ -51,6 +29,47 @@ TEST_P(raptor_build, build_with_file)
     }
 
     cli_test_result const result = execute_app("raptor", "build",
+                                                         "--kmer 19",
+                                                         "--window ", std::to_string(window_size),
+                                                         "--size 64k",
+                                                         "--threads ", run_parallel ? "2" : "1",
+                                                         "--output index.ibf",
+                                                         "raptor_cli_test.txt");
+    EXPECT_EQ(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{});
+
+    std::string const expected = string_from_file(ibf_path(number_of_repeated_bins, window_size), std::ios::binary);
+    std::string const actual = string_from_file("index.ibf", std::ios::binary);
+
+    EXPECT_TRUE(expected == actual);
+}
+
+TEST_P(raptor_build, build_with_file_socks)
+{
+    auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
+    bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
+
+    {
+        std::string const expanded_bins = repeat_bins(number_of_repeated_bins);
+        std::ofstream file{"raptor_cli_test.txt"};
+        auto split_bins = expanded_bins
+                        | std::views::split(' ')
+                        | std::views::transform([](auto &&rng) {
+                            return std::string_view(&*rng.begin(), std::ranges::distance(rng));});
+        bool repeat{false};
+        for (auto && file_path : split_bins)
+        {
+            file << "dummy_color: " << file_path;
+            if (repeat)
+                file << ' ' << file_path;
+            file << '\n';
+            repeat = !repeat;
+        }
+        file << '\n';
+    }
+
+    cli_test_result const result = execute_app("raptor", "socks", "build",
                                                          "--kmer 19",
                                                          "--window ", std::to_string(window_size),
                                                          "--size 64k",
@@ -99,6 +118,27 @@ TEST_P(raptor_search, search)
     EXPECT_EQ(result.err, std::string{});
 
     std::string const expected = string_from_file(search_result_path(number_of_repeated_bins, window_size, number_of_errors), std::ios::binary);
+    std::string const actual = string_from_file("search.out");
+
+    EXPECT_EQ(expected, actual);
+}
+
+TEST_P(raptor_search, search_socks)
+{
+    auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
+
+    if (window_size == 23 || number_of_errors != 0)
+        GTEST_SKIP() << "SOCKS only supports exact kmers";
+
+    cli_test_result const result = execute_app("raptor", "socks", "lookup-kmer",
+                                                         "--output search.out",
+                                                         "--index ", ibf_path(number_of_repeated_bins, window_size),
+                                                         "--query ", data("query_socks.fq"));
+    EXPECT_EQ(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{});
+
+    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins, window_size, number_of_errors, true), std::ios::binary);
     std::string const actual = string_from_file("search.out");
 
     EXPECT_EQ(expected, actual);

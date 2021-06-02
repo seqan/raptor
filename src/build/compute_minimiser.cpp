@@ -47,21 +47,24 @@ void compute_minimiser(build_arguments const & arguments)
             uint64_t count{0};
             uint16_t cutoff{default_cutoff};
 
-            for (auto && [file_name, bin_number] : zipped_view)
+            for (auto && [file_names, bin_number] : zipped_view)
             {
-                (void) bin_number;
-                seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>> fin{file_name};
+                for (auto && file_name : file_names)
+                {
+                    seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>> fin{file_name};
 
-                for (auto & [seq] : fin)
-                    for (auto && hash : seq | minimiser_view)
-                        minimiser_table[hash] = std::min<uint8_t>(254u, minimiser_table[hash] + 1);
-                        // The hash table stores how often a minimiser appears. It does not matter whether a minimiser appears
-                        // 50 times or 2000 times, it is stored regardless because the biggest cutoff value is 50. Hence,
-                        // the hash table stores only values up to 254 to save memory.
+                    for (auto & [seq] : fin)
+                        for (auto && hash : seq | minimiser_view)
+                            minimiser_table[hash] = std::min<uint8_t>(254u, minimiser_table[hash] + 1);
+                            // The hash table stores how often a minimiser appears. It does not matter whether a minimiser appears
+                            // 50 times or 2000 times, it is stored regardless because the biggest cutoff value is 50. Hence,
+                            // the hash table stores only values up to 254 to save memory.
+                }
 
                 // Since the curoffs are based on the filesize of a gzipped fastq file, we try account for the other cases:
                 // We multiply by two if we have fasta input.
                 // We divide by 3 if the input is not compressed.
+                auto & file_name = file_names[0];
                 bool const is_compressed = file_name.extension() == ".gz" || file_name.extension() == ".bgzf" || file_name.extension() == ".bz2";
                 bool const is_fasta = is_compressed ? check_for_fasta_format(seqan3::format_fasta::file_extensions, file_name.stem())
                                                     : check_for_fasta_format(seqan3::format_fasta::file_extensions, file_name.extension());
@@ -77,7 +80,7 @@ void compute_minimiser(build_arguments const & arguments)
                 }
 
                 // Store binary file
-                std::ofstream outfile{arguments.out_path.string() + file_name.stem().string() + ".minimiser", std::ios::binary};
+                std::ofstream outfile{arguments.out_path.string() + std::to_string(bin_number) + ".minimiser", std::ios::binary};
                 for (auto && hash : minimiser_table)
                 {
                     if (hash.second > cutoff)
@@ -88,7 +91,7 @@ void compute_minimiser(build_arguments const & arguments)
                 }
 
                 // Store header file
-                std::ofstream headerfile{arguments.out_path.string() + file_name.stem().string() + ".header"};
+                std::ofstream headerfile{arguments.out_path.string() + std::to_string(bin_number) + ".header"};
                 headerfile << static_cast<uint64_t>(arguments.kmer_size) << '\t'
                            << arguments.window_size << '\t'
                            << cutoff << '\t'

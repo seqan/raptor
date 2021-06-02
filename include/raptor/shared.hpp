@@ -36,7 +36,8 @@ struct build_arguments
     uint8_t threads{1u};
     uint8_t parts{1u};
 
-    std::vector<std::filesystem::path> bin_path{};
+    std::vector<std::vector<std::filesystem::path>> bin_path{};
+    std::filesystem::path bin_file{};
     std::filesystem::path out_path{"./"};
     std::string size{};
     uint64_t bins{64};
@@ -44,6 +45,7 @@ struct build_arguments
     uint64_t hash{2};
     bool compute_minimiser{false};
     bool compressed{false};
+    bool is_socks{false};
 };
 
 struct search_arguments
@@ -63,6 +65,7 @@ struct search_arguments
     uint8_t errors{0};
     bool compressed{false};
     bool write_time{false};
+    bool is_socks{false};
 };
 
 } // namespace raptor

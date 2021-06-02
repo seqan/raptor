@@ -65,10 +65,11 @@ private:
 
         auto worker = [&] (auto && zipped_view, auto &&)
         {
-            for (auto && [file_name, bin_number] : zipped_view)
-                for (auto && [seq] : sequence_file_t{file_name})
-                    for (auto && value : seq | hash_view())
-                        ibf.emplace(value, seqan3::bin_index{bin_number});
+            for (auto && [file_names, bin_number] : zipped_view)
+                for (auto && file_name : file_names)
+                    for (auto && [seq] : sequence_file_t{file_name})
+                        for (auto && value : seq | hash_view())
+                            ibf.emplace(value, seqan3::bin_index{bin_number});
         };
 
         call_parallel_on_bins(worker, *arguments);

@@ -17,12 +17,15 @@ void build_from_minimiser(build_arguments const & arguments)
         {
             uint64_t read_number;
 
-            for (auto && [file_name, bin_number] : zipped_view)
+            for (auto && [file_names, bin_number] : zipped_view)
             {
-                std::ifstream infile{file_name, std::ios::binary};
+                for (auto && file_name : file_names)
+                {
+                    std::ifstream infile{file_name, std::ios::binary};
 
-                while(infile.read(reinterpret_cast<char*>(&read_number), sizeof(read_number)))
-                    ibf.emplace(read_number, seqan3::bin_index{bin_number});
+                    while(infile.read(reinterpret_cast<char*>(&read_number), sizeof(read_number)))
+                        ibf.emplace(read_number, seqan3::bin_index{bin_number});
+                }
             }
         };
 
