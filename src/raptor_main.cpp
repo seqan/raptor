@@ -19,7 +19,7 @@ int main(int argc, char ** argv)
         if (sub_parser.info.app_name == std::string_view{"raptor-build"})
             raptor::run_build(sub_parser, false);
         if (sub_parser.info.app_name == std::string_view{"raptor-search"})
-            raptor::run_search(sub_parser);
+            raptor::run_search(sub_parser, false);
         if (sub_parser.info.app_name == std::string_view{"raptor-socks"})
         {
             seqan3::argument_parser socks_parser{"socks", argc - 1, argv + 1, seqan3::update_notifications::off, {"build", "lookup-kmer"}};
@@ -28,8 +28,7 @@ int main(int argc, char ** argv)
             if (socks_sub_parser.info.app_name == std::string_view{"socks-build"})
                 raptor::run_build(socks_sub_parser, true);
             if (socks_sub_parser.info.app_name == std::string_view{"socks-lookup-kmer"})
-                std::exit(-1);
-                // raptor::run_search(socks_sub_parser, true);
+                raptor::run_search(socks_sub_parser, true);
         }
     }
     catch (seqan3::argument_parser_error const & ext)

@@ -123,6 +123,27 @@ TEST_P(raptor_search, search)
     EXPECT_EQ(expected, actual);
 }
 
+TEST_P(raptor_search, search_socks)
+{
+    auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
+
+    if (window_size == 23 || number_of_errors != 0)
+        GTEST_SKIP() << "SOCKS only supports exact kmers";
+
+    cli_test_result const result = execute_app("raptor", "socks", "lookup-kmer",
+                                                         "--output search.out",
+                                                         "--index ", ibf_path(number_of_repeated_bins, window_size),
+                                                         "--query ", data("query_socks.fq"));
+    EXPECT_EQ(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{});
+
+    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins, window_size, number_of_errors, true), std::ios::binary);
+    std::string const actual = string_from_file("search.out");
+
+    EXPECT_EQ(expected, actual);
+}
+
 // Search with threshold
 TEST_P(raptor_search, search_threshold)
 {

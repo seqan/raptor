@@ -27,6 +27,9 @@ declare_datasource (FILE bin4.fa
 declare_datasource (FILE query.fq
                     URL ${CMAKE_SOURCE_DIR}/test/data/query.fq
                     URL_HASH SHA256=f48eb3f357e23df89e7e15d2f77f9285a428f73c4903eb1c6580271e0dea3d87)
+declare_datasource (FILE query_socks.fq
+                    URL ${CMAKE_SOURCE_DIR}/test/data/query_socks.fq
+                    URL_HASH SHA256=c21cfd169d5b16192486b3175fb33f09eb3e0ae1154cde4aa102b62fc12b6683)
 
 declare_datasource (FILE 1bins19window.ibf
                     URL ${CMAKE_SOURCE_DIR}/test/data/1bins19window.ibf
@@ -74,3 +77,13 @@ declare_datasource (FILE 128bins19window1error.out
 declare_datasource (FILE 128bins23window1error.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/128bins23window1error.out
                     URL_HASH SHA256=101c164463d9c9760351cbb81024dd74129725d9e18ef1dc7a7f3e1cd7b5e01e)
+
+declare_datasource (FILE 1bins19window0errorsocks.out
+                    URL ${CMAKE_SOURCE_DIR}/test/data/1bins19window0errorsocks.out
+                    URL_HASH SHA256=b1053f5b749071c54528f7b00cc66f278eb50f5643d46db01774932ea510fbbd)
+declare_datasource (FILE 64bins19window0errorsocks.out
+                    URL ${CMAKE_SOURCE_DIR}/test/data/64bins19window0errorsocks.out
+                    URL_HASH SHA256=d5e883ce66d1fc574cd6c9ae62c2d25a7671ad7be0948c49d969b1de88293def)
+declare_datasource (FILE 128bins19window0errorsocks.out
+                    URL ${CMAKE_SOURCE_DIR}/test/data/128bins19window0errorsocks.out
+                    URL_HASH SHA256=3087b98c1f4e0d0a1a54f0dc11100f25fdfa8eba62d8f24c082ea1c523146618)

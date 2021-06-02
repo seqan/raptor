@@ -65,6 +65,7 @@ struct search_arguments
     uint8_t errors{0};
     bool compressed{false};
     bool write_time{false};
+    bool is_socks{false};
 };
 
 } // namespace raptor
