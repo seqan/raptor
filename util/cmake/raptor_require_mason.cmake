@@ -6,7 +6,7 @@
 # -----------------------------------------------------------------------------------------------------
 
 macro (raptor_require_mason)
-    set (mason_args ${RAPTOR_UTILITY_EXTERNAL_PROJECT_CMAKE_ARGS})
+    set (mason_args ${SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS})
     list (APPEND mason_args "-DSEQAN_BUILD_SYSTEM=APP:mason2")
 
     include (ExternalProject)
