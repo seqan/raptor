@@ -20,13 +20,20 @@ string (ASCII 27 Esc)
 set (FontBold "${Esc}[1m")
 set (FontReset "${Esc}[m")
 
+# Dependency: SeqAn3.
+find_package (SeqAn3 QUIET REQUIRED HINTS ../lib/seqan3/build_system)
+
 # Define cmake configuration flags to configure and build external projects with the same flags as specified for
 # this project.
-set (RAPTOR_UTILITY_EXTERNAL_PROJECT_CMAKE_ARGS "")
-list (APPEND RAPTOR_UTILITY_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
-list (APPEND RAPTOR_UTILITY_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
-list (APPEND RAPTOR_UTILITY_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}")
-list (APPEND RAPTOR_UTILITY_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}")
+set (SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "")
+list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
+list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}")
+list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}")
+
+# Use ccache.
+include ("${SEQAN3_CLONE_DIR}/test/cmake/seqan3_require_ccache.cmake")
+seqan3_require_ccache ()
 
 # Optionally build mason and DREAM-Yara.
 option (RAPTOR_UTILITY_BUILD_MASON "Build mason. Needed to generate artificial data set." OFF)
@@ -49,9 +56,6 @@ if (RAPTOR_UTILITY_BUILD_DREAM_YARA)
 else ()
     message ("-- DREAM-Yara will not be built. Enable via 'cmake -DRAPTOR_UTILITY_BUILD_DREAM_YARA=1 .'")
 endif()
-
-# Dependency: SeqAn3.
-find_package (SeqAn3 QUIET REQUIRED HINTS ../lib/seqan3/build_system)
 
 add_library (common INTERFACE)
 target_link_libraries ("common" INTERFACE seqan3::seqan3)

@@ -6,7 +6,7 @@
 # -----------------------------------------------------------------------------------------------------
 
 macro (raptor_require_dream_yara)
-    set (dream_yara_args ${RAPTOR_UTILITY_EXTERNAL_PROJECT_CMAKE_ARGS})
+    set (dream_yara_args ${SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS})
 
     include (ExternalProject)
     ExternalProject_Add (

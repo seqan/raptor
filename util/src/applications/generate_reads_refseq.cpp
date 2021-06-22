@@ -8,6 +8,7 @@
 
 struct cmd_arguments
 {
+    std::filesystem::path bin_file_path{};
     std::vector<std::filesystem::path> bin_path{};
     std::filesystem::path output_directory{};
     uint8_t errors{2u};
@@ -138,9 +139,10 @@ void initialise_argument_parser(seqan3::argument_parser & parser, cmd_arguments 
     parser.info.author = "enrico.seiler@fu-berlin.de";
     parser.info.short_description = "Generate reads from bins.";
     parser.info.version = "0.0.1";
-    parser.info.examples = {"./generate_reads_refseq --output ./reads_e2 ./big_dataset/64/bins/bin_{00..63}.fasta"};
-    parser.add_positional_option(arguments.bin_path,
-                                 "Provide a list of bins.");
+    parser.info.examples = {"./generate_reads_refseq --output ./reads_e2 all_bins.txt"};
+    parser.add_positional_option(arguments.bin_file_path,
+                                 "Provide a path to a file containing one path to a bin per line.",
+                                 seqan3::input_file_validator{});
     parser.add_option(arguments.output_directory,
                       '\0',
                       "output",
@@ -186,6 +188,20 @@ int main(int argc, char ** argv)
     {
         std::cout << "[Error] " << ext.what() << "\n";
         return -1;
+    }
+
+    std::ifstream istrm{arguments.bin_file_path};
+    std::string line;
+    seqan3::input_file_validator validator{};
+
+    while (std::getline(istrm, line))
+    {
+        if (!line.empty())
+        {
+            std::filesystem::path bin_path{line};
+            validator(bin_path);
+            arguments.bin_path.push_back(std::move(bin_path));
+        }
     }
 
     size_t const number_of_bins{arguments.bin_path.size()};
