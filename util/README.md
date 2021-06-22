@@ -246,6 +246,7 @@ We will use `generate_reads_refseq` which can be found in the `bin` directory wi
 
 ```bash
 mkdir clustered_64/reads_e2
+seq -f "clustered_64/bin_%02g.fasta.gz" 0 1 63 > all_bin_paths.txt
 for read_length in 100 150 250
 do
     <build_directory>/bin/generate_reads_refseq --output clustered_64/reads_e2/$read_length \
@@ -253,7 +254,7 @@ do
                                                 --read_length $read_length \
                                                 --number_of_reads 1048576 \
                                                 --threads 32 \
-                                                clustered_64/bin_{00..63}.fasta.gz
+                                                all_bin_paths.txt
 done
 for read_length in 100 150 250
 do
@@ -263,6 +264,7 @@ done
 
 ```bash
 mkdir clustered_1024/reads_e2
+seq -f "clustered_64/bin_%04g.fasta.gz" 0 1 1023 > all_bin_paths.txt
 for read_length in 100 150 250
 do
     <build_directory>/bin/generate_reads_refseq --output clustered_1024/reads_e2/$read_length \
@@ -270,7 +272,7 @@ do
                                                 --read_length $read_length \
                                                 --number_of_reads 1048576 \
                                                 --threads 32 \
-                                                clustered_1024/bin_{0000..1023}.fasta.gz
+                                                all_bin_paths.txt
 done
 for read_length in 100 150 250
 do
