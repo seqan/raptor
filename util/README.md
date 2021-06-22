@@ -264,7 +264,7 @@ done
 
 ```bash
 mkdir clustered_1024/reads_e2
-seq -f "clustered_64/bin_%04g.fasta.gz" 0 1 1023 > all_bin_paths.txt
+seq -f "clustered_1024/bin_%04g.fasta.gz" 0 1 1023 > all_bin_paths.txt
 for read_length in 100 150 250
 do
     <build_directory>/bin/generate_reads_refseq --output clustered_1024/reads_e2/$read_length \
