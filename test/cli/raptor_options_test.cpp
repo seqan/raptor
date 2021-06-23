@@ -4,7 +4,9 @@
 
 #include <seqan3/test/snippet/create_temporary_snippet_file.hpp>
 
-seqan3::test::create_temporary_snippet_file tmp_ibf_file{"tmp.ibf", "dummy"};
+seqan3::test::create_temporary_snippet_file tmp_ibf_file{"tmp.ibf", "\nsome_content"};
+seqan3::test::create_temporary_snippet_file dummy_sequence_file{"dummy.fasta", "\nACGTC"};
+seqan3::test::create_temporary_snippet_file tmp_bin_list_file{"all_bins.txt", std::string{"\n"} + dummy_sequence_file.file_path.string()};
 
 #include "cli_test.hpp"
 
@@ -76,11 +78,32 @@ TEST_F(raptor, unknown_option)
     EXPECT_EQ(result.err, expected);
 }
 
+TEST_F(raptor_build, input_missing)
+{
+    cli_test_result const result = execute_app("raptor", "build",
+                                                         "--size 8m",
+                                                         "--output ./ibf.out");
+    EXPECT_NE(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] Not enough positional arguments provided (Need at least 1). See -h/--help for more information.\n"});
+}
+
+TEST_F(raptor_build, input_invalid)
+{
+    cli_test_result const result = execute_app("raptor", "build",
+                                                         "--size 8m",
+                                                         "--output ./ibf.out",
+                                                         "nonexistent");
+    EXPECT_NE(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] Validation failed for positional option 1: The file \"nonexistent\" does not exist!\n"});
+}
+
 TEST_F(raptor_build, output_missing)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8m",
-                                                         "dummy");
+                                                         tmp_bin_list_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
@@ -91,7 +114,7 @@ TEST_F(raptor_build, output_wrong)
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8m",
                                                          "--output foo/out.ibf",
-                                                         "dummy");
+                                                         tmp_bin_list_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Cannot write \"foo/out.ibf\"!\n"});
@@ -102,7 +125,7 @@ TEST_F(raptor_build, directory_missing)
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8m",
                                                          "--compute-minimiser",
-                                                         "dummy");
+                                                         tmp_bin_list_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
@@ -114,7 +137,7 @@ TEST_F(raptor_build, directory_wrong)
                                                          "--size 8m",
                                                          "--compute-minimiser",
                                                          "--output foo/bar",
-                                                         "dummy");
+                                                         tmp_bin_list_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Cannot create directory: \"foo/bar\"!\n"});
@@ -124,7 +147,7 @@ TEST_F(raptor_build, size_missing)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--output ./ibf.out",
-                                                         "dummy");
+                                                         tmp_bin_list_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Option --size is required but not set.\n"});
@@ -135,7 +158,7 @@ TEST_F(raptor_build, size_wrong_space)
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8 m",
                                                          "--output ./ibf.out",
-                                                         "dummy");
+                                                         tmp_bin_list_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Validation failed for option --size: Value 8 must be an integer "
@@ -147,7 +170,7 @@ TEST_F(raptor_build, size_wrong_suffix)
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8x",
                                                          "--output ibf.out",
-                                                         "dummy");
+                                                         tmp_bin_list_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Validation failed for option --size: Value 8x must be an integer "
@@ -161,7 +184,7 @@ TEST_F(raptor_build, kmer_window)
                                                          "--window 19",
                                                          "--size 8m",
                                                          "--output ibf.out",
-                                                         "dummy");
+                                                         tmp_bin_list_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] The k-mer size cannot be bigger than the window size.\n"});
