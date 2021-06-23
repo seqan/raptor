@@ -10,7 +10,8 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
     init_shared_options(parser, arguments);
     parser.add_positional_option(arguments.bin_file,
                                  arguments.is_socks ? "File containing color and file names." :
-                                                      "File containing one file per line per bin.");
+                                                      "File containing one file per line per bin.",
+                                 seqan3::input_file_validator{});
     parser.add_option(arguments.window_size,
                       '\0',
                       "window",
@@ -66,7 +67,6 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
     {
         std::ifstream istrm{arguments.bin_file};
         std::string line;
-        std::vector<std::filesystem::path> tmp;
         auto sequence_file_validator{bin_validator{}.sequence_file_validator};
 
         while (std::getline(istrm, line))
@@ -74,9 +74,7 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
             if (!line.empty())
             {
                 sequence_file_validator(line);
-                tmp.emplace_back(line);
-                arguments.bin_path.push_back(std::move(tmp));
-                tmp.clear();
+                arguments.bin_path.emplace_back(std::vector<std::filesystem::path>{line});
             }
         }
     }
@@ -93,6 +91,7 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
         {
             if (!line.empty())
             {
+                tmp.clear();
                 std::stringstream sstream{line};
                 sstream >> color_name;
                 while (std::getline(sstream, file_name, ' '))
@@ -103,8 +102,7 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
                         tmp.emplace_back(file_name);
                     }
                 }
-                arguments.bin_path.push_back(std::move(tmp));
-                tmp.clear();
+                arguments.bin_path.emplace_back(tmp);
             }
         }
     }
