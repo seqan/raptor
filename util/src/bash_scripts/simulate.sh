@@ -60,7 +60,7 @@ do
         --number_of_haplotypes $HAPLOTYPE_COUNT \
         $list_file > /dev/null
     rm $list_file
-    cat $read_dir/*.fastq > $read_dir/all
+    find $read_dir -type f -name "*.fastq" -print0 | sort -zV | xargs -0 cat > $read_dir/all
     mv $read_dir/all $read_dir/all.fastq
     for i in $(seq 0 9); do cat $read_dir/all.fastq >> $read_dir/all_10.fastq; done
 done
