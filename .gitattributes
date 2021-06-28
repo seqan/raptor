@@ -1,2 +1,2 @@
-doc linguist-documentation
-util linguist-documentation
+doc/** linguist-documentation
+util/** linguist-documentation
