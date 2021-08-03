@@ -168,7 +168,7 @@ other members of [SeqAn](https://www.seqan.de).
 
 ### Citation
 In your academic works (also comparisons and pipelines) please cite:
-  * Seiler, E. et al. (2020). Raptor: A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences. bioRxiv 2020.10.08.330985. doi: https://doi.org/10.1101/2020.10.08.330985
+  * *Raptor: A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences*; Enrico Seiler, Svenja Mehringer, Mitra Darvish, Etienne Turc, and Knut Reinert; iScience 2021 24 (7): 102782. doi: https://doi.org/10.1016/j.isci.2021.102782
 
 ### Supplementary
 The subdirectory `util` contains applications and scripts related to the paper.
