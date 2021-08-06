@@ -34,6 +34,27 @@ void run_program_single(search_arguments const & arguments)
 
     sync_out synced_out{arguments.out_file};
 
+    {
+        size_t position{};
+        std::string line{};
+        for (auto const & file_list : arguments.bin_path)
+        {
+            line.clear();
+            line = '#';
+            line += std::to_string(position);
+            line += '\t';
+            for (auto const & filename : file_list)
+            {
+                line += filename;
+                line += ',';
+            }
+            line.back() = '\n';
+            synced_out << line;
+            ++position;
+        }
+        synced_out << "#QUERY_NAME\tUSER_BINS\n";
+    }
+
     size_t const kmers_per_window = arguments.window_size - arguments.kmer_size + 1;
     size_t const kmers_per_pattern = arguments.pattern_size - arguments.kmer_size + 1;
     size_t const min_number_of_minimisers = kmers_per_window == 1 ? kmers_per_pattern :
@@ -84,7 +105,10 @@ void run_program_single(search_arguments const & arguments)
                 }
                 ++current_bin;
             }
-            result_string += '\n';
+            if (auto & last_char = result_string.back(); last_char == ',')
+                last_char = '\n';
+            else
+                result_string += '\n';
             synced_out.write(result_string);
         }
     };

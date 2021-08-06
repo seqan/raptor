@@ -26,6 +26,13 @@ public:
         file << std::forward<t>(data);
     }
 
+    template <typename t>
+    void operator<<(t && data) // Cannot return a reference to itself since multiple threads write in the meantime.
+    {
+        std::lock_guard<std::mutex> lock(write_mutex);
+        file << std::forward<t>(data);
+    }
+
 private:
     std::ofstream file;
     std::mutex write_mutex;

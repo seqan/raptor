@@ -3,6 +3,9 @@
 #include <seqan3/std/filesystem>
 #include <vector>
 
+#include <cereal/types/string.hpp>
+#include <cereal/types/vector.hpp>
+
 #include <seqan3/io/sequence_file/input.hpp>
 
 namespace raptor
@@ -36,7 +39,7 @@ struct build_arguments
     uint8_t threads{1u};
     uint8_t parts{1u};
 
-    std::vector<std::vector<std::filesystem::path>> bin_path{};
+    std::vector<std::vector<std::string>> bin_path{};
     std::filesystem::path bin_file{};
     std::filesystem::path out_path{"./"};
     std::string size{};
@@ -55,6 +58,7 @@ struct search_arguments
     uint8_t threads{1u};
     uint8_t parts{1u};
 
+    std::vector<std::vector<std::string>> bin_path{};
     std::filesystem::path query_file{};
     std::filesystem::path ibf_file{};
     std::filesystem::path out_file{"search.out"};

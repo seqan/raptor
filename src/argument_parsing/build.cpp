@@ -74,7 +74,7 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
             if (!line.empty())
             {
                 sequence_file_validator(line);
-                arguments.bin_path.emplace_back(std::vector<std::filesystem::path>{line});
+                arguments.bin_path.emplace_back(std::vector<std::string>{line});
             }
         }
     }
@@ -84,7 +84,7 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
         std::string line;
         std::string color_name;
         std::string file_name;
-        std::vector<std::filesystem::path> tmp;
+        std::vector<std::string> tmp;
         auto sequence_file_validator{bin_validator{}.sequence_file_validator};
 
         while (std::getline(istrm, line))

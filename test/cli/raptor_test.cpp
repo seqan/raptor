@@ -3,11 +3,105 @@
 #include <string>                // strings
 #include <vector>                // vectors
 
+#include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
+#include <seqan3/utility/views/zip.hpp>
+
 #include "cli_test.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////// raptor build tests ///////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Good example for printing tables: https://en.cppreference.com/w/cpp/io/ios_base/width
+std::string debug_ibfs(seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed> const & expected_ibf,
+                       seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed> const & actual_ibf)
+{
+    std::stringstream result{};
+    result << ">>>IBFs differ<<<\n";
+    result.setf(std::ios::left, std::ios::adjustfield);
+
+    result.width(22);
+    result << "#Member accessor";
+    result.width(15);
+    result << "Expected value";
+    result.width(13);
+    result << "Actual value";
+    result << '\n';
+
+    result.width(22);
+    result << "bin_count()";
+    result.width(15);
+    result << expected_ibf.bin_count();
+    result.width(13);
+    result << actual_ibf.bin_count();
+    result << '\n';
+
+    result.width(22);
+    result << "bin_size()";
+    result.width(15);
+    result << expected_ibf.bin_size();
+    result.width(13);
+    result << actual_ibf.bin_size();
+    result << '\n';
+
+    result.width(22);
+    result << "hash_function_count()";
+    result.width(15);
+    result << expected_ibf.hash_function_count();
+    result.width(13);
+    result << actual_ibf.hash_function_count();
+    result << '\n';
+
+    result.width(22);
+    result << "bit_size()";
+    result.width(15);
+    result << expected_ibf.bit_size();
+    result.width(13);
+    result << actual_ibf.bit_size();
+    result << '\n';
+
+    return result.str();
+}
+
+void compare_results(std::filesystem::path const & expected_result, std::filesystem::path const & actual_result)
+{
+    uint8_t expected_kmer_size{}, actual_kmer_size{};
+    uint32_t expected_window_size{}, actual_window_size{};
+    std::vector<std::vector<std::string>> expected_bin_path{}, actual_bin_path{};
+    seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed> expected_ibf{}, actual_ibf{};
+
+    {
+        std::ifstream is{expected_result, std::ios::binary};
+        cereal::BinaryInputArchive iarchive{is};
+        iarchive(expected_kmer_size);
+        iarchive(expected_window_size);
+        iarchive(expected_bin_path);
+        iarchive(expected_ibf);
+    }
+    {
+        std::ifstream is{actual_result, std::ios::binary};
+        cereal::BinaryInputArchive iarchive{is};
+        iarchive(actual_kmer_size);
+        iarchive(actual_window_size);
+        iarchive(actual_bin_path);
+        iarchive(actual_ibf);
+    }
+
+    EXPECT_EQ(expected_kmer_size, actual_kmer_size);
+    EXPECT_EQ(expected_window_size, actual_window_size);
+    EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs(expected_ibf, actual_ibf);
+    EXPECT_EQ(std::ranges::distance(expected_bin_path), std::ranges::distance(actual_bin_path));
+    for (auto const && [expected_list, actual_list] : seqan3::views::zip(expected_bin_path, actual_bin_path))
+    {
+        EXPECT_TRUE(std::ranges::distance(expected_list) > 0);
+        for (auto const && [expected_file, actual_file] : seqan3::views::zip(expected_list, actual_list))
+        {
+            std::filesystem::path const expected_path(expected_file);
+            std::filesystem::path const actual_path(actual_file);
+            EXPECT_EQ(expected_path.filename(), actual_path.filename());
+        }
+    }
+}
 
 TEST_P(raptor_build, build_with_file)
 {
@@ -39,10 +133,7 @@ TEST_P(raptor_build, build_with_file)
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
 
-    std::string const expected = string_from_file(ibf_path(number_of_repeated_bins, window_size), std::ios::binary);
-    std::string const actual = string_from_file("index.ibf", std::ios::binary);
-
-    EXPECT_TRUE(expected == actual);
+    compare_results(ibf_path(number_of_repeated_bins, window_size), "index.ibf");
 }
 
 TEST_P(raptor_build, build_with_file_socks)
@@ -80,10 +171,7 @@ TEST_P(raptor_build, build_with_file_socks)
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
 
-    std::string const expected = string_from_file(ibf_path(number_of_repeated_bins, window_size), std::ios::binary);
-    std::string const actual = string_from_file("index.ibf", std::ios::binary);
-
-    EXPECT_TRUE(expected == actual);
+    compare_results(ibf_path(number_of_repeated_bins, window_size), "index.ibf");
 }
 
 INSTANTIATE_TEST_SUITE_P(build_suite,
@@ -168,10 +256,22 @@ TEST_P(raptor_search, search_threshold)
                 result += std::to_string(i);
                 result += ',';
             }
+            result.pop_back();
             return result;
         }();
 
-        return "query1\t" + bin_list + "\nquery2\t" + bin_list + "\nquery3\t" + bin_list + '\n';
+        std::string header{};
+        std::string line{};
+        std::ifstream search_result{search_result_path(number_of_repeated_bins,
+                                                       window_size,
+                                                       window_size == 23 ? 1 : number_of_errors)};
+        while (std::getline(search_result, line) && line.substr(0, 6) != "query1")
+        {
+            header += line;
+            header += '\n';
+        }
+
+        return header + "query1\t" + bin_list + "\nquery2\t" + bin_list + "\nquery3\t" + bin_list + '\n';
     }();
 
     std::string const actual = string_from_file("search_threshold.out");
