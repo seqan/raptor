@@ -105,7 +105,10 @@ void run_program_single(search_arguments const & arguments)
                 }
                 ++current_bin;
             }
-            result_string += '\n';
+            if (auto & last_char = result_string.back(); last_char == ',')
+                last_char = '\n';
+            else
+                result_string += '\n';
             synced_out.write(result_string);
         }
     };

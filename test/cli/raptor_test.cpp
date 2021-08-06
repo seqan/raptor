@@ -256,6 +256,7 @@ TEST_P(raptor_search, search_threshold)
                 result += std::to_string(i);
                 result += ',';
             }
+            result.pop_back();
             return result;
         }();
 
