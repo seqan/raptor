@@ -97,13 +97,14 @@ void run_search(seqan3::argument_parser & parser, bool const is_socks)
     }
 
     // ==========================================
-    // Read window and kmer size.
+    // Read window and kmer size, and the bin paths.
     // ==========================================
     {
         std::ifstream is{arguments.ibf_file, std::ios::binary};
         cereal::BinaryInputArchive iarchive{is};
         iarchive(arguments.kmer_size);
         iarchive(arguments.window_size);
+        iarchive(arguments.bin_path);
         if (arguments.is_socks)
             arguments.pattern_size = arguments.kmer_size;
     }

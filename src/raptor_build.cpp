@@ -14,7 +14,8 @@ void raptor_build(build_arguments const & arguments)
         return;
     }
 
-    if (arguments.bin_path[0][0].extension() == ".minimiser")
+    std::filesystem::path const first_file_path{arguments.bin_path[0][0]};
+    if (first_file_path.extension() == ".minimiser")
     {
         if (arguments.compressed)
             build_from_minimiser<true>(arguments);

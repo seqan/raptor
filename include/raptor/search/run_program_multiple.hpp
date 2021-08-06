@@ -41,6 +41,29 @@ void run_program_multiple(search_arguments const & arguments)
         load_ibf(ibf, arguments, 0, ibf_io_time);
     };
 
+    sync_out synced_out{arguments.out_file};
+
+    {
+        size_t position{};
+        std::string line{};
+        for (auto const & file_list : arguments.bin_path)
+        {
+            line.clear();
+            line = '#';
+            line += std::to_string(position);
+            line += '\t';
+            for (auto const & filename : file_list)
+            {
+                line += filename;
+                line += ',';
+            }
+            line.back() = '\n';
+            synced_out << line;
+            ++position;
+        }
+        synced_out << "#QUERY_NAME\tUSER_BINS\n";
+    }
+
     for (auto && chunked_records : fin | seqan3::views::chunk((1ULL<<20)*10))
     {
         auto cereal_handle = std::async(std::launch::async, cereal_worker);
@@ -81,7 +104,6 @@ void run_program_multiple(search_arguments const & arguments)
         }
 
         load_ibf(ibf, arguments, arguments.parts - 1, ibf_io_time);
-        sync_out synced_out{arguments.out_file};
 
         auto output_task = [&](size_t const start, size_t const end)
         {

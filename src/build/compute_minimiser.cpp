@@ -64,7 +64,7 @@ void compute_minimiser(build_arguments const & arguments)
                 // Since the curoffs are based on the filesize of a gzipped fastq file, we try account for the other cases:
                 // We multiply by two if we have fasta input.
                 // We divide by 3 if the input is not compressed.
-                auto & file_name = file_names[0];
+                std::filesystem::path const file_name{file_names[0]};
                 bool const is_compressed = file_name.extension() == ".gz" || file_name.extension() == ".bgzf" || file_name.extension() == ".bz2";
                 bool const is_fasta = is_compressed ? check_for_fasta_format(seqan3::format_fasta::file_extensions, file_name.stem())
                                                     : check_for_fasta_format(seqan3::format_fasta::file_extensions, file_name.extension());

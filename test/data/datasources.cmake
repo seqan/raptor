@@ -33,50 +33,50 @@ declare_datasource (FILE query_socks.fq
 
 declare_datasource (FILE 1bins19window.ibf
                     URL ${CMAKE_SOURCE_DIR}/test/data/1bins19window.ibf
-                    URL_HASH SHA256=33b55e33699f3ebe143cdd4fa11c8f9d62e526d0068aea8e6c296f89bd92af05)
+                    URL_HASH SHA256=799688b64a255f4b4ee3a3b7e8388865f8c6df899b307b5f596a8c65ea60c7ec)
 declare_datasource (FILE 1bins23window.ibf
                     URL ${CMAKE_SOURCE_DIR}/test/data/1bins23window.ibf
-                    URL_HASH SHA256=35b415f46d6d22764fb1c4f0f3f09e21aeb920c65e47a87f8e53fe190912a0ff)
+                    URL_HASH SHA256=f20d6526b14be258dfb6b56cab884783f929cc89a8ca3f03c4522ba415a52561)
 declare_datasource (FILE 64bins19window.ibf
                     URL ${CMAKE_SOURCE_DIR}/test/data/64bins19window.ibf
-                    URL_HASH SHA256=02eddb5255bf193365cc59757c3c7c2fe6ed6c224a8bd369067fed0db8a29480)
+                    URL_HASH SHA256=ae8f2480da5c14658b445e283242b2a3235ad79a4df3017d6e64855b1f6d5683)
 declare_datasource (FILE 64bins23window.ibf
                     URL ${CMAKE_SOURCE_DIR}/test/data/64bins23window.ibf
-                    URL_HASH SHA256=fa9631d4cf15dbcb7c941223b79ab8b59ce23a6b64929b295ae639a0cbfd1a7c)
+                    URL_HASH SHA256=8604caf9db0066ec615b9582296463fbac1d4616673d8c8184b4062f9d9c9c28)
 declare_datasource (FILE 128bins19window.ibf
                     URL ${CMAKE_SOURCE_DIR}/test/data/128bins19window.ibf
-                    URL_HASH SHA256=67386b6ff6d196d4cbfe36bc26c1eb9d39b377bcd9610cf01905d58f4fbd5d84)
+                    URL_HASH SHA256=dd6e460cfefb55af6047952869cdc62f06ca67f5cbf046e182a41c184c509887)
 declare_datasource (FILE 128bins23window.ibf
                     URL ${CMAKE_SOURCE_DIR}/test/data/128bins23window.ibf
-                    URL_HASH SHA256=2f36e34f7e2462906efa28eb36dab007277ea7ea6f71252b47a60fa166be6c50)
+                    URL_HASH SHA256=52b145747bb1404efccd9387197dadf3083d3fbd06aa2e19b21a7364be830ce7)
 
 declare_datasource (FILE 1bins19window0error.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/1bins19window0error.out
-                    URL_HASH SHA256=b8ea0488dd7cb423b8727a6f51576d84bfffea4c16717d98e5a7247e02ace1b7)
+                    URL_HASH SHA256=83c5d7b006fabba02a6abf55149969835aeb2059158a7275df24063ff36ea237)
 declare_datasource (FILE 1bins19window1error.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/1bins19window1error.out
-                    URL_HASH SHA256=b8ea0488dd7cb423b8727a6f51576d84bfffea4c16717d98e5a7247e02ace1b7)
+                    URL_HASH SHA256=83c5d7b006fabba02a6abf55149969835aeb2059158a7275df24063ff36ea237)
 declare_datasource (FILE 1bins23window1error.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/1bins23window1error.out
-                    URL_HASH SHA256=b8ea0488dd7cb423b8727a6f51576d84bfffea4c16717d98e5a7247e02ace1b7)
+                    URL_HASH SHA256=83c5d7b006fabba02a6abf55149969835aeb2059158a7275df24063ff36ea237)
 declare_datasource (FILE 64bins19window0error.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/64bins19window0error.out
-                    URL_HASH SHA256=4c922d863949c251dcc6c351c1e7ca2a169d78969e7777abc28a6542e59211e2)
+                    URL_HASH SHA256=c240714613c7e70492490430cf3eb090916484e6a696ecc9c6bd2a8387e13ea2)
 declare_datasource (FILE 64bins19window1error.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/64bins19window1error.out
-                    URL_HASH SHA256=841b3f6fb42f82b73ca6969e3395b7d48e212c8ede46526ec7befd0d670d18c5)
+                    URL_HASH SHA256=119702fd89d86c423074fee9d6e5f454a1d1bf161c3b39832f34a01f591720c0)
 declare_datasource (FILE 64bins23window1error.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/64bins23window1error.out
-                    URL_HASH SHA256=841b3f6fb42f82b73ca6969e3395b7d48e212c8ede46526ec7befd0d670d18c5)
+                    URL_HASH SHA256=119702fd89d86c423074fee9d6e5f454a1d1bf161c3b39832f34a01f591720c0)
 declare_datasource (FILE 128bins19window0error.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/128bins19window0error.out
-                    URL_HASH SHA256=62e23f0d578dd5a849fd75cde52620d4342481bc3226aced9c4de1c351b75d63)
+                    URL_HASH SHA256=98548021bc956d87536371352fbc932bd76791f037ebcd203ca29172e1e46030)
 declare_datasource (FILE 128bins19window1error.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/128bins19window1error.out
-                    URL_HASH SHA256=101c164463d9c9760351cbb81024dd74129725d9e18ef1dc7a7f3e1cd7b5e01e)
+                    URL_HASH SHA256=cee2b0f801b89287c04f280ba75a0feff36dd695c356df32898b5368d072c4e2)
 declare_datasource (FILE 128bins23window1error.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/128bins23window1error.out
-                    URL_HASH SHA256=101c164463d9c9760351cbb81024dd74129725d9e18ef1dc7a7f3e1cd7b5e01e)
+                    URL_HASH SHA256=cee2b0f801b89287c04f280ba75a0feff36dd695c356df32898b5368d072c4e2)
 
 declare_datasource (FILE 1bins19window0errorsocks.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/1bins19window0errorsocks.out

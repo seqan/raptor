@@ -16,6 +16,7 @@ static inline void store_index(std::filesystem::path const & path,
     cereal::BinaryOutputArchive oarchive{os};
     oarchive(arguments.kmer_size);
     oarchive(arguments.window_size);
+    oarchive(arguments.bin_path);
     oarchive(ibf);
 }
 
