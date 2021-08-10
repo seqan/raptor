@@ -20,8 +20,13 @@ def process_output(path, bin_count, read_count, path_to_fp, path_to_fn):
                     try:
                         [x, y, thr, count] = line.strip().split('\t')
                     except ValueError:
-                        fn += 1
-                        continue
+                        try:
+                            [x, y] = line.strip().split('\t')
+                            thr = -1
+                            count = -1
+                        except ValueError:
+                            fn += 1
+                            continue
                     [read_id, bins] = [int(x), [int(e) for e in y[:-1].split(',') if e != '']]
                     true_id = (read_id % read_count) // (read_count // bin_count)
                     if true_id in bins:
