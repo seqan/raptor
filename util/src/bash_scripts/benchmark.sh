@@ -19,6 +19,8 @@ for i in $(seq -f "$BIN_DIR/$BIN_NUMBER/bins/bin_%0${#BIN_NUMBER}g.fasta" 0 1 $(
 do
     cp $i $working_directory/bins/
 done
+seq -f "$working_directory/bins/bin_%0${#BIN_NUMBER}g.fasta" 0 1 $((BIN_NUMBER-1)) > $working_directory/bins.list
+
 cp $BIN_DIR/$BIN_NUMBER/reads_e$ERRORS\_$READ_LENGTH/all.fastq $working_directory/reads/
 
 do_task () {
@@ -33,7 +35,7 @@ do_task () {
             --size $SIZE \
             --threads $THREADS \
             --hash $HASH \
-            $(seq -f "$working_directory/bins/bin_%0${#BIN_NUMBER}g.fasta" 0 1 $((BIN_NUMBER-1)))
+            $working_directory/bins.list
 
     query_log=$working_directory/$w\_$k\_$SIZE\_query.log # Does not contain HASH
     query_out=$working_directory/$w\_$k\_$SIZE.out
@@ -43,8 +45,6 @@ do_task () {
             --query $working_directory/reads/all.fastq \
             --index $ibf_filename \
             --output $query_out \
-            --kmer $k \
-            --window $w \
             --threads $THREADS \
             --error $ERRORS \
             --pattern $READ_LENGTH \
