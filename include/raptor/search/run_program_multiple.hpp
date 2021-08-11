@@ -74,6 +74,8 @@ void run_program_multiple(search_arguments const & arguments)
         auto end = std::chrono::high_resolution_clock::now();
         reads_io_time += std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
 
+        cereal_handle.wait();
+
         std::vector<seqan3::counting_vector<uint16_t>> counts(records.size(),
                                                               seqan3::counting_vector<uint16_t>(ibf.bin_count(), 0));
 
@@ -94,7 +96,6 @@ void run_program_multiple(search_arguments const & arguments)
             }
         };
 
-        cereal_handle.wait();
         do_parallel(count_task, records.size(), arguments.threads, compute_time);
 
         for (size_t const part : std::views::iota(1u, static_cast<unsigned int>(arguments.parts - 1)))

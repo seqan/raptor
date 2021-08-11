@@ -15,8 +15,7 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
                       "index",
                       arguments.is_socks ? "Provide a valid path to an IBF." :
                                            "Provide a valid path to an IBF. Parts: Without suffix _0",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator{});
+                      seqan3::option_spec::required);
     parser.add_option(arguments.query_file,
                       '\0',
                       "query",
@@ -81,6 +80,19 @@ void run_search(seqan3::argument_parser & parser, bool const is_socks)
 
     arguments.treshold_was_set = parser.is_option_set("threshold");
 
+    if (arguments.parts == 1)
+    {
+        seqan3::input_file_validator{}(arguments.ibf_file);
+    }
+    else
+    {
+        seqan3::input_file_validator validator{};
+        for (size_t part{0}; part < arguments.parts; ++part)
+        {
+            validator(arguments.ibf_file.string() + std::string{"_"} + std::to_string(part));
+        }
+    }
+
     // ==========================================
     // Process --pattern.
     // ==========================================
@@ -100,7 +112,9 @@ void run_search(seqan3::argument_parser & parser, bool const is_socks)
     // Read window and kmer size, and the bin paths.
     // ==========================================
     {
-        std::ifstream is{arguments.ibf_file, std::ios::binary};
+        std::ifstream is{arguments.parts == 1 ? arguments.ibf_file.string() :
+                                                arguments.ibf_file.string() + std::string{"_0"},
+                         std::ios::binary};
         cereal::BinaryInputArchive iarchive{is};
         iarchive(arguments.kmer_size);
         iarchive(arguments.window_size);
