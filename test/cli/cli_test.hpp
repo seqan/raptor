@@ -156,3 +156,4 @@ struct raptor : public cli_test
 
 struct raptor_build : public raptor, public testing::WithParamInterface<std::tuple<size_t, size_t, bool>> {};
 struct raptor_search : public raptor, public testing::WithParamInterface<std::tuple<size_t, size_t, size_t>> {};
+struct raptor_parts : public raptor, public testing::WithParamInterface<std::tuple<size_t, size_t, bool, size_t>> {};

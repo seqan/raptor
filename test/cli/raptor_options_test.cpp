@@ -208,8 +208,7 @@ TEST_F(raptor_search, ibf_wrong)
                                                          "--output search.out");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] Validation failed for option --index: The file \"foo.ibf\" does not "
-                                      "exist!\n"});
+    EXPECT_EQ(result.err, std::string{"[Error] The file \"foo.ibf\" does not exist!\n"});
 }
 
 TEST_F(raptor_search, query_missing)
