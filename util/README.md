@@ -74,6 +74,7 @@ bin/
 $ tree src/bash_scripts/
 src/bash_scripts/
 ├── benchmark.sh           # Runs benchmarks for Raptor
+├── benchmark_wk.sh        # Runs different w/k combinations for Raptor
 ├── count_minimisers.sh    # Counts a variety of different minimizers for a data set
 ├── dream_yara.sh          # Runs benchmarks for DREAM-Yara
 ├── original_dream_yara.sh # Runs benchmarks for the original DREAM-Yara

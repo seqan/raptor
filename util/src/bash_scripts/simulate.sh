@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-BINARY_DIR="<path to built binaries>"
-OUT_DIR="<output path>"
+BINARY_DIR="<path to built binaries>" # Dir containing "mason_genome", "split_sequence", etc.
+OUT_DIR="<output path>" # Where simulated data should be stored
 LENGTH=4294967296 # 4*2^30 =  4GiB
 SEED=42 # was 20181406 before, but was hardcoded to 42 in seqan
 BIN_NUMBER=1024
