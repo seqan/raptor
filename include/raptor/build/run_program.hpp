@@ -50,7 +50,7 @@ void run_program(build_arguments const & arguments)
             auto filter_view = std::views::filter([&] (auto && hash)
                 { return std::ranges::find(association[part], hash & mask) != association[part].end(); });
 
-            auto ibf = generator(filter_view);
+            auto ibf = generator(std::move(filter_view));
             std::filesystem::path out_path{arguments.out_path};
             out_path += "_" + std::to_string(part);
             store_index(out_path, ibf, arguments);

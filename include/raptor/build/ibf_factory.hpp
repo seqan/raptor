@@ -48,7 +48,7 @@ private:
 
         auto hash_view = [&] ()
         {
-            if constexpr (!std::ranges::view<view_t>)
+            if constexpr (std::same_as<view_t, int>)
             {
                 return seqan3::views::minimiser_hash(seqan3::ungapped{arguments->kmer_size},
                                                      seqan3::window_size{arguments->window_size},

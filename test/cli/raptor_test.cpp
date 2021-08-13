@@ -369,7 +369,7 @@ TEST_P(raptor_parts, pipeline)
 
 INSTANTIATE_TEST_SUITE_P(parts_suite,
                          raptor_parts,
-                         testing::Combine(testing::Values(0), testing::Values(19, 23), testing::Values(true, false), testing::Values(0, 1)),
+                         testing::Combine(testing::Values(0, 16, 32), testing::Values(19, 23), testing::Values(true, false), testing::Values(0, 1)),
                          [] (testing::TestParamInfo<raptor_parts::ParamType> const & info)
                          {
                              std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
