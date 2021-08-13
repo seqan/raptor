@@ -26,6 +26,10 @@ target_link_libraries ("${PROJECT_NAME}_simple_model_lib" PUBLIC "${PROJECT_NAME
 add_library ("${PROJECT_NAME}_search_lib" STATIC raptor_search.cpp)
 target_link_libraries ("${PROJECT_NAME}_search_lib" PUBLIC "${PROJECT_NAME}_simple_model_lib")
 
+# Raptor upgrade
+add_library ("${PROJECT_NAME}_upgrade_lib" STATIC raptor_upgrade.cpp)
+target_link_libraries ("${PROJECT_NAME}_upgrade_lib" PUBLIC "${PROJECT_NAME}_interface")
+
 # Raptor argument parsing
 add_library ("${PROJECT_NAME}_argument_parsing_shared_lib" STATIC argument_parsing/shared.cpp)
 target_link_libraries ("${PROJECT_NAME}_argument_parsing_shared_lib" PUBLIC "${PROJECT_NAME}_interface")
@@ -39,14 +43,19 @@ target_link_libraries ("${PROJECT_NAME}_argument_parsing_search_lib" PUBLIC "${P
 add_library ("${PROJECT_NAME}_argument_parsing_top_level_lib" STATIC argument_parsing/top_level.cpp)
 target_link_libraries ("${PROJECT_NAME}_argument_parsing_top_level_lib" PUBLIC "${PROJECT_NAME}_argument_parsing_shared_lib")
 
+add_library ("${PROJECT_NAME}_argument_parsing_upgrade_lib" STATIC argument_parsing/upgrade.cpp)
+target_link_libraries ("${PROJECT_NAME}_argument_parsing_upgrade_lib" PUBLIC "${PROJECT_NAME}_argument_parsing_shared_lib")
+
 # Raptor library
 add_library ("${PROJECT_NAME}_lib" INTERFACE)
 target_link_libraries ("${PROJECT_NAME}_lib" INTERFACE "${PROJECT_NAME}_argument_parsing_build_lib")
 target_link_libraries ("${PROJECT_NAME}_lib" INTERFACE "${PROJECT_NAME}_argument_parsing_search_lib")
 target_link_libraries ("${PROJECT_NAME}_lib" INTERFACE "${PROJECT_NAME}_argument_parsing_shared_lib")
 target_link_libraries ("${PROJECT_NAME}_lib" INTERFACE "${PROJECT_NAME}_argument_parsing_top_level_lib")
+target_link_libraries ("${PROJECT_NAME}_lib" INTERFACE "${PROJECT_NAME}_argument_parsing_upgrade_lib")
 target_link_libraries ("${PROJECT_NAME}_lib" INTERFACE "${PROJECT_NAME}_build_lib")
 target_link_libraries ("${PROJECT_NAME}_lib" INTERFACE "${PROJECT_NAME}_search_lib")
+target_link_libraries ("${PROJECT_NAME}_lib" INTERFACE "${PROJECT_NAME}_upgrade_lib")
 
 # Raptor executable
 add_executable ("${PROJECT_NAME}" raptor_main.cpp)

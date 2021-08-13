@@ -1,0 +1,40 @@
+#pragma once
+
+#include <raptor/argument_parsing/shared.hpp>
+#include <raptor/build/store_index.hpp>
+
+namespace raptor
+{
+
+template <bool compressed>
+void upgrade_index(upgrade_arguments const & arguments)
+{
+    constexpr seqan3::data_layout layout = compressed ? seqan3::data_layout::compressed : seqan3::data_layout::uncompressed;
+    seqan3::interleaved_bloom_filter<layout> original_ibf{};
+
+    if (arguments.parts == 1u)
+    {
+        std::ifstream is{arguments.in_file, std::ios::binary};
+        cereal::BinaryInputArchive iarchive{is};
+        iarchive(original_ibf);
+        store_index(arguments.out_file, original_ibf, arguments);
+    }
+    else
+    {
+        for (size_t part : std::views::iota(0u, arguments.parts))
+        {
+            std::filesystem::path in_file{arguments.in_file};
+            in_file += "_" + std::to_string(part);
+
+            std::ifstream is{in_file, std::ios::binary};
+            cereal::BinaryInputArchive iarchive{is};
+            iarchive(original_ibf);
+
+            std::filesystem::path out_file{arguments.out_file};
+            out_file += "_" + std::to_string(part);
+            store_index(out_file, original_ibf, arguments);
+        }
+    }
+}
+
+} // namespace raptor

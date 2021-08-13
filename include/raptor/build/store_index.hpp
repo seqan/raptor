@@ -7,10 +7,10 @@
 namespace raptor
 {
 
-template <auto layout>
+template <auto layout, typename arguments_t>
 static inline void store_index(std::filesystem::path const & path,
                                seqan3::interleaved_bloom_filter<layout> const & ibf,
-                               build_arguments const & arguments)
+                               arguments_t const & arguments)
 {
     std::ofstream os{path, std::ios::binary};
     cereal::BinaryOutputArchive oarchive{os};
