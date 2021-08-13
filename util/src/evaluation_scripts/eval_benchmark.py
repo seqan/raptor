@@ -5,42 +5,41 @@ import os
 import re
 import time
 
-#Adjust parameters in generate_table_unpartitioned (bin and read count)
-OUT_PATH = '<output directory of benchmark with bin_number directory, e.g. /dev/shm/username/1024'
-#stores results in `OUTPATH/table.csv`
+BINS=1024
+READ_COUNT=1048576
+INPUT_BASE = '/home/infri/develop/raptor/build/util/test/results' # E.g., /dev/shm/username; should contain BINS subdirectory.
+OUTPUT_BASE = '/home/infri/develop/raptor/build/util/test/results' # Will create BINS subdirectory.
+EVAL_ENERGY=False # Energy consumption was measured in the benchmark.
 
-def process_output(path, bin_count, read_count, path_to_fp, path_to_fn):
-    with open(os.path.join(OUT_PATH, path_to_fn), "w") as fn_f:
-        with open(os.path.join(OUT_PATH, path_to_fp), "w") as fp_f:
-            with open(path) as f:
-                tp = 0
-                fp = 0
-                fn = 0
-                for line in f:
-                    try:
-                        [x, y, thr, count] = line.strip().split('\t')
-                    except ValueError:
-                        try:
-                            [x, y] = line.strip().split('\t')
-                            thr = -1
-                            count = -1
-                        except ValueError:
-                            fn += 1
-                            continue
-                    [read_id, bins] = [int(x), [int(e) for e in y[:-1].split(',') if e != '']]
-                    true_id = (read_id % read_count) // (read_count // bin_count)
-                    if true_id in bins:
-                        tp += 1
-                        if len(bins) != 1:
-                            fp += len(bins) - 1
-                            fp_f.write("False positive: read:{} bins:{} threshold:{} count:{}\n".format(read_id, bins, thr, count))
-                    else:
-                        fn += 1
-                        fn_f.write("False negative: read:{} bins:{} threshold:{} count:{}\n".format(read_id, bins, thr, count))
-                        fp += len(bins)
-                        if len(bins) != 0:
-                            fp_f.write("False positive: read:{} bins:{} threshold:{} count:{}\n".format(read_id, bins, thr, count))
-                return [tp,fp,fn]
+input_path = os.path.join(INPUT_BASE, str(BINS))
+if not os.path.exists(input_path):
+    raise OSError("{} does not exist.".format(input_path))
+output_path = os.path.join(INPUT_BASE, str(BINS))
+os.makedirs(output_path, exist_ok=True)
+
+def process_output(path):
+    with open(path) as f:
+        tp = 0
+        fp = 0
+        fn = 0
+        for line in f:
+            if line[0] == '#':
+                continue
+            try:
+                [x, y] = line.strip().split('\t')
+            except ValueError:
+                fn += 1
+                continue
+            [read_id, bins] = [int(x), [int(e) for e in y.split(',') if e != '']]
+            true_id = (read_id % READ_COUNT) // (READ_COUNT // BINS)
+            if true_id in bins:
+                tp += 1
+                if len(bins) != 1:
+                    fp += len(bins) - 1
+            else:
+                fn += 1
+                fp += len(bins)
+        return [tp,fp,fn]
 
 def process_time_log(path):
     time = []
@@ -67,39 +66,84 @@ def process_internal_time(path):
         [ibf_time, read_time, compute_time] = line.strip().split('\t')
         return [ibf_time, read_time, compute_time]
 
-def get_param_list(path = OUT_PATH):
+def process_energy(path):
+    if not EVAL_ENERGY:
+        return [-1, -1]
+    with open(path) as f:
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        energy_pkg = line.strip().split(' ')[0]
+        line = f.readline()
+        energy_ram = line.strip().split(' ')[0]
+        return [energy_pkg, energy_ram]
+
+def get_param_list(path = output_path):
     result = []
     for entry in os.listdir(path):
         match = re.match('(\d+)_(\d+)_(\d+\w).out$', entry)
         if match is not None:
             result.append( (match.group(1), match.group(2), match.group(3)) )
+    result.sort(key=lambda entry: int(entry[2][:-1]))
     return result
 
-# (how many bins: int), (how many reads: int)
-def generate_table_unpartitioned(bin_count=1024, read_count=1048576):
+def generate_table_unpartitioned():
     data = []
     params = get_param_list()
     format_string = 'Processing file {{:>{}}} of {}...'.format(len(str(len(params))), len(params))
     for i, (window_size, kmer_size, ibf_size) in enumerate(params):
         print(format_string.format(i + 1), end='', flush=True)
-        path_to_build_log = os.path.join(OUT_PATH, '{}_{}_{}_build.log'.format(window_size, kmer_size, ibf_size))
-        path_to_query_log = os.path.join(OUT_PATH, '{}_{}_{}_query.log'.format(window_size, kmer_size, ibf_size))
-        path_to_output = os.path.join(OUT_PATH, '{}_{}_{}.out'.format(window_size, kmer_size, ibf_size))
-        path_to_internal_time = os.path.join(OUT_PATH, '{}_{}_{}.out.time'.format(window_size, kmer_size, ibf_size))
-        path_to_fp = os.path.join(OUT_PATH, 'fp_{}_{}_{}.txt'.format(window_size, kmer_size, ibf_size))
-        path_to_fn = os.path.join(OUT_PATH, 'fn_{}_{}_{}.txt'.format(window_size, kmer_size, ibf_size))
+        path_to_build_log = os.path.join(output_path, '{}_{}_{}_build.log'.format(window_size, kmer_size, ibf_size))
+        path_to_build_perf = os.path.join(input_path, '{}_{}_{}_build.perf'.format(window_size, kmer_size, ibf_size))
+        path_to_query_log = os.path.join(output_path, '{}_{}_{}_query.log'.format(window_size, kmer_size, ibf_size))
+        path_to_query_perf = os.path.join(input_path, '{}_{}_{}_query.perf'.format(window_size, kmer_size, ibf_size))
+        path_to_output = os.path.join(output_path, '{}_{}_{}.out'.format(window_size, kmer_size, ibf_size))
+        path_to_internal_time = os.path.join(output_path, '{}_{}_{}.out.time'.format(window_size, kmer_size, ibf_size))
 
         [build_time, build_ram] = process_time_log(path_to_build_log)
+        [build_energy_pkg, build_energy_ram] = process_energy(path_to_build_perf)
         [query_time, query_ram] = process_time_log(path_to_query_log)
+        [query_energy_pkg, query_energy_ram] = process_energy(path_to_query_perf)
         [query_ibf_time, query_reads_time, query_compute_time] = process_internal_time(path_to_internal_time)
-        [tp, fp, fn] = process_output(path_to_output, bin_count, read_count, path_to_fp, path_to_fn)
-        data.append([build_time, build_ram, query_time, query_ibf_time, query_reads_time, query_compute_time, query_ram, fp, fn])
+        [tp, fp, fn] = process_output(path_to_output)
+
+        data.append([build_time,
+                     build_ram,
+                     build_energy_pkg,
+                     build_energy_ram,
+                     query_time,
+                     query_ibf_time,
+                     query_reads_time,
+                     query_compute_time,
+                     query_ram,
+                     query_energy_pkg,
+                     query_energy_ram,
+                     fp,
+                     fn])
         print('Done', flush=True)
-    df = pd.DataFrame(data, columns = [('Construct', 'Time'),  ('Construct', 'RAM'), ('Search','Overall'),  ('Search','IBF I/O'), ('Search','Reads I/O'),  ('Search','Compute'), ('Search','RAM'),  ('Search','FP'), ('Search','FN')])
-    df.index = [str(x).replace(',', ';').replace("'", '').replace('m', '') for x in params]
-    df.columns = pd.MultiIndex.from_tuples(df.columns, names=['','w k size'])
+    df = pd.DataFrame(data, columns = [('Construct', 'Time [MM:SS]'),
+                                       ('Construct', 'RAM [MiB]'),
+                                       ('Construct', 'energy-pkg [J]'),
+                                       ('Construct', 'energy-ram [J]'),
+                                       ('Search', 'Overall [MM:SS.ss]'),
+                                       ('Search', 'IBF I/O [SS.ss]'),
+                                       ('Search', 'Reads I/O [SS.ss]'),
+                                       ('Search', 'Compute [SS.ss]'),
+                                       ('Search', 'RAM [MiB]'),
+                                       ('Search', 'energy-pkg [J]'),
+                                       ('Search', 'energy-ram [J]'),
+                                       ('Search', 'FP'),
+                                       ('Search', 'FN')])
+    df.index = [str(x).replace(',', ';').replace("'", '') for x in params]
+    df.columns = pd.MultiIndex.from_tuples(df.columns, names=['','(w; k; size)'])
+    if not EVAL_ENERGY:
+        df = df.drop([('Construct', 'energy-pkg [J]'), ('Construct', 'energy-ram [J]'),
+                      ('Search', 'energy-pkg [J]'), ('Search', 'energy-ram [J]')], axis=1)
     return df
 
-path_to_csv = os.path.join(OUT_PATH, 'table.csv')
+path_to_csv = os.path.join(output_path, 'table.csv')
 df = generate_table_unpartitioned()
 df.to_csv(path_to_csv)
