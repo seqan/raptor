@@ -72,4 +72,18 @@ struct search_arguments
     bool is_socks{false};
 };
 
+struct upgrade_arguments
+{
+    uint32_t window_size{};
+    uint8_t kmer_size{};
+    uint8_t parts{1u};
+    bool compressed{false};
+
+    std::filesystem::path bin_file{};
+    std::filesystem::path in_file{};
+    std::filesystem::path out_file{};
+
+    std::vector<std::vector<std::string>> bin_path{};
+};
+
 } // namespace raptor

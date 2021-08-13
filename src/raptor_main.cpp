@@ -3,6 +3,7 @@
 #include <raptor/argument_parsing/build.hpp>
 #include <raptor/argument_parsing/search.hpp>
 #include <raptor/argument_parsing/shared.hpp>
+#include <raptor/argument_parsing/upgrade.hpp>
 #include <raptor/argument_parsing/top_level.hpp>
 #include <raptor/raptor.hpp>
 
@@ -10,7 +11,7 @@ int main(int argc, char ** argv)
 {
     try
     {
-        seqan3::argument_parser top_level_parser{"raptor", argc, argv, seqan3::update_notifications::on, {"build", "search", "socks"}};
+        seqan3::argument_parser top_level_parser{"raptor", argc, argv, seqan3::update_notifications::on, {"build", "search", "socks", "upgrade"}};
         raptor::init_top_level_parser(top_level_parser);
 
         raptor::try_parsing(top_level_parser);
@@ -30,6 +31,8 @@ int main(int argc, char ** argv)
             if (socks_sub_parser.info.app_name == std::string_view{"socks-lookup-kmer"})
                 raptor::run_search(socks_sub_parser, true);
         }
+        if (sub_parser.info.app_name == std::string_view{"raptor-upgrade"})
+            raptor::run_upgrade(sub_parser);
     }
     catch (seqan3::argument_parser_error const & ext)
     {
