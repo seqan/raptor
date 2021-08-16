@@ -72,9 +72,7 @@ for w in $(seq 23 2 32 && seq 32 2 80) # w=23,25,27,29,31,32,34,36,38,...,80
 do
     for k in 16 17 18 19 20
     do
-        if [[ $w != 23 ]] || [[ $k != 20 ]]; then # Segfault for READ_LENGTH = 150
-            do_task & pidlist="$pidlist $!"
-        fi
+        do_task & pidlist="$pidlist $!"
     done
     for job in $pidlist
     do
