@@ -98,7 +98,7 @@ To build an index over all bins, we first prepare a file that contains one file 
 (a line corresponds to a bin) and use this file as input:
 ```
 seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63 > all_bin_paths.txt
-raptor build --kmer 19 --window 23 --size 8m --output another_index.raptor all_bin_paths.txt
+raptor build --kmer 19 --window 23 --size 8m --output index.raptor all_bin_paths.txt
 ```
 
 You may be prompted to enable or disable automatic update notifications. For questions, please consult
@@ -151,7 +151,7 @@ raptor build --kmer 19 --window 23 --size 8m --compute-minimiser --output precom
 Then we run the build step again and use the computed minimisers as input:
 ```
 seq -f "precomputed_minimisers/bin_%02g.minimiser" 0 1 63 > all_minimiser_paths.txt
-raptor build --size 8m --output another_minimiser_index.raptor all_minimiser_paths.txt
+raptor build --size 8m --output minimiser_index.raptor all_minimiser_paths.txt
 ```
 
 ### SOCKS interface
