@@ -1,3 +1,10 @@
+// -----------------------------------------------------------------------------------------------------
+// Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
+// Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
+// This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
+// shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
+// -----------------------------------------------------------------------------------------------------
+
 #include <raptor/argument_parsing/shared.hpp>
 
 namespace raptor
@@ -11,7 +18,7 @@ void init_shared_meta(seqan3::argument_parser & parser)
                            "nucleotide sequences; Enrico Seiler, Svenja Mehringer, Mitra Darvish, Etienne Turc, "
                            "and Knut Reinert; iScience 2021 24 (7): 102782. doi: "
                            "https://doi.org/10.1016/j.isci.2021.102782";
-    parser.info.date = "03-08-2021";
+    parser.info.date = "17-08-2021";
     parser.info.email = "enrico.seiler@fu-berlin.de";
     parser.info.long_copyright = R"(BSD 3-Clause License
 
