@@ -33,6 +33,7 @@ set (FontReset "${Esc}[m")
 
 # Dependency: SeqAn3.
 set (SEQAN3_CEREAL ON CACHE BOOL "Require cereal to be present.")
+set (SEQAN3_SUBMODULES_DIR "lib")
 find_package (SeqAn3 QUIET REQUIRED HINTS lib/seqan3/build_system)
 
 # Use ccache.

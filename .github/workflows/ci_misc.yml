@@ -41,7 +41,7 @@ jobs:
         with:
           path: src
           fetch-depth: 2
-          submodules: recursive
+          submodules: true
 
       - name: Add package source
         run: bash ./src/lib/seqan3/.github/workflows/scripts/configure_apt.sh

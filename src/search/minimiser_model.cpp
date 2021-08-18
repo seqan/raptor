@@ -72,7 +72,7 @@ std::vector<size_t> precompute_threshold(size_t const pattern_size,
 
 void do_cerealisation_out(std::vector<size_t> const & vec, search_arguments const & arguments)
 {
-    std::filesystem::path filename = arguments.ibf_file.parent_path() / ("binary_p" + std::to_string(arguments.pattern_size) +
+    std::filesystem::path filename = arguments.index_file.parent_path() / ("binary_p" + std::to_string(arguments.pattern_size) +
                                                                          "_w" + std::to_string(arguments.window_size) +
                                                                          "_k" + std::to_string(arguments.kmer_size) +
                                                                          "_e" + std::to_string(arguments.errors) +
@@ -84,7 +84,7 @@ void do_cerealisation_out(std::vector<size_t> const & vec, search_arguments cons
 
 bool do_cerealisation_in(std::vector<size_t> & vec, search_arguments const & arguments)
 {
-    std::filesystem::path filename = arguments.ibf_file.parent_path() / ("binary_p" + std::to_string(arguments.pattern_size) +
+    std::filesystem::path filename = arguments.index_file.parent_path() / ("binary_p" + std::to_string(arguments.pattern_size) +
                                                                          "_w" + std::to_string(arguments.window_size) +
                                                                          "_k" + std::to_string(arguments.kmer_size) +
                                                                          "_e" + std::to_string(arguments.errors) +

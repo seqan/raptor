@@ -17,14 +17,14 @@ template <bool compressed>
 void upgrade_index(upgrade_arguments const & arguments)
 {
     constexpr seqan3::data_layout layout = compressed ? seqan3::data_layout::compressed : seqan3::data_layout::uncompressed;
-    seqan3::interleaved_bloom_filter<layout> original_ibf{};
+    seqan3::interleaved_bloom_filter<layout> original_index{};
 
     if (arguments.parts == 1u)
     {
         std::ifstream is{arguments.in_file, std::ios::binary};
         cereal::BinaryInputArchive iarchive{is};
-        iarchive(original_ibf);
-        store_index(arguments.out_file, original_ibf, arguments);
+        iarchive(original_index);
+        store_index(arguments.out_file, std::move(original_index), arguments);
     }
     else
     {
@@ -35,11 +35,11 @@ void upgrade_index(upgrade_arguments const & arguments)
 
             std::ifstream is{in_file, std::ios::binary};
             cereal::BinaryInputArchive iarchive{is};
-            iarchive(original_ibf);
+            iarchive(original_index);
 
             std::filesystem::path out_file{arguments.out_file};
             out_file += "_" + std::to_string(part);
-            store_index(out_file, original_ibf, arguments);
+            store_index(out_file, std::move(original_index), arguments);
         }
     }
 }

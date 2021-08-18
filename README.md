@@ -30,20 +30,21 @@ Refer to the [Seqan3 Setup Tutorial](https://docs.seqan.de/seqan/3-master-user/s
 <details><summary>Download current master branch (click to expand)</summary>
 
 ```bash
-git clone --recurse-submodules https://github.com/seqan/raptor
+git clone https://github.com/seqan/raptor
+git submodule update --init
 ```
 
 </details>
 
 <details><summary>Download specific version (click to expand)</summary>
 
-E.g., for version `1.0.0`:
+E.g., for version `1.1.0`:
 ```bash
-git clone --branch raptor-v1.0.0 --recurse-submodules https://github.com/seqan/raptor
+git clone --branch raptor-v1.1.0 --recurse-submodules https://github.com/seqan/raptor
 ```
 Or from within an existing repository
 ```bash
-git checkout raptor-v1.0.0
+git checkout raptor-v1.1.0
 ```
 </details>
 
@@ -98,7 +99,7 @@ To build an index over all bins, we first prepare a file that contains one file 
 (a line corresponds to a bin) and use this file as input:
 ```
 seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63 > all_bin_paths.txt
-raptor build --kmer 19 --window 23 --size 8m --output index.raptor all_bin_paths.txt
+raptor build --kmer 19 --window 23 --size 8m --output raptor.index all_bin_paths.txt
 ```
 
 You may be prompted to enable or disable automatic update notifications. For questions, please consult
@@ -107,7 +108,7 @@ You may be prompted to enable or disable automatic update notifications. For que
 Afterwards, we can search for all reads from bin 1:
 
 ```
-raptor search --error 2 --index index.raptor --query example_data/64/reads/mini.fastq --output search.output
+raptor search --error 2 --index raptor.index --query example_data/64/reads/mini.fastq --output search.output
 ```
 
 Each line of the output consists of the read ID (in the toy example these are numbers) and the corresponding bins in
@@ -151,7 +152,7 @@ raptor build --kmer 19 --window 23 --size 8m --compute-minimiser --output precom
 Then we run the build step again and use the computed minimisers as input:
 ```
 seq -f "precomputed_minimisers/bin_%02g.minimiser" 0 1 63 > all_minimiser_paths.txt
-raptor build --size 8m --output minimiser_index.raptor all_minimiser_paths.txt
+raptor build --size 8m --output minimiser_raptor.index all_minimiser_paths.txt
 ```
 
 ### SOCKS interface

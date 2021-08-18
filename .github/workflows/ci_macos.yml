@@ -46,7 +46,7 @@ jobs:
         with:
           path: src
           fetch-depth: 2
-          submodules: recursive
+          submodules: true
 
       - name: Configure Homebrew
         uses: Homebrew/actions/setup-homebrew@master

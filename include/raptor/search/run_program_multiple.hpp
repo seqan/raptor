@@ -12,7 +12,7 @@
 
 #include <raptor/search/compute_simple_model.hpp>
 #include <raptor/search/do_parallel.hpp>
-#include <raptor/search/load_ibf.hpp>
+#include <raptor/search/load_index.hpp>
 #include <raptor/search/sync_out.hpp>
 
 namespace raptor
@@ -21,15 +21,15 @@ namespace raptor
 template <bool compressed>
 void run_program_multiple(search_arguments const & arguments)
 {
-    constexpr seqan3::data_layout ibf_data_layout = compressed ? seqan3::data_layout::compressed :
+    constexpr seqan3::data_layout data_layout_mode = compressed ? seqan3::data_layout::compressed :
                                                                  seqan3::data_layout::uncompressed;
-    auto ibf = seqan3::interleaved_bloom_filter<ibf_data_layout>{};
+    auto index = raptor_index<data_layout_mode>{};
 
     seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::id, seqan3::field::seq>> fin{arguments.query_file};
     using record_type = typename decltype(fin)::record_type;
     std::vector<record_type> records{};
 
-    double ibf_io_time{0.0};
+    double index_io_time{0.0};
     double reads_io_time{0.0};
     double compute_time{0.0};
 
@@ -45,7 +45,7 @@ void run_program_multiple(search_arguments const & arguments)
 
     auto cereal_worker = [&] ()
     {
-        load_ibf(ibf, arguments, 0, ibf_io_time);
+        load_index(index, arguments, 0, index_io_time);
     };
 
     sync_out synced_out{arguments.out_file};
@@ -84,10 +84,11 @@ void run_program_multiple(search_arguments const & arguments)
         cereal_handle.wait();
 
         std::vector<seqan3::counting_vector<uint16_t>> counts(records.size(),
-                                                              seqan3::counting_vector<uint16_t>(ibf.bin_count(), 0));
+                                                              seqan3::counting_vector<uint16_t>(index.ibf().bin_count(), 0));
 
         auto count_task = [&](size_t const start, size_t const end)
         {
+            auto & ibf = index.ibf();
             auto counter = ibf.template counting_agent<uint16_t>();
             size_t counter_id = start;
 
@@ -107,14 +108,15 @@ void run_program_multiple(search_arguments const & arguments)
 
         for (size_t const part : std::views::iota(1u, static_cast<unsigned int>(arguments.parts - 1)))
         {
-            load_ibf(ibf, arguments, part, ibf_io_time);
+            load_index(index, arguments, part, index_io_time);
             do_parallel(count_task, records.size(), arguments.threads, compute_time);
         }
 
-        load_ibf(ibf, arguments, arguments.parts - 1, ibf_io_time);
+        load_index(index, arguments, arguments.parts - 1, index_io_time);
 
         auto output_task = [&](size_t const start, size_t const end)
         {
+            auto & ibf = index.ibf();
             auto counter = ibf.template counting_agent<uint16_t>();
             size_t counter_id = start;
             std::string result_string{};
@@ -171,10 +173,10 @@ void run_program_multiple(search_arguments const & arguments)
         std::filesystem::path file_path{arguments.out_file};
         file_path += ".time";
         std::ofstream file_handle{file_path};
-        file_handle << "IBF I/O\tReads I/O\tCompute\n";
+        file_handle << "Index I/O\tReads I/O\tCompute\n";
         file_handle << std::fixed
                     << std::setprecision(2)
-                    << ibf_io_time << '\t'
+                    << index_io_time << '\t'
                     << reads_io_time << '\t'
                     << compute_time;
     }

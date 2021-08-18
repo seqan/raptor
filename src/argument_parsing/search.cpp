@@ -8,6 +8,7 @@
 #include <seqan3/io/views/async_input_buffer.hpp>
 
 #include <raptor/argument_parsing/search.hpp>
+#include <raptor/index.hpp>
 #include <raptor/search/search.hpp>
 
 namespace raptor
@@ -17,11 +18,11 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
 {
     init_shared_meta(parser);
     init_shared_options(parser, arguments);
-    parser.add_option(arguments.ibf_file,
+    parser.add_option(arguments.index_file,
                       '\0',
                       "index",
-                      arguments.is_socks ? "Provide a valid path to an IBF." :
-                                           "Provide a valid path to an IBF. Parts: Without suffix _0",
+                      arguments.is_socks ? "Provide a valid path to an index." :
+                                           "Provide a valid path to an index. Parts: Without suffix _0",
                       seqan3::option_spec::required);
     parser.add_option(arguments.query_file,
                       '\0',
@@ -61,7 +62,7 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
     parser.add_flag(arguments.compressed,
                     '\0',
                     "compressed",
-                    "Build a compressed IBF.");
+                    "Build a compressed index.");
     parser.add_flag(arguments.write_time,
                     '\0',
                     "time",
@@ -87,17 +88,17 @@ void run_search(seqan3::argument_parser & parser, bool const is_socks)
 
     arguments.treshold_was_set = parser.is_option_set("threshold");
 
-    if (arguments.parts == 1)
+    bool partitioned{false};
+    seqan3::input_file_validator validator{};
+
+    try
     {
-        seqan3::input_file_validator{}(arguments.ibf_file);
+        validator(arguments.index_file.string() + std::string{"_0"});
+        partitioned = true;
     }
-    else
+    catch (seqan3::validation_error const & e)
     {
-        seqan3::input_file_validator validator{};
-        for (size_t part{0}; part < arguments.parts; ++part)
-        {
-            validator(arguments.ibf_file.string() + std::string{"_"} + std::to_string(part));
-        }
+        validator(arguments.index_file);
     }
 
     // ==========================================
@@ -119,15 +120,29 @@ void run_search(seqan3::argument_parser & parser, bool const is_socks)
     // Read window and kmer size, and the bin paths.
     // ==========================================
     {
-        std::ifstream is{arguments.parts == 1 ? arguments.ibf_file.string() :
-                                                arguments.ibf_file.string() + std::string{"_0"},
+        std::ifstream is{partitioned ? arguments.index_file.string() + std::string{"_0"} :
+                                       arguments.index_file.string(),
                          std::ios::binary};
         cereal::BinaryInputArchive iarchive{is};
-        iarchive(arguments.kmer_size);
-        iarchive(arguments.window_size);
-        iarchive(arguments.bin_path);
+        raptor_index<> tmp{};
+        tmp.load_parameters(iarchive);
+        arguments.kmer_size = tmp.kmer_size();
+        arguments.window_size = tmp.window_size();
+        arguments.parts = tmp.parts();
+        arguments.bin_path = tmp.bin_path();
         if (arguments.is_socks)
             arguments.pattern_size = arguments.kmer_size;
+    }
+
+    // ==========================================
+    // Partitioned index: Check that all parts are available.
+    // ==========================================
+    if (partitioned)
+    {
+        for (size_t part{0}; part < arguments.parts; ++part)
+        {
+            validator(arguments.index_file.string() + std::string{"_"} + std::to_string(part));
+        }
     }
 
     // ==========================================

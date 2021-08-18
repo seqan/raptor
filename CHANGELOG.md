@@ -1,9 +1,9 @@
 # 2.0.0
 
 ## Features
-* The index additionally stores the original file paths, window size, and k-mer size
+* The index additionally stores the original file paths, window size, k-mer size, and the number of parts
   ([\#34](https://github.com/seqan/raptor/pull/34), [\#47](https://github.com/seqan/raptor/pull/47)):
-  * `--window` and `--kmer` are no longer supported when running `raptor search`.
+  * `--window`, `--kmer`, `--parts` are no longer supported when running `raptor search`.
   * Indices built with an older version of raptor cannot be used with version 2.0.0.
   * Old indices can be converted by running `raptor upgrade`.
 

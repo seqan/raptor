@@ -11,13 +11,16 @@
 
 #include <seqan3/test/snippet/create_temporary_snippet_file.hpp>
 
-seqan3::test::create_temporary_snippet_file tmp_ibf_file{"tmp.ibf", "\nsome_content"};
+seqan3::test::create_temporary_snippet_file tmp_index_file{"tmp.index", "\nsome_content"};
 seqan3::test::create_temporary_snippet_file dummy_sequence_file{"dummy.fasta", "\nACGTC"};
 seqan3::test::create_temporary_snippet_file tmp_bin_list_file{"all_bins.txt", std::string{"\n"} + dummy_sequence_file.file_path.string()};
 
 #include "cli_test.hpp"
 
-TEST_F(raptor, no_options)
+struct raptor_build : public raptor_base {};
+struct raptor_search : public raptor_base {};
+
+TEST_F(raptor_base, no_options)
 {
     cli_test_result const result = execute_app("raptor");
     std::string const expected
@@ -59,7 +62,7 @@ TEST_F(raptor_search, no_options)
     EXPECT_EQ(result.err, std::string{});
 }
 
-TEST_F(raptor, no_subparser)
+TEST_F(raptor_base, no_subparser)
 {
     cli_test_result const result = execute_app("raptor", "foo");
     std::string const expected
@@ -72,7 +75,7 @@ TEST_F(raptor, no_subparser)
     EXPECT_EQ(result.err, expected);
 }
 
-TEST_F(raptor, unknown_option)
+TEST_F(raptor_base, unknown_option)
 {
     cli_test_result const result = execute_app("raptor", "-v");
     std::string const expected
@@ -120,11 +123,11 @@ TEST_F(raptor_build, output_wrong)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8m",
-                                                         "--output foo/out.ibf",
+                                                         "--output foo/out.index",
                                                          tmp_bin_list_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] Cannot write \"foo/out.ibf\"!\n"});
+    EXPECT_EQ(result.err, std::string{"[Error] Cannot write \"foo/out.index\"!\n"});
 }
 
 TEST_F(raptor_build, directory_missing)
@@ -211,17 +214,17 @@ TEST_F(raptor_search, ibf_wrong)
 {
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--query ", data("query.fq"),
-                                                         "--index foo.ibf",
+                                                         "--index foo.index",
                                                          "--output search.out");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] The file \"foo.ibf\" does not exist!\n"});
+    EXPECT_EQ(result.err, std::string{"[Error] The file \"foo.index\" does not exist!\n"});
 }
 
 TEST_F(raptor_search, query_missing)
 {
     cli_test_result const result = execute_app("raptor", "search",
-                                                         "--index ", tmp_ibf_file.file_path,
+                                                         "--index ", tmp_index_file.file_path,
                                                          "--output search.out");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
@@ -232,7 +235,7 @@ TEST_F(raptor_search, query_wrong)
 {
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--query foo.fasta",
-                                                         "--index ", tmp_ibf_file.file_path,
+                                                         "--index ", tmp_index_file.file_path,
                                                          "--output search.out");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
@@ -244,7 +247,7 @@ TEST_F(raptor_search, output_missing)
 {
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--query ", data("query.fq"),
-                                                         "--index ", tmp_ibf_file.file_path);
+                                                         "--index ", tmp_index_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
@@ -254,10 +257,21 @@ TEST_F(raptor_search, output_wrong)
 {
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--query ", data("query.fq"),
-                                                         "--index ", tmp_ibf_file.file_path,
+                                                         "--index ", tmp_index_file.file_path,
                                                          "--output foo/search.out");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Validation failed for option --output: Cannot write "
                                       "\"foo/search.out\"!\n"});
+}
+
+TEST_F(raptor_search, old_index)
+{
+    cli_test_result const result = execute_app("raptor", "search",
+                                                         "--query ", data("query.fq"),
+                                                         "--index ", data("1_1.index"),
+                                                         "--output search.out");
+    EXPECT_NE(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] Unsupported index version. Check raptor upgrade.\n"});
 }

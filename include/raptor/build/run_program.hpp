@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <raptor/build/ibf_factory.hpp>
+#include <raptor/build/index_factory.hpp>
 #include <raptor/build/store_index.hpp>
 
 namespace raptor
@@ -16,12 +16,12 @@ namespace raptor
 template <bool compressed>
 void run_program(build_arguments const & arguments)
 {
-    ibf_factory<compressed> generator{arguments};
+    index_factory<compressed> generator{arguments};
 
     if (arguments.parts == 1u)
     {
-        auto ibf = generator();
-        store_index(arguments.out_path, ibf, arguments);
+        auto index = generator();
+        store_index(arguments.out_path, index, arguments);
     }
     else
     {
@@ -57,10 +57,10 @@ void run_program(build_arguments const & arguments)
             auto filter_view = std::views::filter([&] (auto && hash)
                 { return std::ranges::find(association[part], hash & mask) != association[part].end(); });
 
-            auto ibf = generator(std::move(filter_view));
+            auto index = generator(std::move(filter_view));
             std::filesystem::path out_path{arguments.out_path};
             out_path += "_" + std::to_string(part);
-            store_index(out_path, ibf, arguments);
+            store_index(out_path, index, arguments);
         }
     }
 }

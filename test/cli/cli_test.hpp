@@ -100,7 +100,7 @@ protected:
     }
 };
 
-struct raptor : public cli_test
+struct raptor_base : public cli_test
 {
     static inline std::string const repeat_bins(size_t const repetitions) noexcept
     {
@@ -130,7 +130,7 @@ struct raptor : public cli_test
         name += std::to_string(std::max<int>(1, number_of_repetitions * 4));
         name += "bins";
         name += std::to_string(window_size);
-        name += "window.ibf";
+        name += "window.index";
         return cli_test::data(name);
     }
 
@@ -160,8 +160,3 @@ struct raptor : public cli_test
         return {file_buffer.str()};
     }
 };
-
-struct raptor_build : public raptor, public testing::WithParamInterface<std::tuple<size_t, size_t, bool>> {};
-struct raptor_search : public raptor, public testing::WithParamInterface<std::tuple<size_t, size_t, size_t>> {};
-struct raptor_parts : public raptor, public testing::WithParamInterface<std::tuple<size_t, size_t, bool, size_t>> {};
-struct raptor_upgrade : public raptor {};
