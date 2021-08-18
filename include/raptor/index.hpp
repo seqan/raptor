@@ -27,6 +27,7 @@ private:
     uint64_t window_size_{};
     uint8_t kmer_size_{};
     uint8_t parts_{};
+    bool compressed_{};
     std::vector<std::vector<std::string>> bin_path_{};
     ibf_t ibf_{};
 
@@ -45,12 +46,14 @@ public:
     explicit raptor_index(window const window_size,
                           kmer const kmer_size,
                           uint8_t const parts,
+                          bool const compressed,
                           std::vector<std::vector<std::string>> const & bin_path,
                           ibf_t && ibf)
     :
         window_size_{window_size.v},
         kmer_size_{kmer_size.v},
         parts_{parts},
+        compressed_{compressed},
         bin_path_{bin_path},
         ibf_{std::move(ibf)}
     {}
@@ -61,6 +64,7 @@ public:
         window_size_{arguments.window_size},
         kmer_size_{arguments.kmer_size},
         parts_{arguments.parts},
+        compressed_{arguments.compressed},
         bin_path_{arguments.bin_path},
         ibf_{seqan3::bin_count{arguments.bins},
              seqan3::bin_size{arguments.bits / arguments.parts},
@@ -73,6 +77,7 @@ public:
         window_size_ = other.window_size_;
         kmer_size_ = other.kmer_size_;
         parts_ = other.parts_;
+        compressed_ = true;
         bin_path_ = other.bin_path_;
         ibf_ = ibf_t{other.ibf_};
     }
@@ -83,6 +88,7 @@ public:
         window_size_ = std::move(other.window_size_);
         kmer_size_ = std::move(other.kmer_size_);
         parts_ = std::move(other.parts_);
+        compressed_ = true;
         bin_path_ = std::move(other.bin_path_);
         ibf_ = std::move(ibf_t{std::move(other.ibf_)});
     }
@@ -100,6 +106,11 @@ public:
     uint8_t parts() const
     {
         return parts_;
+    }
+
+    bool compressed() const
+    {
+        return compressed_;
     }
 
     std::vector<std::vector<std::string>> const & bin_path() const
@@ -135,12 +146,18 @@ public:
                 archive(window_size_);
                 archive(kmer_size_);
                 archive(parts_);
+                archive(compressed_);
+                if ((data_layout_mode == seqan3::data_layout::compressed && !compressed_) ||
+                    (data_layout_mode == seqan3::data_layout::uncompressed && compressed_))
+                {
+                    throw seqan3::argument_parser_error{"Data layouts of serialised and specified index differ."};
+                }
                 archive(bin_path_);
                 archive(ibf_);
             }
-            catch (std::exception const &)
+            catch (std::exception const & e)
             {
-                throw seqan3::argument_parser_error{"Cannot read index."};
+                throw seqan3::argument_parser_error{"Cannot read index: " + std::string{e.what()}};
             }
         }
         else
@@ -168,11 +185,12 @@ public:
                 archive(window_size_);
                 archive(kmer_size_);
                 archive(parts_);
+                archive(compressed_);
                 archive(bin_path_);
             }
-            catch (std::exception const &)
+            catch (std::exception const & e)
             {
-                throw seqan3::argument_parser_error{"Cannot read index."};
+                throw seqan3::argument_parser_error{"Cannot read index: " + std::string{e.what()}};
             }
         }
         else
