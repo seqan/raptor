@@ -9,6 +9,7 @@
 
 #include <seqan3/argument_parser/exceptions.hpp>
 #include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
+#include <seqan3/search/kmer_index/shape.hpp>
 
 #include <raptor/shared.hpp>
 
@@ -144,7 +145,9 @@ public:
             try
             {
                 archive(window_size_);
-                archive(kmer_size_);
+                seqan3::shape shape = kmer_size_ ? seqan3::shape{seqan3::ungapped{kmer_size_}} : seqan3::shape{};
+                archive(shape);
+                kmer_size_ = shape.size();
                 archive(parts_);
                 archive(compressed_);
                 if ((data_layout_mode == seqan3::data_layout::compressed && !compressed_) ||
@@ -183,7 +186,9 @@ public:
             try
             {
                 archive(window_size_);
-                archive(kmer_size_);
+                seqan3::shape shape{};
+                archive(shape);
+                kmer_size_ = shape.size();
                 archive(parts_);
                 archive(compressed_);
                 archive(bin_path_);
