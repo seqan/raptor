@@ -5,3 +5,16 @@
 [submodule "lib/robin-hood-hashing"]
 	path = lib/robin-hood-hashing
 	url = https://github.com/martinus/robin-hood-hashing.git
+	branch = master
+[submodule "lib/submodules/cereal"]
+	path = lib/submodules/cereal
+	url = https://github.com/USCiLab/cereal
+	branch = master
+[submodule "lib/submodules/range-v3"]
+	path = lib/submodules/range-v3
+	url = https://github.com/ericniebler/range-v3
+	branch = master
+[submodule "lib/submodules/sdsl-lite"]
+	path = lib/submodules/sdsl-lite
+	url = https://github.com/xxsds/sdsl-lite
+	branch = master

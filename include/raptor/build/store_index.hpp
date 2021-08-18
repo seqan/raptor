@@ -9,22 +9,36 @@
 
 #include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
 
+#include <raptor/index.hpp>
 #include <raptor/shared.hpp>
 
 namespace raptor
 {
 
-template <auto layout, typename arguments_t>
+template <seqan3::data_layout layout, typename arguments_t>
 static inline void store_index(std::filesystem::path const & path,
-                               seqan3::interleaved_bloom_filter<layout> const & ibf,
+                               raptor_index<layout> const & index,
                                arguments_t const & arguments)
 {
     std::ofstream os{path, std::ios::binary};
     cereal::BinaryOutputArchive oarchive{os};
-    oarchive(arguments.kmer_size);
-    oarchive(arguments.window_size);
-    oarchive(arguments.bin_path);
-    oarchive(ibf);
+    oarchive(index);
+}
+
+template <auto layout, typename arguments_t>
+static inline void store_index(std::filesystem::path const & path,
+                               seqan3::interleaved_bloom_filter<layout> && ibf,
+                               arguments_t const & arguments)
+{
+    raptor_index<layout> index{window{arguments.window_size},
+                               kmer{arguments.kmer_size},
+                               arguments.parts,
+                               arguments.bin_path,
+                               std::move(ibf)};
+
+    std::ofstream os{path, std::ios::binary};
+    cereal::BinaryOutputArchive oarchive{os};
+    oarchive(index);
 }
 
 } // namespace raptor

@@ -16,13 +16,12 @@ namespace raptor
 template <bool compressed>
 void build_from_minimiser(build_arguments const & arguments)
 {
-    seqan3::interleaved_bloom_filter<> ibf{seqan3::bin_count{arguments.bins},
-                                           seqan3::bin_size{arguments.bits / arguments.parts},
-                                           seqan3::hash_function_count{arguments.hash}};
+    raptor_index<> index{arguments};
 
     auto worker = [&] (auto && zipped_view, auto &&)
         {
             uint64_t read_number;
+            auto & ibf = index.ibf();
 
             for (auto && [file_names, bin_number] : zipped_view)
             {
@@ -40,12 +39,12 @@ void build_from_minimiser(build_arguments const & arguments)
 
     if constexpr (compressed)
     {
-        seqan3::interleaved_bloom_filter<seqan3::data_layout::compressed> cibf{std::move(ibf)};
-        store_index(arguments.out_path, cibf, arguments);
+        raptor_index<seqan3::data_layout::compressed> cindex{std::move(index)};
+        store_index(arguments.out_path, cindex, arguments);
     }
     else
     {
-        store_index(arguments.out_path, ibf, arguments);
+        store_index(arguments.out_path, index, arguments);
     }
 }
 

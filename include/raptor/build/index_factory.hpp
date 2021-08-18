@@ -16,17 +16,17 @@ namespace raptor
 {
 
 template <bool compressed>
-class ibf_factory
+class index_factory
 {
 public:
-    ibf_factory() = default;
-    ibf_factory(ibf_factory const &) = default;
-    ibf_factory(ibf_factory &&) = default;
-    ibf_factory & operator=(ibf_factory const &) = default;
-    ibf_factory & operator=(ibf_factory &&) = default;
-    ~ibf_factory() = default;
+    index_factory() = default;
+    index_factory(index_factory const &) = default;
+    index_factory(index_factory &&) = default;
+    index_factory & operator=(index_factory const &) = default;
+    index_factory & operator=(index_factory &&) = default;
+    ~index_factory() = default;
 
-    explicit ibf_factory(build_arguments const & args) : arguments{std::addressof(args)} {}
+    explicit index_factory(build_arguments const & args) : arguments{std::addressof(args)} {}
 
     template <typename view_t = int>
     [[nodiscard]] auto operator()(view_t && hash_filter_view = 0) const
@@ -36,7 +36,7 @@ public:
         if constexpr (!compressed)
             return tmp;
         else
-            return seqan3::interleaved_bloom_filter<seqan3::data_layout::compressed>{std::move(tmp)};
+            return raptor_index<seqan3::data_layout::compressed>{std::move(tmp)};
     }
 
 private:
@@ -49,9 +49,7 @@ private:
 
         assert(arguments != nullptr);
 
-        seqan3::interleaved_bloom_filter<> ibf{seqan3::bin_count{arguments->bins},
-                                               seqan3::bin_size{arguments->bits / arguments->parts},
-                                               seqan3::hash_function_count{arguments->hash}};
+        raptor_index<> index{*arguments};
 
         auto hash_view = [&] ()
         {
@@ -72,6 +70,8 @@ private:
 
         auto worker = [&] (auto && zipped_view, auto &&)
         {
+            auto & ibf = index.ibf();
+
             for (auto && [file_names, bin_number] : zipped_view)
                 for (auto && file_name : file_names)
                     for (auto && [seq] : sequence_file_t{file_name})
@@ -81,7 +81,7 @@ private:
 
         call_parallel_on_bins(worker, *arguments);
 
-        return ibf;
+        return index;
     }
 };
 

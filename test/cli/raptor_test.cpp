@@ -13,11 +13,14 @@
 #include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
 #include <seqan3/utility/views/zip.hpp>
 
+#include <raptor/index.hpp>
+
 #include "cli_test.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////// raptor build tests ///////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct raptor_build : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, bool>> {};
 
 // Good example for printing tables: https://en.cppreference.com/w/cpp/io/ios_base/width
 std::string debug_ibfs(seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed> const & expected_ibf,
@@ -72,33 +75,28 @@ std::string debug_ibfs(seqan3::interleaved_bloom_filter<seqan3::data_layout::unc
 
 void compare_results(std::filesystem::path const & expected_result, std::filesystem::path const & actual_result)
 {
-    uint8_t expected_kmer_size{}, actual_kmer_size{};
-    uint32_t expected_window_size{}, actual_window_size{};
-    std::vector<std::vector<std::string>> expected_bin_path{}, actual_bin_path{};
-    seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed> expected_ibf{}, actual_ibf{};
+    raptor::raptor_index<seqan3::data_layout::uncompressed> expected_index, actual_index{};
 
     {
         std::ifstream is{expected_result, std::ios::binary};
         cereal::BinaryInputArchive iarchive{is};
-        iarchive(expected_kmer_size);
-        iarchive(expected_window_size);
-        iarchive(expected_bin_path);
-        iarchive(expected_ibf);
+        iarchive(expected_index);
     }
     {
         std::ifstream is{actual_result, std::ios::binary};
         cereal::BinaryInputArchive iarchive{is};
-        iarchive(actual_kmer_size);
-        iarchive(actual_window_size);
-        iarchive(actual_bin_path);
-        iarchive(actual_ibf);
+        iarchive(actual_index);
     }
 
-    EXPECT_EQ(expected_kmer_size, actual_kmer_size);
-    EXPECT_EQ(expected_window_size, actual_window_size);
+    EXPECT_EQ(expected_index.window_size(), actual_index.window_size());
+    EXPECT_EQ(expected_index.kmer_size(), actual_index.kmer_size());
+    EXPECT_EQ(expected_index.parts(), actual_index.parts());
+
+    auto const & expected_ibf{expected_index.ibf()}, actual_ibf{actual_index.ibf()};
     EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs(expected_ibf, actual_ibf);
-    EXPECT_EQ(std::ranges::distance(expected_bin_path), std::ranges::distance(actual_bin_path));
-    for (auto const && [expected_list, actual_list] : seqan3::views::zip(expected_bin_path, actual_bin_path))
+
+    EXPECT_EQ(std::ranges::distance(expected_index.bin_path()), std::ranges::distance(actual_index.bin_path()));
+    for (auto const && [expected_list, actual_list] : seqan3::views::zip(expected_index.bin_path(), actual_index.bin_path()))
     {
         EXPECT_TRUE(std::ranges::distance(expected_list) > 0);
         for (auto const && [expected_file, actual_file] : seqan3::views::zip(expected_list, actual_list))
@@ -134,13 +132,13 @@ TEST_P(raptor_build, build_with_file)
                                                          "--window ", std::to_string(window_size),
                                                          "--size 64k",
                                                          "--threads ", run_parallel ? "2" : "1",
-                                                         "--output index.ibf",
+                                                         "--output raptor.index",
                                                          "raptor_cli_test.txt");
     EXPECT_EQ(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
 
-    compare_results(ibf_path(number_of_repeated_bins, window_size), "index.ibf");
+    compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
 }
 
 TEST_P(raptor_build, build_with_file_socks)
@@ -172,13 +170,13 @@ TEST_P(raptor_build, build_with_file_socks)
                                                          "--window ", std::to_string(window_size),
                                                          "--size 64k",
                                                          "--threads ", run_parallel ? "2" : "1",
-                                                         "--output index.ibf",
+                                                         "--output raptor.index",
                                                          "raptor_cli_test.txt");
     EXPECT_EQ(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
 
-    compare_results(ibf_path(number_of_repeated_bins, window_size), "index.ibf");
+    compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
 }
 
 INSTANTIATE_TEST_SUITE_P(build_suite,
@@ -195,6 +193,7 @@ INSTANTIATE_TEST_SUITE_P(build_suite,
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////// raptor search tests //////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct raptor_search : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, size_t>> {};
 
 TEST_P(raptor_search, search)
 {
@@ -300,6 +299,7 @@ INSTANTIATE_TEST_SUITE_P(search_suite,
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////// raptor parts tests //////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct raptor_parts : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, bool, size_t>> {};
 
 TEST_P(raptor_parts, pipeline)
 {
@@ -332,7 +332,7 @@ TEST_P(raptor_parts, pipeline)
                                                           "--window ", std::to_string(window_size),
                                                           "--size 64k",
                                                           "--threads ", run_parallel ? "2" : "1",
-                                                          "--output index.ibf",
+                                                          "--output raptor.index",
                                                           "--parts 4",
                                                           "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
@@ -342,8 +342,7 @@ TEST_P(raptor_parts, pipeline)
     cli_test_result const result2 = execute_app("raptor", "search",
                                                           "--output search.out",
                                                           "--error ", std::to_string(number_of_errors),
-                                                          "--index ", "index.ibf",
-                                                          "--parts 4",
+                                                          "--index ", "raptor.index",
                                                           "--query ", data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
@@ -389,6 +388,7 @@ INSTANTIATE_TEST_SUITE_P(parts_suite,
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////// raptor upgrade tests /////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct raptor_upgrade : public raptor_base {};
 
 TEST_F(raptor_upgrade, upgrade_index)
 {
@@ -410,13 +410,13 @@ TEST_F(raptor_upgrade, upgrade_index)
                                                          "--kmer 19",
                                                          "--window 23",
                                                          "--bins raptor_cli_test.txt",
-                                                         "--input ", data("1_1.ibf"),
-                                                         "--output index.ibf");
+                                                         "--input ", data("1_1.index"),
+                                                         "--output raptor.index");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
     ASSERT_EQ(result.exit_code, 0);
 
-    compare_results(ibf_path(16, 23), "index.ibf");
+    compare_results(ibf_path(16, 23), "raptor.index");
 }
 
 TEST_F(raptor_upgrade, upgrade_partitioned)
@@ -443,8 +443,8 @@ TEST_F(raptor_upgrade, upgrade_partitioned)
                                                           "--kmer 19",
                                                           "--window 23",
                                                           "--bins raptor_cli_test.txt",
-                                                          "--input ", data("1_1.ibf"),
-                                                          "--output index.ibf",
+                                                          "--input ", data("1_1.index"),
+                                                          "--output raptor.index",
                                                           "--parts 4");
 
     EXPECT_EQ(result1.out, std::string{});
@@ -454,8 +454,7 @@ TEST_F(raptor_upgrade, upgrade_partitioned)
     cli_test_result const result2 = execute_app("raptor", "search",
                                                           "--output search.out",
                                                           "--error 1",
-                                                          "--index index.ibf",
-                                                          "--parts 4",
+                                                          "--index raptor.index",
                                                           "--query ", data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});

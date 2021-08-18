@@ -31,38 +31,38 @@ declare_datasource (FILE query_socks.fq
                     URL ${CMAKE_SOURCE_DIR}/test/data/query_socks.fq
                     URL_HASH SHA256=c21cfd169d5b16192486b3175fb33f09eb3e0ae1154cde4aa102b62fc12b6683)
 
-declare_datasource (FILE 1bins19window.ibf
-                    URL ${CMAKE_SOURCE_DIR}/test/data/1bins19window.ibf
-                    URL_HASH SHA256=799688b64a255f4b4ee3a3b7e8388865f8c6df899b307b5f596a8c65ea60c7ec)
-declare_datasource (FILE 1bins23window.ibf
-                    URL ${CMAKE_SOURCE_DIR}/test/data/1bins23window.ibf
-                    URL_HASH SHA256=f20d6526b14be258dfb6b56cab884783f929cc89a8ca3f03c4522ba415a52561)
-declare_datasource (FILE 64bins19window.ibf
-                    URL ${CMAKE_SOURCE_DIR}/test/data/64bins19window.ibf
-                    URL_HASH SHA256=ae8f2480da5c14658b445e283242b2a3235ad79a4df3017d6e64855b1f6d5683)
-declare_datasource (FILE 64bins23window.ibf
-                    URL ${CMAKE_SOURCE_DIR}/test/data/64bins23window.ibf
-                    URL_HASH SHA256=8604caf9db0066ec615b9582296463fbac1d4616673d8c8184b4062f9d9c9c28)
-declare_datasource (FILE 128bins19window.ibf
-                    URL ${CMAKE_SOURCE_DIR}/test/data/128bins19window.ibf
-                    URL_HASH SHA256=dd6e460cfefb55af6047952869cdc62f06ca67f5cbf046e182a41c184c509887)
-declare_datasource (FILE 128bins23window.ibf
-                    URL ${CMAKE_SOURCE_DIR}/test/data/128bins23window.ibf
-                    URL_HASH SHA256=52b145747bb1404efccd9387197dadf3083d3fbd06aa2e19b21a7364be830ce7)
-declare_datasource (FILE 1_1.ibf
-                    URL ${CMAKE_SOURCE_DIR}/test/data/1_1.ibf
+declare_datasource (FILE 1bins19window.index
+                    URL ${CMAKE_SOURCE_DIR}/test/data/1bins19window.index
+                    URL_HASH SHA256=513f5b8be3557626aead12f9ce49f1aac6b0222251de1b9b702a01c684249fcf)
+declare_datasource (FILE 1bins23window.index
+                    URL ${CMAKE_SOURCE_DIR}/test/data/1bins23window.index
+                    URL_HASH SHA256=6158e595302df504b730412eac41256b243272e1910f6a8ddecb07cf657930d1)
+declare_datasource (FILE 64bins19window.index
+                    URL ${CMAKE_SOURCE_DIR}/test/data/64bins19window.index
+                    URL_HASH SHA256=80828d122466861e5c8ee1dd4c31eace0c3db18baa5e21530c0e782f75220090)
+declare_datasource (FILE 64bins23window.index
+                    URL ${CMAKE_SOURCE_DIR}/test/data/64bins23window.index
+                    URL_HASH SHA256=9f44d40a3cf1e56b369f33a4d9e10a1ef258e483888b44d3d7cba53b1e242a6b)
+declare_datasource (FILE 128bins19window.index
+                    URL ${CMAKE_SOURCE_DIR}/test/data/128bins19window.index
+                    URL_HASH SHA256=158b4ad922e23df61503b55884cd913505e68ce4c7337e3f3e53a39b52b1ab56)
+declare_datasource (FILE 128bins23window.index
+                    URL ${CMAKE_SOURCE_DIR}/test/data/128bins23window.index
+                    URL_HASH SHA256=b80d92683cc3f338bfa527a306a6c11de50381cb85af1e0251e4cb90b2f131b9)
+declare_datasource (FILE 1_1.index
+                    URL ${CMAKE_SOURCE_DIR}/test/data/1_1.index
                     URL_HASH SHA256=2a00d9fd2cf9865841b559219cb1896d33e8a20e77604906ba551e94fbdbed7f)
-declare_datasource (FILE 1_1.ibf_0
-                    URL ${CMAKE_SOURCE_DIR}/test/data/1_1.ibf_0
+declare_datasource (FILE 1_1.index_0
+                    URL ${CMAKE_SOURCE_DIR}/test/data/1_1.index_0
                     URL_HASH SHA256=b39aaf45fab2837903add389b3d3efe33557808f8dd823113efbbd4df1e601f3)
-declare_datasource (FILE 1_1.ibf_1
-                    URL ${CMAKE_SOURCE_DIR}/test/data/1_1.ibf_1
+declare_datasource (FILE 1_1.index_1
+                    URL ${CMAKE_SOURCE_DIR}/test/data/1_1.index_1
                     URL_HASH SHA256=1a882db0e38056ae1b63efdb0cfd49b46d8c26d7a2edcaf62ca27115487bd682)
-declare_datasource (FILE 1_1.ibf_2
-                    URL ${CMAKE_SOURCE_DIR}/test/data/1_1.ibf_2
+declare_datasource (FILE 1_1.index_2
+                    URL ${CMAKE_SOURCE_DIR}/test/data/1_1.index_2
                     URL_HASH SHA256=1f4cff9952cdc6137500d89b3a3b2e11eef33734b858be9e328dfe4c03d8c4c0)
-declare_datasource (FILE 1_1.ibf_3
-                    URL ${CMAKE_SOURCE_DIR}/test/data/1_1.ibf_3
+declare_datasource (FILE 1_1.index_3
+                    URL ${CMAKE_SOURCE_DIR}/test/data/1_1.index_3
                     URL_HASH SHA256=b72db8be6455990c4a67c22748b725d501e400f61e5291293c11cd6c3793f93a)
 
 declare_datasource (FILE 1bins19window0error.out

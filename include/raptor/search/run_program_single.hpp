@@ -12,7 +12,7 @@
 
 #include <raptor/search/compute_simple_model.hpp>
 #include <raptor/search/do_parallel.hpp>
-#include <raptor/search/load_ibf.hpp>
+#include <raptor/search/load_index.hpp>
 #include <raptor/search/sync_out.hpp>
 
 namespace raptor
@@ -21,17 +21,17 @@ namespace raptor
 template <bool compressed>
 void run_program_single(search_arguments const & arguments)
 {
-    constexpr seqan3::data_layout ibf_data_layout = compressed ? seqan3::data_layout::compressed :
+    constexpr seqan3::data_layout data_layout_mode = compressed ? seqan3::data_layout::compressed :
                                                                  seqan3::data_layout::uncompressed;
-    auto ibf = seqan3::interleaved_bloom_filter<ibf_data_layout>{};
+    auto index = raptor_index<data_layout_mode>{};
 
-    double ibf_io_time{0.0};
+    double index_io_time{0.0};
     double reads_io_time{0.0};
     double compute_time{0.0};
 
     auto cereal_worker = [&] ()
     {
-        load_ibf(ibf, arguments, ibf_io_time);
+        load_index(index, arguments, index_io_time);
     };
     auto cereal_handle = std::async(std::launch::async, cereal_worker);
 
@@ -74,6 +74,7 @@ void run_program_single(search_arguments const & arguments)
 
     auto worker = [&] (size_t const start, size_t const end)
     {
+        auto & ibf = index.ibf();
         auto counter = ibf.template counting_agent<uint16_t>();
         std::string result_string{};
         std::vector<uint64_t> minimiser;
@@ -138,10 +139,10 @@ void run_program_single(search_arguments const & arguments)
         std::filesystem::path file_path{arguments.out_file};
         file_path += ".time";
         std::ofstream file_handle{file_path};
-        file_handle << "IBF I/O\tReads I/O\tCompute\n";
+        file_handle << "Index I/O\tReads I/O\tCompute\n";
         file_handle << std::fixed
                     << std::setprecision(2)
-                    << ibf_io_time << '\t'
+                    << index_io_time << '\t'
                     << reads_io_time << '\t'
                     << compute_time;
     }

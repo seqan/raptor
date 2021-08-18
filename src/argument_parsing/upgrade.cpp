@@ -52,7 +52,7 @@ void init_upgrade_parser(seqan3::argument_parser & parser, upgrade_arguments & a
     parser.add_flag(arguments.compressed,
                     '\0',
                     "compressed",
-                    "Original IBF was compressed.");
+                    "Original index was compressed.");
 }
 
 void run_upgrade(seqan3::argument_parser & parser)

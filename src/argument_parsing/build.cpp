@@ -19,6 +19,12 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
                                  arguments.is_socks ? "File containing color and file names." :
                                                       "File containing one file per line per bin.",
                                  seqan3::input_file_validator{});
+    parser.add_option(arguments.parts,
+                      '\0',
+                      "parts",
+                      "Splits the index in this many parts.",
+                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
+                      power_of_two_validator{});
     parser.add_option(arguments.window_size,
                       '\0',
                       "window",
@@ -40,7 +46,7 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
     parser.add_option(arguments.size,
                       '\0',
                       "size",
-                      "Choose the size of the resulting IBF.",
+                      "Choose the size of the resulting index.",
                       seqan3::option_spec::required,
                       size_validator{"\\d+\\s{0,1}[k,m,g,t,K,M,G,T]"});
     parser.add_option(arguments.hash,
@@ -52,7 +58,7 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
     parser.add_flag(arguments.compressed,
                     '\0',
                     "compressed",
-                    "Build a compressed IBF.");
+                    "Build a compressed index.");
     parser.add_flag(arguments.compute_minimiser,
                     '\0',
                     "compute-minimiser",
