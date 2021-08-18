@@ -33,22 +33,22 @@ declare_datasource (FILE query_socks.fq
 
 declare_datasource (FILE 1bins19window.index
                     URL ${CMAKE_SOURCE_DIR}/test/data/1bins19window.index
-                    URL_HASH SHA256=513f5b8be3557626aead12f9ce49f1aac6b0222251de1b9b702a01c684249fcf)
+                    URL_HASH SHA256=ecf2a165fb4c1c1602305dad13aecb084aa6f414fea58aafdf6b52b0e4770181)
 declare_datasource (FILE 1bins23window.index
                     URL ${CMAKE_SOURCE_DIR}/test/data/1bins23window.index
-                    URL_HASH SHA256=6158e595302df504b730412eac41256b243272e1910f6a8ddecb07cf657930d1)
+                    URL_HASH SHA256=e5d88a3d18d8e9193511a87d147d720e1996397468345caaa74b2ae2debfaa55)
 declare_datasource (FILE 64bins19window.index
                     URL ${CMAKE_SOURCE_DIR}/test/data/64bins19window.index
-                    URL_HASH SHA256=80828d122466861e5c8ee1dd4c31eace0c3db18baa5e21530c0e782f75220090)
+                    URL_HASH SHA256=d333b5a7b93560ec748fdf3d22087c283d43ddbaacca6eb612d13f04d9be5876)
 declare_datasource (FILE 64bins23window.index
                     URL ${CMAKE_SOURCE_DIR}/test/data/64bins23window.index
-                    URL_HASH SHA256=9f44d40a3cf1e56b369f33a4d9e10a1ef258e483888b44d3d7cba53b1e242a6b)
+                    URL_HASH SHA256=8bf6c1e91de4401383f299e00a2803cf1256a63048bbbd68c1086f92750b79b7)
 declare_datasource (FILE 128bins19window.index
                     URL ${CMAKE_SOURCE_DIR}/test/data/128bins19window.index
-                    URL_HASH SHA256=158b4ad922e23df61503b55884cd913505e68ce4c7337e3f3e53a39b52b1ab56)
+                    URL_HASH SHA256=fa0d51f25037315926fbf2d291af2e3ad95c0508630b5a8ed1e291b45324e8c4)
 declare_datasource (FILE 128bins23window.index
                     URL ${CMAKE_SOURCE_DIR}/test/data/128bins23window.index
-                    URL_HASH SHA256=b80d92683cc3f338bfa527a306a6c11de50381cb85af1e0251e4cb90b2f131b9)
+                    URL_HASH SHA256=c8d63563e8e301a21e19a46605fac354fa4d1b1b0b5e7d5a6a066fa024e05e62)
 declare_datasource (FILE 1_1.index
                     URL ${CMAKE_SOURCE_DIR}/test/data/1_1.index
                     URL_HASH SHA256=2a00d9fd2cf9865841b559219cb1896d33e8a20e77604906ba551e94fbdbed7f)

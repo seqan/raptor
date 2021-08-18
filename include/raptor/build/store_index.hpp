@@ -33,6 +33,7 @@ static inline void store_index(std::filesystem::path const & path,
     raptor_index<layout> index{window{arguments.window_size},
                                kmer{arguments.kmer_size},
                                arguments.parts,
+                               arguments.compressed,
                                arguments.bin_path,
                                std::move(ibf)};
 

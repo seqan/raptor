@@ -59,10 +59,6 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
                       "pattern",
                       "Choose the pattern size. Default: Use median of sequence lengths in query file.",
                       arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
-    parser.add_flag(arguments.compressed,
-                    '\0',
-                    "compressed",
-                    "Build a compressed index.");
     parser.add_flag(arguments.write_time,
                     '\0',
                     "time",
@@ -129,6 +125,7 @@ void run_search(seqan3::argument_parser & parser, bool const is_socks)
         arguments.kmer_size = tmp.kmer_size();
         arguments.window_size = tmp.window_size();
         arguments.parts = tmp.parts();
+        arguments.compressed = tmp.compressed();
         arguments.bin_path = tmp.bin_path();
         if (arguments.is_socks)
             arguments.pattern_size = arguments.kmer_size;
