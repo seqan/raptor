@@ -18,6 +18,7 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
 {
     init_shared_meta(parser);
     init_shared_options(parser, arguments);
+    parser.info.examples = {"raptor search --error 2 --index raptor.index --query queries.fastq --output search.output"};
     parser.add_option(arguments.index_file,
                       '\0',
                       "index",
@@ -33,13 +34,12 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
     parser.add_option(arguments.out_file,
                       '\0',
                       "output",
-                      "Please provide a valid path to the output.",
-                      seqan3::option_spec::required,
-                      seqan3::output_file_validator{});
+                      "Provide a path to the output.",
+                      seqan3::option_spec::required);
     parser.add_option(arguments.errors,
                       '\0',
                       "error",
-                      "Choose the number of errors.",
+                      "The number of errors",
                       arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
                       positive_integer_validator{true});
     parser.add_option(arguments.tau,
@@ -57,7 +57,7 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
     parser.add_option(arguments.pattern_size,
                       '\0',
                       "pattern",
-                      "Choose the pattern size. Default: Use median of sequence lengths in query file.",
+                      "The pattern size. Default: Use median of sequence lengths in query file.",
                       arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
     parser.add_flag(arguments.write_time,
                     '\0',
@@ -76,6 +76,15 @@ void run_search(seqan3::argument_parser & parser, bool const is_socks)
     // ==========================================
     // Various checks.
     // ==========================================
+
+    std::filesystem::path output_directory = arguments.out_file.parent_path();
+    std::error_code ec{};
+    std::filesystem::create_directories(output_directory, ec);
+    if (!output_directory.empty() && ec)
+        throw seqan3::argument_parser_error{seqan3::detail::to_string("Failed to create directory\"",
+                                                                      output_directory.c_str(),
+                                                                      "\": ",
+                                                                      ec.message())};
 
     if (!arguments.is_socks)
     {

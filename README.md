@@ -2,7 +2,8 @@
 ### A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences
 
 ## Download and Installation
-There may be performance benefits when compiling from source, especially when using `-march=native` as compiler directive.
+There may be performance benefits when compiling from source, especially when using `-march=native` as compiler
+directive.
 
 ### Install with bioconda (Linux)
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/raptor/README.html)
@@ -24,7 +25,8 @@ brew install brewsci/bio/raptor
 * GCC 9, 10 or 11 (most recent minor version)
 * git
 
-Refer to the [Seqan3 Setup Tutorial](https://docs.seqan.de/seqan/3-master-user/setup.html) for more in depth information.
+Refer to the [Seqan3 Setup Tutorial](https://docs.seqan.de/seqan/3-master-user/setup.html) for more in depth
+information.
 </details>
 
 <details><summary>Download current master branch (click to expand)</summary>
@@ -105,28 +107,35 @@ raptor build --kmer 19 --window 23 --size 8m --output raptor.index all_bin_paths
 You may be prompted to enable or disable automatic update notifications. For questions, please consult
 [the SeqAn documentation](https://github.com/seqan/seqan3/wiki/Update-Notifications).
 
-Afterwards, we can search for all reads from bin 1:
+Afterwards, we can search for some reads:
 
 ```
 raptor search --error 2 --index raptor.index --query example_data/64/reads/mini.fastq --output search.output
 ```
 
-Each line of the output consists of the read ID (in the toy example these are numbers) and the corresponding bins in
-which they were found:
+The output starts with a header section (lines starting with `\#`). The header maps a number to each input file.
+After the header section, each line of the output consists of the read ID (in the toy example these are numbers) and
+the corresponding bins in which they were found:
 ```text
-0       0,
-1       0,
-2       0,
-3       0,
-4       0,
-16384   1,
+#0	example_data/64/bins/bin_00.fasta
+#1	example_data/64/bins/bin_01.fasta
 ...
-1015812 62,
-1032192 63,
-1032193 63,
-1032194 63,
-1032195 63,
-1032196 63,
+#62	example_data/64/bins/bin_62.fasta
+#63	example_data/64/bins/bin_63.fasta
+#QUERY_NAME	USER_BINS
+0	0
+1	0
+2	0
+3	0
+4	0
+16384	1
+...
+1015812	62
+1032192	63
+1032193	63
+1032194	63
+1032195	63
+1032196	63
 ```
 
 For a list of options, see the help pages:
@@ -134,6 +143,7 @@ For a list of options, see the help pages:
 raptor --help
 raptor build --help
 raptor search --help
+raptor upgrade --help
 ```
 
 ### Preprocessing the input
@@ -144,9 +154,8 @@ Following above example, we would change the build step as follows:
 
 First we precompute the minimisers and store them in a directory:
 ```
-mkdir -p precomputed_minimisers
 seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63 > all_bin_paths.txt
-raptor build --kmer 19 --window 23 --size 8m --compute-minimiser --output precomputed_minimisers/ all_bin_paths.txt
+raptor build --kmer 19 --window 23 --compute-minimiser --output precomputed_minimisers all_bin_paths.txt
 ```
 
 Then we run the build step again and use the computed minimisers as input:
@@ -154,6 +163,11 @@ Then we run the build step again and use the computed minimisers as input:
 seq -f "precomputed_minimisers/bin_%02g.minimiser" 0 1 63 > all_minimiser_paths.txt
 raptor build --size 8m --output minimiser_raptor.index all_minimiser_paths.txt
 ```
+
+The preprocessing applies the same cutoffs as used in Mantis
+([Pandey et al., 2018](https://doi.org/10.1016/j.cels.2018.05.021)).
+This means that only minimisers that occur more often than the cutoff specifies are included in the output.
+If you wish to process all minimisers, you can use `--disable-cutoffs`.
 
 ### SOCKS interface
 We implement the core interface of [SOCKS](https://gitlab.ub.uni-bielefeld.de/gi/socks).
@@ -169,10 +183,13 @@ other members of [SeqAn](https://www.seqan.de).
 
 ### Citation
 In your academic works (also comparisons and pipelines) please cite:
-  * *Raptor: A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences*; Enrico Seiler, Svenja Mehringer, Mitra Darvish, Etienne Turc, and Knut Reinert; iScience 2021 24 (7): 102782. doi: https://doi.org/10.1016/j.isci.2021.102782
+  * *Raptor: A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences*;
+    Enrico Seiler, Svenja Mehringer, Mitra Darvish, Etienne Turc, and Knut Reinert; iScience 2021 24 (7): 102782.
+    doi: https://doi.org/10.1016/j.isci.2021.102782
 
 ### Supplementary
 The subdirectory `util` contains applications and scripts related to the paper.
 
 ### License
-Raptor is open source software. However, certain conditions apply when you (re-)distribute and/or modify Raptor, please see the [license](https://github.com/seqan/raptor/blob/master/LICENSE.md).
+Raptor is open source software. However, certain conditions apply when you (re-)distribute and/or modify Raptor,
+please see the [license](https://github.com/seqan/raptor/blob/master/LICENSE.md).

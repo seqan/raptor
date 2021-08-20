@@ -109,7 +109,15 @@ public:
     bin_validator & operator=(bin_validator &&) = default;
     ~bin_validator() = default;
 
-    void operator() (option_value_type const & values) const
+    void operator() (std::vector<std::string> const & values) const
+    {
+        auto view = values | std::views::transform([] (auto const & str) { return std::filesystem::path{str}; });
+        operator()(view);
+    }
+
+    template <typename rng_t>
+        requires std::same_as<std::filesystem::path, std::remove_cvref_t<std::ranges::range_value_t<rng_t>>>
+    void operator() (rng_t const & values) const
     {
         if (values.empty())
             throw seqan3::validation_error{"The list of input files cannot be empty."};
@@ -148,8 +156,12 @@ public:
         bool const is_minimiser_input = values[0].extension() == ".minimiser";
 
         for (auto && value : values)
+        {
             if (is_minimiser_input != (value.extension() == ".minimiser"))
                 throw seqan3::validation_error{"You cannot mix sequence and minimiser files as input."};
+            if (std::filesystem::file_size(value) == 0u)
+                throw seqan3::validation_error{"The file " + value.string() + " is empty."};
+        }
     }
 
     std::string get_help_page_message() const

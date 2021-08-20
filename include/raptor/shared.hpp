@@ -49,13 +49,14 @@ struct build_arguments
     std::vector<std::vector<std::string>> bin_path{};
     std::filesystem::path bin_file{};
     std::filesystem::path out_path{"./"};
-    std::string size{};
+    std::string size{"1k"};
     uint64_t bins{64};
     uint64_t bits{4096};
     uint64_t hash{2};
     bool compute_minimiser{false};
     bool compressed{false};
     bool is_socks{false};
+    bool disable_cutoffs{false};
 };
 
 struct search_arguments
