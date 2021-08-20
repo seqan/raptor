@@ -13,10 +13,13 @@ namespace raptor
 void init_top_level_parser(seqan3::argument_parser & parser)
 {
     init_shared_meta(parser);
-    parser.info.description.emplace_back("Binning Directories are a datastruture that can be used in various ways. "
-                                         "What's a bin, how can it be used, etc.");
-
-    parser.info.examples = {"./raptor build --help", "./raptor search --help"};
+    parser.info.description.emplace_back("Raptor is a system for approximately searching many queries such as "
+                                         "next-generation sequencing reads or transcripts in large collections of "
+                                         "nucleotide sequences. Raptor uses winnowing minimizers to define a set of "
+                                         "representative k-mers, an extension of the interleaved Bloom filters (IBFs) "
+                                         "as a set membership data structure and probabilistic thresholding for "
+                                         "minimizers. Our approach allows compression and partitioning of the IBF to "
+                                         "enable the effective use of secondary memory.");
 };
 
 } // namespace raptor

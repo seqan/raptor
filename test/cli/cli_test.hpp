@@ -12,8 +12,11 @@
 #include <sstream>               // ostringstream
 #include <string>                // strings
 
-// Include the EXPECT_RANGE_EQ macro for better information if range elements differ.
+#include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
 #include <seqan3/test/expect_range_eq.hpp>
+#include <seqan3/utility/views/zip.hpp>
+
+#include <raptor/index.hpp>
 
 #pragma once
 
@@ -158,5 +161,97 @@ struct raptor_base : public cli_test
         std::stringstream file_buffer;
         file_buffer << file_stream.rdbuf();
         return {file_buffer.str()};
+    }
+
+    // Good example for printing tables: https://en.cppreference.com/w/cpp/io/ios_base/width
+    static inline std::string const debug_ibfs(seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed> const & expected_ibf,
+                                               seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed> const & actual_ibf)
+    {
+        std::stringstream result{};
+        result << ">>>IBFs differ<<<\n";
+        result.setf(std::ios::left, std::ios::adjustfield);
+
+        result.width(22);
+        result << "#Member accessor";
+        result.width(15);
+        result << "Expected value";
+        result.width(13);
+        result << "Actual value";
+        result << '\n';
+
+        result.width(22);
+        result << "bin_count()";
+        result.width(15);
+        result << expected_ibf.bin_count();
+        result.width(13);
+        result << actual_ibf.bin_count();
+        result << '\n';
+
+        result.width(22);
+        result << "bin_size()";
+        result.width(15);
+        result << expected_ibf.bin_size();
+        result.width(13);
+        result << actual_ibf.bin_size();
+        result << '\n';
+
+        result.width(22);
+        result << "hash_function_count()";
+        result.width(15);
+        result << expected_ibf.hash_function_count();
+        result.width(13);
+        result << actual_ibf.hash_function_count();
+        result << '\n';
+
+        result.width(22);
+        result << "bit_size()";
+        result.width(15);
+        result << expected_ibf.bit_size();
+        result.width(13);
+        result << actual_ibf.bit_size();
+        result << '\n';
+
+        return result.str();
+    }
+
+    static inline void compare_results(std::filesystem::path const & expected_result,
+                                       std::filesystem::path const & actual_result,
+                                       bool const compare_extension = true)
+    {
+        raptor::raptor_index<seqan3::data_layout::uncompressed> expected_index, actual_index{};
+
+        {
+            std::ifstream is{expected_result, std::ios::binary};
+            cereal::BinaryInputArchive iarchive{is};
+            iarchive(expected_index);
+        }
+        {
+            std::ifstream is{actual_result, std::ios::binary};
+            cereal::BinaryInputArchive iarchive{is};
+            iarchive(actual_index);
+        }
+
+        EXPECT_EQ(expected_index.window_size(), actual_index.window_size());
+        EXPECT_EQ(expected_index.kmer_size(), actual_index.kmer_size());
+        EXPECT_EQ(expected_index.parts(), actual_index.parts());
+        EXPECT_EQ(expected_index.compressed(), actual_index.compressed());
+
+        auto const & expected_ibf{expected_index.ibf()}, actual_ibf{actual_index.ibf()};
+        EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs(expected_ibf, actual_ibf);
+
+        EXPECT_EQ(std::ranges::distance(expected_index.bin_path()), std::ranges::distance(actual_index.bin_path()));
+        for (auto const && [expected_list, actual_list] : seqan3::views::zip(expected_index.bin_path(), actual_index.bin_path()))
+        {
+            EXPECT_TRUE(std::ranges::distance(expected_list) > 0);
+            for (auto const && [expected_file, actual_file] : seqan3::views::zip(expected_list, actual_list))
+            {
+                std::filesystem::path const expected_path(expected_file);
+                std::filesystem::path const actual_path(actual_file);
+                if (compare_extension)
+                    EXPECT_EQ(expected_path.filename(), actual_path.filename());
+                else
+                    EXPECT_EQ(expected_path.stem(), actual_path.stem());
+            }
+        }
     }
 };

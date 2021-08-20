@@ -24,7 +24,7 @@ void init_shared_options(seqan3::argument_parser & parser, arguments_t & argumen
     parser.add_option(arguments.threads,
                       '\0',
                       "threads",
-                      "Choose the number of threads.",
+                      "The numer of threads to use.",
                       seqan3::option_spec::standard,
                       positive_integer_validator{});
 }

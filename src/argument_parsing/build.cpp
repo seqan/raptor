@@ -15,6 +15,9 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
 {
     init_shared_meta(parser);
     init_shared_options(parser, arguments);
+    parser.info.examples = {"raptor build --kmer 19 --window 23 --size 8m --output raptor.index all_bin_paths.txt",
+                            "raptor build --kmer 19 --window 23 --compute-minimiser --output precomputed_minimisers all_bin_paths.txt",
+                            "raptor build --size 8m --output minimiser_raptor.index all_minimiser_paths.txt"};
     parser.add_positional_option(arguments.bin_file,
                                  arguments.is_socks ? "File containing color and file names." :
                                                       "File containing one file per line per bin.",
@@ -28,13 +31,13 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
     parser.add_option(arguments.window_size,
                       '\0',
                       "window",
-                      "Choose the window size.",
+                      "The window size.",
                       arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
                       positive_integer_validator{});
     parser.add_option(arguments.kmer_size,
                       '\0',
                       "kmer",
-                      "Choose the kmer size.",
+                      "The k-mer size.",
                       seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{1, 32});
     parser.add_option(arguments.out_path,
@@ -46,13 +49,13 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
     parser.add_option(arguments.size,
                       '\0',
                       "size",
-                      "Choose the size of the resulting index.",
-                      seqan3::option_spec::required,
+                      "The size in bytes of the resulting index.",
+                      seqan3::option_spec::standard,
                       size_validator{"\\d+\\s{0,1}[k,m,g,t,K,M,G,T]"});
     parser.add_option(arguments.hash,
                       '\0',
                       "hash",
-                      "Choose the number of hashes.",
+                      "The number of hash functions to use.",
                       seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{1, 5});
     parser.add_flag(arguments.compressed,
@@ -64,6 +67,11 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
                     "compute-minimiser",
                     "Computes minimisers using cutoffs from Mantis (Pandey et al.). Does not create the index.",
                     arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
+    parser.add_flag(arguments.disable_cutoffs,
+                    '\0',
+                    "disable-cutoffs",
+                    "Do not apply cutoffs when using --compute-minimiser.",
+                    arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
 }
 
 void run_build(seqan3::argument_parser & parser, bool const is_socks)
@@ -74,20 +82,51 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
     try_parsing(parser);
 
     // ==========================================
+    // Various checks.
+    // ==========================================
+    if (parser.is_option_set("window"))
+    {
+        if (arguments.kmer_size > arguments.window_size)
+            throw seqan3::argument_parser_error{"The k-mer size cannot be bigger than the window size."};
+    }
+    else
+        arguments.window_size = arguments.kmer_size;
+
+    std::filesystem::path output_directory = parser.is_option_set("compute-minimiser") ? arguments.out_path :
+                                                                                         arguments.out_path.parent_path();
+    std::error_code ec{};
+    std::filesystem::create_directories(output_directory, ec);
+    if (!output_directory.empty() && ec)
+        throw seqan3::argument_parser_error{seqan3::detail::to_string("Failed to create directory\"",
+                                                                      output_directory.c_str(),
+                                                                      "\": ",
+                                                                      ec.message())};
+
+    if (!parser.is_option_set("compute-minimiser"))
+    {
+        seqan3::output_file_validator{}(arguments.out_path);
+
+        if (!parser.is_option_set("size"))
+        {
+            throw seqan3::argument_parser_error{"Option --size is required but not set."};
+        }
+    }
+
+    // ==========================================
     // Process bin_path
     // ==========================================
-    if (!arguments.is_socks) // Either only one bin or a file containing bin paths
+    if (!arguments.is_socks) // File containing bin paths
     {
         std::ifstream istrm{arguments.bin_file};
         std::string line;
-        auto sequence_file_validator{bin_validator{}.sequence_file_validator};
+        bin_validator validator{};
 
         while (std::getline(istrm, line))
         {
             if (!line.empty())
             {
-                sequence_file_validator(line);
                 arguments.bin_path.emplace_back(std::vector<std::string>{line});
+                validator(arguments.bin_path.back());
             }
         }
     }
@@ -98,7 +137,7 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
         std::string color_name;
         std::string file_name;
         std::vector<std::string> tmp;
-        auto sequence_file_validator{bin_validator{}.sequence_file_validator};
+        bin_validator validator{};
 
         while (std::getline(istrm, line))
         {
@@ -111,53 +150,16 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
                 {
                     if (!file_name.empty())
                     {
-                        sequence_file_validator(file_name);
                         tmp.emplace_back(file_name);
                     }
                 }
+                validator(tmp);
                 arguments.bin_path.emplace_back(tmp);
             }
         }
     }
 
-    // ==========================================
-    // Various checks.
-    // ==========================================
-
     arguments.bins = arguments.bin_path.size();
-
-    if (parser.is_option_set("window"))
-    {
-        if (arguments.kmer_size > arguments.window_size)
-            throw seqan3::argument_parser_error{"The k-mer size cannot be bigger than the window size."};
-    }
-    else
-        arguments.window_size = arguments.kmer_size;
-
-    if (parser.is_option_set("compute-minimiser"))
-    {
-        try
-        {
-            seqan3::output_directory_validator{}(arguments.out_path);
-        }
-        catch (seqan3::argument_parser_error const & ext)
-        {
-            std::cerr << "[Error] " << ext.what() << '\n';
-            std::exit(-1);
-        }
-    }
-    else
-    {
-        try
-        {
-            seqan3::output_file_validator{}(arguments.out_path);
-        }
-        catch (seqan3::argument_parser_error const & ext)
-        {
-            std::cerr << "[Error] " << ext.what() << '\n';
-            std::exit(-1);
-        }
-    }
 
     // ==========================================
     // Process --size.

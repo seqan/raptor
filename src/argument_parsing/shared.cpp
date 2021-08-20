@@ -18,7 +18,7 @@ void init_shared_meta(seqan3::argument_parser & parser)
                            "nucleotide sequences; Enrico Seiler, Svenja Mehringer, Mitra Darvish, Etienne Turc, "
                            "and Knut Reinert; iScience 2021 24 (7): 102782. doi: "
                            "https://doi.org/10.1016/j.isci.2021.102782";
-    parser.info.date = "17-08-2021";
+    parser.info.date = "20-08-2021";
     parser.info.email = "enrico.seiler@fu-berlin.de";
     parser.info.long_copyright = R"(BSD 3-Clause License
 

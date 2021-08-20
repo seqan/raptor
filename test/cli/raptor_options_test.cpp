@@ -12,7 +12,7 @@
 #include <seqan3/test/snippet/create_temporary_snippet_file.hpp>
 
 seqan3::test::create_temporary_snippet_file tmp_index_file{"tmp.index", "\nsome_content"};
-seqan3::test::create_temporary_snippet_file dummy_sequence_file{"dummy.fasta", "\nACGTC"};
+seqan3::test::create_temporary_snippet_file dummy_sequence_file{"dummy.fasta", "\n>ID\nACGTC"};
 seqan3::test::create_temporary_snippet_file tmp_bin_list_file{"all_bins.txt", std::string{"\n"} + dummy_sequence_file.file_path.string()};
 
 #include "cli_test.hpp"
@@ -119,17 +119,6 @@ TEST_F(raptor_build, output_missing)
     EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
 }
 
-TEST_F(raptor_build, output_wrong)
-{
-    cli_test_result const result = execute_app("raptor", "build",
-                                                         "--size 8m",
-                                                         "--output foo/out.index",
-                                                         tmp_bin_list_file.file_path);
-    EXPECT_NE(result.exit_code, 0);
-    EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] Cannot write \"foo/out.index\"!\n"});
-}
-
 TEST_F(raptor_build, directory_missing)
 {
     cli_test_result const result = execute_app("raptor", "build",
@@ -139,18 +128,6 @@ TEST_F(raptor_build, directory_missing)
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
-}
-
-TEST_F(raptor_build, directory_wrong)
-{
-    cli_test_result const result = execute_app("raptor", "build",
-                                                         "--size 8m",
-                                                         "--compute-minimiser",
-                                                         "--output foo/bar",
-                                                         tmp_bin_list_file.file_path);
-    EXPECT_NE(result.exit_code, 0);
-    EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] Cannot create directory: \"foo/bar\"!\n"});
 }
 
 TEST_F(raptor_build, size_missing)
@@ -251,18 +228,6 @@ TEST_F(raptor_search, output_missing)
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
-}
-
-TEST_F(raptor_search, output_wrong)
-{
-    cli_test_result const result = execute_app("raptor", "search",
-                                                         "--query ", data("query.fq"),
-                                                         "--index ", tmp_index_file.file_path,
-                                                         "--output foo/search.out");
-    EXPECT_NE(result.exit_code, 0);
-    EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] Validation failed for option --output: Cannot write "
-                                      "\"foo/search.out\"!\n"});
 }
 
 TEST_F(raptor_search, old_index)
