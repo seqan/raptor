@@ -18,7 +18,7 @@ void init_shared_meta(seqan3::argument_parser & parser)
                            "nucleotide sequences; Enrico Seiler, Svenja Mehringer, Mitra Darvish, Etienne Turc, "
                            "and Knut Reinert; iScience 2021 24 (7): 102782. doi: "
                            "https://doi.org/10.1016/j.isci.2021.102782";
-    parser.info.date = "20-08-2021";
+    parser.info.date = RAPTOR_DATE;
     parser.info.email = "enrico.seiler@fu-berlin.de";
     parser.info.long_copyright = R"(BSD 3-Clause License
 
@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.)";
     parser.info.short_copyright = "BSD 3-Clause License";
     parser.info.short_description = "A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences.";
     parser.info.url = "https://github.com/seqan/raptor";
-    parser.info.version = "2.0.0";
+    parser.info.version = RAPTOR_VERSION;
 }
 
 void try_parsing(seqan3::argument_parser & parser)
