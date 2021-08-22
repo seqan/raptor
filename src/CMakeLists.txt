@@ -32,6 +32,8 @@ target_link_libraries ("${PROJECT_NAME}_upgrade_lib" PUBLIC "${PROJECT_NAME}_int
 
 # Raptor argument parsing
 add_library ("${PROJECT_NAME}_argument_parsing_shared_lib" STATIC argument_parsing/shared.cpp)
+target_compile_definitions ("${PROJECT_NAME}_argument_parsing_shared_lib" PUBLIC "-DRAPTOR_VERSION=\"${CMAKE_PROJECT_VERSION} (${RAPTOR_COMMIT_HASH})\"")
+target_compile_definitions ("${PROJECT_NAME}_argument_parsing_shared_lib" PUBLIC "-DRAPTOR_DATE=\"${RAPTOR_COMMIT_DATE}\"")
 target_link_libraries ("${PROJECT_NAME}_argument_parsing_shared_lib" PUBLIC "${PROJECT_NAME}_interface")
 
 add_library ("${PROJECT_NAME}_argument_parsing_build_lib" STATIC argument_parsing/build.cpp)
