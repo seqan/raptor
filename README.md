@@ -1,4 +1,4 @@
-# Raptor [![build status](https://github.com/seqan/raptor/workflows/Raptor%20CI/badge.svg?branch=master)](https://github.com/seqan/raptor/actions)
+# Raptor [![build status](https://github.com/seqan/raptor/workflows/Raptor%20CI/badge.svg?branch=master)](https://github.com/seqan/raptor/actions) [![codecov](https://codecov.io/gh/seqan/raptor/branch/master/graph/badge.svg?token=SJVMYRUKW2)](https://codecov.io/gh/seqan/raptor)
 ### A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences
 
 ## Download and Installation
