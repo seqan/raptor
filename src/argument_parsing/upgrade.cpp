@@ -63,6 +63,10 @@ void run_upgrade(seqan3::argument_parser & parser)
     // ==========================================
     // Various checks.
     // ==========================================
+    if (arguments.kmer_size > arguments.window_size)
+        throw seqan3::argument_parser_error{"The k-mer size cannot be bigger than the window size."};
+
+    arguments.shape = seqan3::shape{seqan3::ungapped{arguments.kmer_size}};
 
     std::filesystem::path output_directory = arguments.out_file.parent_path();
     std::error_code ec{};

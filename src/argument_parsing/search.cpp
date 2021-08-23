@@ -131,13 +131,15 @@ void run_search(seqan3::argument_parser & parser, bool const is_socks)
         cereal::BinaryInputArchive iarchive{is};
         raptor_index<> tmp{};
         tmp.load_parameters(iarchive);
-        arguments.kmer_size = tmp.kmer_size();
+        arguments.shape = tmp.shape();
+        arguments.shape_size = arguments.shape.size();
+        arguments.shape_weight = arguments.shape.count();
         arguments.window_size = tmp.window_size();
         arguments.parts = tmp.parts();
         arguments.compressed = tmp.compressed();
         arguments.bin_path = tmp.bin_path();
         if (arguments.is_socks)
-            arguments.pattern_size = arguments.kmer_size;
+            arguments.pattern_size = arguments.shape_size;
     }
 
     // ==========================================

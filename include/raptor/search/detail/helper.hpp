@@ -10,6 +10,8 @@
 #include <cstdint>
 #include <vector>
 
+#include <seqan3/search/kmer_index/shape.hpp>
+
 namespace raptor::detail
 {
 
@@ -28,6 +30,6 @@ double enumerate_all_errors(size_t const number_of_minimizers, size_t const erro
 
 std::vector<double> destroyed_indirectly_by_error(size_t const pattern_size,
                                                   size_t const window_size,
-                                                  uint8_t const kmer_size);
+                                                  seqan3::shape const shape);
 
 } // namespace raptor::detail

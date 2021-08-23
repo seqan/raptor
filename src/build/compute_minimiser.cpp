@@ -35,9 +35,9 @@ bool check_for_fasta_format(std::vector<std::string> const & valid_extensions, s
 
 void compute_minimiser(build_arguments const & arguments)
 {
-    auto minimiser_view = seqan3::views::minimiser_hash(seqan3::ungapped{arguments.kmer_size},
+    auto minimiser_view = seqan3::views::minimiser_hash(arguments.shape,
                                                         seqan3::window_size{arguments.window_size},
-                                                        seqan3::seed{adjust_seed(arguments.kmer_size)});
+                                                        seqan3::seed{adjust_seed(arguments.shape.count())});
 
     uint16_t const default_cutoff{50};
 
@@ -109,7 +109,7 @@ void compute_minimiser(build_arguments const & arguments)
             output_path /= file_name.stem();
             output_path += ".header";
             std::ofstream headerfile{output_path};
-            headerfile << static_cast<uint64_t>(arguments.kmer_size) << '\t'
+            headerfile << arguments.shape.to_string() << '\t'
                         << arguments.window_size << '\t'
                         << cutoff << '\t'
                         << count << '\n';

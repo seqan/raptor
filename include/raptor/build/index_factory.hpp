@@ -55,15 +55,15 @@ private:
         {
             if constexpr (std::same_as<view_t, int>)
             {
-                return seqan3::views::minimiser_hash(seqan3::ungapped{arguments->kmer_size},
+                return seqan3::views::minimiser_hash(arguments->shape,
                                                      seqan3::window_size{arguments->window_size},
-                                                     seqan3::seed{adjust_seed(arguments->kmer_size)});
+                                                     seqan3::seed{adjust_seed(arguments->shape.count())});
             }
             else
             {
-                return seqan3::views::minimiser_hash(seqan3::ungapped{arguments->kmer_size},
+                return seqan3::views::minimiser_hash(arguments->shape,
                                                      seqan3::window_size{arguments->window_size},
-                                                     seqan3::seed{adjust_seed(arguments->kmer_size)})
+                                                     seqan3::seed{adjust_seed(arguments->shape.count())})
                        | hash_filter_view;
             }
         };

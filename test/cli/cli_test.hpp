@@ -232,7 +232,7 @@ struct raptor_base : public cli_test
         }
 
         EXPECT_EQ(expected_index.window_size(), actual_index.window_size());
-        EXPECT_EQ(expected_index.kmer_size(), actual_index.kmer_size());
+        EXPECT_EQ(expected_index.shape(), actual_index.shape());
         EXPECT_EQ(expected_index.parts(), actual_index.parts());
         EXPECT_EQ(expected_index.compressed(), actual_index.compressed());
 

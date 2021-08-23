@@ -28,11 +28,13 @@ private:
     using text_t = seqan3::dna4_vector;
 
     //!\brief The window size of the minimiser.
-    uint64_t w{26};
-    //!\brief The size of the k-mers.
-    uint8_t k{20};
+    uint64_t window_size{23};
+    //!\brief The shape to use.
+    seqan3::shape shape{seqan3::ungapped{20u}};
+    //!\brief The size of the shape.
+    uint8_t shape_size{shape.size()};
     //!\brief Random but fixed value to xor k-mers with. Counteracts consecutive minimisers.
-    uint64_t seed{adjust_seed(k)};
+    uint64_t seed{adjust_seed(shape.count())};
 
     //!\brief Stores the k-mer hashes of the forward strand.
     std::vector<uint64_t> forward_hashes;
@@ -46,32 +48,35 @@ public:
     //!\brief Stores the end positions of the minimisers.
     std::vector<uint64_t> minimiser_end;
 
-    forward_strand_minimiser() = default;                                        //!< Defaulted
-    forward_strand_minimiser(forward_strand_minimiser const &) = default;                       //!< Defaulted
-    forward_strand_minimiser(forward_strand_minimiser &&) = default;                            //!< Defaulted
-    forward_strand_minimiser & operator=(forward_strand_minimiser const &) = default;           //!< Defaulted
-    forward_strand_minimiser & operator=(forward_strand_minimiser &&) = default;                //!< Defaulted
-    ~forward_strand_minimiser() = default;                                       //!< Defaulted
+    forward_strand_minimiser() = default; //!< Defaulted
+    forward_strand_minimiser(forward_strand_minimiser const &) = default; //!< Defaulted
+    forward_strand_minimiser(forward_strand_minimiser &&) = default; //!< Defaulted
+    forward_strand_minimiser & operator=(forward_strand_minimiser const &) = default; //!< Defaulted
+    forward_strand_minimiser & operator=(forward_strand_minimiser &&) = default; //!< Defaulted
+    ~forward_strand_minimiser() = default; //!< Defaulted
 
     /*!\brief Constructs a minimiser from given k-mer, window size and a seed.
-     * \param[in] w_    The window size.
-     * \param[in] k_    The k-mer size.
-     * \param[in] seed_ The seed to use. Default: 0x8F3F73B5CF1C9ADE.
+     * \param[in] window_size_ The window size.
+     * \param[in] shape_       The shape.
+     * \param[in] seed_        The seed to use. Default: 0x8F3F73B5CF1C9ADE.
      */
-    forward_strand_minimiser(window const w_, kmer const k_, uint64_t const seed_ = 0x8F3F73B5CF1C9ADE) :
-        w{w_.v}, k{k_.v}, seed{adjust_seed(k_.v, seed_)}
+    forward_strand_minimiser(window const window_size_,
+                             seqan3::shape const shape_,
+                             uint64_t const seed_ = 0x8F3F73B5CF1C9ADE) :
+        window_size{window_size_.v}, shape{shape_}, shape_size{shape.size()}, seed{adjust_seed(shape.count(), seed_)}
     {}
 
     /*!\brief Resize the minimiser.
-     * \param[in] w_    The new window size.
-     * \param[in] k_    The new k-mer size.
-     * \param[in] seed_ The new seed to use. Default: 0x8F3F73B5CF1C9ADE.
+     * \param[in] window_size_ The new window size.
+     * \param[in] shape_       The new shape.
+     * \param[in] seed_        The new seed to use. Default: 0x8F3F73B5CF1C9ADE.
      */
-    void resize(window const w_, kmer const k_, uint64_t const seed_ = 0x8F3F73B5CF1C9ADE)
+    void resize(window const window_size_, seqan3::shape const shape_, uint64_t const seed_ = 0x8F3F73B5CF1C9ADE)
     {
-        w = w_.v;
-        k = k_.v;
-        seed = adjust_seed(k_.v, seed_);
+        window_size = window_size_.v;
+        shape = shape_;
+        shape_size = shape.size();
+        seed = adjust_seed(shape.count(), seed_);
     }
 
     void compute(text_t const & text)
@@ -84,12 +89,12 @@ public:
         minimiser_end.clear();
 
         // Return empty vector if text is shorter than k.
-        if (k > text_length)
+        if (shape_size > text_length)
             return;
 
-        uint64_t possible_minimisers = text_length > w ? text_length - w + 1u : 1u;
-        assert(w >= k);
-        uint64_t kmers_per_window = w - k + 1u;
+        uint64_t possible_minimisers = text_length > window_size ? text_length - window_size + 1u : 1u;
+        assert(window_size >= shape_size);
+        uint64_t kmers_per_window = window_size - shape_size + 1u;
 
         // Helper lambda for xor'ing values depending on `do_xor`.
         auto apply_xor = [this] (uint64_t const val)
@@ -99,7 +104,7 @@ public:
 
         // Compute all k-mer hashes for both forward and reverse strand.
         forward_hashes = text |
-                         seqan3::views::kmer_hash(seqan3::ungapped{k}) |
+                         seqan3::views::kmer_hash(shape) |
                          std::views::transform(apply_xor) |
                          seqan3::views::to<std::vector<uint64_t>>;
 
@@ -113,7 +118,7 @@ public:
 
         // Initialisation. We need to compute all hashes for the first window.
         for (uint64_t i = 0; i < kmers_per_window; ++i)
-            window_values.emplace_back(forward_hashes[i], i, i + k - 1);
+            window_values.emplace_back(forward_hashes[i], i, i + shape_size - 1);
 
         auto min = std::min_element(std::begin(window_values), std::end(window_values));
         minimiser_hash.push_back(std::get<0>(*min));
@@ -140,7 +145,7 @@ public:
 
             window_values.emplace_back(forward_hashes[kmers_per_window - 1 + i],
                                        kmers_per_window + i - 1,
-                                       kmers_per_window + i + k - 2);
+                                       kmers_per_window + i + shape_size - 2);
 
             if (std::get<0>(window_values.back()) < std::get<0>(*min))
             {

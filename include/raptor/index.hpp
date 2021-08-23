@@ -9,7 +9,6 @@
 
 #include <seqan3/argument_parser/exceptions.hpp>
 #include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
-#include <seqan3/search/kmer_index/shape.hpp>
 
 #include <raptor/shared.hpp>
 
@@ -26,7 +25,7 @@ private:
     using ibf_t = seqan3::interleaved_bloom_filter<data_layout_mode_>;
 
     uint64_t window_size_{};
-    uint8_t kmer_size_{};
+    seqan3::shape shape_{};
     uint8_t parts_{};
     bool compressed_{};
     std::vector<std::vector<std::string>> bin_path_{};
@@ -45,14 +44,14 @@ public:
     ~raptor_index() = default;
 
     explicit raptor_index(window const window_size,
-                          kmer const kmer_size,
+                          seqan3::shape const shape,
                           uint8_t const parts,
                           bool const compressed,
                           std::vector<std::vector<std::string>> const & bin_path,
                           ibf_t && ibf)
     :
         window_size_{window_size.v},
-        kmer_size_{kmer_size.v},
+        shape_{shape},
         parts_{parts},
         compressed_{compressed},
         bin_path_{bin_path},
@@ -63,7 +62,7 @@ public:
         requires (data_layout_mode == seqan3::data_layout::uncompressed)
     :
         window_size_{arguments.window_size},
-        kmer_size_{arguments.kmer_size},
+        shape_{arguments.shape},
         parts_{arguments.parts},
         compressed_{arguments.compressed},
         bin_path_{arguments.bin_path},
@@ -76,7 +75,7 @@ public:
         requires (data_layout_mode == seqan3::data_layout::compressed)
     {
         window_size_ = other.window_size_;
-        kmer_size_ = other.kmer_size_;
+        shape_ = other.shape_;
         parts_ = other.parts_;
         compressed_ = true;
         bin_path_ = other.bin_path_;
@@ -87,7 +86,7 @@ public:
         requires (data_layout_mode == seqan3::data_layout::compressed)
     {
         window_size_ = std::move(other.window_size_);
-        kmer_size_ = std::move(other.kmer_size_);
+        shape_ = std::move(other.shape_);
         parts_ = std::move(other.parts_);
         compressed_ = true;
         bin_path_ = std::move(other.bin_path_);
@@ -99,9 +98,9 @@ public:
         return window_size_;
     }
 
-    uint8_t kmer_size() const
+    seqan3::shape shape() const
     {
-        return kmer_size_;
+        return shape_;
     }
 
     uint8_t parts() const
@@ -145,9 +144,7 @@ public:
             try
             {
                 archive(window_size_);
-                seqan3::shape shape = kmer_size_ ? seqan3::shape{seqan3::ungapped{kmer_size_}} : seqan3::shape{};
-                archive(shape);
-                kmer_size_ = shape.size();
+                archive(shape_);
                 archive(parts_);
                 archive(compressed_);
                 if ((data_layout_mode == seqan3::data_layout::compressed && !compressed_) ||
@@ -186,9 +183,7 @@ public:
             try
             {
                 archive(window_size_);
-                seqan3::shape shape{};
-                archive(shape);
-                kmer_size_ = shape.size();
+                archive(shape_);
                 archive(parts_);
                 archive(compressed_);
                 archive(bin_path_);

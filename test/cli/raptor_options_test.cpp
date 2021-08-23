@@ -19,6 +19,7 @@ seqan3::test::create_temporary_snippet_file tmp_bin_list_file{"all_bins.txt", st
 
 struct raptor_build : public raptor_base {};
 struct raptor_search : public raptor_base {};
+struct raptor_upgrade : public raptor_base {};
 
 TEST_F(raptor_base, no_options)
 {
@@ -92,7 +93,7 @@ TEST_F(raptor_build, input_missing)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8m",
-                                                         "--output ./ibf.out");
+                                                         "--output ./index.raptor");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Not enough positional arguments provided (Need at least 1). See -h/--help for more information.\n"});
@@ -102,7 +103,7 @@ TEST_F(raptor_build, input_invalid)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8m",
-                                                         "--output ./ibf.out",
+                                                         "--output ./index.raptor",
                                                          "nonexistent");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
@@ -133,7 +134,7 @@ TEST_F(raptor_build, directory_missing)
 TEST_F(raptor_build, size_missing)
 {
     cli_test_result const result = execute_app("raptor", "build",
-                                                         "--output ./ibf.out",
+                                                         "--output ./index.raptor",
                                                          tmp_bin_list_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
@@ -144,7 +145,7 @@ TEST_F(raptor_build, size_wrong_space)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8 m",
-                                                         "--output ./ibf.out",
+                                                         "--output ./index.raptor",
                                                          tmp_bin_list_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
@@ -156,7 +157,7 @@ TEST_F(raptor_build, size_wrong_suffix)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8x",
-                                                         "--output ibf.out",
+                                                         "--output index.raptor",
                                                          tmp_bin_list_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
@@ -170,11 +171,24 @@ TEST_F(raptor_build, kmer_window)
                                                          "--kmer 20",
                                                          "--window 19",
                                                          "--size 8m",
-                                                         "--output ibf.out",
+                                                         "--output index.raptor",
                                                          tmp_bin_list_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] The k-mer size cannot be bigger than the window size.\n"});
+}
+
+TEST_F(raptor_build, kmer_shape)
+{
+    cli_test_result const result = execute_app("raptor", "build",
+                                                         "--kmer 20",
+                                                         "--shape 11",
+                                                         "--size 8m",
+                                                         "--output index.raptor",
+                                                         tmp_bin_list_file.file_path);
+    EXPECT_NE(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] You cannot set both shape and k-mer arguments.\n"});
 }
 
 TEST_F(raptor_search, ibf_missing)
@@ -239,4 +253,17 @@ TEST_F(raptor_search, old_index)
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Unsupported index version. Check raptor upgrade.\n"});
+}
+
+TEST_F(raptor_upgrade, kmer_window)
+{
+    cli_test_result const result = execute_app("raptor", "upgrade",
+                                                         "--bins ", tmp_bin_list_file.file_path,
+                                                         "--input ", data("1_1.index"),
+                                                         "--output index.raptor",
+                                                         "--window 19",
+                                                         "--kmer 20");
+    EXPECT_NE(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] The k-mer size cannot be bigger than the window size.\n"});
 }

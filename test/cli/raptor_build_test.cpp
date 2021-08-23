@@ -35,9 +35,42 @@ TEST_P(raptor_build, build_with_file)
                                                          "--threads ", run_parallel ? "2" : "1",
                                                          "--output raptor.index",
                                                          "raptor_cli_test.txt");
-    EXPECT_EQ(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
+    ASSERT_EQ(result.exit_code, 0);
+
+    compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
+}
+
+TEST_P(raptor_build, build_with_shape)
+{
+    auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
+    bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
+
+    {
+        std::string const expanded_bins = repeat_bins(number_of_repeated_bins);
+        std::ofstream file{"raptor_cli_test.txt"};
+        auto split_bins = expanded_bins
+                        | std::views::split(' ')
+                        | std::views::transform([](auto &&rng) {
+                            return std::string_view(&*rng.begin(), std::ranges::distance(rng));});
+        for (auto && file_path : split_bins)
+        {
+            file << file_path << '\n';
+        }
+        file << '\n';
+    }
+
+    cli_test_result const result = execute_app("raptor", "build",
+                                                         "--shape 1111111111111111111",
+                                                         "--window ", std::to_string(window_size),
+                                                         "--size 64k",
+                                                         "--threads ", run_parallel ? "2" : "1",
+                                                         "--output raptor.index",
+                                                         "raptor_cli_test.txt");
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{});
+    ASSERT_EQ(result.exit_code, 0);
 
     compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
 }
@@ -73,9 +106,9 @@ TEST_P(raptor_build, build_with_file_socks)
                                                          "--threads ", run_parallel ? "2" : "1",
                                                          "--output raptor.index",
                                                          "raptor_cli_test.txt");
-    EXPECT_EQ(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
+    ASSERT_EQ(result.exit_code, 0);
 
     compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
 }
