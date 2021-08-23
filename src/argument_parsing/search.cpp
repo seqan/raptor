@@ -80,11 +80,14 @@ void run_search(seqan3::argument_parser & parser, bool const is_socks)
     std::filesystem::path output_directory = arguments.out_file.parent_path();
     std::error_code ec{};
     std::filesystem::create_directories(output_directory, ec);
+
+// LCOV_EXCL_START
     if (!output_directory.empty() && ec)
         throw seqan3::argument_parser_error{seqan3::detail::to_string("Failed to create directory\"",
                                                                       output_directory.c_str(),
                                                                       "\": ",
                                                                       ec.message())};
+// LCOV_EXCL_END
 
     if (!arguments.is_socks)
     {
