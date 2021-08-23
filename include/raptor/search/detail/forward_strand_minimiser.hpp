@@ -88,9 +88,11 @@ public:
         minimiser_begin.clear();
         minimiser_end.clear();
 
+// LCOV_EXCL_START
         // Return empty vector if text is shorter than k.
         if (shape_size > text_length)
             return;
+// LCOV_EXCL_END
 
         uint64_t possible_minimisers = text_length > window_size ? text_length - window_size + 1u : 1u;
         assert(window_size >= shape_size);
@@ -102,11 +104,13 @@ public:
             return val ^ seed;
         };
 
+// LCOV_EXCL_START
         // Compute all k-mer hashes for both forward and reverse strand.
         forward_hashes = text |
                          seqan3::views::kmer_hash(shape) |
                          std::views::transform(apply_xor) |
                          seqan3::views::to<std::vector<uint64_t>>;
+// LCOV_EXCL_END
 
         // Choose the minimisers.
         minimiser_hash.reserve(possible_minimisers);
@@ -143,9 +147,11 @@ public:
                 window_values.pop_front();
             }
 
+// LCOV_EXCL_START
             window_values.emplace_back(forward_hashes[kmers_per_window - 1 + i],
                                        kmers_per_window + i - 1,
                                        kmers_per_window + i + shape_size - 2);
+// LCOV_EXCL_END
 
             if (std::get<0>(window_values.back()) < std::get<0>(*min))
             {

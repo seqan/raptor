@@ -40,6 +40,9 @@ declare_datasource (FILE bin4.fa.gz
 declare_datasource (FILE query.fq
                     URL ${CMAKE_SOURCE_DIR}/test/data/query.fq
                     URL_HASH SHA256=f48eb3f357e23df89e7e15d2f77f9285a428f73c4903eb1c6580271e0dea3d87)
+declare_datasource (FILE query_empty.fq
+                    URL ${CMAKE_SOURCE_DIR}/test/data/query_empty.fq
+                    URL_HASH SHA256=80cd7628b6fdcb7dbbe99dd7f05a7a5578b462db9dd67b6d0e6982b03c5d4cd5)
 declare_datasource (FILE query_socks.fq
                     URL ${CMAKE_SOURCE_DIR}/test/data/query_socks.fq
                     URL_HASH SHA256=c21cfd169d5b16192486b3175fb33f09eb3e0ae1154cde4aa102b62fc12b6683)
@@ -122,3 +125,13 @@ declare_datasource (FILE 64bins19window0errorsocks.out
 declare_datasource (FILE 128bins19window0errorsocks.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/128bins19window0errorsocks.out
                     URL_HASH SHA256=3087b98c1f4e0d0a1a54f0dc11100f25fdfa8eba62d8f24c082ea1c523146618)
+
+declare_datasource (FILE 1binsempty.out
+                    URL ${CMAKE_SOURCE_DIR}/test/data/1binsempty.out
+                    URL_HASH SHA256=515b16f2e507b9f4bac1b717c65d3a16b7c0f2bebe0977f7e0a471479dbcff42)
+declare_datasource (FILE 64binsempty.out
+                    URL ${CMAKE_SOURCE_DIR}/test/data/64binsempty.out
+                    URL_HASH SHA256=3ca3257deccc01931390e3b0185d26ab97775a022eb8696930d680ba8701454e)
+declare_datasource (FILE 128binsempty.out
+                    URL ${CMAKE_SOURCE_DIR}/test/data/128binsempty.out
+                    URL_HASH SHA256=e4eee8bce310b11bdb4da718fe3f3129508955b35cb89c7dc0f61b952d48410b)

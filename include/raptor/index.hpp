@@ -162,7 +162,7 @@ public:
         }
         else
         {
-            throw seqan3::argument_parser_error{"Unsupported index version. Check raptor upgrade."};
+            throw seqan3::argument_parser_error{"Unsupported index version. Check raptor upgrade."}; // LCOV_EXCL_LINE
         }
     }
 
@@ -188,14 +188,16 @@ public:
                 archive(compressed_);
                 archive(bin_path_);
             }
+// LCOV_EXCL_START
             catch (std::exception const & e)
             {
                 throw seqan3::argument_parser_error{"Cannot read index: " + std::string{e.what()}};
             }
+// LCOV_EXCL_END
         }
         else
         {
-            throw seqan3::argument_parser_error{"Unsupported index version. Check raptor upgrade."};
+            throw seqan3::argument_parser_error{"Unsupported index version. Check raptor upgrade."}; // LCOV_EXCL_LINE
         }
     }
     //!\endcond

@@ -137,15 +137,22 @@ struct raptor_base : public cli_test
         return cli_test::data(name);
     }
 
-    static inline std::filesystem::path const search_result_path(size_t const number_of_repetitions, size_t const window_size, size_t const number_of_errors, bool const socks = false) noexcept
+    static inline std::filesystem::path const search_result_path(size_t const number_of_repetitions, size_t const window_size, size_t const number_of_errors, bool const socks = false, bool const empty = false) noexcept
     {
         std::string name{};
         name += std::to_string(std::max<int>(1, number_of_repetitions * 4));
         name += "bins";
-        name += std::to_string(window_size);
-        name += "window";
-        name += std::to_string(number_of_errors);
-        name += "error";
+        if (empty)
+        {
+            name += "empty";
+        }
+        else
+        {
+            name += std::to_string(window_size);
+            name += "window";
+            name += std::to_string(number_of_errors);
+            name += "error";
+        }
         if (socks)
             name += "socks.out";
         else
