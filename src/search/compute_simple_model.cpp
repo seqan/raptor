@@ -18,7 +18,7 @@ std::vector<size_t> compute_simple_model(search_arguments const & arguments)
     {
         precomp_thresholds = precompute_threshold(arguments.pattern_size,
                                                   arguments.window_size,
-                                                  arguments.kmer_size,
+                                                  arguments.shape,
                                                   arguments.errors,
                                                   arguments.tau);
 

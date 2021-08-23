@@ -62,12 +62,12 @@ void run_program_single(search_arguments const & arguments)
         synced_out << "#QUERY_NAME\tUSER_BINS\n";
     }
 
-    size_t const kmers_per_window = arguments.window_size - arguments.kmer_size + 1;
-    size_t const kmers_per_pattern = arguments.pattern_size - arguments.kmer_size + 1;
+    size_t const kmers_per_window = arguments.window_size - arguments.shape_size + 1;
+    size_t const kmers_per_pattern = arguments.pattern_size - arguments.shape_size + 1;
     size_t const min_number_of_minimisers = kmers_per_window == 1 ? kmers_per_pattern :
                                                 std::ceil(kmers_per_pattern / static_cast<double>(kmers_per_window));
-    size_t const kmer_lemma = arguments.pattern_size + 1u > (arguments.errors + 1u) * arguments.kmer_size ?
-                                arguments.pattern_size + 1u - (arguments.errors + 1u) * arguments.kmer_size :
+    size_t const kmer_lemma = arguments.pattern_size + 1u > (arguments.errors + 1u) * arguments.shape_size ?
+                                arguments.pattern_size + 1u - (arguments.errors + 1u) * arguments.shape_size :
                                 0;
     size_t const max_number_of_minimisers = arguments.pattern_size - arguments.window_size + 1;
     std::vector<size_t> const precomp_thresholds = compute_simple_model(arguments);
@@ -79,9 +79,9 @@ void run_program_single(search_arguments const & arguments)
         std::string result_string{};
         std::vector<uint64_t> minimiser;
 
-        auto hash_view = seqan3::views::minimiser_hash(seqan3::ungapped{arguments.kmer_size},
+        auto hash_view = seqan3::views::minimiser_hash(arguments.shape,
                                                        seqan3::window_size{arguments.window_size},
-                                                       seqan3::seed{adjust_seed(arguments.kmer_size)});
+                                                       seqan3::seed{adjust_seed(arguments.shape_weight)});
 
         for (auto && [id, seq] : records | seqan3::views::slice(start, end))
         {

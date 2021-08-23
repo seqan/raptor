@@ -100,8 +100,10 @@ double enumerate_all_errors(size_t const number_of_minimisers, size_t const erro
 
 std::vector<double> destroyed_indirectly_by_error(size_t const pattern_size,
                                                   size_t const window_size,
-                                                  uint8_t const kmer_size)
+                                                  seqan3::shape const shape)
 {
+    uint8_t const kmer_size{shape.size()};
+
     using alphabet_t = seqan3::dna4;
     using rank_type = decltype(seqan3::to_rank(alphabet_t{}));
     rank_type max_rank = seqan3::alphabet_size<alphabet_t> - 1;
@@ -124,7 +126,7 @@ std::vector<double> destroyed_indirectly_by_error(size_t const pattern_size,
         for (size_t i = 0; i < pattern_size; ++i)
             sequence.push_back(seqan3::assign_rank_to(dis(gen), alphabet_t{}));
 
-        forward_strand_minimiser mini{window{window_size}, kmer{kmer_size}};
+        forward_strand_minimiser mini{window{window_size}, shape};
         mini.compute(sequence);
         for (auto x : mini.minimiser_begin)
             mins[x] = true;

@@ -47,9 +47,9 @@ void run_program_single_socks(search_arguments const & arguments)
         auto counter = ibf.template counting_agent<uint8_t>();
         std::string result_string{};
 
-        auto hash_view = seqan3::views::minimiser_hash(seqan3::ungapped{arguments.kmer_size},
+        auto hash_view = seqan3::views::minimiser_hash(arguments.shape,
                                                        seqan3::window_size{arguments.window_size},
-                                                       seqan3::seed{adjust_seed(arguments.kmer_size)});
+                                                       seqan3::seed{adjust_seed(arguments.shape_weight)});
 
         for (auto && seq : records | seqan3::views::slice(start, end))
         {

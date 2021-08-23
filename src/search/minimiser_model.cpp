@@ -21,10 +21,12 @@ namespace raptor
 
 std::vector<size_t> precompute_threshold(size_t const pattern_size,
                                          size_t const window_size,
-                                         uint8_t const kmer_size,
+                                         seqan3::shape const shape,
                                          size_t const errors,
                                          double const tau)
 {
+    uint8_t const kmer_size{shape.size()};
+
     if (window_size == kmer_size)
         return {pattern_size + 1 > (errors + 1) * kmer_size ? pattern_size + 1 - (errors + 1) * kmer_size : 0};
 
@@ -36,7 +38,7 @@ std::vector<size_t> precompute_threshold(size_t const pattern_size,
     size_t const maximal_number_of_minimizers = pattern_size - window_size + 1;
 
     std::vector<double> indirect_errors;
-    indirect_errors = detail::destroyed_indirectly_by_error(pattern_size, window_size, kmer_size);
+    indirect_errors = detail::destroyed_indirectly_by_error(pattern_size, window_size, shape);
 
     // Iterate over the possible number of minimizers
     for (size_t number_of_minimizers = minimal_number_of_minimizers; number_of_minimizers <= maximal_number_of_minimizers; ++number_of_minimizers)
@@ -74,7 +76,7 @@ void do_cerealisation_out(std::vector<size_t> const & vec, search_arguments cons
 {
     std::filesystem::path filename = arguments.index_file.parent_path() / ("binary_p" + std::to_string(arguments.pattern_size) +
                                                                          "_w" + std::to_string(arguments.window_size) +
-                                                                         "_k" + std::to_string(arguments.kmer_size) +
+                                                                         "_k" + arguments.shape.to_string() +
                                                                          "_e" + std::to_string(arguments.errors) +
                                                                          "_tau" + std::to_string(arguments.tau));
     std::ofstream os{filename, std::ios::binary};
@@ -86,7 +88,7 @@ bool do_cerealisation_in(std::vector<size_t> & vec, search_arguments const & arg
 {
     std::filesystem::path filename = arguments.index_file.parent_path() / ("binary_p" + std::to_string(arguments.pattern_size) +
                                                                          "_w" + std::to_string(arguments.window_size) +
-                                                                         "_k" + std::to_string(arguments.kmer_size) +
+                                                                         "_k" + arguments.shape.to_string() +
                                                                          "_e" + std::to_string(arguments.errors) +
                                                                          "_tau" + std::to_string(arguments.tau));
     if (!std::filesystem::exists(filename))

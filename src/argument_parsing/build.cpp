@@ -37,9 +37,15 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
     parser.add_option(arguments.kmer_size,
                       '\0',
                       "kmer",
-                      "The k-mer size.",
+                      "The k-mer size.", // Mutually exclusive with --shape.
                       seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{1, 32});
+    parser.add_option(arguments.shape_string,
+                      '\0',
+                      "shape",
+                      "The shape to use for k-mers. Mutually exclusive with --kmer.",
+                      seqan3::option_spec::hidden, // Add help in kmer_size
+                      seqan3::regex_validator{"[01]+"});
     parser.add_option(arguments.out_path,
                       '\0',
                       "output",
@@ -84,13 +90,34 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
     // ==========================================
     // Various checks.
     // ==========================================
+    if (parser.is_option_set("shape"))
+    {
+        if (parser.is_option_set("kmer"))
+            throw seqan3::argument_parser_error{"You cannot set both shape and k-mer arguments."};
+
+        uint64_t tmp{};
+
+        std::from_chars(arguments.shape_string.data(),
+                        arguments.shape_string.data() + arguments.shape_string.size(),
+                        tmp,
+                        2);
+
+        arguments.shape = seqan3::shape{seqan3::bin_literal{tmp}};
+    }
+    else
+    {
+        arguments.shape = seqan3::shape{seqan3::ungapped{arguments.kmer_size}};
+    }
+
     if (parser.is_option_set("window"))
     {
-        if (arguments.kmer_size > arguments.window_size)
+        if (arguments.shape.size() > arguments.window_size)
             throw seqan3::argument_parser_error{"The k-mer size cannot be bigger than the window size."};
     }
     else
-        arguments.window_size = arguments.kmer_size;
+    {
+        arguments.window_size = arguments.shape.size();
+    }
 
     std::filesystem::path output_directory = parser.is_option_set("compute-minimiser") ? arguments.out_path :
                                                                                          arguments.out_path.parent_path();
@@ -198,9 +225,16 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
     {
         header_file_path.replace_extension("header");
         std::ifstream file_stream{header_file_path};
-        uint64_t kmer_size{};
-        file_stream >> kmer_size >> arguments.window_size;
-        arguments.kmer_size = kmer_size;
+        std::string shape_string{};
+        file_stream >> shape_string >> arguments.window_size;
+
+        uint64_t tmp{};
+        std::from_chars(shape_string.data(),
+                        shape_string.data() + shape_string.size(),
+                        tmp,
+                        2);
+
+        arguments.shape = seqan3::shape{seqan3::bin_literal{tmp}};
     }
 
     // ==========================================
