@@ -44,7 +44,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          path: src
+          path: raptor
           fetch-depth: 2
           submodules: true
 
@@ -52,13 +52,13 @@ jobs:
         uses: Homebrew/actions/setup-homebrew@master
 
       - name: Install CMake
-        run: bash ./src/lib/seqan3/.github/workflows/scripts/install_cmake.sh
+        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_cmake.sh
 
       - name: Install ccache
-        run: bash ./src/lib/seqan3/.github/workflows/scripts/install_via_brew.sh ccache
+        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_via_brew.sh ccache
 
       - name: Install compiler ${{ matrix.cxx }}
-        run: bash ./src/lib/seqan3/.github/workflows/scripts/install_via_brew.sh gcc $(echo "${{ matrix.cxx }}" | sed "s/g++-//g")
+        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_via_brew.sh gcc $(echo "${{ matrix.cxx }}" | sed "s/g++-//g")
 
       - name: Load ccache
         uses: actions/cache@v2
@@ -83,7 +83,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ../src -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
+          cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
 
       - name: Build application
         env:

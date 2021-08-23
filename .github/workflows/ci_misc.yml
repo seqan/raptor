@@ -39,24 +39,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          path: src
+          path: raptor
           fetch-depth: 2
           submodules: true
 
       - name: Add package source
-        run: bash ./src/lib/seqan3/.github/workflows/scripts/configure_apt.sh
+        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/configure_apt.sh
 
       - name: Install CMake
         env:
           BUILD: ${{ matrix.build }}
           CMAKE_VERSION: ${{ matrix.cmake }}
-        run: bash ./src/lib/seqan3/.github/workflows/scripts/install_cmake.sh
+        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_cmake.sh
 
       - name: Install Doxygen
         if: matrix.build == 'documentation'
         env:
           DOXYGEN_VERSION: ${{ matrix.doxygen }}
-        run: bash ./src/lib/seqan3/.github/workflows/scripts/install_doxygen.sh
+        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_doxygen.sh
 
       - name: Install ccache
         if: matrix.requires_ccache
@@ -91,7 +91,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ../src -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
+          cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
 
       - name: Build tests
         if: ${{!matrix.skip_build_tests}}
