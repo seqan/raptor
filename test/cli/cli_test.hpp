@@ -127,13 +127,13 @@ struct raptor_base : public cli_test
         return result;
     }
 
-    static inline std::filesystem::path const ibf_path(size_t const number_of_repetitions, size_t const window_size) noexcept
+    static inline std::filesystem::path const ibf_path(size_t const number_of_repetitions, size_t const window_size, bool const compressed = false) noexcept
     {
         std::string name{};
         name += std::to_string(std::max<int>(1, number_of_repetitions * 4));
         name += "bins";
         name += std::to_string(window_size);
-        name += "window.index";
+        name += compressed ? "windowc.index" : "window.index";
         return cli_test::data(name);
     }
 
@@ -164,8 +164,9 @@ struct raptor_base : public cli_test
     }
 
     // Good example for printing tables: https://en.cppreference.com/w/cpp/io/ios_base/width
-    static inline std::string const debug_ibfs(seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed> const & expected_ibf,
-                                               seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed> const & actual_ibf)
+    template <seqan3::data_layout layout = seqan3::data_layout::uncompressed>
+    static inline std::string const debug_ibfs(seqan3::interleaved_bloom_filter<layout> const & expected_ibf,
+                                               seqan3::interleaved_bloom_filter<layout> const & actual_ibf)
     {
         std::stringstream result{};
         result << ">>>IBFs differ<<<\n";
@@ -214,11 +215,12 @@ struct raptor_base : public cli_test
         return result.str();
     }
 
+    template <seqan3::data_layout layout = seqan3::data_layout::uncompressed>
     static inline void compare_results(std::filesystem::path const & expected_result,
                                        std::filesystem::path const & actual_result,
                                        bool const compare_extension = true)
     {
-        raptor::raptor_index<seqan3::data_layout::uncompressed> expected_index, actual_index{};
+        raptor::raptor_index<layout> expected_index, actual_index{};
 
         {
             std::ifstream is{expected_result, std::ios::binary};
@@ -237,7 +239,7 @@ struct raptor_base : public cli_test
         EXPECT_EQ(expected_index.compressed(), actual_index.compressed());
 
         auto const & expected_ibf{expected_index.ibf()}, actual_ibf{actual_index.ibf()};
-        EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs(expected_ibf, actual_ibf);
+        EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs<layout>(expected_ibf, actual_ibf);
 
         EXPECT_EQ(std::ranges::distance(expected_index.bin_path()), std::ranges::distance(actual_index.bin_path()));
         for (auto const && [expected_list, actual_list] : seqan3::views::zip(expected_index.bin_path(), actual_index.bin_path()))

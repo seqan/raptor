@@ -24,6 +24,19 @@ declare_datasource (FILE bin4.fa
                     URL ${CMAKE_SOURCE_DIR}/test/data/bin4.fa
                     URL_HASH SHA256=b4e3be3c001aac8481be2251aab110e4318996d26f2cdc91fb3061c35cbec4a1)
 
+declare_datasource (FILE bin1.fa.gz
+                    URL ${CMAKE_SOURCE_DIR}/test/data/bin1.fa.gz
+                    URL_HASH SHA256=8c18f83a6e5c3fcde122052ceb843beadc7eaf31157b68b7a7caa70004be86ab)
+declare_datasource (FILE bin2.fa.gz
+                    URL ${CMAKE_SOURCE_DIR}/test/data/bin2.fa.gz
+                    URL_HASH SHA256=60534c9bb4b593d39cedd5039614eb7eec6ab92961c490bb461232d9626d71a9)
+declare_datasource (FILE bin3.fa.gz
+                    URL ${CMAKE_SOURCE_DIR}/test/data/bin3.fa.gz
+                    URL_HASH SHA256=1139affca816f0b404011a038d8c9d94481e28f84e566a57da4be4abc0b9eb13)
+declare_datasource (FILE bin4.fa.gz
+                    URL ${CMAKE_SOURCE_DIR}/test/data/bin4.fa.gz
+                    URL_HASH SHA256=9986c8665294cc4a5eaf1341990f8680afd2ffa1aa6b4906d269f7ca96c393f2)
+
 declare_datasource (FILE query.fq
                     URL ${CMAKE_SOURCE_DIR}/test/data/query.fq
                     URL_HASH SHA256=f48eb3f357e23df89e7e15d2f77f9285a428f73c4903eb1c6580271e0dea3d87)
@@ -64,6 +77,13 @@ declare_datasource (FILE 1_1.index_2
 declare_datasource (FILE 1_1.index_3
                     URL ${CMAKE_SOURCE_DIR}/test/data/1_1.index_3
                     URL_HASH SHA256=b72db8be6455990c4a67c22748b725d501e400f61e5291293c11cd6c3793f93a)
+
+declare_datasource (FILE 1_1c.index
+                    URL ${CMAKE_SOURCE_DIR}/test/data/1_1c.index
+                    URL_HASH SHA256=361172918e940944a4fa5ef518d3cc7ec8f024964a99fbfbf1cc6ce1132f637c)
+declare_datasource (FILE 64bins23windowc.index
+                    URL ${CMAKE_SOURCE_DIR}/test/data/64bins23windowc.index
+                    URL_HASH SHA256=fa0cd03253dc8fd9620190a95f8db021c3ffb4db3a5b99ea754b5793879f3cd6)
 
 declare_datasource (FILE 1bins19window0error.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/1bins19window0error.out

@@ -38,6 +38,36 @@ TEST_F(raptor_upgrade, upgrade_index)
     compare_results(ibf_path(16, 23), "raptor.index");
 }
 
+TEST_F(raptor_upgrade, upgrade_compressed_index)
+{
+    {
+        std::string const expanded_bins = repeat_bins(16);
+        std::ofstream file{"raptor_cli_test.txt"};
+        auto split_bins = expanded_bins
+                        | std::views::split(' ')
+                        | std::views::transform([](auto &&rng) {
+                            return std::string_view(&*rng.begin(), std::ranges::distance(rng));});
+        for (auto && file_path : split_bins)
+        {
+            file << file_path << '\n';
+        }
+        file << '\n';
+    }
+
+    cli_test_result const result = execute_app("raptor", "upgrade",
+                                                         "--kmer 19",
+                                                         "--window 23",
+                                                         "--compressed",
+                                                         "--bins raptor_cli_test.txt",
+                                                         "--input ", data("1_1c.index"),
+                                                         "--output raptor.index");
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{});
+    ASSERT_EQ(result.exit_code, 0);
+
+    compare_results<seqan3::data_layout::compressed>(ibf_path(16, 23, true), "raptor.index");
+}
+
 TEST_F(raptor_upgrade, upgrade_partitioned)
 {
     std::stringstream header{};
