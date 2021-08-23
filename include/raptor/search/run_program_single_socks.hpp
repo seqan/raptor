@@ -90,6 +90,7 @@ void run_program_single_socks(search_arguments const & arguments)
         do_parallel(worker, records.size(), arguments.threads, compute_time);
     }
 
+// LCOV_EXCL_START
     if (arguments.write_time)
     {
         std::filesystem::path file_path{arguments.out_file};
@@ -102,6 +103,7 @@ void run_program_single_socks(search_arguments const & arguments)
                     << reads_io_time << '\t'
                     << compute_time;
     }
+// LCOV_EXCL_END
 }
 
 } // namespace raptor
