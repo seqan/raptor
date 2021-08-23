@@ -194,6 +194,49 @@ TEST_P(raptor_preprocessing, pipeline_compressed_bins)
     EXPECT_EQ(expected, actual);
 }
 
+TEST_F(raptor_preprocessing, pipeline_compressed)
+{
+    {
+        std::string const expanded_bins = repeat_bins(16);
+        std::ofstream file{"raptor_cli_test.txt"};
+        std::ofstream file2{"raptor_cli_test.minimiser"};
+        auto split_bins = expanded_bins
+                        | std::views::split(' ')
+                        | std::views::transform([](auto &&rng) {
+                            return std::string(&*rng.begin(), std::ranges::distance(rng));});
+        for (auto && file_path : split_bins)
+        {
+            file << file_path << '\n';
+            file2 << seqan3::detail::to_string("precomputed_minimisers/",
+                                               std::filesystem::path{file_path}.stem().c_str(),
+                                               ".minimiser\n");
+        }
+        file << '\n';
+    }
+
+    cli_test_result const result1 = execute_app("raptor", "build",
+                                                          "--kmer 19",
+                                                          "--window 23",
+                                                          "--compute-minimiser",
+                                                          "--disable-cutoffs",
+                                                          "--output precomputed_minimisers",
+                                                          "raptor_cli_test.txt");
+    EXPECT_EQ(result1.out, std::string{});
+    EXPECT_EQ(result1.err, std::string{});
+    ASSERT_EQ(result1.exit_code, 0);
+
+    cli_test_result const result2 = execute_app("raptor", "build",
+                                                          "--size 64k",
+                                                          "--output raptor.index",
+                                                          "--compressed",
+                                                          "raptor_cli_test.minimiser");
+    EXPECT_EQ(result2.out, std::string{});
+    EXPECT_EQ(result2.err, std::string{});
+    ASSERT_EQ(result2.exit_code, 0);
+
+    compare_results<seqan3::data_layout::compressed>(ibf_path(16, 23, true), "raptor.index", false);
+}
+
 INSTANTIATE_TEST_SUITE_P(preprocessing_suite,
                          raptor_preprocessing,
                          testing::Combine(testing::Values(0, 16, 32), testing::Values(19, 23), testing::Values(true, false), testing::Values(0, 1)),
