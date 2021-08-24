@@ -15,6 +15,9 @@ namespace raptor
 
 void init_shared_meta(seqan3::argument_parser & parser);
 void try_parsing(seqan3::argument_parser & parser);
+void parse_bin_paths(std::filesystem::path const & bin_file,
+                     std::vector<std::vector<std::string>> & bin_paths,
+                     bool const is_socks);
 
 template <typename arguments_t>
 void init_shared_options(seqan3::argument_parser & parser, arguments_t & arguments)

@@ -100,7 +100,7 @@ private:
 class bin_validator
 {
 public:
-    using option_value_type = std::vector<std::filesystem::path>;
+    using option_value_type = std::vector<std::vector<std::string>>;
 
     bin_validator() = default;
     bin_validator(bin_validator const &) = default;
@@ -109,71 +109,43 @@ public:
     bin_validator & operator=(bin_validator &&) = default;
     ~bin_validator() = default;
 
-    void operator() (std::vector<std::string> const & values) const
-    {
-        auto view = values | std::views::transform([] (auto const & str) { return std::filesystem::path{str}; });
-        operator()(view);
-    }
-
-    template <typename rng_t>
-        requires std::same_as<std::filesystem::path, std::remove_cvref_t<std::ranges::range_value_t<rng_t>>>
-    void operator() (rng_t const & values) const
+    void operator() (option_value_type const & values) const
     {
         if (values.empty())
             throw seqan3::validation_error{"The list of input files cannot be empty."};
 
-        for (auto && value : values)
+        bool const is_minimiser_input = std::filesystem::path{values[0][0]}.extension() == ".minimiser";
+
+        for (std::vector<std::string> const & vector_of_paths : values)
         {
-            try
+            for (std::string const & value : vector_of_paths)
             {
-                sequence_file_validator(value);
-            }
-            catch (seqan3::validation_error const & exception)
-            {
-                if (value.extension() == ".minimiser")
-                    minimiser_file_validator(value);
-                else if (values.size() == 1u)
-                {
-                    std::ifstream list_of_files{value};
-                    std::string line;
-                    while (std::getline(list_of_files, line))
-                    {
-                        if (!line.empty())
-                        {
-                            std::filesystem::path bin_path{line};
-                            if (bin_path.extension() == ".minimiser")
-                                minimiser_file_validator(bin_path);
-                            else
-                                sequence_file_validator(bin_path);
-                        }
-                    }
-                }
+                std::filesystem::path const file_path{value};
+
+                if (is_minimiser_input && (file_path.extension() != ".minimiser"))
+                    throw seqan3::validation_error{"You cannot mix sequence and minimiser files as input."};
+                if (std::filesystem::file_size(file_path) == 0u)
+                    throw seqan3::validation_error{"The file " + value + " is empty."};
+
+                if (is_minimiser_input)
+                    minimiser_file_validator(file_path);
                 else
-                    throw exception;
+                    sequence_file_validator(file_path);
             }
-        }
-
-        bool const is_minimiser_input = values[0].extension() == ".minimiser";
-
-        for (auto && value : values)
-        {
-            if (is_minimiser_input != (value.extension() == ".minimiser"))
-                throw seqan3::validation_error{"You cannot mix sequence and minimiser files as input."};
-            if (std::filesystem::file_size(value) == 0u)
-                throw seqan3::validation_error{"The file " + value.string() + " is empty."};
         }
     }
 
     std::string get_help_page_message() const
     {
-        return seqan3::detail::to_string("The input file must exist and read permissions must be granted. Valid file "
-                                         "extensions for bin files are: [minimiser], or ", sequence_extensions,
+        // Update
+        return seqan3::detail::to_string("The file must contain at least one file path per line, with multiple paths "
+                                         "being separated by a whitespace. Each line in the file corresponds to one "
+                                         "bin. Valid extensions for the paths in the file are [minimiser] when "
+                                         " preprocessing, and ", sequence_extensions,
                                          #if defined(SEQAN3_HAS_BZIP2) || defined(SEQAN3_HAS_ZLIB)
-                                         " possibly followed by: ", compression_extensions, ". ",
-                                         #else
-                                         ". ",
+                                         ", possibly followed by ", compression_extensions,
                                          #endif
-                                         "All other extensions will be assumed to contain one line per path to a bin.");
+                                         " otherwise. ");
     }
 
 private:
@@ -189,11 +161,11 @@ private:
                                      result.push_back("bgzf");
                                  #endif
                                  return result;
-                             }()};
+                             }()}; // LCOV_EXCL_LINE
     std::vector<std::string> combined_extensions{[&] ()
                              {
                                  if (compression_extensions.empty())
-                                    return sequence_extensions;
+                                    return sequence_extensions; // LCOV_EXCL_LINE
                                  std::vector<std::string> result;
                                  for (auto && sequence_extension : sequence_extensions)
                                  {

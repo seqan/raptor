@@ -68,4 +68,35 @@ void try_parsing(seqan3::argument_parser & parser)
     }
 }
 
+void parse_bin_paths(std::filesystem::path const & bin_file,
+                     std::vector<std::vector<std::string>> & bin_paths,
+                     bool const is_socks)
+{
+    std::ifstream istrm{bin_file};
+    std::string line{};
+    std::string color_name{};
+    std::string file_name{};
+    std::vector<std::string> tmp{};
+
+    while (std::getline(istrm, line))
+    {
+        if (!line.empty())
+        {
+            tmp.clear();
+            std::stringstream sstream{line};
+
+            if (is_socks)
+                sstream >> color_name;
+
+            while (std::getline(sstream, file_name, ' '))
+                if (!file_name.empty())
+                    tmp.emplace_back(file_name);
+
+            bin_paths.emplace_back(tmp);
+        }
+    }
+
+    bin_validator{}(bin_paths);
+}
+
 } // namespace raptor
