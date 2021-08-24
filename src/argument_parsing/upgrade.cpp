@@ -96,18 +96,7 @@ void run_upgrade(seqan3::argument_parser & parser)
     // ==========================================
     // Process bin_path
     // ==========================================
-    std::ifstream istrm{arguments.bin_file};
-    std::string line;
-    auto sequence_file_validator{bin_validator{}.sequence_file_validator};
-
-    while (std::getline(istrm, line))
-    {
-        if (!line.empty())
-        {
-            sequence_file_validator(line);
-            arguments.bin_path.emplace_back(std::vector<std::string>{line});
-        }
-    }
+    parse_bin_paths(arguments.bin_file, arguments.bin_path, false);
 
     // ==========================================
     // Dispatch

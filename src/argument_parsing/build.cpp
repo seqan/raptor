@@ -19,8 +19,8 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
                             "raptor build --kmer 19 --window 23 --compute-minimiser --output precomputed_minimisers all_bin_paths.txt",
                             "raptor build --size 8m --output minimiser_raptor.index all_minimiser_paths.txt"};
     parser.add_positional_option(arguments.bin_file,
-                                 arguments.is_socks ? "File containing color and file names." :
-                                                      "File containing one file per line per bin.",
+                                 (arguments.is_socks ? "File containing color and file names. " :
+                                                       "File containing file names. ") + bin_validator{}.get_help_page_message(),
                                  seqan3::input_file_validator{});
     parser.add_option(arguments.parts,
                       '\0',
@@ -145,50 +145,7 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
     // ==========================================
     // Process bin_path
     // ==========================================
-    if (!arguments.is_socks) // File containing bin paths
-    {
-        std::ifstream istrm{arguments.bin_file};
-        std::string line;
-        bin_validator validator{};
-
-        while (std::getline(istrm, line))
-        {
-            if (!line.empty())
-            {
-                arguments.bin_path.emplace_back(std::vector<std::string>{line});
-                validator(arguments.bin_path.back());
-            }
-        }
-    }
-    else
-    {
-        std::ifstream istrm{arguments.bin_file};
-        std::string line;
-        std::string color_name;
-        std::string file_name;
-        std::vector<std::string> tmp;
-        bin_validator validator{};
-
-        while (std::getline(istrm, line))
-        {
-            if (!line.empty())
-            {
-                tmp.clear();
-                std::stringstream sstream{line};
-                sstream >> color_name;
-                while (std::getline(sstream, file_name, ' '))
-                {
-                    if (!file_name.empty())
-                    {
-                        tmp.emplace_back(file_name);
-                    }
-                }
-                validator(tmp);
-                arguments.bin_path.emplace_back(tmp);
-            }
-        }
-    }
-
+    parse_bin_paths(arguments.bin_file, arguments.bin_path, arguments.is_socks);
     arguments.bins = arguments.bin_path.size();
 
     // ==========================================

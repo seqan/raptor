@@ -191,6 +191,76 @@ TEST_F(raptor_build, kmer_shape)
     EXPECT_EQ(result.err, std::string{"[Error] You cannot set both shape and k-mer arguments.\n"});
 }
 
+TEST_F(raptor_build, zero_threads)
+{
+    cli_test_result const result = execute_app("raptor", "build",
+                                                         "--kmer 20",
+                                                         "--threads 0",
+                                                         "--size 8m",
+                                                         "--output index.raptor",
+                                                         tmp_bin_list_file.file_path);
+    EXPECT_NE(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] Validation failed for option --threads: The value must be a positive integer.\n"});
+}
+
+TEST_F(raptor_build, no_bins_in_file)
+{
+    seqan3::test::create_temporary_snippet_file tmp_bin_list_empty{"empty.txt", std::string{"\n"}};
+
+    cli_test_result const result = execute_app("raptor", "build",
+                                                         "--kmer 20",
+                                                         "--size 8m",
+                                                         "--output index.raptor",
+                                                         tmp_bin_list_empty.file_path);
+    EXPECT_NE(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] The list of input files cannot be empty.\n"});
+}
+
+TEST_F(raptor_build, empty_file_in_bin)
+{
+    seqan3::test::create_temporary_snippet_file empty_sequence_file{"empty.fasta", std::string{"\n"}};
+    seqan3::test::create_temporary_snippet_file tmp_empty_bin_file{"empty_bin.txt", std::string{"\n"} + empty_sequence_file.file_path.string()};
+
+    cli_test_result const result = execute_app("raptor", "build",
+                                                         "--kmer 20",
+                                                         "--size 8m",
+                                                         "--output index.raptor",
+                                                         tmp_empty_bin_file.file_path);
+    EXPECT_NE(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] The file " + tmp_empty_bin_file.file_path.parent_path().string() + "/empty.fasta is empty.\n"});
+}
+
+TEST_F(raptor_build, mixed_input)
+{
+    seqan3::test::create_temporary_snippet_file minimiser_file{"bin1.minimiser", std::string{"\n0"}};
+    seqan3::test::create_temporary_snippet_file mixed_bin_file{"mixed.txt", std::string{"\n"} + minimiser_file.file_path.string() + std::string{"\nbin2.fasta"}};
+
+    cli_test_result const result = execute_app("raptor", "build",
+                                                         "--kmer 20",
+                                                         "--size 8m",
+                                                         "--output index.raptor",
+                                                         mixed_bin_file.file_path);
+    EXPECT_NE(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] You cannot mix sequence and minimiser files as input.\n"});
+}
+
+TEST_F(raptor_build, wrong_parts)
+{
+    cli_test_result const result = execute_app("raptor", "build",
+                                                         "--kmer 20",
+                                                         "--size 8m",
+                                                         "--parts 3",
+                                                         "--output index.raptor",
+                                                         tmp_bin_list_file.file_path);
+    EXPECT_NE(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] Validation failed for option --parts: The value must be a power of two.\n"});
+}
+
 TEST_F(raptor_search, ibf_missing)
 {
     cli_test_result const result = execute_app("raptor", "search",
