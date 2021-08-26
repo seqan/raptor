@@ -131,6 +131,17 @@ TEST_F(raptor_build, directory_missing)
     EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
 }
 
+TEST_F(raptor_build, alias)
+{
+    cli_test_result const result = execute_app("raptor", "build",
+                                                         "--size 8m",
+                                                         "--compute-minimizer",
+                                                         tmp_bin_list_file.file_path);
+    EXPECT_NE(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
+}
+
 TEST_F(raptor_build, size_missing)
 {
     cli_test_result const result = execute_app("raptor", "build",

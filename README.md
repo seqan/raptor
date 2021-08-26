@@ -1,12 +1,18 @@
-# Raptor [![build status](https://github.com/seqan/raptor/workflows/Raptor%20CI/badge.svg?branch=master)](https://github.com/seqan/raptor/actions) [![codecov](https://codecov.io/gh/seqan/raptor/branch/master/graph/badge.svg?token=SJVMYRUKW2)](https://codecov.io/gh/seqan/raptor)
+# Raptor [![build status][1]][2] [![codecov][3]][4] [![install with bioconda][5]][6]
+
+[1]: https://github.com/seqan/raptor/workflows/Raptor%20CI/badge.svg?branch=master
+[2]: https://github.com/seqan/raptor/actions
+[3]: https://codecov.io/gh/seqan/raptor/branch/master/graph/badge.svg?token=SJVMYRUKW2
+[4]: https://codecov.io/gh/seqan/raptor
+[5]: https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat
+[6]: https://bioconda.github.io/recipes/raptor/README.html
+
 ### A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences
 
 ## Download and Installation
-There may be performance benefits when compiling from source, especially when using `-march=native` as compiler
-directive.
+There may be performance benefits when compiling from source as the build can be optimized for the host system.
 
 ### Install with bioconda (Linux)
-[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/raptor/README.html)
 
 ```bash
 conda install -c bioconda -c conda-forge raptor
@@ -62,16 +68,20 @@ make
 
 The binary can be found in `bin`.
 
-You may want to add the raptor executable yo your PATH:
+You may want to add the Raptor executable to your PATH:
 ```
 export PATH=$(pwd)/bin:$PATH
 raptor --version
 ```
 
+By default, Raptor will be built with host specific optimizations (`-march=native`). This behavior can be disabled by
+passing `-DRAPTOR_NATIVE_BUILD=OFF` to CMake.
+
 </details>
 
 ## Example Data and Usage
-A toy data set can be found [here](https://ftp.imp.fu-berlin.de/pub/seiler/raptor/).
+A toy data set (124 MiB compressed, 983 MiB decompressed) can be found
+[here](https://ftp.imp.fu-berlin.de/pub/seiler/raptor/).
 
 ```bash
 wget https://ftp.imp.fu-berlin.de/pub/seiler/raptor/example_data.tar.gz
@@ -113,7 +123,7 @@ Afterwards, we can search for some reads:
 raptor search --error 2 --index raptor.index --query example_data/64/reads/mini.fastq --output search.output
 ```
 
-The output starts with a header section (lines starting with `\#`). The header maps a number to each input file.
+The output starts with a header section (lines starting with `#`). The header maps a number to each input file.
 After the header section, each line of the output consists of the read ID (in the toy example these are numbers) and
 the corresponding bins in which they were found:
 ```text
@@ -168,6 +178,18 @@ The preprocessing applies the same cutoffs as used in Mantis
 ([Pandey et al., 2018](https://doi.org/10.1016/j.cels.2018.05.021)).
 This means that only minimisers that occur more often than the cutoff specifies are included in the output.
 If you wish to process all minimisers, you can use `--disable-cutoffs`.
+
+### Partitioned indices
+To reduce the overall memory consumption, the index can be divided into multiple (a power of two) parts.
+This can be done by passing `--parts n` to `raptor build`, where `n` is the number of parts you want to create.
+This will create `n` files, each representing one part of the index. The `--size` parameter describes the overall size
+of the index. For example, `--size 8g --parts 4` will create four 2 GiB indices. This will reduce the memory consumption
+of `raptor build` and `raptor search` by approximately 6 GiB, since there will only be one part in memory at any given
+time. `raptor search` will automatically detect the parts, and does not need any special parameters.
+
+### Upgrading the index (v1.1.0 to v2.0.0)
+An old index can be upgraded by running `raptor upgrade` and providing some information about how the index was
+constructed.
 
 ### SOCKS interface
 We implement the core interface of [SOCKS](https://gitlab.ub.uni-bielefeld.de/gi/socks).
