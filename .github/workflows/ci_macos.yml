@@ -83,7 +83,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
+          cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" -DRAPTOR_NATIVE_BUILD=OFF
 
       - name: Build application
         env:

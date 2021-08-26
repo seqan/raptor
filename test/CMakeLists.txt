@@ -53,13 +53,17 @@ macro (add_app_test test_filename test_alternative)
     target_link_libraries (${target} "${PROJECT_NAME}_lib" seqan3::seqan3 gtest gtest_main)
 
     # Make seqan3::test available for both cli and api tests.
-    target_include_directories(${target} PUBLIC "${SEQAN3_CLONE_DIR}/test/include")
-    target_include_directories(${target} PUBLIC "${SEQAN3_TEST_CLONE_DIR}/googletest/include/")
+    target_include_directories (${target} PUBLIC "${SEQAN3_CLONE_DIR}/test/include")
+    target_include_directories (${target} PUBLIC "${SEQAN3_TEST_CLONE_DIR}/googletest/include/")
 
     # Add the test to its general target (cli or api).
     if (${test_alternative} STREQUAL "CLI_TEST")
         add_dependencies (${target} "${PROJECT_NAME}") # cli test needs the application executable
         add_dependencies (cli_test ${target})
+        if (RAPTOR_ENABLE_BENCHMARK)
+            target_include_directories (${target} PUBLIC "${SEQAN3_BENCHMARK_CLONE_DIR}/include/")
+            target_link_libraries (${target} gbenchmark)
+        endif ()
     elseif (${test_alternative} STREQUAL "API_TEST")
         add_dependencies (api_test ${target})
     endif ()
@@ -93,5 +97,12 @@ include (data/datasources.cmake)
 add_subdirectory (api)
 add_subdirectory (cli)
 add_subdirectory (coverage)
+
+if (RAPTOR_ENABLE_BENCHMARK)
+    set (SEQAN3_BENCHMARK_CLONE_DIR "${PROJECT_BINARY_DIR}/vendor/benchmark")
+    include ("${SEQAN3_CLONE_DIR}/test/cmake/seqan3_require_benchmark.cmake")
+    seqan3_require_benchmark ()
+    add_subdirectory (benchmark)
+endif ()
 
 message (STATUS "${FontBold}You can run `make test` to build and run tests.${FontReset}")
