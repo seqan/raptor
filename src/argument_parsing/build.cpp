@@ -44,7 +44,7 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
                       '\0',
                       "shape",
                       "The shape to use for k-mers. Mutually exclusive with --kmer.",
-                      seqan3::option_spec::hidden, // Add help in kmer_size
+                      seqan3::option_spec::advanced, // Add help in kmer_size
                       seqan3::regex_validator{"[01]+"});
     parser.add_option(arguments.out_path,
                       '\0',
@@ -73,6 +73,11 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
                     "compute-minimiser",
                     "Computes minimisers using cutoffs from Mantis (Pandey et al.). Does not create the index.",
                     arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
+    parser.add_flag(arguments.compute_minimiser,
+                    '\0',
+                    "compute-minimizer",
+                    "Hidden flag, alias of --compute-minimiser.",
+                    seqan3::option_spec::hidden);
     parser.add_flag(arguments.disable_cutoffs,
                     '\0',
                     "disable-cutoffs",
@@ -119,8 +124,13 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
         arguments.window_size = arguments.shape.size();
     }
 
-    std::filesystem::path output_directory = parser.is_option_set("compute-minimiser") ? arguments.out_path :
-                                                                                         arguments.out_path.parent_path();
+    bool const is_compute_minimiser_set{parser.is_option_set("compute-minimiser") ||
+                                        parser.is_option_set("compute-minimizer")};
+
+    arguments.compute_minimiser = is_compute_minimiser_set;
+
+    std::filesystem::path output_directory = is_compute_minimiser_set ? arguments.out_path :
+                                                                        arguments.out_path.parent_path();
     std::error_code ec{};
     std::filesystem::create_directories(output_directory, ec);
 
@@ -132,7 +142,7 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
                                                                       ec.message())};
 // LCOV_EXCL_END
 
-    if (!parser.is_option_set("compute-minimiser"))
+    if (!is_compute_minimiser_set)
     {
         seqan3::output_file_validator{}(arguments.out_path);
 

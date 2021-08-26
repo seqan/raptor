@@ -10,6 +10,11 @@ cmake_minimum_required (VERSION 3.8)
 # Define the application name and version.
 project (raptor VERSION 2.0.0)
 
+# Messages
+string (ASCII 27 Esc)
+set (FontBold "${Esc}[1m")
+set (FontReset "${Esc}[m")
+
 # Fallback to these values if there is no git or no git repository
 set (RAPTOR_COMMIT_DATE "2021-08-20--no-git"
      CACHE STRING
@@ -52,15 +57,23 @@ if (NOT CMAKE_BUILD_TYPE)
          FORCE)
 endif ()
 
+set (RAPTOR_NATIVE_BUILD ON CACHE BOOL "Optimize build for current architecture.")
+if (RAPTOR_NATIVE_BUILD)
+    message (STATUS "${FontBold}Native build enabled. Built binaries will be optimized for this system.${FontReset}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+else ()
+     message (STATUS "${FontBold}Native build disabled. Detecting popcnt support.${FontReset}")
+     include (CheckCXXCompilerFlag)
+     check_cxx_compiler_flag ("-mpopcnt" RAPTOR_HAS_POPCNT)
+     if (RAPTOR_HAS_POPCNT)
+          set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
+     endif ()
+endif ()
+
 # Specify the directories where to store the built archives, libraries and executables
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-
-# Messages
-string (ASCII 27 Esc)
-set (FontBold "${Esc}[1m")
-set (FontReset "${Esc}[m")
 
 # Dependency: SeqAn3.
 set (SEQAN3_CEREAL ON CACHE BOOL "Require cereal to be present.")
@@ -68,8 +81,8 @@ set (SEQAN3_SUBMODULES_DIR "lib")
 find_package (SeqAn3 QUIET REQUIRED HINTS lib/seqan3/build_system)
 
 # Use ccache.
-set (USE_CCACHE ON CACHE BOOL "Use ccache if available.")
-if (USE_CCACHE)
+set (RAPTOR_USE_CCACHE ON CACHE BOOL "Use ccache if available.")
+if (RAPTOR_USE_CCACHE)
      include ("${SEQAN3_CLONE_DIR}/test/cmake/seqan3_require_ccache.cmake")
      seqan3_require_ccache ()
 endif ()
