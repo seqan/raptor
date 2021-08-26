@@ -68,8 +68,11 @@ set (SEQAN3_SUBMODULES_DIR "lib")
 find_package (SeqAn3 QUIET REQUIRED HINTS lib/seqan3/build_system)
 
 # Use ccache.
-include ("${SEQAN3_CLONE_DIR}/test/cmake/seqan3_require_ccache.cmake")
-seqan3_require_ccache ()
+set (USE_CCACHE ON CACHE BOOL "Use ccache if available.")
+if (USE_CCACHE)
+     include ("${SEQAN3_CLONE_DIR}/test/cmake/seqan3_require_ccache.cmake")
+     seqan3_require_ccache ()
+endif ()
 
 # Add the application.
 add_subdirectory (src)
