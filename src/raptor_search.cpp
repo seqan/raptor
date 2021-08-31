@@ -5,9 +5,9 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
+#include <raptor/search/run_program_multiple.hpp>
 #include <raptor/search/run_program_single.hpp>
 #include <raptor/search/run_program_single_socks.hpp>
-#include <raptor/search/run_program_multiple.hpp>
 
 namespace raptor
 {
