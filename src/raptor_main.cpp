@@ -10,8 +10,8 @@
 #include <raptor/argument_parsing/build.hpp>
 #include <raptor/argument_parsing/search.hpp>
 #include <raptor/argument_parsing/shared.hpp>
-#include <raptor/argument_parsing/upgrade.hpp>
 #include <raptor/argument_parsing/top_level.hpp>
+#include <raptor/argument_parsing/upgrade.hpp>
 #include <raptor/raptor.hpp>
 
 int main(int argc, char ** argv)
