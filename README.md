@@ -1,24 +1,26 @@
-# Raptor [![build status][1]][2] [![codecov][3]][4] [![install with bioconda][5]][6]
+# Raptor [![build status][1]][2] [![codecov][3]][4] [![install with bioconda][5]][6] [![install with brew][7]][8]
 
 [1]: https://github.com/seqan/raptor/workflows/Raptor%20CI/badge.svg?branch=master
 [2]: https://github.com/seqan/raptor/actions
 [3]: https://codecov.io/gh/seqan/raptor/branch/master/graph/badge.svg?token=SJVMYRUKW2
 [4]: https://codecov.io/gh/seqan/raptor
 [5]: https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat
-[6]: https://bioconda.github.io/recipes/raptor/README.html
+[6]: #install-with-bioconda-linux
+[7]: https://img.shields.io/badge/install%20with-brew-brightgreen.svg?style=flat
+[8]: #install-with-brew-linux-macos
 
 ### A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences
 
 ## Download and Installation
 There may be performance benefits when compiling from source as the build can be optimized for the host system.
 
-### Install with bioconda (Linux)
+### Install with [bioconda](https://bioconda.github.io/recipes/raptor/README.html) (Linux)
 
 ```bash
 conda install -c bioconda -c conda-forge raptor
 ```
 
-### Install with brew (Linux, macOS)
+### Install with [brew](https://brew.sh/) (Linux, macOS)
 
 ```bash
 brew install brewsci/bio/raptor
