@@ -8,16 +8,27 @@
 #include <benchmark/benchmark.h>
 
 #include <seqan3/alphabet/nucleotide/dna4.hpp>
-#include <seqan3/utility/views/slice.hpp>
-
+#include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
 #include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
 #include <seqan3/search/views/kmer_hash.hpp>
 #include <seqan3/test/performance/sequence_generator.hpp>
+#include <seqan3/utility/views/slice.hpp>
+#include <seqan3/utility/views/zip.hpp>
 
-static constexpr size_t const genome_size{5000}; // 4'300'000'000
+#if 1
+static constexpr size_t const genome_size{5000};
 static constexpr size_t const read_size{100};
-static constexpr size_t const read_count{1000}; // 1'000'000
-static constexpr size_t const ibf_size{8'388'608/*=1MiB*/}; // 34'359'738'368/*=4GiB*/
+static constexpr size_t const read_count{1000};
+static constexpr size_t const ibf_size{8'388'608/*=1MiB*/};
+#else
+static constexpr size_t const genome_size{4'300'000'000};
+static constexpr size_t const read_size{100};
+static constexpr size_t const read_count{10'000'000};
+static constexpr size_t const ibf_size{34'359'738'368/*=4GiB*/};
+#endif
+
+static constexpr size_t const threads{1}; // Only applies to construction
+using ibf_t = seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed>;
 
 static std::vector<seqan3::dna4> const genome{seqan3::test::generate_sequence<seqan3::dna4>(genome_size, 0, 0)};
 static std::vector<std::vector<seqan3::dna4>> const reads{[] (auto const & genome) {
@@ -31,28 +42,43 @@ static std::vector<std::vector<seqan3::dna4>> const reads{[] (auto const & genom
     return result;
     } (genome)};
 
-static void search_benchmark(benchmark::State & state)
+static ibf_t construct_ibf(size_t const bin_count, auto && hash_adaptor)
 {
-    size_t const bin_count = static_cast<size_t>(state.range(0));
     size_t const hash_num{2u};
     size_t const bin_size{ibf_size / bin_count};
     size_t const chunk_size{(genome_size + bin_count - 1) / bin_count};
+    size_t const chunked_genome_size{(genome_size + bin_count - 1) / bin_count};
+    size_t const workload_size = std::clamp<size_t>(std::bit_ceil(bin_count / threads), 8u, 64u);
+    ibf_t ibf{seqan3::bin_count{bin_count}, seqan3::bin_size{bin_size}, seqan3::hash_function_count{hash_num}};
 
-    seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed> ibf{seqan3::bin_count{bin_count},
-                                                                            seqan3::bin_size{bin_size},
-                                                                            seqan3::hash_function_count{hash_num}};
+    auto chunked_genomes = genome | seqan3::views::chunk(chunked_genome_size);
+    auto workload = seqan3::views::zip(chunked_genomes, std::views::iota(0u)) | seqan3::views::chunk(workload_size);
+    auto worker = [&ibf, &hash_adaptor] (auto && payload, auto &&)
+    {
+        for (auto && [sequence, bin_number] : payload)
+            for (auto && hash : sequence | hash_adaptor)
+                    ibf.emplace(hash, seqan3::bin_index{bin_number});
+    };
 
-    size_t bin_counter{};
-    for (auto && sequence : genome | seqan3::views::chunk(chunk_size))
-        for (auto && hash : sequence | seqan3::views::kmer_hash(seqan3::ungapped{19u}))
-            ibf.emplace(hash, seqan3::bin_index{bin_counter++});
+    seqan3::detail::execution_handler_parallel executioner{threads};
+    executioner.bulk_execute(std::move(worker), std::move(workload), [](){});
+
+    return ibf;
+}
+
+static void bulk_count(benchmark::State & state)
+{
+    size_t const bin_count = static_cast<size_t>(state.range(0));
+    auto hash_adaptor = seqan3::views::kmer_hash(seqan3::ungapped{19u});
+
+    ibf_t const ibf{construct_ibf(bin_count, hash_adaptor)};
 
     auto agent = ibf.counting_agent<uint16_t>();
     for (auto _ : state)
         for (auto && query : reads)
-            benchmark::DoNotOptimize(agent.bulk_count(query | seqan3::views::kmer_hash(seqan3::ungapped{19u})));
+            benchmark::DoNotOptimize(agent.bulk_count(query | hash_adaptor));
 }
 
-BENCHMARK(search_benchmark)->RangeMultiplier(2)->Range(64, 65536);
+BENCHMARK(bulk_count)->RangeMultiplier(2)->Range(64, 65536);
 
 BENCHMARK_MAIN();
