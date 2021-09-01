@@ -209,6 +209,17 @@ In your academic works (also comparisons and pipelines) please cite:
     Enrico Seiler, Svenja Mehringer, Mitra Darvish, Etienne Turc, and Knut Reinert; iScience 2021 24 (7): 102782.
     doi: https://doi.org/10.1016/j.isci.2021.102782
 
+### RECOMB 2021
+Raptor was presented at the [25th International Conference on Research in Computational Molecular Biology][recomb_url]:
+  * [Slides][recomb_slides]
+  * [Pre-recorded version of the talk][recomb_talk]
+
+Please see the [License](#license) section for information on allowed use.
+
+[recomb_url]: https://www.recomb2021.org/
+[recomb_slides]: https://box.fu-berlin.de/s/TtM3Raxixm35Syy
+[recomb_talk]: https://box.fu-berlin.de/s/YJFQnwqdE5q2Tym
+
 ### Supplementary
 The subdirectory `util` contains applications and scripts related to the paper.
 
