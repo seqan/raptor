@@ -17,6 +17,6 @@ sed -i "s/DO_TIME=0/DO_TIME=1/" $SCRIPT_DIR/g++.sh
 make -k -j6 cli_test api_test
 
 find . -name "ram_usage.*" -exec cat {} + > complete.txt
-$SCRIPT_DIR/parse.py complete.txt stats.csv
+$SCRIPT_DIR/ram_usage.py complete.txt stats.csv
 
 echo "Results can be found in $(pwd)/stats.csv"
