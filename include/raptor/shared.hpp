@@ -40,7 +40,7 @@ struct dna4_traits : seqan3::sequence_file_input_default_traits_dna
 struct build_arguments
 {
     // Related to k-mers
-    uint32_t window_size{20u};
+    uint32_t window_size{0u};
     uint8_t kmer_size{20u};
     std::string shape_string{};
     seqan3::shape shape{seqan3::ungapped{kmer_size}};

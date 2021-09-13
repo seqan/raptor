@@ -58,7 +58,7 @@ void run_upgrade(seqan3::argument_parser & parser)
 {
     upgrade_arguments arguments{};
     init_upgrade_parser(parser, arguments);
-    try_parsing(parser);
+    parser.parse();
 
     // ==========================================
     // Various checks.
