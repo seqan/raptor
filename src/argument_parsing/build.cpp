@@ -31,7 +31,7 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
     parser.add_option(arguments.window_size,
                       '\0',
                       "window",
-                      "The window size.",
+                      "The window size. \\fI\\fBIf not set, defaults to the k-mer size.\\fP",
                       arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
                       positive_integer_validator{});
     parser.add_option(arguments.kmer_size,
@@ -90,7 +90,7 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
     build_arguments arguments{};
     arguments.is_socks = is_socks;
     init_build_parser(parser, arguments);
-    try_parsing(parser);
+    parser.parse();
 
     // ==========================================
     // Various checks.

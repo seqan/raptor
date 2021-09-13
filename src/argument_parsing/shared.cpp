@@ -55,19 +55,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.)";
     parser.info.version = RAPTOR_VERSION;
 }
 
-void try_parsing(seqan3::argument_parser & parser)
-{
-    try
-    {
-        parser.parse();
-    }
-    catch (seqan3::argument_parser_error const & ext)
-    {
-        std::cerr << "[Error] " << ext.what() << '\n';
-        std::exit(-1);
-    }
-}
-
 void parse_bin_paths(std::filesystem::path const & bin_file,
                      std::vector<std::vector<std::string>> & bin_paths,
                      bool const is_socks)

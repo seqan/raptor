@@ -71,7 +71,7 @@ void run_search(seqan3::argument_parser & parser, bool const is_socks)
     search_arguments arguments{};
     arguments.is_socks = is_socks;
     init_search_parser(parser, arguments);
-    try_parsing(parser);
+    parser.parse();
 
     // ==========================================
     // Various checks.
