@@ -90,6 +90,7 @@ struct search_arguments
     std::filesystem::path out_file{"search.out"};
     bool write_time{false};
     bool is_socks{false};
+    bool is_hibf{false};
 };
 
 struct upgrade_arguments

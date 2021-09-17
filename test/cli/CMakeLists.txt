@@ -6,6 +6,7 @@ set (cli_test_list raptor_build_test
                    raptor_parts_test
                    raptor_preprocessing_test
                    raptor_search_test
+                   raptor_search_hibf_test
                    raptor_upgrade_test)
 
 foreach (cli_test_target IN LISTS cli_test_list)
@@ -16,6 +17,18 @@ foreach (cli_test_target IN LISTS cli_test_list)
     target_use_datasources (${cli_test_target} FILES 1_1.index_1)
     target_use_datasources (${cli_test_target} FILES 1_1.index_2)
     target_use_datasources (${cli_test_target} FILES 1_1.index_3)
+    target_use_datasources (${cli_test_target} FILES 1bins19window.hibf)
+    target_use_datasources (${cli_test_target} FILES 64bins19window.hibf)
+    target_use_datasources (${cli_test_target} FILES 128bins19window.hibf)
+    target_use_datasources (${cli_test_target} FILES 128bins19window0errorhibf.out)
+    target_use_datasources (${cli_test_target} FILES 128bins19window1errorhibf.out)
+    target_use_datasources (${cli_test_target} FILES 1bins19window0errorhibf.out)
+    target_use_datasources (${cli_test_target} FILES 1bins19window1errorhibf.out)
+    target_use_datasources (${cli_test_target} FILES 64bins19window0errorhibf.out)
+    target_use_datasources (${cli_test_target} FILES 64bins19window1errorhibf.out)
+    target_use_datasources (${cli_test_target} FILES 128binsemptyhibf.out)
+    target_use_datasources (${cli_test_target} FILES 64binsemptyhibf.out)
+    target_use_datasources (${cli_test_target} FILES 1binsemptyhibf.out)
     target_use_datasources (${cli_test_target} FILES 128bins19window0error.out)
     target_use_datasources (${cli_test_target} FILES 128bins19window0errorsocks.out)
     target_use_datasources (${cli_test_target} FILES 128bins19window1error.out)
