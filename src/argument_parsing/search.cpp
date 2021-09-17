@@ -92,7 +92,7 @@ void run_search(seqan3::argument_parser & parser, bool const is_socks)
                                                                       output_directory.c_str(),
                                                                       "\": ",
                                                                       ec.message())};
-// LCOV_EXCL_END
+// LCOV_EXCL_STOP
 
     if (!arguments.is_socks)
     {

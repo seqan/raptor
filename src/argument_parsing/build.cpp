@@ -140,7 +140,7 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
                                                                       output_directory.c_str(),
                                                                       "\": ",
                                                                       ec.message())};
-// LCOV_EXCL_END
+// LCOV_EXCL_STOP
 
     if (!is_compute_minimiser_set)
     {
@@ -177,14 +177,14 @@ void run_build(seqan3::argument_parser & parser, bool const is_socks)
         case 'm':
             multiplier = 8ull * 1024ull * 1024ull;
             break;
-// LCOV_EXCL_END
+// LCOV_EXCL_STOP
         case 'k':
             multiplier = 8ull * 1024ull;
             break;
 // LCOV_EXCL_START
         default:
             throw seqan3::argument_parser_error{"Use {k, m, g, t} to pass size. E.g., --size 8g."};
-// LCOV_EXCL_END
+// LCOV_EXCL_STOP
     }
 
     size_t size{};

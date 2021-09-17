@@ -195,7 +195,7 @@ public:
             {
                 throw seqan3::argument_parser_error{"Cannot read index: " + std::string{e.what()}};
             }
-// LCOV_EXCL_END
+// LCOV_EXCL_STOP
         }
         else
         {

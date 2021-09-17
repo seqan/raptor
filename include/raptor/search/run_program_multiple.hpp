@@ -181,7 +181,7 @@ void run_program_multiple(search_arguments const & arguments)
                     << reads_io_time << '\t'
                     << compute_time;
     }
-// LCOV_EXCL_END
+// LCOV_EXCL_STOP
 }
 
 } // namespace raptor
