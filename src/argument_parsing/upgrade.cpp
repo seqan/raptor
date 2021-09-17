@@ -78,7 +78,7 @@ void run_upgrade(seqan3::argument_parser & parser)
                                                                       output_directory.c_str(),
                                                                       "\": ",
                                                                       ec.message())};
-// LCOV_EXCL_END
+// LCOV_EXCL_STOP
 
     if (arguments.parts == 1)
     {

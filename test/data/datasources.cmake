@@ -88,6 +88,16 @@ declare_datasource (FILE 64bins23windowc.index
                     URL ${CMAKE_SOURCE_DIR}/test/data/64bins23windowc.index
                     URL_HASH SHA256=fa0cd03253dc8fd9620190a95f8db021c3ffb4db3a5b99ea754b5793879f3cd6)
 
+declare_datasource (FILE 1bins19window.hibf
+                    URL ${CMAKE_SOURCE_DIR}/test/data/hibf/1bins19window.hibf
+                    URL_HASH SHA256=25034bceb705a6c842bbfccc1b0759d75658eaeca4412500036e6dcf26a9fa0c)
+declare_datasource (FILE 64bins19window.hibf
+                    URL ${CMAKE_SOURCE_DIR}/test/data/hibf/64bins19window.hibf
+                    URL_HASH SHA256=d8acaa02c4316d3c6253bf2eea985ce2f061ffc48e835b7fbecb90586b252eca)
+declare_datasource (FILE 128bins19window.hibf
+                    URL ${CMAKE_SOURCE_DIR}/test/data/hibf/128bins19window.hibf
+                    URL_HASH SHA256=0431676e48f9e829668b0b5b7feb1a1e2ba33333a470e15744627e76086a5c35)
+
 declare_datasource (FILE 1bins19window0error.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/1bins19window0error.out
                     URL_HASH SHA256=1ff27bf9de0ad5e5487c857327c2494fb42c38e81cf8f86291157cf2c941af86)
@@ -126,6 +136,25 @@ declare_datasource (FILE 128bins19window0errorsocks.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/128bins19window0errorsocks.out
                     URL_HASH SHA256=3087b98c1f4e0d0a1a54f0dc11100f25fdfa8eba62d8f24c082ea1c523146618)
 
+declare_datasource (FILE 1bins19window0errorhibf.out
+                    URL ${CMAKE_SOURCE_DIR}/test/data/hibf/1bins19window0errorhibf.out
+                    URL_HASH SHA256=1ff27bf9de0ad5e5487c857327c2494fb42c38e81cf8f86291157cf2c941af86)
+declare_datasource (FILE 1bins19window1errorhibf.out
+                    URL ${CMAKE_SOURCE_DIR}/test/data/hibf/1bins19window1errorhibf.out
+                    URL_HASH SHA256=1ff27bf9de0ad5e5487c857327c2494fb42c38e81cf8f86291157cf2c941af86)
+declare_datasource (FILE 64bins19window0errorhibf.out
+                    URL ${CMAKE_SOURCE_DIR}/test/data/hibf/64bins19window0errorhibf.out
+                    URL_HASH SHA256=f4197ab25eab37f537f883bf56ec092ad8536e271bae0b8c1065ebd23e5e2a50)
+declare_datasource (FILE 64bins19window1errorhibf.out
+                    URL ${CMAKE_SOURCE_DIR}/test/data/hibf/64bins19window1errorhibf.out
+                    URL_HASH SHA256=9370dcb822521586d71efd8097f41d179a816435d9fb7920abdee99cecd227c3)
+declare_datasource (FILE 128bins19window0errorhibf.out
+                    URL ${CMAKE_SOURCE_DIR}/test/data/hibf/128bins19window0errorhibf.out
+                    URL_HASH SHA256=1b517f5e7b703bf182fd57be9f10a06302a7b4d360fcc1c50a75a1d9530a2a77)
+declare_datasource (FILE 128bins19window1errorhibf.out
+                    URL ${CMAKE_SOURCE_DIR}/test/data/hibf/128bins19window1errorhibf.out
+                    URL_HASH SHA256=c73674cfe452339caaa886ea7cd2ca399280f31a830445c36c6d2c7826f4d096)
+
 declare_datasource (FILE 1binsempty.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/1binsempty.out
                     URL_HASH SHA256=515b16f2e507b9f4bac1b717c65d3a16b7c0f2bebe0977f7e0a471479dbcff42)
@@ -135,3 +164,13 @@ declare_datasource (FILE 64binsempty.out
 declare_datasource (FILE 128binsempty.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/128binsempty.out
                     URL_HASH SHA256=e4eee8bce310b11bdb4da718fe3f3129508955b35cb89c7dc0f61b952d48410b)
+
+declare_datasource (FILE 1binsemptyhibf.out
+                    URL ${CMAKE_SOURCE_DIR}/test/data/hibf/1binsemptyhibf.out
+                    URL_HASH SHA256=515b16f2e507b9f4bac1b717c65d3a16b7c0f2bebe0977f7e0a471479dbcff42)
+declare_datasource (FILE 64binsemptyhibf.out
+                    URL ${CMAKE_SOURCE_DIR}/test/data/hibf/64binsemptyhibf.out
+                    URL_HASH SHA256=d4dec373615d39c54dbbc40bc9898598fc3f6f34e42ed41f4282a45906de717b)
+declare_datasource (FILE 128binsemptyhibf.out
+                    URL ${CMAKE_SOURCE_DIR}/test/data/hibf/128binsemptyhibf.out
+                    URL_HASH SHA256=9362d17453ae79956ab6f0bf271a17ae9027b58314d28393c5875fd11ed04464)

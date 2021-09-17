@@ -8,21 +8,23 @@
 #pragma once
 
 #include <seqan3/argument_parser/exceptions.hpp>
-#include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
 
+#include <raptor/hierarchical_interleaved_bloom_filter.hpp>
 #include <raptor/shared.hpp>
 
 namespace raptor
 {
 
-template <seqan3::data_layout data_layout_mode_ = seqan3::data_layout::uncompressed>
+template <seqan3::data_layout data_layout_mode_ = seqan3::data_layout::uncompressed, bool is_hibf = false>
 class raptor_index
 {
 private:
-    template <seqan3::data_layout data_layout_mode>
+    template <seqan3::data_layout data_layout_mode, bool is_hibf_>
     friend class raptor_index;
 
-    using ibf_t = seqan3::interleaved_bloom_filter<data_layout_mode_>;
+    using ibf_t = std::conditional_t<is_hibf,
+                                     hierarchical_interleaved_bloom_filter<data_layout_mode_>,
+                                     seqan3::interleaved_bloom_filter<data_layout_mode_>>;
 
     uint64_t window_size_{};
     seqan3::shape shape_{};
@@ -193,7 +195,7 @@ public:
             {
                 throw seqan3::argument_parser_error{"Cannot read index: " + std::string{e.what()}};
             }
-// LCOV_EXCL_END
+// LCOV_EXCL_STOP
         }
         else
         {

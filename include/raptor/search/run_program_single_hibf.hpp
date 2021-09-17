@@ -19,11 +19,11 @@ namespace raptor
 {
 
 template <bool compressed>
-void run_program_single(search_arguments const & arguments)
+void run_program_single_hibf(search_arguments const & arguments)
 {
     constexpr seqan3::data_layout data_layout_mode = compressed ? seqan3::data_layout::compressed :
                                                                  seqan3::data_layout::uncompressed;
-    auto index = raptor_index<data_layout_mode>{};
+    auto index = raptor_index<data_layout_mode, true>{};
 
     double index_io_time{0.0};
     double reads_io_time{0.0};
@@ -65,7 +65,7 @@ void run_program_single(search_arguments const & arguments)
     size_t const kmers_per_window = arguments.window_size - arguments.shape_size + 1;
     size_t const kmers_per_pattern = arguments.pattern_size - arguments.shape_size + 1;
     size_t const min_number_of_minimisers = kmers_per_window == 1 ? kmers_per_pattern :
-                                                std::ceil(kmers_per_pattern / static_cast<double>(kmers_per_window));
+                                                std::ceil(kmers_per_pattern / static_cast<double>(kmers_per_window)); // LCOV_EXCL_LINE TODO: HIBF-BUILD
     size_t const kmer_lemma = arguments.pattern_size + 1u > (arguments.errors + 1u) * arguments.shape_size ?
                                 arguments.pattern_size + 1u - (arguments.errors + 1u) * arguments.shape_size :
                                 0;
@@ -75,7 +75,7 @@ void run_program_single(search_arguments const & arguments)
     auto worker = [&] (size_t const start, size_t const end)
     {
         auto & ibf = index.ibf();
-        auto counter = ibf.template counting_agent<uint16_t>();
+        auto counter = ibf.membership_agent();
         std::string result_string{};
         std::vector<uint64_t> minimiser;
 
@@ -91,27 +91,25 @@ void run_program_single(search_arguments const & arguments)
             result_string += '\t';
 
             minimiser = seq | hash_view | seqan3::views::to<std::vector<uint64_t>>;
-            auto & result = counter.bulk_count(minimiser);
             size_t const minimiser_count{minimiser.size()};
             size_t current_bin{0};
 
             size_t const threshold = arguments.treshold_was_set ?
                                          static_cast<size_t>(minimiser_count * arguments.threshold) :
                                          kmers_per_window == 1 ? kmer_lemma :
+// LCOV_EXCL_START TODO: HIBF-BUILD
                                          precomp_thresholds[std::min(minimiser_count < min_number_of_minimisers ?
                                                                          0 :
                                                                          minimiser_count - min_number_of_minimisers,
                                                                      max_number_of_minimisers -
                                                                          min_number_of_minimisers)] + 2;
+// LCOV_EXCL_STOP TODO: HIBF-BUILD
+            auto & result = counter.bulk_contains(minimiser, threshold); // Results contains user bin IDs
 
             for (auto && count : result)
             {
-                if (count >= threshold)
-                {
-                    result_string += std::to_string(current_bin);
-                    result_string += ',';
-                }
-                ++current_bin;
+                result_string += std::to_string(count);
+                result_string += ',';
             }
             if (auto & last_char = result_string.back(); last_char == ',')
                 last_char = '\n';

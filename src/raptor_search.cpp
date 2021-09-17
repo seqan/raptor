@@ -7,6 +7,7 @@
 
 #include <raptor/search/run_program_multiple.hpp>
 #include <raptor/search/run_program_single.hpp>
+#include <raptor/search/run_program_single_hibf.hpp>
 #include <raptor/search/run_program_single_socks.hpp>
 
 namespace raptor
@@ -14,7 +15,11 @@ namespace raptor
 
 void raptor_search(search_arguments const & arguments)
 {
-    if (arguments.parts == 1)
+    if (arguments.is_hibf)
+    {
+        run_program_single_hibf<false>(arguments);
+    }
+    else if (arguments.parts == 1)
     {
         if (arguments.is_socks)
         {

@@ -59,6 +59,11 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
                       "pattern",
                       "The pattern size. Default: Use median of sequence lengths in query file.",
                       arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
+    parser.add_flag(arguments.is_hibf,
+                    '\0',
+                    "hibf",
+                    "Index is an HIBF.",
+                    seqan3::option_spec::advanced);
     parser.add_flag(arguments.write_time,
                     '\0',
                     "time",
@@ -87,7 +92,7 @@ void run_search(seqan3::argument_parser & parser, bool const is_socks)
                                                                       output_directory.c_str(),
                                                                       "\": ",
                                                                       ec.message())};
-// LCOV_EXCL_END
+// LCOV_EXCL_STOP
 
     if (!arguments.is_socks)
     {

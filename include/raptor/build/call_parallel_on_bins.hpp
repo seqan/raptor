@@ -22,7 +22,7 @@ void call_parallel_on_bins(algorithm_t && worker, build_arguments const & argume
     size_t const chunk_size = std::clamp<size_t>(std::bit_ceil(arguments.bins / arguments.threads),
                                                  8u,
                                                  64u);
-// LCOV_EXCL_END
+// LCOV_EXCL_STOP
     auto chunked_view = seqan3::views::zip(arguments.bin_path, std::views::iota(0u)) |
                         seqan3::views::chunk(chunk_size);
     seqan3::detail::execution_handler_parallel executioner{arguments.threads};

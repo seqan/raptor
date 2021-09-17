@@ -127,17 +127,18 @@ struct raptor_base : public cli_test
         return result;
     }
 
-    static inline std::filesystem::path const ibf_path(size_t const number_of_repetitions, size_t const window_size, bool const compressed = false) noexcept
+    static inline std::filesystem::path const ibf_path(size_t const number_of_repetitions, size_t const window_size, bool const compressed = false, bool const hibf = false) noexcept
     {
         std::string name{};
         name += std::to_string(std::max<int>(1, number_of_repetitions * 4));
         name += "bins";
         name += std::to_string(window_size);
-        name += compressed ? "windowc.index" : "window.index";
+        name += compressed ? "windowc." : "window.";
+        name += hibf ? "hibf" : "index";
         return cli_test::data(name);
     }
 
-    static inline std::filesystem::path const search_result_path(size_t const number_of_repetitions, size_t const window_size, size_t const number_of_errors, bool const socks = false, bool const empty = false) noexcept
+    static inline std::filesystem::path const search_result_path(size_t const number_of_repetitions, size_t const window_size, size_t const number_of_errors, bool const socks = false, bool const empty = false, bool const hibf = false) noexcept
     {
         std::string name{};
         name += std::to_string(std::max<int>(1, number_of_repetitions * 4));
@@ -155,6 +156,8 @@ struct raptor_base : public cli_test
         }
         if (socks)
             name += "socks.out";
+        else if (hibf)
+            name += "hibf.out";
         else
             name += ".out";
         return cli_test::data(name);
