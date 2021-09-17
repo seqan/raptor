@@ -1,2 +1,3 @@
 doc/** linguist-documentation
+test/util/** linguist-documentation
 util/** linguist-documentation
