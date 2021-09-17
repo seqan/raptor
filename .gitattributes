@@ -1,3 +1,4 @@
 doc/** linguist-documentation
 test/util/** linguist-documentation
+test/benchmark/parse.py linguist-documentation
 util/** linguist-documentation
