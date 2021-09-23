@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <raptor/build/call_parallel_on_bins.hpp>
+#include <raptor/index.hpp>
 
 namespace raptor
 {

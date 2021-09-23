@@ -107,4 +107,4 @@ jobs:
           CCACHE_MAXSIZE: 500M
         run: |
           cd build
-          ctest . -j3 --output-on-failure
+          ctest . -j3 -E header_test --output-on-failure
