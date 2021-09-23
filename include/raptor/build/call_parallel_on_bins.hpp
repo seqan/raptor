@@ -9,8 +9,9 @@
 
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
 #include <seqan3/utility/views/chunk.hpp>
+#include <seqan3/utility/views/zip.hpp>
 
-#include <raptor/shared.hpp>
+#include <raptor/argument_parsing/build_arguments.hpp>
 
 namespace raptor
 {

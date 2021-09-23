@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <raptor/shared.hpp>
+#include <raptor/argument_parsing/upgrade_arguments.hpp>
 
 namespace raptor
 {

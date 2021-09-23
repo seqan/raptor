@@ -5,8 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <raptor/argument_parsing/build.hpp>
-#include <raptor/build/build.hpp>
+#include <raptor/argument_parsing/build_parsing.hpp>
+#include <raptor/argument_parsing/init_shared_meta.hpp>
+#include <raptor/argument_parsing/parse_bin_paths.hpp>
+#include <raptor/argument_parsing/validators.hpp>
+#include <raptor/build/raptor_build.hpp>
 
 namespace raptor
 {
@@ -14,7 +17,6 @@ namespace raptor
 void init_build_parser(seqan3::argument_parser & parser, build_arguments & arguments)
 {
     init_shared_meta(parser);
-    init_shared_options(parser, arguments);
     parser.info.examples = {"raptor build --kmer 19 --window 23 --size 8m --output raptor.index all_bin_paths.txt",
                             "raptor build --kmer 19 --window 23 --compute-minimiser --output precomputed_minimisers all_bin_paths.txt",
                             "raptor build --size 8m --output minimiser_raptor.index all_minimiser_paths.txt"};
@@ -64,6 +66,12 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
                       "The number of hash functions to use.",
                       seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{1, 5});
+    parser.add_option(arguments.threads,
+                      '\0',
+                      "threads",
+                      "The numer of threads to use.",
+                      seqan3::option_spec::standard,
+                      positive_integer_validator{});
     parser.add_flag(arguments.compressed,
                     '\0',
                     "compressed",
@@ -85,7 +93,7 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
                     arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
 }
 
-void run_build(seqan3::argument_parser & parser, bool const is_socks)
+void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
 {
     build_arguments arguments{};
     arguments.is_socks = is_socks;

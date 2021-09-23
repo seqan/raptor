@@ -5,6 +5,9 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
+#include <numeric>
+#include <random>
+
 #include <raptor/search/detail/forward_strand_minimiser.hpp>
 #include <raptor/search/detail/helper.hpp>
 

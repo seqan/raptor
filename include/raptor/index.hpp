@@ -9,8 +9,9 @@
 
 #include <seqan3/argument_parser/exceptions.hpp>
 
+#include <raptor/argument_parsing/build_arguments.hpp>
 #include <raptor/hierarchical_interleaved_bloom_filter.hpp>
-#include <raptor/shared.hpp>
+#include <raptor/strong_types.hpp>
 
 namespace raptor
 {

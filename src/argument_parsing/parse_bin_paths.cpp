@@ -5,30 +5,41 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#pragma once
-
+#include <raptor/argument_parsing/parse_bin_paths.hpp>
 #include <raptor/argument_parsing/validators.hpp>
-#include <raptor/shared.hpp>
 
 namespace raptor
 {
 
-void init_shared_meta(seqan3::argument_parser & parser);
 void parse_bin_paths(std::filesystem::path const & bin_file,
                      std::vector<std::vector<std::string>> & bin_paths,
-                     bool const is_socks);
-
-template <typename arguments_t>
-void init_shared_options(seqan3::argument_parser & parser, arguments_t & arguments)
+                     bool const is_socks)
 {
-    static_assert(std::same_as<arguments_t, build_arguments> || std::same_as<arguments_t, search_arguments>);
+    std::ifstream istrm{bin_file};
+    std::string line{};
+    std::string color_name{};
+    std::string file_name{};
+    std::vector<std::string> tmp{};
 
-    parser.add_option(arguments.threads,
-                      '\0',
-                      "threads",
-                      "The numer of threads to use.",
-                      seqan3::option_spec::standard,
-                      positive_integer_validator{});
+    while (std::getline(istrm, line))
+    {
+        if (!line.empty())
+        {
+            tmp.clear();
+            std::stringstream sstream{line};
+
+            if (is_socks)
+                sstream >> color_name;
+
+            while (std::getline(sstream, file_name, ' '))
+                if (!file_name.empty())
+                    tmp.emplace_back(file_name);
+
+            bin_paths.emplace_back(tmp);
+        }
+    }
+
+    bin_validator{}(bin_paths);
 }
 
 } // namespace raptor

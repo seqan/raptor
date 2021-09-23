@@ -5,7 +5,7 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <raptor/build/build.hpp>
+#include <raptor/build/raptor_build.hpp>
 #include <raptor/build/build_from_minimiser.hpp>
 #include <raptor/build/compute_minimiser.hpp>
 #include <raptor/build/run_program.hpp>

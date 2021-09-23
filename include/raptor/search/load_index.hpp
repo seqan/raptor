@@ -8,10 +8,9 @@
 #pragma once
 
 #include <chrono>
-#include <seqan3/std/filesystem>
 
+#include <raptor/argument_parsing/search_arguments.hpp>
 #include <raptor/index.hpp>
-#include <raptor/shared.hpp>
 
 namespace raptor
 {

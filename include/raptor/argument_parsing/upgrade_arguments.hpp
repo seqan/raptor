@@ -7,11 +7,27 @@
 
 #pragma once
 
-#include <raptor/argument_parsing/shared.hpp>
+#include <seqan3/std/filesystem>
+#include <vector>
+
+#include <seqan3/search/kmer_index/shape.hpp>
 
 namespace raptor
 {
 
-void init_top_level_parser(seqan3::argument_parser & parser);
+struct upgrade_arguments
+{
+    uint32_t window_size{};
+    uint8_t kmer_size{};
+    seqan3::shape shape{};
+    uint8_t parts{1u};
+    bool compressed{false};
+
+    std::filesystem::path bin_file{};
+    std::filesystem::path in_file{};
+    std::filesystem::path out_file{};
+
+    std::vector<std::vector<std::string>> bin_path{};
+};
 
 } // namespace raptor

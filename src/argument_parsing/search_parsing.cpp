@@ -7,7 +7,10 @@
 
 #include <seqan3/io/views/async_input_buffer.hpp>
 
-#include <raptor/argument_parsing/search.hpp>
+#include <raptor/argument_parsing/init_shared_meta.hpp>
+#include <raptor/argument_parsing/search_parsing.hpp>
+#include <raptor/argument_parsing/validators.hpp>
+#include <raptor/dna4_traits.hpp>
 #include <raptor/index.hpp>
 #include <raptor/search/search.hpp>
 
@@ -17,7 +20,6 @@ namespace raptor
 void init_search_parser(seqan3::argument_parser & parser, search_arguments & arguments)
 {
     init_shared_meta(parser);
-    init_shared_options(parser, arguments);
     parser.info.examples = {"raptor search --error 2 --index raptor.index --query queries.fastq --output search.output"};
     parser.add_option(arguments.index_file,
                       '\0',
@@ -59,6 +61,12 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
                       "pattern",
                       "The pattern size. Default: Use median of sequence lengths in query file.",
                       arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
+    parser.add_option(arguments.threads,
+                      '\0',
+                      "threads",
+                      "The numer of threads to use.",
+                      seqan3::option_spec::standard,
+                      positive_integer_validator{});
     parser.add_flag(arguments.is_hibf,
                     '\0',
                     "hibf",
@@ -71,7 +79,7 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
                     seqan3::option_spec::advanced);
 }
 
-void run_search(seqan3::argument_parser & parser, bool const is_socks)
+void search_parsing(seqan3::argument_parser & parser, bool const is_socks)
 {
     search_arguments arguments{};
     arguments.is_socks = is_socks;

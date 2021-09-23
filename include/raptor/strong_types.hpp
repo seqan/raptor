@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include <raptor/argument_parsing/shared.hpp>
+#include <cstdint>
 
 namespace raptor
 {
 
-void init_search_parser(seqan3::argument_parser & parser, search_arguments & arguments);
-void run_search(seqan3::argument_parser & parser, bool const is_socks);
+//!\brief Strong type for passing the window size.
+struct window { uint64_t v; };
 
 } // namespace raptor

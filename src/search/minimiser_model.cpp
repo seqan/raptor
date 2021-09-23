@@ -10,10 +10,12 @@
  * \brief Provides stuff.
  */
 
+#include <fstream>
 #include <numeric>
 
 #include <cereal/types/vector.hpp>
 
+#include <raptor/search/detail/helper.hpp>
 #include <raptor/search/minimiser_model.hpp>
 
 namespace raptor
