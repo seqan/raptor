@@ -8,7 +8,6 @@
 #pragma once
 
 #include <raptor/build/store_index.hpp>
-#include <raptor/shared.hpp>
 
 namespace raptor
 {

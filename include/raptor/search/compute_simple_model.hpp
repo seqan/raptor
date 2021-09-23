@@ -7,8 +7,7 @@
 
 #pragma once
 
-#include <raptor/search/minimiser_model.hpp>
-#include <raptor/shared.hpp>
+#include <raptor/argument_parsing/search_arguments.hpp>
 
 namespace raptor
 {

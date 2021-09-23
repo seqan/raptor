@@ -5,7 +5,15 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
+#include <robin_hood.h>
+
+#include <seqan3/io/sequence_file/input.hpp>
+#include <seqan3/search/views/minimiser_hash.hpp>
+
+#include <raptor/adjust_seed.hpp>
 #include <raptor/build/compute_minimiser.hpp>
+#include <raptor/build/call_parallel_on_bins.hpp>
+#include <raptor/dna4_traits.hpp>
 
 namespace raptor
 {

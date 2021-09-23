@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <seqan3/argument_parser/all.hpp>
+#include <seqan3/argument_parser/argument_parser.hpp>
 #include <seqan3/io/sequence_file/input.hpp>
 
 namespace raptor

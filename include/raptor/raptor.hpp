@@ -7,9 +7,7 @@
 
 #pragma once
 
-#include <seqan3/argument_parser/all.hpp>
-
-#include <raptor/shared.hpp>
+#include <seqan3/argument_parser/argument_parser.hpp>
 
 namespace raptor
 {

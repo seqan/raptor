@@ -7,10 +7,12 @@
 
 #pragma once
 
+#include <seqan3/std/filesystem>
+
 #include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
 
 #include <raptor/index.hpp>
-#include <raptor/shared.hpp>
+#include <raptor/strong_types.hpp>
 
 namespace raptor
 {

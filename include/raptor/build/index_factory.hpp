@@ -9,7 +9,9 @@
 
 #include <seqan3/search/views/minimiser_hash.hpp>
 
+#include <raptor/adjust_seed.hpp>
 #include <raptor/build/call_parallel_on_bins.hpp>
+#include <raptor/dna4_traits.hpp>
 #include <raptor/index.hpp>
 
 namespace raptor

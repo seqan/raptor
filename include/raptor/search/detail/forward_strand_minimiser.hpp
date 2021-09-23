@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include <numeric>
-#include <random>
+#include <deque>
 
 #include <seqan3/alphabet/nucleotide/dna4.hpp>
 #include <seqan3/search/views/kmer_hash.hpp>
 
-#include <raptor/shared.hpp>
+#include <raptor/adjust_seed.hpp>
+#include <raptor/strong_types.hpp>
 
 namespace raptor::detail
 {

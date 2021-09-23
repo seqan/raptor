@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <raptor/argument_parsing/shared.hpp>
+#include <raptor/argument_parsing/upgrade_arguments.hpp>
 #include <raptor/build/store_index.hpp>
 
 namespace raptor

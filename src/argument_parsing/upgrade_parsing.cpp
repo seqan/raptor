@@ -5,7 +5,10 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <raptor/argument_parsing/upgrade.hpp>
+#include <raptor/argument_parsing/init_shared_meta.hpp>
+#include <raptor/argument_parsing/parse_bin_paths.hpp>
+#include <raptor/argument_parsing/upgrade_parsing.hpp>
+#include <raptor/argument_parsing/validators.hpp>
 #include <raptor/upgrade/upgrade.hpp>
 
 namespace raptor
@@ -54,7 +57,7 @@ void init_upgrade_parser(seqan3::argument_parser & parser, upgrade_arguments & a
                     "Original index was compressed.");
 }
 
-void run_upgrade(seqan3::argument_parser & parser)
+void upgrade_parsing(seqan3::argument_parser & parser)
 {
     upgrade_arguments arguments{};
     init_upgrade_parser(parser, arguments);

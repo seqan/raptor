@@ -7,12 +7,11 @@
 
 #pragma once
 
-#include <raptor/argument_parsing/shared.hpp>
+#include <seqan3/argument_parser/argument_parser.hpp>
 
 namespace raptor
 {
 
-void init_upgrade_parser(seqan3::argument_parser & parser, upgrade_arguments & arguments);
-void run_upgrade(seqan3::argument_parser & parser);
+void build_parsing(seqan3::argument_parser & parser, bool const is_socks);
 
 } // namespace raptor

@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <raptor/shared.hpp>
+#include <seqan3/argument_parser/argument_parser.hpp>
 
 namespace raptor
 {
 
-void raptor_build(build_arguments const & arguments);
+void init_shared_meta(seqan3::argument_parser & parser);
 
 } // namespace raptor

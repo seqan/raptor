@@ -7,9 +7,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <vector>
-
 #include <seqan3/search/kmer_index/shape.hpp>
 
 namespace raptor::detail

@@ -6,6 +6,7 @@
 // -----------------------------------------------------------------------------------------------------
 
 #include <raptor/search/compute_simple_model.hpp>
+#include <raptor/search/minimiser_model.hpp>
 
 namespace raptor
 {
