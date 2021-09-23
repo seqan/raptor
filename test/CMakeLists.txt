@@ -22,8 +22,7 @@ list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${PROJEC
 list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}")
 set (SEQAN3_TEST_CLONE_DIR "${PROJECT_BINARY_DIR}/vendor/googletest")
 
-include ("${SEQAN3_CLONE_DIR}/test/cmake/seqan3_require_test.cmake")
-
+include (seqan3_require_test)
 seqan3_require_test ()
 
 # Build tests just before their execution, because they have not been built with "all" target.
@@ -97,6 +96,7 @@ include (data/datasources.cmake)
 add_subdirectory (api)
 add_subdirectory (cli)
 add_subdirectory (coverage)
+add_subdirectory (header)
 
 if (RAPTOR_ENABLE_BENCHMARK)
     set (SEQAN3_BENCHMARK_CLONE_DIR "${PROJECT_BINARY_DIR}/vendor/benchmark")

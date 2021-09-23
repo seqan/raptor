@@ -120,7 +120,7 @@ jobs:
       - name: Run tests
         run: |
           cd build
-          ctest . -j2 --output-on-failure
+          ctest . -j2 -E header_test --output-on-failure
 
       - name: Generate coverage report
         if: matrix.build == 'coverage'

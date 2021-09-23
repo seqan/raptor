@@ -34,6 +34,30 @@ jobs:
             requires_ccache: false
             skip_build_tests: true
             skip_run_tests: false
+          - name: "Header gcc11"
+            cxx: "g++-11"
+            cc: "gcc-11"
+            build_type: Release
+            build: header
+            build_threads: 2
+            test_threads: 2
+            cmake: 3.8.2
+            requires_toolchain: true
+            requires_ccache: true
+            skip_build_tests: false
+            skip_run_tests: false
+          - name: "Header gcc9"
+            cxx: "g++-9"
+            cc: "gcc-9"
+            build_type: Release
+            build: header
+            build_threads: 2
+            test_threads: 2
+            cmake: 3.8.2
+            requires_toolchain: true
+            requires_ccache: true
+            skip_build_tests: false
+            skip_run_tests: false
 
     steps:
       - name: Checkout
@@ -104,7 +128,7 @@ jobs:
         run: |
           ccache -p || true
           cd build
-          make -k -j${{ matrix.build_threads }}
+          make -k -j${{ matrix.build_threads }} header_test
           ccache -s || true
 
       - name: Run tests
@@ -116,7 +140,7 @@ jobs:
             cat doxygen_warnings.txt
             test ! -s doxygen_warnings.txt
           else
-            ctest . -j${{ matrix.test_threads }} --output-on-failure
+            ctest . -j${{ matrix.test_threads }} -R header_test --output-on-failure
           fi
 
       - name: Package documentation

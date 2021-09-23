@@ -80,10 +80,13 @@ set (SEQAN3_CEREAL ON CACHE BOOL "Require cereal to be present.")
 set (SEQAN3_SUBMODULES_DIR "lib")
 find_package (SeqAn3 QUIET REQUIRED HINTS lib/seqan3/build_system)
 
+# Allow to include CMake scripts from seqan3.
+list(APPEND CMAKE_MODULE_PATH "${SEQAN3_CLONE_DIR}/test/cmake/")
+
 # Use ccache.
 set (RAPTOR_USE_CCACHE ON CACHE BOOL "Use ccache if available.")
 if (RAPTOR_USE_CCACHE)
-     include ("${SEQAN3_CLONE_DIR}/test/cmake/seqan3_require_ccache.cmake")
+     include (seqan3_require_ccache)
      seqan3_require_ccache ()
 endif ()
 
