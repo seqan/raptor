@@ -14,8 +14,8 @@
 namespace raptor
 {
 
-template <typename t>
-inline void do_parallel(t && worker, size_t const num_records, size_t const threads, double & compute_time)
+template <typename algorithm_t>
+void do_parallel(algorithm_t && worker, size_t const num_records, size_t const threads, double & compute_time)
 {
     auto start = std::chrono::high_resolution_clock::now();
     std::vector<decltype(std::async(std::launch::async, worker, size_t{}, size_t{}))> tasks;

@@ -12,12 +12,6 @@
 namespace raptor
 {
 
-void do_cerealisation_out(std::vector<size_t> const & vec, search_arguments const & arguments);
-bool do_cerealisation_in(std::vector<size_t> & vec, search_arguments const & arguments);
-std::vector<size_t> precompute_threshold(size_t const pattern_size,
-                                         size_t const window_size,
-                                         seqan3::shape const shape,
-                                         size_t const errors,
-                                         double const tau);
+std::vector<size_t> precompute_threshold(search_arguments const & arguments);
 
 } // namespace raptor
