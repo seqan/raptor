@@ -12,8 +12,6 @@
 namespace raptor
 {
 
-bool check_for_fasta_format(std::vector<std::string> const & valid_extensions, std::string const & file_path);
-
 void compute_minimiser(build_arguments const & arguments);
 
 } // namespace raptor

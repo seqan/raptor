@@ -14,7 +14,7 @@ namespace raptor
 {
 
 template <bool compressed>
-void run_program(build_arguments const & arguments)
+void build_from_files(build_arguments const & arguments)
 {
     index_factory<compressed> generator{arguments};
 

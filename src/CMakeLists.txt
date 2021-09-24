@@ -10,8 +10,11 @@ target_include_directories ("${PROJECT_NAME}_interface" INTERFACE ../lib/robin-h
 add_library ("${PROJECT_NAME}_compute_minimiser_lib" STATIC build/compute_minimiser.cpp)
 target_link_libraries ("${PROJECT_NAME}_compute_minimiser_lib" PUBLIC "${PROJECT_NAME}_interface")
 
+add_library ("${PROJECT_NAME}_build_from_minimiser_lib" STATIC build/build_from_minimiser.cpp)
+target_link_libraries ("${PROJECT_NAME}_build_from_minimiser_lib" PUBLIC "${PROJECT_NAME}_interface")
+
 add_library ("${PROJECT_NAME}_build_lib" STATIC build/raptor_build.cpp)
-target_link_libraries ("${PROJECT_NAME}_build_lib" PUBLIC "${PROJECT_NAME}_compute_minimiser_lib")
+target_link_libraries ("${PROJECT_NAME}_build_lib" PUBLIC "${PROJECT_NAME}_compute_minimiser_lib" "${PROJECT_NAME}_build_from_minimiser_lib")
 
 # Raptor search
 add_library ("${PROJECT_NAME}_search_helper_lib" STATIC search/detail/helper.cpp)
