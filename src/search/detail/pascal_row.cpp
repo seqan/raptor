@@ -5,13 +5,20 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#pragma once
+#include <raptor/search/detail/pascal_row.hpp>
 
-#include <raptor/argument_parsing/build_arguments.hpp>
-
-namespace raptor
+namespace raptor::detail
 {
 
-void build_from_minimiser(build_arguments const & arguments);
+std::vector<size_t> pascal_row(size_t const n)
+{
+    std::vector<size_t> result(n + 1);
+    result[0] = 1;
 
-} // namespace raptor
+    for (size_t i = 1; i <= n; ++i)
+        result[i] = result[i - 1] * (n + 1 - i) / i;
+
+    return result;
+}
+
+} // namespace raptor::detail

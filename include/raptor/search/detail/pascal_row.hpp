@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <raptor/argument_parsing/build_arguments.hpp>
+#include <vector>
 
-namespace raptor
+namespace raptor::detail
 {
 
-void build_from_minimiser(build_arguments const & arguments);
+std::vector<size_t> pascal_row(size_t const n);
 
-} // namespace raptor
+} // namespace raptor::detail

@@ -15,8 +15,8 @@
 namespace raptor
 {
 
-template <typename t>
-void load_index(t & index, search_arguments const & arguments, size_t const part, double & index_io_time)
+template <typename index_t>
+void load_index(index_t & index, search_arguments const & arguments, size_t const part, double & index_io_time)
 {
     std::filesystem::path index_file{arguments.index_file};
     index_file += "_" + std::to_string(part);
@@ -31,8 +31,8 @@ void load_index(t & index, search_arguments const & arguments, size_t const part
     index_io_time += std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
 }
 
-template <typename t>
-void load_index(t & index, search_arguments const & arguments, double & index_io_time)
+template <typename index_t>
+void load_index(index_t & index, search_arguments const & arguments, double & index_io_time)
 {
     std::ifstream is{arguments.index_file, std::ios::binary};
     cereal::BinaryInputArchive iarchive{is};

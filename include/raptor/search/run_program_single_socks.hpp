@@ -10,7 +10,6 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <raptor/adjust_seed.hpp>
-#include <raptor/search/compute_simple_model.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/search/do_parallel.hpp>
 #include <raptor/search/load_index.hpp>

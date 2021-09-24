@@ -7,11 +7,14 @@
 
 #pragma once
 
-#include <raptor/argument_parsing/build_arguments.hpp>
+#include <utility>
+#include <vector>
 
-namespace raptor
+namespace raptor::detail
 {
 
-void build_from_minimiser(build_arguments const & arguments);
+std::tuple<double, std::vector<double>> simple_model(size_t const kmer_size,
+                                                     std::vector<double> const & proba_x,
+                                                     std::vector<double> const & indirect_errors);
 
-} // namespace raptor
+} // namespace raptor::detail

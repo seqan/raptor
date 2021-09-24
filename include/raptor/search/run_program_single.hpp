@@ -10,7 +10,7 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <raptor/adjust_seed.hpp>
-#include <raptor/search/compute_simple_model.hpp>
+#include <raptor/search/precompute_threshold.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/search/do_parallel.hpp>
 #include <raptor/search/load_index.hpp>
@@ -71,7 +71,7 @@ void run_program_single(search_arguments const & arguments)
                                 arguments.pattern_size + 1u - (arguments.errors + 1u) * arguments.shape_size :
                                 0;
     size_t const max_number_of_minimisers = arguments.pattern_size - arguments.window_size + 1;
-    std::vector<size_t> const precomp_thresholds = compute_simple_model(arguments);
+    std::vector<size_t> const precomp_thresholds = precompute_threshold(arguments);
 
     auto worker = [&] (size_t const start, size_t const end)
     {

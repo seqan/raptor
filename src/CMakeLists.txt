@@ -10,21 +10,30 @@ target_include_directories ("${PROJECT_NAME}_interface" INTERFACE ../lib/robin-h
 add_library ("${PROJECT_NAME}_compute_minimiser_lib" STATIC build/compute_minimiser.cpp)
 target_link_libraries ("${PROJECT_NAME}_compute_minimiser_lib" PUBLIC "${PROJECT_NAME}_interface")
 
+add_library ("${PROJECT_NAME}_build_from_minimiser_lib" STATIC build/build_from_minimiser.cpp)
+target_link_libraries ("${PROJECT_NAME}_build_from_minimiser_lib" PUBLIC "${PROJECT_NAME}_interface")
+
 add_library ("${PROJECT_NAME}_build_lib" STATIC build/raptor_build.cpp)
-target_link_libraries ("${PROJECT_NAME}_build_lib" PUBLIC "${PROJECT_NAME}_compute_minimiser_lib")
+target_link_libraries ("${PROJECT_NAME}_build_lib" PUBLIC "${PROJECT_NAME}_compute_minimiser_lib" "${PROJECT_NAME}_build_from_minimiser_lib")
 
 # Raptor search
-add_library ("${PROJECT_NAME}_search_helper_lib" STATIC search/detail/helper.cpp)
-target_link_libraries ("${PROJECT_NAME}_search_helper_lib" PUBLIC "${PROJECT_NAME}_interface")
+add_library ("${PROJECT_NAME}_search_pascal_row_lib" STATIC search/detail/pascal_row.cpp)
+target_link_libraries ("${PROJECT_NAME}_search_pascal_row_lib" PUBLIC "${PROJECT_NAME}_interface")
 
-add_library ("${PROJECT_NAME}_minimiser_model_lib" STATIC search/minimiser_model.cpp)
-target_link_libraries ("${PROJECT_NAME}_minimiser_model_lib" PUBLIC "${PROJECT_NAME}_search_helper_lib")
+add_library ("${PROJECT_NAME}_search_simple_model_lib" STATIC search/detail/simple_model.cpp)
+target_link_libraries ("${PROJECT_NAME}_search_simple_model_lib" PUBLIC "${PROJECT_NAME}_search_pascal_row_lib")
 
-add_library ("${PROJECT_NAME}_simple_model_lib" STATIC search/compute_simple_model.cpp)
-target_link_libraries ("${PROJECT_NAME}_simple_model_lib" PUBLIC "${PROJECT_NAME}_minimiser_model_lib")
+add_library ("${PROJECT_NAME}_search_enumerate_all_errors_lib" STATIC search/detail/enumerate_all_errors.cpp)
+target_link_libraries ("${PROJECT_NAME}_search_enumerate_all_errors_lib" PUBLIC "${PROJECT_NAME}_interface")
+
+add_library ("${PROJECT_NAME}_search_destroyed_indirectly_by_error_lib" STATIC search/detail/destroyed_indirectly_by_error.cpp)
+target_link_libraries ("${PROJECT_NAME}_search_destroyed_indirectly_by_error_lib" PUBLIC "${PROJECT_NAME}_interface")
+
+add_library ("${PROJECT_NAME}_precompute_threshold_lib" STATIC search/precompute_threshold.cpp)
+target_link_libraries ("${PROJECT_NAME}_precompute_threshold_lib" PUBLIC "${PROJECT_NAME}_search_destroyed_indirectly_by_error_lib" "${PROJECT_NAME}_search_simple_model_lib" "${PROJECT_NAME}_search_enumerate_all_errors_lib")
 
 add_library ("${PROJECT_NAME}_search_lib" STATIC search/raptor_search.cpp)
-target_link_libraries ("${PROJECT_NAME}_search_lib" PUBLIC "${PROJECT_NAME}_simple_model_lib")
+target_link_libraries ("${PROJECT_NAME}_search_lib" PUBLIC "${PROJECT_NAME}_precompute_threshold_lib")
 
 # Raptor upgrade
 add_library ("${PROJECT_NAME}_upgrade_lib" STATIC upgrade/raptor_upgrade.cpp)
