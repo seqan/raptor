@@ -21,9 +21,8 @@ namespace raptor
 template <bool compressed>
 void run_program_single_socks(search_arguments const & arguments)
 {
-    constexpr seqan3::data_layout data_layout_mode = compressed ? seqan3::data_layout::compressed :
-                                                                 seqan3::data_layout::uncompressed;
-    auto index = raptor_index<data_layout_mode>{};
+    using index_structure_t = std::conditional_t<compressed, index_structure::ibf_compressed, index_structure::ibf>;
+    auto index = raptor_index<index_structure_t>{};
 
     double index_io_time{0.0};
     double reads_io_time{0.0};

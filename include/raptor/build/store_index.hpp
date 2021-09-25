@@ -17,9 +17,9 @@
 namespace raptor
 {
 
-template <seqan3::data_layout layout, typename arguments_t>
+template <typename data_t, typename arguments_t>
 static inline void store_index(std::filesystem::path const & path,
-                               raptor_index<layout> const & index,
+                               raptor_index<data_t> const & index,
                                arguments_t const & arguments)
 {
     std::ofstream os{path, std::ios::binary};
@@ -32,12 +32,12 @@ static inline void store_index(std::filesystem::path const & path,
                                seqan3::interleaved_bloom_filter<layout> && ibf,
                                arguments_t const & arguments)
 {
-    raptor_index<layout> index{window{arguments.window_size},
-                               arguments.shape,
-                               arguments.parts,
-                               arguments.compressed,
-                               arguments.bin_path,
-                               std::move(ibf)};
+    raptor_index<seqan3::interleaved_bloom_filter<layout>> index{window{arguments.window_size},
+                                                                 arguments.shape,
+                                                                 arguments.parts,
+                                                                 arguments.compressed,
+                                                                 arguments.bin_path,
+                                                                 std::move(ibf)};
 
     std::ofstream os{path, std::ios::binary};
     cereal::BinaryOutputArchive oarchive{os};

@@ -143,7 +143,7 @@ INSTANTIATE_TEST_SUITE_P(compressed_suite,
 
 TEST_F(raptor_compressed, wrong_compression)
 {
-    raptor::raptor_index<seqan3::data_layout::compressed> index{};
+    raptor::raptor_index<raptor::index_structure::ibf_compressed> index{};
 
     std::ifstream is{data("1bins19window.index"), std::ios::binary};
     cereal::BinaryInputArchive iarchive{is};

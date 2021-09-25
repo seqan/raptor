@@ -38,7 +38,7 @@ public:
         if constexpr (!compressed)
             return tmp;
         else
-            return raptor_index<seqan3::data_layout::compressed>{std::move(tmp)};
+            return raptor_index<index_structure::ibf_compressed>{std::move(tmp)};
     }
 
 private:
