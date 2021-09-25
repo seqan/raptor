@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <seqan3/argument_parser/argument_parser.hpp>
+#include <raptor/argument_parsing/build_arguments.hpp>
 
 namespace raptor::hibf
 {
 
-void chopper_build(seqan3::argument_parser & parser);
+void chopper_build(build_arguments const & arguments);
 
 } // namespace raptor::hibf

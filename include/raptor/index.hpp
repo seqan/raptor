@@ -16,27 +16,37 @@
 namespace raptor
 {
 
-template <seqan3::data_layout data_layout_mode_ = seqan3::data_layout::uncompressed, bool is_hibf = false>
+namespace index_structure
+{
+
+    using ibf = seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed>;
+    using ibf_compressed = seqan3::interleaved_bloom_filter<seqan3::data_layout::compressed>;
+    using hibf = hierarchical_interleaved_bloom_filter<seqan3::data_layout::uncompressed>;
+    using hibf_compressed = hierarchical_interleaved_bloom_filter<seqan3::data_layout::compressed>;
+
+    template <typename return_t, typename input_t>
+    concept compressible_from =
+        (std::same_as<return_t, ibf_compressed> && std::same_as<input_t, ibf>) ||
+        (std::same_as<return_t, hibf_compressed> && std::same_as<input_t, hibf>);
+
+} // namespace index_structure
+
+template <typename data_t = index_structure::ibf>
 class raptor_index
 {
 private:
-    template <seqan3::data_layout data_layout_mode, bool is_hibf_>
+    template <typename friend_data_t>
     friend class raptor_index;
-
-    using ibf_t = std::conditional_t<is_hibf,
-                                     hierarchical_interleaved_bloom_filter<data_layout_mode_>,
-                                     seqan3::interleaved_bloom_filter<data_layout_mode_>>;
 
     uint64_t window_size_{};
     seqan3::shape shape_{};
     uint8_t parts_{};
     bool compressed_{};
     std::vector<std::vector<std::string>> bin_path_{};
-    ibf_t ibf_{};
+    data_t ibf_{};
 
 public:
-    static constexpr seqan3::data_layout data_layout_mode = data_layout_mode_;
-
+    static constexpr seqan3::data_layout data_layout_mode = data_t::data_layout_mode;
     static constexpr uint32_t version{1u};
 
     raptor_index() = default;
@@ -51,7 +61,7 @@ public:
                           uint8_t const parts,
                           bool const compressed,
                           std::vector<std::vector<std::string>> const & bin_path,
-                          ibf_t && ibf)
+                          data_t && ibf)
     :
         window_size_{window_size.v},
         shape_{shape},
@@ -61,9 +71,7 @@ public:
         ibf_{std::move(ibf)}
     {}
 
-    explicit raptor_index(build_arguments const & arguments)
-        requires (data_layout_mode == seqan3::data_layout::uncompressed)
-    :
+    explicit raptor_index(build_arguments const & arguments) :
         window_size_{arguments.window_size},
         shape_{arguments.shape},
         parts_{arguments.parts},
@@ -72,28 +80,32 @@ public:
         ibf_{seqan3::bin_count{arguments.bins},
              seqan3::bin_size{arguments.bits / arguments.parts},
              seqan3::hash_function_count{arguments.hash}}
-    {}
-
-    explicit raptor_index(raptor_index<seqan3::data_layout::uncompressed> const & other)
-        requires (data_layout_mode == seqan3::data_layout::compressed)
     {
+        static_assert(data_layout_mode == seqan3::data_layout::uncompressed);
+    }
+
+    template <typename other_data_t>
+    explicit raptor_index(raptor_index<other_data_t> const & other)
+    {
+        static_assert(index_structure::compressible_from<data_t, other_data_t>);
         window_size_ = other.window_size_;
         shape_ = other.shape_;
         parts_ = other.parts_;
         compressed_ = true;
         bin_path_ = other.bin_path_;
-        ibf_ = ibf_t{other.ibf_};
+        ibf_ = data_t{other.ibf_};
     }
 
-    explicit raptor_index(raptor_index<seqan3::data_layout::uncompressed> && other)
-        requires (data_layout_mode == seqan3::data_layout::compressed)
+    template <typename other_data_t>
+    explicit raptor_index(raptor_index<other_data_t> && other)
     {
+        static_assert(index_structure::compressible_from<data_t, other_data_t>);
         window_size_ = std::move(other.window_size_);
         shape_ = std::move(other.shape_);
         parts_ = std::move(other.parts_);
         compressed_ = true;
         bin_path_ = std::move(other.bin_path_);
-        ibf_ = std::move(ibf_t{std::move(other.ibf_)});
+        ibf_ = std::move(data_t{std::move(other.ibf_)});
     }
 
     uint64_t window_size() const
@@ -121,12 +133,12 @@ public:
         return bin_path_;
     }
 
-    ibf_t & ibf()
+    data_t & ibf()
     {
         return ibf_;
     }
 
-    ibf_t const & ibf() const
+    data_t const & ibf() const
     {
         return ibf_;
     }
@@ -135,14 +147,15 @@ public:
      * \brief Serialisation support function.
      * \tparam archive_t Type of `archive`; must satisfy seqan3::cereal_archive.
      * \param[in] archive The archive being serialised from/to.
-     * \param[in] version Index version.
      *
      * \attention These functions are never called directly, see \ref serialisation for more details.
      */
     template <seqan3::cereal_archive archive_t>
-    void CEREAL_SERIALIZE_FUNCTION_NAME(archive_t & archive, uint32_t const version)
+    void CEREAL_SERIALIZE_FUNCTION_NAME(archive_t & archive)
     {
-        if (version == 1u)
+        uint32_t parsed_version{raptor_index<>::version};
+        archive(parsed_version);
+        if (parsed_version == raptor_index<>::version)
         {
             try
             {
@@ -179,9 +192,9 @@ public:
     template <seqan3::cereal_input_archive archive_t>
     void load_parameters(archive_t & archive)
     {
-        uint32_t version{};
-        archive(version);
-        if (version == 1u)
+        uint32_t parsed_version{};
+        archive(parsed_version);
+        if (parsed_version == version)
         {
             try
             {
@@ -208,6 +221,3 @@ public:
 };
 
 } // namespace raptor
-
-CEREAL_CLASS_VERSION(raptor::raptor_index<seqan3::data_layout::uncompressed>, raptor::raptor_index<>::version);
-CEREAL_CLASS_VERSION(raptor::raptor_index<seqan3::data_layout::compressed>, raptor::raptor_index<>::version);

@@ -7,7 +7,7 @@
 
 #include <raptor/argument_parsing/build_parsing.hpp>
 #include <raptor/argument_parsing/init_shared_meta.hpp>
-#include <raptor/argument_parsing/parse_bin_paths.hpp>
+#include <raptor/argument_parsing/parse_bin_path.hpp>
 #include <raptor/argument_parsing/validators.hpp>
 #include <raptor/build/raptor_build.hpp>
 
@@ -72,6 +72,12 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
                       "The numer of threads to use.",
                       seqan3::option_spec::standard,
                       positive_integer_validator{});
+    parser.add_option(arguments.fpr,
+                      '\0',
+                      "fpr",
+                      "False positive rate of the HIBF.",
+                      seqan3::option_spec::advanced,
+                      seqan3::arithmetic_range_validator{0.0, 1.0});
     parser.add_flag(arguments.compressed,
                     '\0',
                     "compressed",
@@ -91,6 +97,11 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
                     "disable-cutoffs",
                     "Do not apply cutoffs when using --compute-minimiser.",
                     arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
+    parser.add_flag(arguments.is_hibf,
+                    '\0',
+                    "hibf",
+                    "Index is an HIBF.",
+                    seqan3::option_spec::advanced);
 }
 
 void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
@@ -154,7 +165,7 @@ void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
     {
         seqan3::output_file_validator{}(arguments.out_path);
 
-        if (!parser.is_option_set("size"))
+        if (!parser.is_option_set("size") && !parser.is_option_set("hibf"))
         {
             throw seqan3::argument_parser_error{"Option --size is required but not set."};
         }
@@ -163,7 +174,7 @@ void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
     // ==========================================
     // Process bin_path
     // ==========================================
-    parse_bin_paths(arguments.bin_file, arguments.bin_path, arguments.is_socks);
+    parse_bin_path(arguments);
     arguments.bins = arguments.bin_path.size();
 
     // ==========================================

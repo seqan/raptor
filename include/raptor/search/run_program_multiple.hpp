@@ -10,10 +10,10 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <raptor/adjust_seed.hpp>
-#include <raptor/search/precompute_threshold.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/search/do_parallel.hpp>
 #include <raptor/search/load_index.hpp>
+#include <raptor/search/precompute_threshold.hpp>
 #include <raptor/search/sync_out.hpp>
 
 namespace raptor
@@ -22,9 +22,8 @@ namespace raptor
 template <bool compressed>
 void run_program_multiple(search_arguments const & arguments)
 {
-    constexpr seqan3::data_layout data_layout_mode = compressed ? seqan3::data_layout::compressed :
-                                                                 seqan3::data_layout::uncompressed;
-    auto index = raptor_index<data_layout_mode>{};
+    using index_structure_t = std::conditional_t<compressed, index_structure::ibf_compressed, index_structure::ibf>;
+    auto index = raptor_index<index_structure_t>{};
 
     seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::id, seqan3::field::seq>> fin{arguments.query_file};
     using record_type = typename decltype(fin)::record_type;

@@ -9,25 +9,25 @@
 
 #include <robin_hood.h>
 
-#include <raptor/build/hibf/build_config.hpp>
+#include <raptor/argument_parsing/build_arguments.hpp>
 #include <raptor/build/hibf/build_data.hpp>
 
 namespace raptor::hibf
 {
 
-class format_integer : public std::numpunct<char>
-{
-protected:
-    virtual char do_thousands_sep() const { return ','; }
-    virtual std::string do_grouping() const { return "\03"; }
-};
+// class format_integer : public std::numpunct<char>
+// {
+// protected:
+//     virtual char do_thousands_sep() const { return ','; }
+//     virtual std::string do_grouping() const { return "\03"; }
+// };
 
 seqan3::interleaved_bloom_filter<> construct_ibf(robin_hood::unordered_flat_set<size_t> & parent_kmers,
-                   robin_hood::unordered_flat_set<size_t> & kmers,
-                   size_t const number_of_bins,
-                   lemon::ListDigraph::Node const & node,
-                   build_data & data,
-                   build_config const & config,
-                   bool is_root);
+                                                 robin_hood::unordered_flat_set<size_t> & kmers,
+                                                 size_t const number_of_bins,
+                                                 lemon::ListDigraph::Node const & node,
+                                                 build_data & data,
+                                                 build_arguments const & arguments,
+                                                 bool is_root);
 
 } // namespace raptor::hibf

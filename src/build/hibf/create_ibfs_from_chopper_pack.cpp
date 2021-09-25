@@ -5,20 +5,20 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <raptor/build/hibf/hierarchical_build.hpp>
 #include <raptor/build/hibf/create_ibfs_from_chopper_pack.hpp>
+#include <raptor/build/hibf/hierarchical_build.hpp>
 #include <raptor/build/hibf/read_chopper_pack_file.hpp>
 
 namespace raptor::hibf
 {
 
-void create_ibfs_from_chopper_pack(build_data & data, build_config const & config)
+void create_ibfs_from_chopper_pack(build_data & data, build_arguments const & arguments)
 {
-    read_chopper_pack_file(data, config.chopper_pack_filename);
+    read_chopper_pack_file(data, arguments.bin_file);
     lemon::ListDigraph::Node root = data.ibf_graph.nodeFromId(0); // root node = high level IBF node
     robin_hood::unordered_flat_set<size_t> root_kmers{};
 
-    hierarchical_build(root_kmers, root, data, config, true);
+    hierarchical_build(root_kmers, root, data, arguments, true);
 }
 
 } // namespace raptor::hibf

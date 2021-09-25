@@ -37,7 +37,7 @@ void build_from_minimiser(build_arguments const & arguments)
 
     if (arguments.compressed)
     {
-        raptor_index<seqan3::data_layout::compressed> cindex{std::move(index)};
+        raptor_index<index_structure::ibf_compressed> cindex{std::move(index)};
         store_index(arguments.out_path, cindex, arguments);
     }
     else

@@ -7,14 +7,13 @@
 
 #pragma once
 
-#include <seqan3/argument_parser/argument_parser.hpp>
+#include <raptor/argument_parsing/build_arguments.hpp>
+#include <raptor/argument_parsing/upgrade_arguments.hpp>
 
 namespace raptor
 {
 
-void parse_bin_paths(std::filesystem::path const & bin_file,
-                     std::vector<std::vector<std::string>> & bin_paths,
-                     bool const is_socks);
-
+void parse_bin_path(build_arguments & arguments);
+void parse_bin_path(upgrade_arguments & arguments);
 
 } // namespace raptor

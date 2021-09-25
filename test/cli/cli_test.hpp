@@ -230,7 +230,7 @@ struct raptor_base : public cli_test
                                        std::filesystem::path const & actual_result,
                                        bool const compare_extension = true)
     {
-        raptor::raptor_index<layout> expected_index, actual_index{};
+        raptor::raptor_index<seqan3::interleaved_bloom_filter<layout>> expected_index, actual_index{};
 
         {
             std::ifstream is{expected_result, std::ios::binary};

@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <raptor/build/hibf/build_config.hpp>
+#include <raptor/argument_parsing/build_arguments.hpp>
 
 namespace raptor::hibf
 {
 
-size_t bin_size_in_bits(build_config const & config, size_t const number_of_kmers_to_be_stored);
+size_t bin_size_in_bits(build_arguments const & arguments, size_t const number_of_kmers_to_be_stored);
 
 } // namespace raptor::hibf

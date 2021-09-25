@@ -12,10 +12,10 @@
 namespace raptor::hibf
 {
 
-size_t bin_size_in_bits(build_config const & config, size_t const number_of_kmers_to_be_stored)
+size_t bin_size_in_bits(build_arguments const & arguments, size_t const number_of_kmers_to_be_stored)
 {
-    return std::ceil( - static_cast<double>(number_of_kmers_to_be_stored * config.hash_funs) /
-                     std::log(1 - std::exp(std::log(config.FPR) / config.hash_funs)));
+    return std::ceil( - static_cast<double>(number_of_kmers_to_be_stored * arguments.hash) /
+                     std::log(1 - std::exp(std::log(arguments.fpr) / arguments.hash)));
 }
 
 } // namespace raptor::hibf

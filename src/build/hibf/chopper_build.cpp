@@ -5,54 +5,32 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <raptor/build/hibf/build_config.hpp>
 #include <raptor/build/hibf/build_data.hpp>
 #include <raptor/build/hibf/chopper_build.hpp>
 #include <raptor/build/hibf/create_ibfs_from_chopper_pack.hpp>
+#include <raptor/build/store_index.hpp>
+#include <raptor/index.hpp>
 
 namespace raptor::hibf
 {
 
-void initialize_argument_parser(seqan3::argument_parser & parser, build_config & config)
+void chopper_build(build_arguments const & arguments)
 {
-    parser.add_option(config.chopper_pack_filename, 'p', "pack-file", "Provide the file produced by chopper pack.");
-    parser.add_option(config.k, 'k', "kmer-size", "The kmer size to build kmers.");
-    parser.add_option(config.hash_funs, '\0', "hash-functions", "The number of hash functions to use for the IBF.");
-    parser.add_option(config.overlap, 'l', "overlap", "The overlap between split regions of the same sequence.");
-    parser.add_option(config.FPR, 'r', "false-positive-rate", "The minimum false positive rate of every IBF.");
-    parser.add_option(config.threads, 't', "threads", "The number of threads to use.");
-    parser.add_option(config.output_filename, 'o', "out-prefix", "Output filename.");
-    parser.add_flag(config.verbose, 'v', "verbose", "Output logging/progress information.");
-}
-
-void chopper_build(seqan3::argument_parser & parser)
-{
-    build_config config{};
-    initialize_argument_parser(parser, config);
-
-    try
-    {
-        parser.parse();
-    }
-    catch (seqan3::argument_parser_error const & ext)
-    {
-        std::cerr << "[CHOPPER BUILD ERROR] " << ext.what() << "\n";
-    }
-
     build_data data{};
-    create_ibfs_from_chopper_pack(data, config);
+    create_ibfs_from_chopper_pack(data, arguments);
 
-    // write vector of ibfs to file
-    {
-        std::ofstream fout(config.output_filename, std::ios::binary);
+    std::vector<std::vector<std::string>> bin_path{};
+    for (size_t i{0}; i < data.hibf.user_bins.num_user_bins(); ++i)
+        bin_path.push_back(std::vector<std::string>{data.hibf.user_bins.filename_of_user_bin(i)});
 
-        if (!fout.good() || !fout.is_open())
-            throw std::runtime_error{"Could not open " + config.output_filename + " for writing."};
+    raptor_index<raptor::index_structure::hibf> index{window{arguments.window_size},
+                                                      arguments.shape,
+                                                      arguments.parts,
+                                                      arguments.compressed,
+                                                      bin_path,
+                                                      std::move(data.hibf)};
 
-        cereal::BinaryOutputArchive archive(fout);
-        archive(data.hibf);
-        archive(config.k);
-    }
+    store_index(arguments.out_path, index, arguments);
 }
 
 } // namespace raptor::hibf

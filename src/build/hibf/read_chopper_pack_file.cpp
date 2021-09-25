@@ -5,9 +5,9 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <raptor/build/hibf/read_chopper_pack_file.hpp>
 #include <raptor/build/hibf/parse_chopper_pack_header.hpp>
 #include <raptor/build/hibf/parse_chopper_pack_line.hpp>
+#include <raptor/build/hibf/read_chopper_pack_file.hpp>
 
 namespace raptor::hibf
 {

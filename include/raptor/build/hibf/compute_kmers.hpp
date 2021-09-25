@@ -9,16 +9,16 @@
 
 #include <robin_hood.h>
 
-#include <raptor/build/hibf/build_config.hpp>
+#include <raptor/argument_parsing/build_arguments.hpp>
 #include <raptor/build/hibf/chopper_pack_record.hpp>
 
 namespace raptor::hibf
 {
 
-robin_hood::unordered_flat_set<size_t> compute_kmers(build_config const & config, chopper_pack_record const & record);
+robin_hood::unordered_flat_set<size_t> compute_kmers(build_arguments const & arguments, chopper_pack_record const & record);
 
 void compute_kmers(robin_hood::unordered_flat_set<size_t> & kmers,
-                   build_config const & config,
+                   build_arguments const & arguments,
                    chopper_pack_record const & record);
 
 } // namespace raptor::hibf
