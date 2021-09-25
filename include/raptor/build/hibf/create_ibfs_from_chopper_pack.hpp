@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include <raptor/build/hibf/build_config.hpp>
+#include <raptor/argument_parsing/build_arguments.hpp>
 #include <raptor/build/hibf/build_data.hpp>
 
 namespace raptor::hibf
 {
 
-void create_ibfs_from_chopper_pack(build_data & data, build_config const & config);
+void create_ibfs_from_chopper_pack(build_data & data, build_arguments const & arguments);
 
 } // namespace raptor::hibf

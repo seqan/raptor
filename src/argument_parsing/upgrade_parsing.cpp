@@ -6,7 +6,7 @@
 // -----------------------------------------------------------------------------------------------------
 
 #include <raptor/argument_parsing/init_shared_meta.hpp>
-#include <raptor/argument_parsing/parse_bin_paths.hpp>
+#include <raptor/argument_parsing/parse_bin_path.hpp>
 #include <raptor/argument_parsing/upgrade_parsing.hpp>
 #include <raptor/argument_parsing/validators.hpp>
 #include <raptor/upgrade/upgrade.hpp>
@@ -99,7 +99,7 @@ void upgrade_parsing(seqan3::argument_parser & parser)
     // ==========================================
     // Process bin_path
     // ==========================================
-    parse_bin_paths(arguments.bin_file, arguments.bin_path, false);
+    parse_bin_path(arguments);
 
     // ==========================================
     // Dispatch
