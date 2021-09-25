@@ -127,7 +127,7 @@ jobs:
         run: |
           lcov --directory ./build/ --capture --output-file ./build/coverage_report.captured
           lcov -a ./build/coverage_report.baseline -a ./build/coverage_report.captured --output-file ./build/coverage_report.total
-          lcov --remove ./build/coverage_report.total '/usr/*' '${{ github.workspace }}/raptor/lib/*' '${{ github.workspace }}/raptor/test/*' '${{ github.workspace }}/build/vendor/*' '${{ github.workspace }}/raptor/include/raptor/build/hibf/*' --output-file ./build/coverage_report
+          lcov --remove ./build/coverage_report.total '/usr/*' '${{ github.workspace }}/raptor/lib/*' '${{ github.workspace }}/raptor/test/*' '${{ github.workspace }}/build/vendor/*' '${{ github.workspace }}/raptor/src/build/hibf/*' '${{ github.workspace }}/raptor/include/raptor/build/hibf/*' --output-file ./build/coverage_report
 
       - name: Submit coverage report
         if: matrix.build == 'coverage'
