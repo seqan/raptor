@@ -45,14 +45,18 @@ void read_chopper_pack_file(build_data & data, std::string const & chopper_pack_
             // update number of technical bins in current_node-IBF
             current_data.number_of_technical_bins = std::max(current_data.number_of_technical_bins, bin + num_tbs);
 
+#ifndef NDEBUG
             bool found_next_node{false}; // sanity check
+#endif
             for (lemon::ListDigraph::OutArcIt arc_it(data.ibf_graph, current_node); arc_it != lemon::INVALID; ++arc_it)
             {
                 auto target = data.ibf_graph.target(arc_it);
                 if (data.node_map[target].parent_bin_index == bin)
                 {
                     current_node = target;
+#ifndef NDEBUG
                     found_next_node = true;
+#endif
                     break;
                 }
             }

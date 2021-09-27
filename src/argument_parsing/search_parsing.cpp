@@ -173,6 +173,6 @@ void search_parsing(seqan3::argument_parser & parser, bool const is_socks)
     // Dispatch
     // ==========================================
     raptor_search(arguments);
-};
+}
 
 } // namespace raptor

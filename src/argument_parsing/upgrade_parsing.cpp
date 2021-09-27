@@ -105,6 +105,6 @@ void upgrade_parsing(seqan3::argument_parser & parser)
     // Dispatch
     // ==========================================
     raptor_upgrade(arguments);
-};
+}
 
 } // namespace raptor

@@ -27,7 +27,7 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
         auto start = &buffer[0];
         auto buffer_end = start + str.size();
 
-        size_t tmp;
+        size_t tmp{};
         while (start < buffer_end)
         {
             auto res = std::from_chars(start, buffer_end, tmp); // {false, pointer} 123

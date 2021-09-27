@@ -45,7 +45,7 @@ jobs:
             requires_toolchain: true
             requires_ccache: true
             skip_build_tests: false
-            skip_run_tests: false
+            skip_run_tests: true
           - name: "Header gcc9"
             cxx: "g++-9"
             cc: "gcc-9"
@@ -57,7 +57,7 @@ jobs:
             requires_toolchain: true
             requires_ccache: true
             skip_build_tests: false
-            skip_run_tests: false
+            skip_run_tests: true
 
     steps:
       - name: Checkout
@@ -140,7 +140,7 @@ jobs:
             cat doxygen_warnings.txt
             test ! -s doxygen_warnings.txt
           else
-            ctest . -j${{ matrix.test_threads }} -R header_test --output-on-failure
+            ctest . -j${{ matrix.test_threads }} --output-on-failure
           fi
 
       - name: Package documentation

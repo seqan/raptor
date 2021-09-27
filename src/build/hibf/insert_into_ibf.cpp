@@ -22,8 +22,6 @@ void insert_into_ibf(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                      seqan3::interleaved_bloom_filter<> & ibf,
                      bool is_root)
 {
-    using sequence_file_t = seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>>;
-
     size_t const chunk_size = kmers.size() / number_of_bins + 1;
     size_t chunk_number{};
 
@@ -47,7 +45,6 @@ void insert_into_ibf(build_arguments const & arguments,
 {
     using sequence_file_t = seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>>;
 
-    assert(record.bin_indices.back() >= 0);
     auto const bin_index = seqan3::bin_index{static_cast<size_t>(record.bin_indices.back())};
     auto hash_view = seqan3::views::minimiser_hash(seqan3::ungapped{arguments.kmer_size},
                                                    seqan3::window_size{arguments.window_size},

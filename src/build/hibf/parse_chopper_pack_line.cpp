@@ -30,7 +30,7 @@ chopper_pack_record parse_chopper_pack_line(std::string const & current_line)
     for (auto && filename : filenames_str | std::views::split(';'))
         result.filenames.push_back((filename | seqan3::views::to<std::string>)); // replace TODO
 
-    size_t tmp; // temporary size_t
+    size_t tmp{}; // temporary size_t
 
     do // read bin_indices
     {
