@@ -50,7 +50,7 @@ if [[ ! -f $1/include/raptor/raptor.hpp ]]; then
     exit 1
 fi
 
-for URL in $(grep -ohr --exclude-dir={.git,lib} "https*://[a-zA-Z0-9./#+?=_%:-]*[a-zA-Z0-9/#+?=_%:-]" $1 | sort | uniq)
+for URL in $(grep -ohr --exclude-dir={.git,lib,build} "https*://[a-zA-Z0-9./#+?=_%:-]*[a-zA-Z0-9/#+?=_%:-]" $1 | sort | uniq)
 do
   do_check $URL
 done
