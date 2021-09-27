@@ -234,6 +234,6 @@ void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
     // Dispatch
     // ==========================================
     raptor_build(arguments);
-};
+}
 
 } // namespace raptor
