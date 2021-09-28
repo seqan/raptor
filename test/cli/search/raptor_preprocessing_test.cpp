@@ -225,7 +225,7 @@ TEST_F(preprocessing, pipeline_compressed_index)
     EXPECT_EQ(result2.err, std::string{});
     ASSERT_EQ(result2.exit_code, 0);
 
-    compare_results<seqan3::data_layout::compressed>(ibf_path(16, 23, true), "raptor.index", false);
+    compare_results<raptor::index_structure::ibf_compressed>(ibf_path(16, 23, true), "raptor.index", false);
 }
 
 INSTANTIATE_TEST_SUITE_P(
