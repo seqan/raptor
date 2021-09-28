@@ -5,23 +5,21 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <seqan3/std/ranges>     // range comparisons
-#include <string>                // strings
-#include <vector>                // vectors
-
 #include <seqan3/test/snippet/create_temporary_snippet_file.hpp>
+
+#include "../cli_test.hpp"
+
+struct build : public raptor_base {};
+struct main : public raptor_base {};
+struct search : public raptor_base {};
+struct upgrade : public raptor_base {};
 
 seqan3::test::create_temporary_snippet_file tmp_index_file{"tmp.index", "\nsome_content"};
 seqan3::test::create_temporary_snippet_file dummy_sequence_file{"dummy.fasta", "\n>ID\nACGTC"};
-seqan3::test::create_temporary_snippet_file tmp_bin_list_file{"all_bins.txt", std::string{"\n"} + dummy_sequence_file.file_path.string()};
+seqan3::test::create_temporary_snippet_file tmp_bin_list_file{"all_bins.txt", std::string{"\n"} +
+                                                                              dummy_sequence_file.file_path.string()};
 
-#include "cli_test.hpp"
-
-struct raptor_build : public raptor_base {};
-struct raptor_search : public raptor_base {};
-struct raptor_upgrade : public raptor_base {};
-
-TEST_F(raptor_base, no_options)
+TEST_F(main, no_options)
 {
     cli_test_result const result = execute_app("raptor");
     std::string const expected
@@ -35,7 +33,7 @@ TEST_F(raptor_base, no_options)
     EXPECT_EQ(result.err, std::string{});
 }
 
-TEST_F(raptor_build, no_options)
+TEST_F(build, no_options)
 {
     cli_test_result const result = execute_app("raptor", "build");
     std::string const expected
@@ -49,7 +47,7 @@ TEST_F(raptor_build, no_options)
     EXPECT_EQ(result.err, std::string{});
 }
 
-TEST_F(raptor_search, no_options)
+TEST_F(search, no_options)
 {
     cli_test_result const result = execute_app("raptor", "search");
     std::string const expected
@@ -63,7 +61,7 @@ TEST_F(raptor_search, no_options)
     EXPECT_EQ(result.err, std::string{});
 }
 
-TEST_F(raptor_base, no_subparser)
+TEST_F(main, no_subparser)
 {
     cli_test_result const result = execute_app("raptor", "foo");
     std::string const expected
@@ -76,7 +74,7 @@ TEST_F(raptor_base, no_subparser)
     EXPECT_EQ(result.err, expected);
 }
 
-TEST_F(raptor_base, unknown_option)
+TEST_F(main, unknown_option)
 {
     cli_test_result const result = execute_app("raptor", "-v");
     std::string const expected
@@ -89,17 +87,18 @@ TEST_F(raptor_base, unknown_option)
     EXPECT_EQ(result.err, expected);
 }
 
-TEST_F(raptor_build, input_missing)
+TEST_F(build, input_missing)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8m",
                                                          "--output ./index.raptor");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] Not enough positional arguments provided (Need at least 1). See -h/--help for more information.\n"});
+    EXPECT_EQ(result.err, std::string{"[Error] Not enough positional arguments provided (Need at least 1). See "
+                                      "-h/--help for more information.\n"});
 }
 
-TEST_F(raptor_build, input_invalid)
+TEST_F(build, input_invalid)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8m",
@@ -107,10 +106,11 @@ TEST_F(raptor_build, input_invalid)
                                                          "nonexistent");
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] Validation failed for positional option 1: The file \"nonexistent\" does not exist!\n"});
+    EXPECT_EQ(result.err, std::string{"[Error] Validation failed for positional option 1: The file \"nonexistent\" does"
+                                      " not exist!\n"});
 }
 
-TEST_F(raptor_build, output_missing)
+TEST_F(build, output_missing)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8m",
@@ -120,7 +120,7 @@ TEST_F(raptor_build, output_missing)
     EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
 }
 
-TEST_F(raptor_build, directory_missing)
+TEST_F(build, directory_missing)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8m",
@@ -131,7 +131,7 @@ TEST_F(raptor_build, directory_missing)
     EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
 }
 
-TEST_F(raptor_build, alias)
+TEST_F(build, alias)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8m",
@@ -142,7 +142,7 @@ TEST_F(raptor_build, alias)
     EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
 }
 
-TEST_F(raptor_build, size_missing)
+TEST_F(build, size_missing)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--output ./index.raptor",
@@ -152,7 +152,7 @@ TEST_F(raptor_build, size_missing)
     EXPECT_EQ(result.err, std::string{"[Error] Option --size is required but not set.\n"});
 }
 
-TEST_F(raptor_build, size_wrong_space)
+TEST_F(build, size_wrong_space)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8 m",
@@ -164,7 +164,7 @@ TEST_F(raptor_build, size_wrong_space)
                                       "followed by [k,m,g,t] (case insensitive).\n"});
 }
 
-TEST_F(raptor_build, size_wrong_suffix)
+TEST_F(build, size_wrong_suffix)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--size 8x",
@@ -176,7 +176,7 @@ TEST_F(raptor_build, size_wrong_suffix)
                                       "followed by [k,m,g,t] (case insensitive).\n"});
 }
 
-TEST_F(raptor_build, kmer_window)
+TEST_F(build, kmer_window)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--kmer 20",
@@ -189,7 +189,7 @@ TEST_F(raptor_build, kmer_window)
     EXPECT_EQ(result.err, std::string{"[Error] The k-mer size cannot be bigger than the window size.\n"});
 }
 
-TEST_F(raptor_build, kmer_shape)
+TEST_F(build, kmer_shape)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--kmer 20",
@@ -202,7 +202,7 @@ TEST_F(raptor_build, kmer_shape)
     EXPECT_EQ(result.err, std::string{"[Error] You cannot set both shape and k-mer arguments.\n"});
 }
 
-TEST_F(raptor_build, zero_threads)
+TEST_F(build, zero_threads)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--kmer 20",
@@ -212,10 +212,11 @@ TEST_F(raptor_build, zero_threads)
                                                          tmp_bin_list_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] Validation failed for option --threads: The value must be a positive integer.\n"});
+    EXPECT_EQ(result.err, std::string{"[Error] Validation failed for option --threads: The value must be a positive "
+                                      "integer.\n"});
 }
 
-TEST_F(raptor_build, no_bins_in_file)
+TEST_F(build, no_bins_in_file)
 {
     seqan3::test::create_temporary_snippet_file tmp_bin_list_empty{"empty.txt", std::string{"\n"}};
 
@@ -229,10 +230,12 @@ TEST_F(raptor_build, no_bins_in_file)
     EXPECT_EQ(result.err, std::string{"[Error] The list of input files cannot be empty.\n"});
 }
 
-TEST_F(raptor_build, empty_file_in_bin)
+TEST_F(build, empty_file_in_bin)
 {
     seqan3::test::create_temporary_snippet_file empty_sequence_file{"empty.fasta", std::string{"\n"}};
-    seqan3::test::create_temporary_snippet_file tmp_empty_bin_file{"empty_bin.txt", std::string{"\n"} + empty_sequence_file.file_path.string()};
+    seqan3::test::create_temporary_snippet_file tmp_empty_bin_file{"empty_bin.txt",
+                                                                   std::string{"\n"} +
+                                                                   empty_sequence_file.file_path.string()};
 
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--kmer 20",
@@ -241,13 +244,16 @@ TEST_F(raptor_build, empty_file_in_bin)
                                                          tmp_empty_bin_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] The file " + tmp_empty_bin_file.file_path.parent_path().string() + "/empty.fasta is empty.\n"});
+    EXPECT_EQ(result.err, std::string{"[Error] The file " + tmp_empty_bin_file.file_path.parent_path().string() +
+                                      "/empty.fasta is empty.\n"});
 }
 
-TEST_F(raptor_build, mixed_input)
+TEST_F(build, mixed_input)
 {
     seqan3::test::create_temporary_snippet_file minimiser_file{"bin1.minimiser", std::string{"\n0"}};
-    seqan3::test::create_temporary_snippet_file mixed_bin_file{"mixed.txt", std::string{"\n"} + minimiser_file.file_path.string() + std::string{"\nbin2.fasta"}};
+    seqan3::test::create_temporary_snippet_file mixed_bin_file{"mixed.txt", std::string{"\n"} +
+                                                                            minimiser_file.file_path.string() +
+                                                                            std::string{"\nbin2.fasta"}};
 
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--kmer 20",
@@ -259,7 +265,7 @@ TEST_F(raptor_build, mixed_input)
     EXPECT_EQ(result.err, std::string{"[Error] You cannot mix sequence and minimiser files as input.\n"});
 }
 
-TEST_F(raptor_build, wrong_parts)
+TEST_F(build, wrong_parts)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--kmer 20",
@@ -269,10 +275,11 @@ TEST_F(raptor_build, wrong_parts)
                                                          tmp_bin_list_file.file_path);
     EXPECT_NE(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] Validation failed for option --parts: The value must be a power of two.\n"});
+    EXPECT_EQ(result.err, std::string{"[Error] Validation failed for option --parts: The value must be a power of "
+                                      "two.\n"});
 }
 
-TEST_F(raptor_search, ibf_missing)
+TEST_F(search, ibf_missing)
 {
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--query ", data("query.fq"),
@@ -282,7 +289,7 @@ TEST_F(raptor_search, ibf_missing)
     EXPECT_EQ(result.err, std::string{"[Error] Option --index is required but not set.\n"});
 }
 
-TEST_F(raptor_search, ibf_wrong)
+TEST_F(search, ibf_wrong)
 {
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--query ", data("query.fq"),
@@ -293,7 +300,7 @@ TEST_F(raptor_search, ibf_wrong)
     EXPECT_EQ(result.err, std::string{"[Error] The file \"foo.index\" does not exist!\n"});
 }
 
-TEST_F(raptor_search, query_missing)
+TEST_F(search, query_missing)
 {
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--index ", tmp_index_file.file_path,
@@ -303,7 +310,7 @@ TEST_F(raptor_search, query_missing)
     EXPECT_EQ(result.err, std::string{"[Error] Option --query is required but not set.\n"});
 }
 
-TEST_F(raptor_search, query_wrong)
+TEST_F(search, query_wrong)
 {
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--query foo.fasta",
@@ -315,7 +322,7 @@ TEST_F(raptor_search, query_wrong)
                                       "exist!\n"});
 }
 
-TEST_F(raptor_search, output_missing)
+TEST_F(search, output_missing)
 {
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--query ", data("query.fq"),
@@ -325,7 +332,7 @@ TEST_F(raptor_search, output_missing)
     EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
 }
 
-TEST_F(raptor_search, old_index)
+TEST_F(search, old_index)
 {
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--query ", data("query.fq"),
@@ -336,7 +343,7 @@ TEST_F(raptor_search, old_index)
     EXPECT_EQ(result.err, std::string{"[Error] Unsupported index version. Check raptor upgrade.\n"});
 }
 
-TEST_F(raptor_upgrade, kmer_window)
+TEST_F(upgrade, kmer_window)
 {
     cli_test_result const result = execute_app("raptor", "upgrade",
                                                          "--bins ", tmp_bin_list_file.file_path,

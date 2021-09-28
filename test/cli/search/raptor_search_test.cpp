@@ -5,11 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include "cli_test.hpp"
+#include "../cli_test.hpp"
 
-struct raptor_search : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, size_t>> {};
+struct search : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, size_t>> {};
 
-TEST_P(raptor_search, search)
+TEST_P(search, with_error)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
@@ -25,13 +25,16 @@ TEST_P(raptor_search, search)
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
 
-    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins, window_size, number_of_errors), std::ios::binary);
+    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins,
+                                                                     window_size,
+                                                                     number_of_errors),
+                                                  std::ios::binary);
     std::string const actual = string_from_file("search.out");
 
     EXPECT_EQ(expected, actual);
 }
 
-TEST_P(raptor_search, search_socks)
+TEST_P(search, search_socks)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
@@ -46,13 +49,17 @@ TEST_P(raptor_search, search_socks)
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
 
-    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins, window_size, number_of_errors, true), std::ios::binary);
+    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins,
+                                                                     window_size,
+                                                                     number_of_errors,
+                                                                     true),
+                                                  std::ios::binary);
     std::string const actual = string_from_file("search.out");
 
     EXPECT_EQ(expected, actual);
 }
 
-TEST_P(raptor_search, search_threshold)
+TEST_P(search, with_threshold)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
@@ -98,7 +105,7 @@ TEST_P(raptor_search, search_threshold)
     EXPECT_EQ(expected, actual);
 }
 
-TEST_P(raptor_search, search_empty)
+TEST_P(search, no_hits)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
@@ -114,19 +121,25 @@ TEST_P(raptor_search, search_empty)
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
 
-    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins, window_size, number_of_errors, false, true), std::ios::binary);
+    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins,
+                                                                     window_size,
+                                                                     number_of_errors,
+                                                                     false,
+                                                                     true),
+                                                  std::ios::binary);
     std::string const actual = string_from_file("search.out");
 
     EXPECT_EQ(expected, actual);
 }
 
-INSTANTIATE_TEST_SUITE_P(search_suite,
-                         raptor_search,
-                         testing::Combine(testing::Values(0, 16, 32), testing::Values(19, 23), testing::Values(0, 1)),
-                         [] (testing::TestParamInfo<raptor_search::ParamType> const & info)
-                         {
-                             std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
-                                                std::to_string(std::get<1>(info.param)) + "_window_" +
-                                                std::to_string(std::get<2>(info.param)) + "_error";
-                             return name;
-                         });
+INSTANTIATE_TEST_SUITE_P(
+    search_suite,
+    search,
+    testing::Combine(testing::Values(0, 16, 32), testing::Values(19, 23), testing::Values(0, 1)),
+    [] (testing::TestParamInfo<search::ParamType> const & info)
+    {
+        std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
+                        std::to_string(std::get<1>(info.param)) + "_window_" +
+                        std::to_string(std::get<2>(info.param)) + "_error";
+        return name;
+    });

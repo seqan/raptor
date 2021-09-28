@@ -1,15 +1,14 @@
+# -----------------------------------------------------------------------------------------------------
+# Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
+# Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
+# This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
+# shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
+# -----------------------------------------------------------------------------------------------------
+
 cmake_minimum_required (VERSION 3.8)
 
-set (cli_test_list raptor_build_test
-                   raptor_compressed_test
-                   raptor_options_test
-                   raptor_parts_test
-                   raptor_preprocessing_test
-                   raptor_search_test
-                   raptor_search_hibf_test
-                   raptor_upgrade_test)
-
-foreach (cli_test_target IN LISTS cli_test_list)
+macro (add_cli_test_and_data)
+    set (cli_test_target "${ARGV0}")
     add_cli_test (${cli_test_target}.cpp)
     target_use_datasources (${cli_test_target} FILES 1_1c.index)
     target_use_datasources (${cli_test_target} FILES 1_1.index)
@@ -62,4 +61,10 @@ foreach (cli_test_target IN LISTS cli_test_list)
     target_use_datasources (${cli_test_target} FILES query_empty.fq)
     target_use_datasources (${cli_test_target} FILES query.fq)
     target_use_datasources (${cli_test_target} FILES query_socks.fq)
-endforeach ()
+endmacro ()
+
+add_subdirectory (argument_parsing)
+add_subdirectory (build)
+add_subdirectory (search)
+add_subdirectory (upgrade)
+

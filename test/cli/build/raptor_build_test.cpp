@@ -5,11 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include "cli_test.hpp"
+#include "../cli_test.hpp"
 
-struct raptor_build : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, bool>> {};
+struct build : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, bool>> {};
 
-TEST_P(raptor_build, build_with_file)
+TEST_P(build, with_file)
 {
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
@@ -42,7 +42,7 @@ TEST_P(raptor_build, build_with_file)
     compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
 }
 
-TEST_P(raptor_build, build_with_shape)
+TEST_P(build, with_shape)
 {
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
@@ -75,7 +75,7 @@ TEST_P(raptor_build, build_with_shape)
     compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
 }
 
-TEST_P(raptor_build, build_with_file_socks)
+TEST_P(build, with_socks_file)
 {
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
@@ -113,13 +113,14 @@ TEST_P(raptor_build, build_with_file_socks)
     compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
 }
 
-INSTANTIATE_TEST_SUITE_P(build_suite,
-                         raptor_build,
-                         testing::Combine(testing::Values(0, 16, 32), testing::Values(19, 23), testing::Values(true, false)),
-                         [] (testing::TestParamInfo<raptor_build::ParamType> const & info)
-                         {
-                             std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
-                                                std::to_string(std::get<1>(info.param)) + "_window_" +
-                                                (std::get<2>(info.param) ? "parallel" : "serial");
-                             return name;
-                         });
+INSTANTIATE_TEST_SUITE_P(
+    build_suite,
+    build,
+    testing::Combine(testing::Values(0, 16, 32), testing::Values(19, 23), testing::Values(true, false)),
+    [] (testing::TestParamInfo<build::ParamType> const & info)
+    {
+        std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
+                           std::to_string(std::get<1>(info.param)) + "_window_" +
+                           (std::get<2>(info.param) ? "parallel" : "serial");
+        return name;
+    });

@@ -5,11 +5,12 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include "cli_test.hpp"
+#include "../cli_test.hpp"
 
-struct raptor_search_hibf : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, size_t>> {};
+struct hierarchical : public raptor_base,
+                      public testing::WithParamInterface<std::tuple<size_t, size_t, size_t>> {};
 
-TEST_P(raptor_search_hibf, search)
+TEST_P(hierarchical, with_error)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
@@ -20,19 +21,28 @@ TEST_P(raptor_search_hibf, search)
                                                          "--output search.out",
                                                          "--error ", std::to_string(number_of_errors),
                                                          "--hibf",
-                                                         "--index ", ibf_path(number_of_repeated_bins, window_size, false, true),
+                                                         "--index ", ibf_path(number_of_repeated_bins,
+                                                                              window_size,
+                                                                              false,
+                                                                              true),
                                                          "--query ", data("query.fq"));
     EXPECT_EQ(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
 
-    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins, window_size, number_of_errors, false, false, true), std::ios::binary);
+    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins,
+                                                                     window_size,
+                                                                     number_of_errors,
+                                                                     false,
+                                                                     false,
+                                                                     true),
+                                                  std::ios::binary);
     std::string const actual = string_from_file("search.out");
 
     EXPECT_EQ(expected, actual);
 }
 
-TEST_P(raptor_search_hibf, search_threshold)
+TEST_P(hierarchical, with_threshold)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
@@ -40,7 +50,10 @@ TEST_P(raptor_search_hibf, search_threshold)
                                                          "--output search_threshold.out",
                                                          "--threshold 0.50",
                                                          "--hibf",
-                                                         "--index ", ibf_path(number_of_repeated_bins, window_size, false, true),
+                                                         "--index ", ibf_path(number_of_repeated_bins,
+                                                                              window_size,
+                                                                              false,
+                                                                              true),
                                                          "--query ", data("query.fq"));
     EXPECT_EQ(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
@@ -74,7 +87,7 @@ TEST_P(raptor_search_hibf, search_threshold)
     EXPECT_EQ(expected, actual);
 }
 
-TEST_P(raptor_search_hibf, search_empty)
+TEST_P(hierarchical, no_hits)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
@@ -85,25 +98,35 @@ TEST_P(raptor_search_hibf, search_empty)
                                                          "--output search.out",
                                                          "--error ", std::to_string(number_of_errors),
                                                          "--hibf",
-                                                         "--index ", ibf_path(number_of_repeated_bins, window_size, false, true),
+                                                         "--index ", ibf_path(number_of_repeated_bins,
+                                                                              window_size,
+                                                                              false,
+                                                                              true),
                                                          "--query ", data("query_empty.fq"));
     EXPECT_EQ(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
 
-    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins, window_size, number_of_errors, false, true, true), std::ios::binary);
+    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins,
+                                                                     window_size,
+                                                                     number_of_errors,
+                                                                     false,
+                                                                     true,
+                                                                     true),
+                                                  std::ios::binary);
     std::string const actual = string_from_file("search.out");
 
     EXPECT_EQ(expected, actual);
 }
 
-INSTANTIATE_TEST_SUITE_P(search_suite,
-                         raptor_search_hibf,
-                         testing::Combine(testing::Values(0, 16, 32), testing::Values(19), testing::Values(0, 1)),
-                         [] (testing::TestParamInfo<raptor_search_hibf::ParamType> const & info)
-                         {
-                             std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
-                                                std::to_string(std::get<1>(info.param)) + "_window_" +
-                                                std::to_string(std::get<2>(info.param)) + "_error";
-                             return name;
-                         });
+INSTANTIATE_TEST_SUITE_P(
+    hierarchical_suite,
+    hierarchical,
+    testing::Combine(testing::Values(0, 16, 32), testing::Values(19), testing::Values(0, 1)),
+    [] (testing::TestParamInfo<hierarchical::ParamType> const & info)
+    {
+        std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
+                        std::to_string(std::get<1>(info.param)) + "_window_" +
+                        std::to_string(std::get<2>(info.param)) + "_error";
+        return name;
+    });

@@ -5,11 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include "cli_test.hpp"
+#include "../cli_test.hpp"
 
-struct raptor_upgrade : public raptor_base {};
+struct upgrade : public raptor_base {};
 
-TEST_F(raptor_upgrade, upgrade_index)
+TEST_F(upgrade, upgrade_index)
 {
     {
         std::string const expanded_bins = repeat_bins(16);
@@ -38,7 +38,7 @@ TEST_F(raptor_upgrade, upgrade_index)
     compare_results(ibf_path(16, 23), "raptor.index");
 }
 
-TEST_F(raptor_upgrade, upgrade_compressed_index)
+TEST_F(upgrade, upgrade_compressed_index)
 {
     {
         std::string const expanded_bins = repeat_bins(16);
@@ -68,7 +68,7 @@ TEST_F(raptor_upgrade, upgrade_compressed_index)
     compare_results<seqan3::data_layout::compressed>(ibf_path(16, 23, true), "raptor.index");
 }
 
-TEST_F(raptor_upgrade, upgrade_partitioned)
+TEST_F(upgrade, upgrade_partitioned)
 {
     std::stringstream header{};
     {
