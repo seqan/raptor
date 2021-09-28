@@ -7,12 +7,6 @@
 
 #include <gtest/gtest.h>
 
-#include <cstdlib>               // system calls
-#include <seqan3/std/filesystem> // test directory creation
-#include <sstream>               // ostringstream
-#include <string>                // strings
-
-#include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
 #include <seqan3/test/expect_range_eq.hpp>
 #include <seqan3/utility/views/zip.hpp>
 
@@ -127,7 +121,10 @@ struct raptor_base : public cli_test
         return result;
     }
 
-    static inline std::filesystem::path const ibf_path(size_t const number_of_repetitions, size_t const window_size, bool const compressed = false, bool const hibf = false) noexcept
+    static inline std::filesystem::path const ibf_path(size_t const number_of_repetitions,
+                                                       size_t const window_size,
+                                                       bool const compressed = false,
+                                                       bool const hibf = false) noexcept
     {
         std::string name{};
         name += std::to_string(std::max<int>(1, number_of_repetitions * 4));
@@ -138,7 +135,12 @@ struct raptor_base : public cli_test
         return cli_test::data(name);
     }
 
-    static inline std::filesystem::path const search_result_path(size_t const number_of_repetitions, size_t const window_size, size_t const number_of_errors, bool const socks = false, bool const empty = false, bool const hibf = false) noexcept
+    static inline std::filesystem::path const search_result_path(size_t const number_of_repetitions,
+                                                                 size_t const window_size,
+                                                                 size_t const number_of_errors,
+                                                                 bool const socks = false,
+                                                                 bool const empty = false,
+                                                                 bool const hibf = false) noexcept
     {
         std::string name{};
         name += std::to_string(std::max<int>(1, number_of_repetitions * 4));
@@ -163,7 +165,8 @@ struct raptor_base : public cli_test
         return cli_test::data(name);
     }
 
-    static inline std::string const string_from_file(std::filesystem::path const & path, std::ios_base::openmode const mode = std::ios_base::in)
+    static inline std::string const string_from_file(std::filesystem::path const & path,
+                                                     std::ios_base::openmode const mode = std::ios_base::in)
     {
         std::ifstream file_stream(path, mode);
         if (!file_stream.is_open())
@@ -251,8 +254,10 @@ struct raptor_base : public cli_test
         auto const & expected_ibf{expected_index.ibf()}, actual_ibf{actual_index.ibf()};
         EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs<layout>(expected_ibf, actual_ibf);
 
-        EXPECT_EQ(std::ranges::distance(expected_index.bin_path()), std::ranges::distance(actual_index.bin_path()));
-        for (auto const && [expected_list, actual_list] : seqan3::views::zip(expected_index.bin_path(), actual_index.bin_path()))
+        auto const & all_expected_bins{expected_index.bin_path()}, all_actual_bins{actual_index.bin_path()};
+        EXPECT_EQ(std::ranges::distance(all_expected_bins), std::ranges::distance(all_actual_bins));
+
+        for (auto const && [expected_list, actual_list] : seqan3::views::zip(all_expected_bins, all_actual_bins))
         {
             EXPECT_TRUE(std::ranges::distance(expected_list) > 0);
             for (auto const && [expected_file, actual_file] : seqan3::views::zip(expected_list, actual_list))

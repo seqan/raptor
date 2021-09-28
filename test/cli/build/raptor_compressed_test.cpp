@@ -5,11 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include "cli_test.hpp"
+#include "../cli_test.hpp"
 
-struct raptor_compressed : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, bool, size_t>> {};
+struct compressed : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, bool, size_t>> {};
 
-TEST_P(raptor_compressed, pipeline)
+TEST_P(compressed, pipeline)
 {
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp, number_of_errors] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
@@ -81,7 +81,7 @@ TEST_P(raptor_compressed, pipeline)
     EXPECT_EQ(expected, actual);
 }
 
-TEST_P(raptor_compressed, pipeline_socks)
+TEST_P(compressed, pipeline_socks)
 {
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp, number_of_errors] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
@@ -123,25 +123,30 @@ TEST_P(raptor_compressed, pipeline_socks)
     EXPECT_EQ(result2.err, std::string{});
     ASSERT_EQ(result2.exit_code, 0);
 
-    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins, window_size, number_of_errors, true), std::ios::binary);
+    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins,
+                                                                     window_size,
+                                                                     number_of_errors,
+                                                                     true),
+                                                  std::ios::binary);
     std::string const actual = string_from_file("search.out");
 
     EXPECT_EQ(expected, actual);
 }
 
-INSTANTIATE_TEST_SUITE_P(compressed_suite,
-                         raptor_compressed,
-                         testing::Combine(testing::Values(0, 16, 32), testing::Values(19, 23), testing::Values(true, false), testing::Values(0, 1)),
-                         [] (testing::TestParamInfo<raptor_compressed::ParamType> const & info)
-                         {
-                             std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
-                                                std::to_string(std::get<1>(info.param)) + "_window_" +
-                                                (std::get<2>(info.param) ? "parallel" : "serial") +
-                                                std::to_string(std::get<3>(info.param)) + "_error";
-                             return name;
-                         });
+INSTANTIATE_TEST_SUITE_P(
+    compressed_suite,
+    compressed,
+    testing::Combine(testing::Values(0, 16, 32), testing::Values(19, 23), testing::Values(true, false), testing::Values(0, 1)),
+    [] (testing::TestParamInfo<compressed::ParamType> const & info)
+    {
+        std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
+                        std::to_string(std::get<1>(info.param)) + "_window_" +
+                        (std::get<2>(info.param) ? "parallel" : "serial") +
+                        std::to_string(std::get<3>(info.param)) + "_error";
+        return name;
+    });
 
-TEST_F(raptor_compressed, wrong_compression)
+TEST_F(compressed, wrong_compression)
 {
     raptor::raptor_index<raptor::index_structure::ibf_compressed> index{};
 

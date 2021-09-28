@@ -5,11 +5,12 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include "cli_test.hpp"
+#include "../cli_test.hpp"
 
-struct raptor_parts : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, size_t, size_t, bool>> {};
+struct parts : public raptor_base,
+               public testing::WithParamInterface<std::tuple<size_t, size_t, size_t, size_t, bool>> {};
 
-TEST_P(raptor_parts, pipeline)
+TEST_P(parts, pipeline)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors, parts, compressed] = GetParam();
 
@@ -80,7 +81,7 @@ TEST_P(raptor_parts, pipeline)
     EXPECT_EQ(expected, actual);
 }
 
-TEST_F(raptor_parts, pipeline_misc)
+TEST_F(parts, pipeline_misc)
 {
     std::stringstream header{};
     {
@@ -177,15 +178,20 @@ TEST_F(raptor_parts, pipeline_misc)
     EXPECT_EQ(expected2, actual2);
 }
 
-INSTANTIATE_TEST_SUITE_P(parts_suite,
-                         raptor_parts,
-                         testing::Combine(testing::Values(32), testing::Values(19, 23), testing::Values(0, 1), testing::Values(2, 4, 8), testing::Values(true, false)),
-                         [] (testing::TestParamInfo<raptor_parts::ParamType> const & info)
-                         {
-                             std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
-                                                std::to_string(std::get<1>(info.param)) + "_window_" +
-                                                std::to_string(std::get<2>(info.param)) + "_error" +
-                                                std::to_string(std::get<3>(info.param)) + "_parts" +
-                                                (std::get<4>(info.param) ? "compressed" : "uncompressed");
-                             return name;
-                         });
+INSTANTIATE_TEST_SUITE_P(
+    parts_suite,
+    parts,
+    testing::Combine(testing::Values(32),
+                     testing::Values(19, 23),
+                     testing::Values(0, 1),
+                     testing::Values(2, 4, 8),
+                     testing::Values(true, false)),
+    [] (testing::TestParamInfo<parts::ParamType> const & info)
+    {
+        std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
+                        std::to_string(std::get<1>(info.param)) + "_window_" +
+                        std::to_string(std::get<2>(info.param)) + "_error" +
+                        std::to_string(std::get<3>(info.param)) + "_parts" +
+                        (std::get<4>(info.param) ? "compressed" : "uncompressed");
+        return name;
+    });
