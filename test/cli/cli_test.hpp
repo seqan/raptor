@@ -5,14 +5,14 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
+#pragma once
+
 #include <gtest/gtest.h>
 
 #include <seqan3/test/expect_range_eq.hpp>
 #include <seqan3/utility/views/zip.hpp>
 
 #include <raptor/index.hpp>
-
-#pragma once
 
 // Provides functions for CLI test implementation.
 struct cli_test : public ::testing::Test
@@ -228,12 +228,27 @@ struct raptor_base : public cli_test
         return result.str();
     }
 
-    template <seqan3::data_layout layout = seqan3::data_layout::uncompressed>
+    template <typename data_t = raptor::index_structure::ibf>
     static inline void compare_results(std::filesystem::path const & expected_result,
                                        std::filesystem::path const & actual_result,
                                        bool const compare_extension = true)
     {
-        raptor::raptor_index<seqan3::interleaved_bloom_filter<layout>> expected_index, actual_index{};
+        constexpr bool is_ibf = std::same_as<data_t, raptor::index_structure::ibf> ||
+                                std::same_as<data_t, raptor::index_structure::ibf_compressed>;
+        constexpr bool is_hibf = std::same_as<data_t, raptor::index_structure::hibf> ||
+                                 std::same_as<data_t, raptor::index_structure::hibf_compressed>;
+
+        static_assert(is_ibf || is_hibf);
+
+        constexpr auto data_layout = [is_ibf] () constexpr
+        {
+            if constexpr (is_ibf)
+                return data_t::data_layout_mode;
+            else
+                return data_t::ibf_t::data_layout_mode;
+        }();
+
+        raptor::raptor_index<data_t> expected_index, actual_index{};
 
         {
             std::ifstream is{expected_result, std::ios::binary};
@@ -251,8 +266,19 @@ struct raptor_base : public cli_test
         EXPECT_EQ(expected_index.parts(), actual_index.parts());
         EXPECT_EQ(expected_index.compressed(), actual_index.compressed());
 
-        auto const & expected_ibf{expected_index.ibf()}, actual_ibf{actual_index.ibf()};
-        EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs<layout>(expected_ibf, actual_ibf);
+        if constexpr(is_ibf)
+        {
+            auto const & expected_ibf{expected_index.ibf()}, actual_ibf{actual_index.ibf()};
+            EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs<data_layout>(expected_ibf, actual_ibf);
+        }
+        else
+        {
+            auto const & expected_hibf{expected_index.ibf()}, actual_hibf{actual_index.ibf()};
+            for (auto const && [expected_ibf, actual_ibf] : seqan3::views::zip(expected_hibf, actual_hibf))
+            {
+                EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs<data_layout>(expected_ibf, actual_ibf);
+            }
+        }
 
         auto const & all_expected_bins{expected_index.bin_path()}, all_actual_bins{actual_index.bin_path()};
         EXPECT_EQ(std::ranges::distance(all_expected_bins), std::ranges::distance(all_actual_bins));
