@@ -1,0 +1,7 @@
+categories:
+- Sequence Analysis
+description: 'Raptor: pre-filter for querying very large collection'
+long_description: 'Raptor: A fast and space-efficient pre-filter for querying very
+  large collections of nucleotide sequences.'
+name: raptor_seqan3
+owner: sgssgene

@@ -1,0 +1,5 @@
+#0	genome0.fasta
+#1	genome1.fasta
+#QUERY_NAME	USER_BINS
+query1	
+query2	1

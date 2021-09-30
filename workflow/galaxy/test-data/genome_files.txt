@@ -1,0 +1,2 @@
+genome0.fasta
+genome1.fasta
