@@ -90,13 +90,22 @@ declare_datasource (FILE 64bins23windowc.index
 
 declare_datasource (FILE 1bins19window.hibf
                     URL ${CMAKE_SOURCE_DIR}/test/data/hibf/1bins19window.hibf
-                    URL_HASH SHA256=25034bceb705a6c842bbfccc1b0759d75658eaeca4412500036e6dcf26a9fa0c)
+                    URL_HASH SHA256=e7d259809af8db71fd78161010e8c822880448ccf3d672f6974532a9cbf4d169)
 declare_datasource (FILE 64bins19window.hibf
                     URL ${CMAKE_SOURCE_DIR}/test/data/hibf/64bins19window.hibf
-                    URL_HASH SHA256=d8acaa02c4316d3c6253bf2eea985ce2f061ffc48e835b7fbecb90586b252eca)
+                    URL_HASH SHA256=354c85086bbbb497206b3fe50832435d9fe8877e8147eb6f57c1a6ef1f085a52)
 declare_datasource (FILE 128bins19window.hibf
                     URL ${CMAKE_SOURCE_DIR}/test/data/hibf/128bins19window.hibf
-                    URL_HASH SHA256=0431676e48f9e829668b0b5b7feb1a1e2ba33333a470e15744627e76086a5c35)
+                    URL_HASH SHA256=6d1c4614559d3625a4625dac29627e8b7a6b3e83cf4fc7addde722f95054cebe)
+declare_datasource (FILE 1bins23window.hibf
+                    URL ${CMAKE_SOURCE_DIR}/test/data/hibf/1bins23window.hibf
+                    URL_HASH SHA256=56d3a9839230a2c9da943d5377ef1dfa087a0ed7930249aecdd8a6a64b6e1079)
+declare_datasource (FILE 64bins23window.hibf
+                    URL ${CMAKE_SOURCE_DIR}/test/data/hibf/64bins23window.hibf
+                    URL_HASH SHA256=d9a95119322915f33faad70ee5b7d39f7815170f609aeebc37d44451482516b6)
+declare_datasource (FILE 128bins23window.hibf
+                    URL ${CMAKE_SOURCE_DIR}/test/data/hibf/128bins23window.hibf
+                    URL_HASH SHA256=bdb5f09f0357d577cf1db68145597f97b01d47bb7a1ef859a26cbccd93649939)
 
 declare_datasource (FILE 1bins19window0error.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/1bins19window0error.out
@@ -138,22 +147,22 @@ declare_datasource (FILE 128bins19window0errorsocks.out
 
 declare_datasource (FILE 1bins19window0errorhibf.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/hibf/1bins19window0errorhibf.out
-                    URL_HASH SHA256=1ff27bf9de0ad5e5487c857327c2494fb42c38e81cf8f86291157cf2c941af86)
+                    URL_HASH SHA256=db866e80d7327cf7bfb792ef9c6af425354b14e8ebd7058796cec9bb43672525)
 declare_datasource (FILE 1bins19window1errorhibf.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/hibf/1bins19window1errorhibf.out
-                    URL_HASH SHA256=1ff27bf9de0ad5e5487c857327c2494fb42c38e81cf8f86291157cf2c941af86)
+                    URL_HASH SHA256=db866e80d7327cf7bfb792ef9c6af425354b14e8ebd7058796cec9bb43672525)
 declare_datasource (FILE 64bins19window0errorhibf.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/hibf/64bins19window0errorhibf.out
-                    URL_HASH SHA256=f4197ab25eab37f537f883bf56ec092ad8536e271bae0b8c1065ebd23e5e2a50)
+                    URL_HASH SHA256=8fcdd69d9447d1b4020139c046ef838059c9c6f153260658aee67dfae6b89659)
 declare_datasource (FILE 64bins19window1errorhibf.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/hibf/64bins19window1errorhibf.out
-                    URL_HASH SHA256=9370dcb822521586d71efd8097f41d179a816435d9fb7920abdee99cecd227c3)
+                    URL_HASH SHA256=61ace76230a97278875d8452dd550e7c853c1d042932d2f0d14a1b0ab63e4ff4)
 declare_datasource (FILE 128bins19window0errorhibf.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/hibf/128bins19window0errorhibf.out
-                    URL_HASH SHA256=1b517f5e7b703bf182fd57be9f10a06302a7b4d360fcc1c50a75a1d9530a2a77)
+                    URL_HASH SHA256=bf513dc1311a81f6bdb246406c069facf672a880dddff8b48fa2337b7325d19c)
 declare_datasource (FILE 128bins19window1errorhibf.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/hibf/128bins19window1errorhibf.out
-                    URL_HASH SHA256=c73674cfe452339caaa886ea7cd2ca399280f31a830445c36c6d2c7826f4d096)
+                    URL_HASH SHA256=bf513dc1311a81f6bdb246406c069facf672a880dddff8b48fa2337b7325d19c)
 
 declare_datasource (FILE 1binsempty.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/1binsempty.out
@@ -167,10 +176,20 @@ declare_datasource (FILE 128binsempty.out
 
 declare_datasource (FILE 1binsemptyhibf.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/hibf/1binsemptyhibf.out
-                    URL_HASH SHA256=515b16f2e507b9f4bac1b717c65d3a16b7c0f2bebe0977f7e0a471479dbcff42)
+                    URL_HASH SHA256=db866e80d7327cf7bfb792ef9c6af425354b14e8ebd7058796cec9bb43672525)
 declare_datasource (FILE 64binsemptyhibf.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/hibf/64binsemptyhibf.out
-                    URL_HASH SHA256=d4dec373615d39c54dbbc40bc9898598fc3f6f34e42ed41f4282a45906de717b)
+                    URL_HASH SHA256=46ccd96c51f14c30661cd63c0ad370323c429581c877a67d199b72b832398b5b)
 declare_datasource (FILE 128binsemptyhibf.out
                     URL ${CMAKE_SOURCE_DIR}/test/data/hibf/128binsemptyhibf.out
-                    URL_HASH SHA256=9362d17453ae79956ab6f0bf271a17ae9027b58314d28393c5875fd11ed04464)
+                    URL_HASH SHA256=db4af85cad7f68db24a65663015770df250e56becad66044b02657d7f989807e)
+
+configure_datasource (FILE 1bins.pack
+                      URL ${CMAKE_SOURCE_DIR}/test/data/hibf/1bins.pack
+                      URL_HASH SHA256=1b7c15eff5a2d884b0058d3ecdc2155f0de0cdc2e59e7d9598030eaaecda8464)
+configure_datasource (FILE 64bins.pack
+                      URL ${CMAKE_SOURCE_DIR}/test/data/hibf/64bins.pack
+                      URL_HASH SHA256=f33eff072b77f47e755ddce2472e7e171e63a0a8192ccaf9fc797c97921226ef)
+configure_datasource (FILE 128bins.pack
+                      URL ${CMAKE_SOURCE_DIR}/test/data/hibf/128bins.pack
+                      URL_HASH SHA256=8dcaf32047203556cb9652628a294ffc3faee1b60a5c887687c9cb52e9ca4a91)

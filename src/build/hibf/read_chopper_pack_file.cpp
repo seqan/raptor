@@ -5,6 +5,8 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
+#include <lemon/list_graph.h> /// Must be first include.
+
 #include <raptor/build/hibf/parse_chopper_pack_header.hpp>
 #include <raptor/build/hibf/parse_chopper_pack_line.hpp>
 #include <raptor/build/hibf/read_chopper_pack_file.hpp>
@@ -18,7 +20,7 @@ void read_chopper_pack_file(build_data & data, std::string const & chopper_pack_
     std::ifstream chopper_pack_file{chopper_pack_filename};
 
     if (!chopper_pack_file.good() || !chopper_pack_file.is_open())
-        throw std::logic_error{"Could not open file " + chopper_pack_filename + " for reading"};
+        throw std::logic_error{"Could not open file " + chopper_pack_filename + " for reading"}; // LCOV_EXCL_LINE
 
     // parse header
     // -------------------------------------------------------------------------

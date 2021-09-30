@@ -5,6 +5,8 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
+#include <lemon/list_graph.h> /// Must be first include.
+
 #include <raptor/build/hibf/bin_size_in_bits.hpp>
 #include <raptor/build/hibf/construct_ibf.hpp>
 #include <raptor/build/hibf/insert_into_ibf.hpp>

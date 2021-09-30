@@ -5,6 +5,8 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
+#include <lemon/list_graph.h> /// Must be first include.
+
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
 
 #include <raptor/build/hibf/hierarchical_build.hpp>

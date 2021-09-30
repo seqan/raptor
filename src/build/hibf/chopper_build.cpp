@@ -5,7 +5,8 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <raptor/build/hibf/build_data.hpp>
+#include <lemon/list_graph.h> /// Must be first include.
+
 #include <raptor/build/hibf/chopper_build.hpp>
 #include <raptor/build/hibf/create_ibfs_from_chopper_pack.hpp>
 #include <raptor/build/store_index.hpp>
@@ -17,7 +18,11 @@ namespace raptor::hibf
 void chopper_build(build_arguments const & arguments)
 {
     build_data data{};
+    // std::cerr << "[DEBUG] chopper_build\n"
+    //           << "        &data:          " << &data << '\n'
+    //           << "        &data.node_map: " << &data.node_map << "\n\n";
     create_ibfs_from_chopper_pack(data, arguments);
+    // assert(false);
 
     std::vector<std::vector<std::string>> bin_path{};
     for (size_t i{0}; i < data.hibf.user_bins.num_user_bins(); ++i)

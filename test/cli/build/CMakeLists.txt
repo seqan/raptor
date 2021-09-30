@@ -8,5 +8,6 @@
 cmake_minimum_required (VERSION 3.8)
 
 add_cli_test_and_data (raptor_build_test)
+add_cli_test_and_data (raptor_hibf_test)
 add_cli_test_and_data (raptor_compressed_test)
 add_cli_test_and_data (raptor_parts_test)
