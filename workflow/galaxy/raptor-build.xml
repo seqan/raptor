@@ -1,0 +1,152 @@
+<tool id="raptor-build" name="raptor build" version="2.0.0+8" python_template_version="3.5">
+    <description>
+        Builds an index to be used by `raptor search`.
+    </description>
+    <requirements>
+        <requirement type="package" version="2.0.0">raptor</requirement>
+    </requirements>
+    <command detect_errors="exit_code"><![CDATA[
+        echo "" > files.txt;
+        #for $i, $s in enumerate($inputs)
+            ln -s '${s}' genome${i}.fasta;
+            echo genome${i}.fasta >> files.txt;
+        #end for
+
+        raptor build files.text
+            #if $window$ --window ${window} #end if#
+            --threads ${threads}
+            --parts ${parts}
+            --kmer ${kmer}
+            --size ${size}
+            --hash ${hash}
+            ${compressed}
+            ${compute_minimiser}
+            ${disable_cutoffs}
+            --output output.index;
+    ]]></command>
+    <inputs>
+        <param name="inputs" label="Files representing a bin each" type="data" format="fasta" multiple="true" />
+        <param name="threads" label="Threads" type="integer" value="1" min="1" help="The numer of threads to use. Default: 1. Value must be a positive integer. " />
+        <param name="parts" label="Parts" type="integer" value="1" min="1" help="Splits the index in this many parts. Default: 1. Value must be a power of two." />
+        <param name="window" label="Window size" type="integer" optional="true" min="1" help="The window size. Default: kmer size. Value must be a positive integer." />
+        <param name="kmer" label ="Kmer size" type="integer" value="20" min="1" max="32" help="The k-mer size. Default: 20. Value must be in range [1,32]." />
+        <param name="size" label="Index size" type="text" value="1k" help="The size in bytes of the resulting index. Default: 1k. Must be an integer followed by [k,m,g,t] (case insensitive)." >
+            <option value="1k">1k</option>
+            <option value="1m">1m</option>
+            <option value="1g">1g</option>
+            <option value="1t">1t</option>
+        </param>
+        <param name="hash" label="Hash functions" type="integer" value="2" min="1" max="5" help="The number of hash functions to use. Default: 2. Value must be in range [1,5]." />
+        <param name="compressed" label="Index compression" type="boolean" truevalue="--compressed" falsevalue="" help="Build a compressed index." />
+        <param name="compute_minimiser" label="Compute Minimiser" type="boolean" truevalue="--compute-minimiser" falsevalue="" help="Computes minimisers using cutoffs from Mantis (Pandey et al.). Does not create the index." />
+        <param name="disable_cutoffs" label="Disable cutoffs" type="boolean" truevalue="--disable-cutoffs" falsevalue="" help="Do not apply cutoffs when using --compute-minimiser." />
+    </inputs>
+    <outputs>
+        <data name="index" format="binary" from_work_dir="output.index" />
+    </outputs>
+    <tests>
+        <test>
+            <param name="inputs" value="genome0.fasta,genome1.fasta" />
+            <param name="kmer" value="2" />
+            <param name="size" value="1k" />
+            <output name="index" file="test_expected.index" />
+        </test>
+    </tests>
+
+    <help><![CDATA[Raptor - A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences.
+===========================================================================================================
+
+POSITIONAL ARGUMENTS
+    ARGUMENT-1 (std::filesystem::path)
+          File containing file names. The file must contain at least one file
+          path per line, with multiple paths being separated by a whitespace.
+          Each line in the file corresponds to one bin. Valid extensions for
+          the paths in the file are [minimiser] when preprocessing, and
+          [embl,fasta,fa,fna,ffn,faa,frn,fas,fastq,fq,genbank,gb,gbk,sam],
+          possibly followed by [bz2,gz,bgzf] otherwise. The input file must
+          exist and read permissions must be granted.
+
+OPTIONS
+
+  Basic options:
+    --threads (unsigned 8 bit integer)
+          The numer of threads to use. Default: 1. Value must be a positive
+          integer.
+    --parts (unsigned 8 bit integer)
+          Splits the index in this many parts. Default: 1. Value must be a
+          power of two.
+    --window (unsigned 32 bit integer)
+          The window size. Default: 20. Value must be a positive integer.
+    --kmer (unsigned 8 bit integer)
+          The k-mer size. Default: 20. Value must be in range [1,32].
+    --output (std::filesystem::path)
+          Provide an output filepath or an output directory if
+          --compute-minimiser is used.
+    --size (std::string)
+          The size in bytes of the resulting index. Default: 1k. Must be an
+          integer followed by [k,m,g,t] (case insensitive).
+    --hash (unsigned 64 bit integer)
+          The number of hash functions to use. Default: 2. Value must be in
+          range [1,5].
+    --compressed
+          Build a compressed index.
+    --compute-minimiser
+          Computes minimisers using cutoffs from Mantis (Pandey et al.). Does
+          not create the index.
+    --disable-cutoffs
+          Do not apply cutoffs when using --compute-minimiser.
+
+EXAMPLES
+    raptor build --kmer 19 --window 23 --size 8m --output raptor.index
+    all_bin_paths.txt
+
+    raptor build --kmer 19 --window 23 --compute-minimiser --output
+    precomputed_minimisers all_bin_paths.txt
+
+    raptor build --size 8m --output minimiser_raptor.index
+    all_minimiser_paths.txt
+
+VERSION
+    Last update: 2021-08-26
+    Raptor version: 2.0.0 (raptor-v2.0.0)
+    SeqAn version: 3.1.0-rc.2
+
+URL
+    https://github.com/seqan/raptor
+
+LEGAL
+    Raptor Copyright: BSD 3-Clause License
+    Author: Enrico Seiler
+    Contact: enrico.seiler@fu-berlin.de
+    SeqAn Copyright: 2006-2021 Knut Reinert, FU-Berlin; released under the
+    3-clause BSDL.
+    In your academic works please cite: Raptor: A fast and space-efficient
+    pre-filter for querying very large collections of nucleotide sequences;
+    Enrico Seiler, Svenja Mehringer, Mitra Darvish, Etienne Turc, and Knut
+    Reinert; iScience 2021 24 (7): 102782. doi:
+    https://doi.org/10.1016/j.isci.2021.102782
+    For full copyright and/or warranty information see --copyright.
+    ]]></help>
+    <citations>
+        <citation type="bibtex">
+@Article{Seiler2021,
+author={Seiler, Enrico
+and Mehringer, Svenja
+and Darvish, Mitra
+and Turc, Etienne
+and Reinert, Knut},
+title={Raptor: A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences},
+journal={iScience},
+year={2021},
+month={Jul},
+day={23},
+publisher={Elsevier},
+volume={24},
+number={7},
+issn={2589-0042},
+doi={10.1016/j.isci.2021.102782},
+url={https://doi.org/10.1016/j.isci.2021.102782}
+}
+</citation>
+    </citations>
+</tool>
