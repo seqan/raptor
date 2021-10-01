@@ -3,7 +3,7 @@ include (ExternalProject)
 # Example call:
 #
 # ```cmake
-# declare_datasource(
+# declare_datasource (
 #   FILE pdb100d.ent.gz # build/data/pdb100d.ent.gz
 #   URL ftp://ftp.wwpdb.org/pub/pdb/data/structures/divided/pdb/00/pdb100d.ent.gz # 16KiloByte
 #   URL_HASH SHA256=c2b8f884568b07f58519966e256e2f3aa440508e8013bd10e0ee338e138e62a0)
@@ -11,7 +11,7 @@ include (ExternalProject)
 #
 # Options:
 #
-# declare_datasource(FILE <datasource name> URL <url1> [<url2>...] [URL_HASH <algo>=<hashValue>] [<option>...])
+# declare_datasource (FILE <datasource name> URL <url1> [<url2>...] [URL_HASH <algo>=<hashValue>] [<option>...])
 #
 # FILE <datasource name> (required):
 #    The name of the downloaded file (must be unique across all declared datasources).
@@ -34,19 +34,19 @@ include (ExternalProject)
 # This uses under the hood ExternalProject's and you can pass any viable option of ExternalProject to this function and
 # overwrite the default behaviour. See https://cmake.org/cmake/help/latest/module/ExternalProject.html for more
 # information.
-function(declare_datasource)
-    set(options "")
-    set(one_value_args FILE URL_HASH)
-    set(multi_value_args URL)
+function (declare_datasource)
+    set (options "")
+    set (one_value_args FILE URL_HASH)
+    set (multi_value_args URL)
 
-    cmake_parse_arguments(ARG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+    cmake_parse_arguments (ARG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-    string(TOLOWER "datasource--${ARG_FILE}" datasource_name)
+    string (TOLOWER "datasource--${ARG_FILE}" datasource_name)
 
     # create data folder
-    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data)
+    file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data)
 
-    ExternalProject_Add(
+    ExternalProject_Add (
         "${datasource_name}"
         URL "${ARG_URL}"
         URL_HASH "${ARG_URL_HASH}"
@@ -60,64 +60,33 @@ function(declare_datasource)
         DOWNLOAD_NO_EXTRACT TRUE # don't extract archive files like .tar.gz.
         ${ARG_UNPARSED_ARGUMENTS}
     )
-endfunction()
-
-function(configure_datasource)
-    set(options "")
-    set(one_value_args FILE URL_HASH)
-    set(multi_value_args URL)
-
-    cmake_parse_arguments(ARG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
-
-    string(TOLOWER "datasource--${ARG_FILE}" datasource_name)
-
-    # create data folder
-    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data)
-
-    ExternalProject_Add(
-        "${datasource_name}"
-        URL "${ARG_URL}"
-        URL_HASH "${ARG_URL_HASH}"
-        DOWNLOAD_NAME "${ARG_FILE}"
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ""
-        INSTALL_COMMAND ""
-        TEST_COMMAND ""
-        PREFIX "${CMAKE_CURRENT_BINARY_DIR}/_datasources"
-        DOWNLOAD_NO_EXTRACT TRUE # don't extract archive files like .tar.gz.
-        ${ARG_UNPARSED_ARGUMENTS}
-    )
-
-    ExternalProject_Get_property("${datasource_name}" DOWNLOADED_FILE)
-    set (TESTDATADIR "${CMAKE_CURRENT_BINARY_DIR}/data")
-    configure_file (${DOWNLOADED_FILE} ${CMAKE_CURRENT_BINARY_DIR}/data/${ARG_FILE} @ONLY)
-endfunction()
+endfunction ()
 
 # Example call:
 #
 # ```cmake
 # # my_app uses and needs the files RF00001.fa.gz, pdb100d.ent.gz, and GRCh38_latest_clinvar.vcf.gz.
-# target_use_datasources(my_app FILES RF00001.fa.gz pdb100d.ent.gz GRCh38_latest_clinvar.vcf.gz)
+# target_use_datasources (my_app FILES RF00001.fa.gz pdb100d.ent.gz GRCh38_latest_clinvar.vcf.gz)
 # ```
 #
 # Options:
 #
-# target_use_datasources(<target> FILES <file1> [<file2>...])
+# target_use_datasources (<target> FILES <file1> [<file2>...])
 #
 # It declares that a <target> uses and depends on the following files.
 #
 # This also sets the build requirement that the files must be downloaded before the <target> will be build.
 #
-# The named <target> must have been created by a command such as add_executable() or add_library().
-function(target_use_datasources target)
-    set(options "")
-    set(one_value_args)
-    set(multi_value_args "FILES")
+# The named <target> must have been created by a command such as add_executable () or add_library ().
+function (target_use_datasources target)
+    set (options "")
+    set (one_value_args)
+    set (multi_value_args "FILES")
 
-    cmake_parse_arguments(ARG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+    cmake_parse_arguments (ARG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
-    foreach(filename ${ARG_FILES})
-        string(TOLOWER "datasource--${filename}" datasource_name)
+    foreach (filename ${ARG_FILES})
+        string (TOLOWER "datasource--${filename}" datasource_name)
         add_dependencies ("${target}" "${datasource_name}")
-    endforeach()
-endfunction()
+    endforeach ()
+endfunction ()
