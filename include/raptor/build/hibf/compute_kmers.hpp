@@ -15,8 +15,6 @@
 namespace raptor::hibf
 {
 
-robin_hood::unordered_flat_set<size_t> compute_kmers(build_arguments const & arguments, chopper_pack_record const & record);
-
 void compute_kmers(robin_hood::unordered_flat_set<size_t> & kmers,
                    build_arguments const & arguments,
                    chopper_pack_record const & record);

@@ -135,6 +135,14 @@ struct raptor_base : public cli_test
         return cli_test::data(name);
     }
 
+    static inline std::filesystem::path const pack_path(size_t const number_of_repetitions) noexcept
+    {
+        std::string name{};
+        name += std::to_string(std::max<int>(1, number_of_repetitions * 4));
+        name += "bins.pack";
+        return cli_test::data(name);
+    }
+
     static inline std::filesystem::path const search_result_path(size_t const number_of_repetitions,
                                                                  size_t const window_size,
                                                                  size_t const number_of_errors,
@@ -240,15 +248,7 @@ struct raptor_base : public cli_test
 
         static_assert(is_ibf || is_hibf);
 
-        constexpr auto data_layout = [is_ibf] () constexpr
-        {
-            if constexpr (is_ibf)
-                return data_t::data_layout_mode;
-            else
-                return data_t::ibf_t::data_layout_mode;
-        }();
-
-        raptor::raptor_index<data_t> expected_index, actual_index{};
+        raptor::raptor_index<data_t> expected_index{}, actual_index{};
 
         {
             std::ifstream is{expected_result, std::ios::binary};
@@ -269,32 +269,56 @@ struct raptor_base : public cli_test
         if constexpr(is_ibf)
         {
             auto const & expected_ibf{expected_index.ibf()}, actual_ibf{actual_index.ibf()};
-            EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs<data_layout>(expected_ibf, actual_ibf);
+            EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs<data_t::data_layout_mode>(expected_ibf, actual_ibf);
         }
         else
         {
-            auto const & expected_hibf{expected_index.ibf()}, actual_hibf{actual_index.ibf()};
-            for (auto const && [expected_ibf, actual_ibf] : seqan3::views::zip(expected_hibf, actual_hibf))
+            auto const & expected_ibfs{expected_index.ibf().ibf_vector}, actual_ibfs{actual_index.ibf().ibf_vector};
+            for (auto const && [expected_ibf, actual_ibf] : seqan3::views::zip(expected_ibfs, actual_ibfs))
             {
-                EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs<data_layout>(expected_ibf, actual_ibf);
+                EXPECT_TRUE(std::ranges::find(actual_ibfs, expected_ibf) != actual_ibfs.end());
             }
         }
 
         auto const & all_expected_bins{expected_index.bin_path()}, all_actual_bins{actual_index.bin_path()};
         EXPECT_EQ(std::ranges::distance(all_expected_bins), std::ranges::distance(all_actual_bins));
 
-        for (auto const && [expected_list, actual_list] : seqan3::views::zip(all_expected_bins, all_actual_bins))
+        if constexpr(is_ibf)
         {
-            EXPECT_TRUE(std::ranges::distance(expected_list) > 0);
-            for (auto const && [expected_file, actual_file] : seqan3::views::zip(expected_list, actual_list))
+            for (auto const && [expected_list, actual_list] : seqan3::views::zip(all_expected_bins, all_actual_bins))
             {
-                std::filesystem::path const expected_path(expected_file);
-                std::filesystem::path const actual_path(actual_file);
-                if (compare_extension)
-                    EXPECT_EQ(expected_path.filename(), actual_path.filename());
-                else
-                    EXPECT_EQ(expected_path.stem(), actual_path.stem());
+                EXPECT_TRUE(std::ranges::distance(expected_list) > 0);
+                    for (auto const && [expected_file, actual_file] : seqan3::views::zip(expected_list, actual_list))
+                    {
+                        std::filesystem::path const expected_path(expected_file);
+                        std::filesystem::path const actual_path(actual_file);
+                        if (compare_extension)
+                            EXPECT_EQ(expected_path.filename(), actual_path.filename());
+                        else
+                            EXPECT_EQ(expected_path.stem(), actual_path.stem());
+                    }
             }
+        }
+        else
+        {
+            auto filenames = std::views::transform([] (std::vector<std::string> const & filename_list)
+            {
+                std::vector<std::string> result{};
+                for (auto const & filename : filename_list)
+                    result.emplace_back(std::filesystem::path{filename}.filename().string());
+                return result;
+            });
+
+            auto expected_filenames_view = all_expected_bins | filenames;
+            auto actual_filenames_view = all_actual_bins | filenames;
+
+            std::vector<std::vector<std::string>> expected_filenames(expected_filenames_view.begin(),
+                                                                     expected_filenames_view.end());
+            std::vector<std::vector<std::string>> actual_filenames(actual_filenames_view.begin(),
+                                                                   actual_filenames_view.end());
+            std::ranges::sort(expected_filenames);
+            std::ranges::sort(actual_filenames);
+            EXPECT_RANGE_EQ(expected_filenames, actual_filenames);
         }
     }
 };

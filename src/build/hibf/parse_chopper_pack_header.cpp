@@ -5,12 +5,15 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
+#include <lemon/list_graph.h> /// Must be first include.
+
 #include <seqan3/std/algorithm>
 #include <cassert>
 #include <seqan3/std/charconv>
 
 #include <raptor/build/hibf/bin_prefixes.hpp>
 #include <raptor/build/hibf/parse_chopper_pack_header.hpp>
+#include <raptor/string_view.hpp>
 
 namespace raptor::hibf
 {
@@ -19,37 +22,44 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
                                  lemon::ListDigraph::NodeMap<node_data> & node_map,
                                  std::istream & chopper_pack_file)
 {
-    auto parse_bin_indices = [] (std::string const & str)
+    auto parse_bin_indices = [] (std::string_view const & buffer)
     {
         std::vector<size_t> result;
 
-        char const * buffer = str.c_str();
-        auto start = &buffer[0];
-        auto buffer_end = start + str.size();
+        auto buffer_start = &buffer[0];
+        auto const buffer_end = buffer_start + buffer.size();
 
         size_t tmp{};
-        while (start < buffer_end)
+
+        while (buffer_start < buffer_end)
         {
-            auto res = std::from_chars(start, buffer_end, tmp); // {false, pointer} 123
-            start = res.ptr;
-            ++start; // skip ;
+            buffer_start = std::from_chars(buffer_start, buffer_end, tmp).ptr;
+            ++buffer_start; // skip ;
             result.push_back(tmp);
         }
 
         return result;
-    };
+    }; // LCOV_EXCL_LINE
+
+    auto parse_first_bin = [] (std::string_view const & buffer)
+    {
+        size_t tmp{};
+        std::from_chars(&buffer[0], &buffer[0] + buffer.size(), tmp);
+        return tmp;
+    }; // LCOV_EXCL_LINE
 
     std::string line;
+
     std::getline(chopper_pack_file, line); // read first line
     assert(line[0] == '#'); // we are reading header lines
     assert(line.substr(1, hibf_prefix.size()) == hibf_prefix); // first line should always be High level IBF
 
     // parse High Level max bin index
     assert(line.substr(hibf_prefix.size() + 2, 11) == "max_bin_id:");
-    std::string hibf_max_bin_str(line.begin() + 27, line.end());
+    std::string_view const hibf_max_bin_str{raptor::detail::string_view(line.begin() + 27, line.end())};
 
     auto high_level_node = ibf_graph.addNode(); // high-level node = root node
-    node_map.set(high_level_node, {0, parse_bin_indices(hibf_max_bin_str).front(), 0, lemon::INVALID, {}});
+    node_map.set(high_level_node, {0, parse_first_bin(hibf_max_bin_str), 0, lemon::INVALID, {}});
 
     std::vector<std::pair<std::vector<size_t>, size_t>> header_records{};
 
@@ -59,17 +69,17 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
         assert(line.substr(1, merged_bin_prefix.size()) == merged_bin_prefix);
 
         // parse header line
-        std::string const indices_str(line.begin() + 1 /*#*/ + merged_bin_prefix.size() + 1 /*_*/,
-                                      std::find(line.begin() + merged_bin_prefix.size() + 2, line.end(), ' '));
+        std::string_view const indices_str{
+            raptor::detail::string_view(line.begin() + 1 /*#*/ + merged_bin_prefix.size() + 1 /*_*/,
+                                        std::find(line.begin() + merged_bin_prefix.size() + 2,
+                                                  line.end(),
+                                                  ' '))};
 
         assert(line.substr(merged_bin_prefix.size() + indices_str.size() + 3, 11) == "max_bin_id:");
-        std::string const max_id_str = line.substr(merged_bin_prefix.size() + indices_str.size() + 14,
-                                                   line.size() - merged_bin_prefix.size() - indices_str.size() - 14);
+        std::string_view const max_id_str{
+            raptor::detail::string_view(line.begin() + merged_bin_prefix.size() + indices_str.size() + 14, line.end())};
 
-        std::vector<size_t> const bin_indices = parse_bin_indices(indices_str);
-        size_t const max_id = parse_bin_indices(max_id_str).front();
-
-        header_records.emplace_back(std::move(bin_indices), max_id);
+        header_records.emplace_back(parse_bin_indices(indices_str), parse_first_bin(max_id_str));
     }
 
     // sort records ascending by the number of bin indices (corresponds to the IBF levels)

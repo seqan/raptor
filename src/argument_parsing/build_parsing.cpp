@@ -180,54 +180,56 @@ void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
     // ==========================================
     // Process --size.
     // ==========================================
-    arguments.size.erase(std::remove(arguments.size.begin(), arguments.size.end(), ' '), arguments.size.end());
-
-    size_t multiplier{};
-
-    switch (std::tolower(arguments.size.back()))
+    if (!parser.is_option_set("hibf"))
     {
-// LCOV_EXCL_START
-        case 't':
-            multiplier = 8ull * 1024ull * 1024ull * 1024ull * 1024ull;
-            break;
-        case 'g':
-            multiplier = 8ull * 1024ull * 1024ull * 1024ull;
-            break;
-        case 'm':
-            multiplier = 8ull * 1024ull * 1024ull;
-            break;
-// LCOV_EXCL_STOP
-        case 'k':
-            multiplier = 8ull * 1024ull;
-            break;
-// LCOV_EXCL_START
-        default:
-            throw seqan3::argument_parser_error{"Use {k, m, g, t} to pass size. E.g., --size 8g."};
-// LCOV_EXCL_STOP
-    }
+        arguments.size.erase(std::remove(arguments.size.begin(), arguments.size.end(), ' '), arguments.size.end());
+        size_t multiplier{};
 
-    size_t size{};
-    std::from_chars(arguments.size.data(), arguments.size.data() + arguments.size.size() - 1, size);
-    size *= multiplier;
-    arguments.bits = size / (((arguments.bins + 63) >> 6) << 6);
+        switch (std::tolower(arguments.size.back()))
+        {
+    // LCOV_EXCL_START
+            case 't':
+                multiplier = 8ull * 1024ull * 1024ull * 1024ull * 1024ull;
+                break;
+            case 'g':
+                multiplier = 8ull * 1024ull * 1024ull * 1024ull;
+                break;
+            case 'm':
+                multiplier = 8ull * 1024ull * 1024ull;
+                break;
+    // LCOV_EXCL_STOP
+            case 'k':
+                multiplier = 8ull * 1024ull;
+                break;
+    // LCOV_EXCL_START
+            default:
+                throw seqan3::argument_parser_error{"Use {k, m, g, t} to pass size. E.g., --size 8g."};
+    // LCOV_EXCL_STOP
+        }
 
-    // ==========================================
-    // Read w and k from minimiser header file
-    // ==========================================
-    if (std::filesystem::path header_file_path = arguments.bin_path[0][0]; header_file_path.extension() == ".minimiser")
-    {
-        header_file_path.replace_extension("header");
-        std::ifstream file_stream{header_file_path};
-        std::string shape_string{};
-        file_stream >> shape_string >> arguments.window_size;
+        size_t size{};
+        std::from_chars(arguments.size.data(), arguments.size.data() + arguments.size.size() - 1, size);
+        size *= multiplier;
+        arguments.bits = size / (((arguments.bins + 63) >> 6) << 6);
 
-        uint64_t tmp{};
-        std::from_chars(shape_string.data(),
-                        shape_string.data() + shape_string.size(),
-                        tmp,
-                        2);
+        // ==========================================
+        // Read w and k from minimiser header file
+        // ==========================================
+        if (std::filesystem::path header_file_path = arguments.bin_path[0][0]; header_file_path.extension() == ".minimiser")
+        {
+            header_file_path.replace_extension("header");
+            std::ifstream file_stream{header_file_path};
+            std::string shape_string{};
+            file_stream >> shape_string >> arguments.window_size;
 
-        arguments.shape = seqan3::shape{seqan3::bin_literal{tmp}};
+            uint64_t tmp{};
+            std::from_chars(shape_string.data(),
+                            shape_string.data() + shape_string.size(),
+                            tmp,
+                            2);
+
+            arguments.shape = seqan3::shape{seqan3::bin_literal{tmp}};
+        }
     }
 
     // ==========================================

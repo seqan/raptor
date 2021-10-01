@@ -62,6 +62,37 @@ function(declare_datasource)
     )
 endfunction()
 
+function(configure_datasource)
+    set(options "")
+    set(one_value_args FILE URL_HASH)
+    set(multi_value_args URL)
+
+    cmake_parse_arguments(ARG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+    string(TOLOWER "datasource--${ARG_FILE}" datasource_name)
+
+    # create data folder
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data)
+
+    ExternalProject_Add(
+        "${datasource_name}"
+        URL "${ARG_URL}"
+        URL_HASH "${ARG_URL_HASH}"
+        DOWNLOAD_NAME "${ARG_FILE}"
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        INSTALL_COMMAND ""
+        TEST_COMMAND ""
+        PREFIX "${CMAKE_CURRENT_BINARY_DIR}/_datasources"
+        DOWNLOAD_NO_EXTRACT TRUE # don't extract archive files like .tar.gz.
+        ${ARG_UNPARSED_ARGUMENTS}
+    )
+
+    ExternalProject_Get_property("${datasource_name}" DOWNLOADED_FILE)
+    set (TESTDATADIR "${CMAKE_CURRENT_BINARY_DIR}/data")
+    configure_file (${DOWNLOADED_FILE} ${CMAKE_CURRENT_BINARY_DIR}/data/${ARG_FILE} @ONLY)
+endfunction()
+
 # Example call:
 #
 # ```cmake

@@ -6,7 +6,7 @@ target_link_libraries ("raptor_interface" INTERFACE seqan3::seqan3)
 target_include_directories ("raptor_interface" INTERFACE ../include)
 target_include_directories ("raptor_interface" INTERFACE ../lib/lemon/include)
 target_include_directories ("raptor_interface" INTERFACE ../lib/robin-hood-hashing/src/include)
-target_compile_options ("raptor_interface" INTERFACE "-pedantic" "-Wall" "-Wextra" "-Werror")
+target_compile_options ("raptor_interface" INTERFACE "-pedantic" "-Wall" "-Wextra")
 
 # Raptor library
 add_library ("raptor_lib" INTERFACE)

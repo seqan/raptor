@@ -1,5 +1,5 @@
-#0	/home/infri/develop/raptor/build/GCC-11.1.0-RelWithDebInfo/test/data/bin1.fa
+#0	/home/infri/develop/raptor/test/data/bin1.fa
 #QUERY_NAME	USER_BINS
-query1	
-query2	
-query3	
+query1	0
+query2	0
+query3	0
