@@ -1,3 +1,3 @@
 #HIGH_LEVEL_IBF max_bin_id:0
 #FILES	BIN_INDICES	NUMBER_OF_BINS
-@TESTDATADIR@/bin1.fa	0	64
+@data_dir@/bin1.fa	0	64

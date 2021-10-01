@@ -28,8 +28,8 @@ seqan3_require_test ()
 # Build tests just before their execution, because they have not been built with "all" target.
 # The trick is here to provide a cmake file as a directory property that executes the build command.
 file (WRITE "${CMAKE_CURRENT_BINARY_DIR}/build_test_targets.cmake"
-            "execute_process(COMMAND ${CMAKE_COMMAND} --build . --target api_test)\n"
-            "execute_process(COMMAND ${CMAKE_COMMAND} --build . --target cli_test)")
+            # "execute_process (COMMAND ${CMAKE_COMMAND} --build . --target api_test)\n"
+            "execute_process (COMMAND ${CMAKE_COMMAND} --build . --target cli_test)")
 set_directory_properties (PROPERTIES TEST_INCLUDE_FILE "${CMAKE_CURRENT_BINARY_DIR}/build_test_targets.cmake")
 
 # Define the test targets. All depending targets are built just before the test execution.
@@ -64,7 +64,8 @@ macro (add_app_test test_filename test_alternative)
             target_link_libraries (${target} gbenchmark)
         endif ()
     elseif (${test_alternative} STREQUAL "API_TEST")
-        add_dependencies (api_test ${target})
+        message (SEND_ERROR "API tests are not enabled.")
+        # add_dependencies (api_test ${target})
     endif ()
 
     # Generate and set the test name.
@@ -93,7 +94,7 @@ endmacro ()
 
 # Fetch data and add the tests.
 include (data/datasources.cmake)
-add_subdirectory (api)
+# add_subdirectory (api)
 add_subdirectory (cli)
 add_subdirectory (coverage)
 add_subdirectory (header)

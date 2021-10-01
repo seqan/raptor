@@ -7,4 +7,4 @@
 
 cmake_minimum_required (VERSION 3.8)
 
-add_cli_test_and_data (raptor_options_test)
+add_cli_test (raptor_options_test.cpp)

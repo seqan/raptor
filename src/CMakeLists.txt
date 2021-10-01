@@ -10,10 +10,11 @@ target_compile_options ("raptor_interface" INTERFACE "-pedantic" "-Wall" "-Wextr
 
 # Raptor library
 add_library ("raptor_lib" INTERFACE)
-target_link_libraries ("raptor_lib" INTERFACE "raptor_argument_parsing")
-target_link_libraries ("raptor_lib" INTERFACE "raptor_build")
-target_link_libraries ("raptor_lib" INTERFACE "raptor_search")
-target_link_libraries ("raptor_lib" INTERFACE "raptor_upgrade")
+target_link_libraries ("raptor_lib" INTERFACE "raptor_argument_parsing"
+                                              "raptor_build"
+                                              "raptor_build_hibf"
+                                              "raptor_search"
+                                              "raptor_upgrade")
 
 # Raptor executable
 add_executable ("raptor" raptor.cpp)
