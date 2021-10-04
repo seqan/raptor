@@ -11,18 +11,6 @@
 #include <raptor/build/hibf/parse_chopper_pack_line.hpp>
 #include <raptor/string_view.hpp>
 
-// LCOV_EXCL_START
-#if defined(__GNUC__) && (__GNUC__ < 10)
-namespace std::ranges
-{
-
-using ::ranges::common_view;
-using ::ranges::split_view;
-
-} // namespace std::ranges
-#endif
-// LCOV_EXCL_END
-
 namespace raptor::hibf
 {
 
@@ -38,9 +26,9 @@ chopper_pack_record parse_chopper_pack_line(std::string const & current_line)
 
     // parse filenames
     std::string_view const filenames{raptor::detail::string_view(buffer.begin(), field_end)};
-    for (auto && filename : std::ranges::split_view{filenames, ';'})
+    for (auto const && filename : filenames | std::views::split(';'))
     {
-        auto const common_view = std::ranges::common_view{filename};
+        auto const common_view = filename | std::views::common;
         result.filenames.emplace_back(common_view.begin(), common_view.end());
     }
 

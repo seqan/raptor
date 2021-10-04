@@ -96,7 +96,9 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" -DRAPTOR_NATIVE_BUILD=OFF
+          cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                          -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
+                          -DRAPTOR_NATIVE_BUILD=OFF
 
       - name: Build tests
         env:
@@ -120,14 +122,19 @@ jobs:
       - name: Run tests
         run: |
           cd build
-          ctest . -j2 -E header_test --output-on-failure
+          ctest . -j2 --output-on-failure
 
       - name: Generate coverage report
         if: matrix.build == 'coverage'
         run: |
           lcov --directory ./build/ --capture --output-file ./build/coverage_report.captured
           lcov -a ./build/coverage_report.baseline -a ./build/coverage_report.captured --output-file ./build/coverage_report.total
-          lcov --remove ./build/coverage_report.total '/usr/*' '${{ github.workspace }}/raptor/lib/*' '${{ github.workspace }}/raptor/test/*' '${{ github.workspace }}/build/vendor/*' --output-file ./build/coverage_report
+          lcov --remove ./build/coverage_report.total \
+                        '/usr/*' \
+                        '${{ github.workspace }}/raptor/lib/*' \
+                        '${{ github.workspace }}/raptor/test/*' \
+                        '${{ github.workspace }}/build/vendor/*' \
+               --output-file ./build/coverage_report
 
       - name: Submit coverage report
         if: matrix.build == 'coverage'

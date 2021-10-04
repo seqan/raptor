@@ -115,7 +115,10 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" -DRAPTOR_NATIVE_BUILD=OFF
+          cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                          -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
+                          -DRAPTOR_NATIVE_BUILD=OFF \
+                          -DRAPTOR_HEADER_TEST_ONLY=${{ matrix.build == 'header' && 'ON' || 'OFF'}}
 
       - name: Build tests
         if: ${{!matrix.skip_build_tests}}
@@ -125,10 +128,11 @@ jobs:
           CCACHE_COMPRESS: true
           CCACHE_COMPRESSLEVEL: 6
           CCACHE_MAXSIZE: 500M
+          CMAKE_BUILD_PARALLEL_LEVEL: ${{ matrix.build_threads }}
         run: |
           ccache -p || true
           cd build
-          make -k -j${{ matrix.build_threads }} header_test
+          make -k test
           ccache -s || true
 
       - name: Run tests
