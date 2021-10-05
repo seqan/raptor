@@ -43,7 +43,7 @@ std::vector<double> destroyed_indirectly_by_error(size_t const pattern_size,
         for (size_t i = 0; i < pattern_size; ++i)
             sequence.push_back(seqan3::assign_rank_to(dis(gen), alphabet_t{}));
 
-        forward_strand_minimiser mini{window{window_size}, shape};
+        forward_strand_minimiser mini{window{static_cast<uint32_t>(window_size)}, shape};
         mini.compute(sequence);
         for (auto x : mini.minimiser_begin)
             mins[x] = true;

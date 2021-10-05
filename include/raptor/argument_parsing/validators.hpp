@@ -10,6 +10,8 @@
 #include <seqan3/argument_parser/argument_parser.hpp>
 #include <seqan3/io/sequence_file/input.hpp>
 
+#include <raptor/strong_types.hpp>
+
 namespace raptor
 {
 
@@ -42,6 +44,11 @@ public:
     ~positive_integer_validator() = default;
 
     explicit positive_integer_validator(bool const is_zero_positive_) : is_zero_positive{is_zero_positive_} {}
+
+    void operator()(window const & val) const
+    {
+        return operator()(val.v);
+    }
 
     void operator()(option_value_type const & val) const
     {
