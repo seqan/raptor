@@ -12,14 +12,17 @@
 
 #include <seqan3/search/kmer_index/shape.hpp>
 
+#include <raptor/strong_types.hpp>
+
 namespace raptor
 {
 
 struct build_arguments
 {
     // Related to k-mers
-    uint32_t window_size{0u};
     uint8_t kmer_size{20u};
+    uint32_t window_size{kmer_size};
+    window window_size_strong{kmer_size};
     std::string shape_string{};
     seqan3::shape shape{seqan3::ungapped{kmer_size}};
     bool compute_minimiser{false};

@@ -14,6 +14,18 @@
 namespace raptor
 {
 
+// Printing a custom default value for argument_parser.
+std::ostream & operator<<(std::ostream & s, window const &)
+{
+    return s << "\\fBk-mer size\\fP";
+}
+
+// Parsing input from argument_parser.
+std::istream & operator>>(std::istream & s, window & window_)
+{
+    return s >> window_.v;
+}
+
 void init_build_parser(seqan3::argument_parser & parser, build_arguments & arguments)
 {
     init_shared_meta(parser);
@@ -30,18 +42,18 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
                       "Splits the index in this many parts.",
                       arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
                       power_of_two_validator{});
-    parser.add_option(arguments.window_size,
-                      '\0',
-                      "window",
-                      "The window size. \\fI\\fBIf not set, defaults to the k-mer size.\\fP",
-                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
-                      positive_integer_validator{});
     parser.add_option(arguments.kmer_size,
                       '\0',
                       "kmer",
                       "The k-mer size.", // Mutually exclusive with --shape.
                       seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{1, 32});
+    parser.add_option(arguments.window_size_strong,
+                      '\0',
+                      "window",
+                      "The window size.",
+                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
+                      positive_integer_validator{});
     parser.add_option(arguments.shape_string,
                       '\0',
                       "shape",
@@ -135,6 +147,7 @@ void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
 
     if (parser.is_option_set("window"))
     {
+        arguments.window_size = arguments.window_size_strong.v;
         if (arguments.shape.size() > arguments.window_size)
             throw seqan3::argument_parser_error{"The k-mer size cannot be bigger than the window size."};
     }

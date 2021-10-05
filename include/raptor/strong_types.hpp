@@ -13,6 +13,9 @@ namespace raptor
 {
 
 //!\brief Strong type for passing the window size.
-struct window { uint64_t v; };
+struct window
+{
+    uint32_t v{};
+};
 
 } // namespace raptor
