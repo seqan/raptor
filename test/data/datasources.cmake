@@ -97,6 +97,9 @@ declare_internal_datasource (FILE 64bins23window.hibf
 declare_internal_datasource (FILE 128bins23window.hibf
                              URL ${CMAKE_SOURCE_DIR}/test/data/hibf/128bins23window.hibf
                              URL_HASH SHA256=bdb5f09f0357d577cf1db68145597f97b01d47bb7a1ef859a26cbccd93649939)
+declare_internal_datasource (FILE three_levels.hibf
+                             URL ${CMAKE_SOURCE_DIR}/test/data/hibf/three_levels.hibf
+                             URL_HASH SHA256=fc594111fd5b6b08e62112109ee4abd2a0f9f78fae00f0a7d38e1ee4e2ebe6cd)
 
 declare_internal_datasource (FILE 1bins19window0error.out
                              URL ${CMAKE_SOURCE_DIR}/test/data/1bins19window0error.out
@@ -187,3 +190,8 @@ declare_internal_datasource (FILE 128bins.pack
                              URL ${CMAKE_SOURCE_DIR}/test/data/hibf/128bins.pack
                              URL_HASH SHA256=847d6d9698525e756b18132ee5a4dd5e9f9b53047674d30cade166499fdaabd3
                              CONFIGURE true)
+declare_internal_datasource (FILE three_levels.pack
+                             URL ${CMAKE_SOURCE_DIR}/test/data/hibf/three_levels.pack
+                             URL_HASH SHA256=f02c43b83faf54bd1b14518bab35a9d0865d2b06baad6661f2303b23283c7b7b
+                             CONFIGURE true)
+

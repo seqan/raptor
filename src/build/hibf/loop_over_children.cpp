@@ -58,7 +58,7 @@ void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
     auto indices_view = std::views::iota(0u, children.size()) | std::views::common;
     std::vector<size_t> indices{indices_view.begin(), indices_view.end()};
 
-    if(is_root)
+    if (is_root)
     {
         // Shuffle indices: More likely to not block each other. Optimal: Interleave
         std::shuffle(indices.begin(), indices.end(), std::mt19937_64{std::random_device{}()});

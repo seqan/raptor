@@ -87,7 +87,7 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
 
     for (auto const & [bin_indices, max_id] : header_records)
     {
-        // we assume that the header lines are in the correct oder (TODO order them)
+        // we assume that the header lines are in the correct order
         // go down the tree until you find the matching parent
         auto it = bin_indices.begin();
         lemon::ListDigraph::Node current_node = high_level_node; // start at root

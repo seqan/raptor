@@ -60,3 +60,20 @@ INSTANTIATE_TEST_SUITE_P(
                            (std::get<2>(info.param) ? "parallel" : "serial");
         return name;
     });
+
+TEST_F(hierarchical, three_levels)
+{
+    cli_test_result const result = execute_app("raptor", "build",
+                                                         "--hibf",
+                                                         "--kmer 19",
+                                                         "--window 19",
+                                                         "--fpr 0.05",
+                                                         "--threads 1",
+                                                         "--output raptor.index",
+                                                         data("three_levels.pack"));
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{});
+    ASSERT_EQ(result.exit_code, 0);
+
+    compare_results<raptor::index_structure::hibf>(data("three_levels.hibf"), "raptor.index");
+}
