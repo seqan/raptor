@@ -1,6 +1,6 @@
 # Raptor [![build status][1]][2] [![codecov][3]][4] [![install with bioconda][5]][6] [![install with brew][7]][8]
 
-[1]: https://github.com/seqan/raptor/actions/workflows/ci_linux.yml/badge.svg?branch=master
+[1]: https://img.shields.io/github/workflow/status/seqan/raptor/CI%20on%20Linux/master?style=flat&logo=github&label=Raptor%20CI
 [2]: https://github.com/seqan/raptor/actions?query=branch%3Amaster
 [3]: https://codecov.io/gh/seqan/raptor/branch/master/graph/badge.svg?token=SJVMYRUKW2
 [4]: https://codecov.io/gh/seqan/raptor
