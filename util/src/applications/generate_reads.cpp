@@ -43,7 +43,7 @@ void run_program(cmd_arguments const & arguments)
 
     std::vector<seqan3::phred42> const quality(arguments.read_length, seqan3::assign_rank_to(40u, seqan3::phred42{}));
 
-    for (auto const bin_file : arguments.bin_path)
+    for (auto const & bin_file : arguments.bin_path)
     {
         // std::cerr << "Processing bin " << ++bin_counter << " of " << number_of_bins << '\n';
 
