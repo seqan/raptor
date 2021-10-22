@@ -130,3 +130,21 @@ INSTANTIATE_TEST_SUITE_P(
                            std::to_string(std::get<2>(info.param)) + "_error";
         return name;
     });
+
+TEST_F(search_hibf, three_levels)
+{
+    cli_test_result const result = execute_app("raptor", "search",
+                                                         "--output search.out",
+                                                         "--error 0",
+                                                         "--hibf",
+                                                         "--index ", data("three_levels.hibf"),
+                                                         "--query ", data("query.fq"));
+    EXPECT_EQ(result.exit_code, 0);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{});
+
+    std::string const expected = string_from_file(data("three_levels.out"), std::ios::binary);
+    std::string const actual = string_from_file("search.out");
+
+    EXPECT_EQ(expected, actual);
+}

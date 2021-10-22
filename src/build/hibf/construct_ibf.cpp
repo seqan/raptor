@@ -24,7 +24,9 @@ seqan3::interleaved_bloom_filter<> construct_ibf(robin_hood::unordered_flat_set<
 {
     auto & node_data = data.node_map[node];
 
-    seqan3::bin_size const bin_size{bin_size_in_bits(arguments, kmers.size() / number_of_bins)};
+    size_t const kmers_per_bin{static_cast<size_t>(std::ceil(static_cast<double>(kmers.size()) / number_of_bins))};
+    double const bin_bits{static_cast<double>(bin_size_in_bits(arguments, kmers_per_bin))};
+    seqan3::bin_size const bin_size{static_cast<size_t>(std::ceil(bin_bits * data.fp_correction[number_of_bins]))};
     seqan3::bin_count const bin_count{node_data.number_of_technical_bins};
     seqan3::interleaved_bloom_filter<> ibf{bin_count, bin_size, seqan3::hash_function_count{arguments.hash}};
 
