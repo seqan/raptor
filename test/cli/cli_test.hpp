@@ -274,7 +274,7 @@ struct raptor_base : public cli_test
         else
         {
             auto const & expected_ibfs{expected_index.ibf().ibf_vector}, actual_ibfs{actual_index.ibf().ibf_vector};
-            for (auto const && [expected_ibf, actual_ibf] : seqan3::views::zip(expected_ibfs, actual_ibfs))
+            for (auto const & expected_ibf : expected_ibfs)
             {
                 EXPECT_TRUE(std::ranges::find(actual_ibfs, expected_ibf) != actual_ibfs.end());
             }

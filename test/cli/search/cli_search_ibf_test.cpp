@@ -7,9 +7,9 @@
 
 #include "../cli_test.hpp"
 
-struct search : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, size_t>> {};
+struct search_ibf : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, size_t>> {};
 
-TEST_P(search, with_error)
+TEST_P(search_ibf, with_error)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
@@ -34,7 +34,7 @@ TEST_P(search, with_error)
     EXPECT_EQ(expected, actual);
 }
 
-TEST_P(search, search_socks)
+TEST_P(search_ibf, socks)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
@@ -59,7 +59,7 @@ TEST_P(search, search_socks)
     EXPECT_EQ(expected, actual);
 }
 
-TEST_P(search, with_threshold)
+TEST_P(search_ibf, threshold)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
@@ -105,7 +105,7 @@ TEST_P(search, with_threshold)
     EXPECT_EQ(expected, actual);
 }
 
-TEST_P(search, no_hits)
+TEST_P(search_ibf, no_hits)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
@@ -133,10 +133,10 @@ TEST_P(search, no_hits)
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    search_suite,
-    search,
+    search_ibf_suite,
+    search_ibf,
     testing::Combine(testing::Values(0, 16, 32), testing::Values(19, 23), testing::Values(0, 1)),
-    [] (testing::TestParamInfo<search::ParamType> const & info)
+    [] (testing::TestParamInfo<search_ibf::ParamType> const & info)
     {
         std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
                         std::to_string(std::get<1>(info.param)) + "_window_" +

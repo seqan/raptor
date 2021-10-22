@@ -7,10 +7,10 @@
 
 #include "../cli_test.hpp"
 
-struct hierarchical : public raptor_base,
-                      public testing::WithParamInterface<std::tuple<size_t, size_t, size_t>> {};
+struct search_hibf : public raptor_base,
+                     public testing::WithParamInterface<std::tuple<size_t, size_t, size_t>> {};
 
-TEST_P(hierarchical, with_error)
+TEST_P(search_hibf, with_error)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
@@ -42,7 +42,7 @@ TEST_P(hierarchical, with_error)
     EXPECT_EQ(expected, actual);
 }
 
-TEST_P(hierarchical, with_threshold)
+TEST_P(search_hibf, with_threshold)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
@@ -87,7 +87,7 @@ TEST_P(hierarchical, with_threshold)
     EXPECT_EQ(expected, actual);
 }
 
-TEST_P(hierarchical, no_hits)
+TEST_P(search_hibf, no_hits)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
@@ -120,13 +120,13 @@ TEST_P(hierarchical, no_hits)
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    hierarchical_suite,
-    hierarchical,
+    search_hibf_suite,
+    search_hibf,
     testing::Combine(testing::Values(0, 16, 32), testing::Values(19), testing::Values(0, 1)),
-    [] (testing::TestParamInfo<hierarchical::ParamType> const & info)
+    [] (testing::TestParamInfo<search_hibf::ParamType> const & info)
     {
         std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
-                        std::to_string(std::get<1>(info.param)) + "_window_" +
-                        std::to_string(std::get<2>(info.param)) + "_error";
+                           std::to_string(std::get<1>(info.param)) + "_window_" +
+                           std::to_string(std::get<2>(info.param)) + "_error";
         return name;
     });
