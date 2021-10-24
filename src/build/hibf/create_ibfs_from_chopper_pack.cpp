@@ -23,6 +23,9 @@ void create_ibfs_from_chopper_pack(build_data & data, build_arguments const & ar
     lemon::ListDigraph::Node root = data.ibf_graph.nodeFromId(0); // root node = high level IBF node
     robin_hood::unordered_flat_set<size_t> root_kmers{};
 
+    size_t const t_max{data.node_map[root].number_of_technical_bins};
+    data.compute_fp_correction(t_max, arguments.hash, arguments.fpr);
+
     hierarchical_build(root_kmers, root, data, arguments, true);
 }
 

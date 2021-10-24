@@ -7,10 +7,10 @@
 
 #include "../cli_test.hpp"
 
-struct preprocessing : public raptor_base,
-                       public testing::WithParamInterface<std::tuple<size_t, size_t, bool, size_t>> {};
+struct search_ibf_preprocessing : public raptor_base,
+                              public testing::WithParamInterface<std::tuple<size_t, size_t, bool, size_t>> {};
 
-TEST_P(preprocessing, pipeline)
+TEST_P(search_ibf_preprocessing, pipeline)
 {
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp, number_of_errors] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
@@ -98,7 +98,7 @@ TEST_P(preprocessing, pipeline)
     EXPECT_EQ(expected, actual);
 }
 
-TEST_P(preprocessing, pipeline_compressed_bins)
+TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
 {
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp, number_of_errors] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
@@ -185,7 +185,7 @@ TEST_P(preprocessing, pipeline_compressed_bins)
     EXPECT_EQ(expected, actual);
 }
 
-TEST_F(preprocessing, pipeline_compressed_index)
+TEST_F(search_ibf_preprocessing, pipeline_compressed_index)
 {
     {
         std::string const expanded_bins = repeat_bins(16);
@@ -229,13 +229,13 @@ TEST_F(preprocessing, pipeline_compressed_index)
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    preprocessing_suite,
-    preprocessing,
+    search_ibf_preprocessing_suite,
+    search_ibf_preprocessing,
     testing::Combine(testing::Values(0, 16, 32),
                      testing::Values(19, 23),
                      testing::Values(true, false),
                      testing::Values(0, 1)),
-    [] (testing::TestParamInfo<preprocessing::ParamType> const & info)
+    [] (testing::TestParamInfo<search_ibf_preprocessing::ParamType> const & info)
     {
         std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
                         std::to_string(std::get<1>(info.param)) + "_window_" +

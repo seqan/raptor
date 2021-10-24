@@ -7,10 +7,10 @@
 
 #include "../cli_test.hpp"
 
-struct parts : public raptor_base,
-               public testing::WithParamInterface<std::tuple<size_t, size_t, size_t, size_t, bool>> {};
+struct build_ibf_partitioned : public raptor_base,
+                               public testing::WithParamInterface<std::tuple<size_t, size_t, size_t, size_t, bool>> {};
 
-TEST_P(parts, pipeline)
+TEST_P(build_ibf_partitioned, pipeline)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors, parts, compressed] = GetParam();
 
@@ -81,7 +81,7 @@ TEST_P(parts, pipeline)
     EXPECT_EQ(expected, actual);
 }
 
-TEST_F(parts, pipeline_misc)
+TEST_F(build_ibf_partitioned, pipeline_misc)
 {
     std::stringstream header{};
     {
@@ -179,14 +179,14 @@ TEST_F(parts, pipeline_misc)
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    parts_suite,
-    parts,
+    build_ibf_partitioned_suite,
+    build_ibf_partitioned,
     testing::Combine(testing::Values(32),
                      testing::Values(19, 23),
                      testing::Values(0, 1),
                      testing::Values(2, 4, 8),
                      testing::Values(true, false)),
-    [] (testing::TestParamInfo<parts::ParamType> const & info)
+    [] (testing::TestParamInfo<build_ibf_partitioned::ParamType> const & info)
     {
         std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
                         std::to_string(std::get<1>(info.param)) + "_window_" +

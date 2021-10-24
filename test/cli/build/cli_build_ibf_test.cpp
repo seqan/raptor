@@ -7,9 +7,9 @@
 
 #include "../cli_test.hpp"
 
-struct build : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, bool>> {};
+struct build_ibf : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, bool>> {};
 
-TEST_P(build, with_file)
+TEST_P(build_ibf, with_file)
 {
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
@@ -42,7 +42,7 @@ TEST_P(build, with_file)
     compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
 }
 
-TEST_P(build, with_shape)
+TEST_P(build_ibf, with_shape)
 {
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
@@ -75,7 +75,7 @@ TEST_P(build, with_shape)
     compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
 }
 
-TEST_P(build, with_socks_file)
+TEST_P(build_ibf, with_socks_file)
 {
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
@@ -114,10 +114,10 @@ TEST_P(build, with_socks_file)
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    build_suite,
-    build,
+    build_ibf_suite,
+    build_ibf,
     testing::Combine(testing::Values(0, 16, 32), testing::Values(19, 23), testing::Values(true, false)),
-    [] (testing::TestParamInfo<build::ParamType> const & info)
+    [] (testing::TestParamInfo<build_ibf::ParamType> const & info)
     {
         std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
                            std::to_string(std::get<1>(info.param)) + "_window_" +

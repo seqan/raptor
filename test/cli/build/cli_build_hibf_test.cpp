@@ -7,9 +7,9 @@
 
 #include "../cli_test.hpp"
 
-struct hierarchical : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, bool>> {};
+struct build_hibf : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, bool>> {};
 
-TEST_P(hierarchical, with_file)
+TEST_P(build_hibf, with_file)
 {
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
@@ -29,7 +29,7 @@ TEST_P(hierarchical, with_file)
     compare_results<raptor::index_structure::hibf>(ibf_path(number_of_repeated_bins, window_size, false, true), "raptor.index");
 }
 
-TEST_P(hierarchical, with_shape)
+TEST_P(build_hibf, with_shape)
 {
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
@@ -50,10 +50,10 @@ TEST_P(hierarchical, with_shape)
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    hierarchical_suite,
-    hierarchical,
+    build_hibf_suite,
+    build_hibf,
     testing::Combine(testing::Values(0, 16, 32), testing::Values(19, 23), testing::Values(true, false)),
-    [] (testing::TestParamInfo<hierarchical::ParamType> const & info)
+    [] (testing::TestParamInfo<build_hibf::ParamType> const & info)
     {
         std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
                            std::to_string(std::get<1>(info.param)) + "_window_" +
@@ -61,7 +61,7 @@ INSTANTIATE_TEST_SUITE_P(
         return name;
     });
 
-TEST_F(hierarchical, three_levels)
+TEST_F(build_hibf, three_levels)
 {
     cli_test_result const result = execute_app("raptor", "build",
                                                          "--hibf",

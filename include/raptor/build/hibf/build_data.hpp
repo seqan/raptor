@@ -24,6 +24,12 @@ struct build_data
     size_t number_of_user_bins{};
     size_t number_of_ibfs{};
 
+    lemon::ListDigraph ibf_graph{};
+    lemon::ListDigraph::NodeMap<node_data> node_map{ibf_graph};
+
+    hierarchical_interleaved_bloom_filter<> hibf{};
+    std::vector<double> fp_correction{};
+
     size_t request_ibf_idx()
     {
         return std::atomic_fetch_add(&ibf_number, 1u);
@@ -42,10 +48,19 @@ struct build_data
         hibf.next_ibf_id.resize(number_of_ibfs);
     }
 
-    lemon::ListDigraph ibf_graph{};
-    lemon::ListDigraph::NodeMap<node_data> node_map{ibf_graph};
+    void compute_fp_correction(size_t const tmax, size_t const hash, double const fpr)
+    {
+        fp_correction.resize(tmax + 1, 1.0);
 
-    hierarchical_interleaved_bloom_filter<> hibf{};
+        double const denominator = std::log(1 - std::exp(std::log(fpr) / hash));
+
+        for (size_t i = 2; i <= tmax; ++i)
+        {
+            double const tmp = 1.0 - std::pow(1 - fpr, static_cast<double>(i));
+            fp_correction[i] = std::log(1 - std::exp(std::log(tmp) / hash)) / denominator;
+            assert(fp_correction[i] >= 1.0);
+        }
+    }
 };
 
 } // namespace raptor::hibf

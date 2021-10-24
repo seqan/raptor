@@ -9,7 +9,7 @@
 
 struct upgrade : public raptor_base {};
 
-TEST_F(upgrade, upgrade_index)
+TEST_F(upgrade, ibf)
 {
     {
         std::string const expanded_bins = repeat_bins(16);
@@ -38,7 +38,7 @@ TEST_F(upgrade, upgrade_index)
     compare_results(ibf_path(16, 23), "raptor.index");
 }
 
-TEST_F(upgrade, upgrade_compressed_index)
+TEST_F(upgrade, compressed_ibf)
 {
     {
         std::string const expanded_bins = repeat_bins(16);
@@ -68,7 +68,7 @@ TEST_F(upgrade, upgrade_compressed_index)
     compare_results<raptor::index_structure::ibf_compressed>(ibf_path(16, 23, true), "raptor.index");
 }
 
-TEST_F(upgrade, upgrade_partitioned)
+TEST_F(upgrade, partitioned_ibf)
 {
     std::stringstream header{};
     {
