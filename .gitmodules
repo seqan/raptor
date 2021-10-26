@@ -21,3 +21,6 @@
 [submodule "lib/lemon"]
 	path = lib/lemon
 	url = https://github.com/seqan/lemon.git
+[submodule "lib/chopper"]
+	path = lib/chopper
+	url = https://github.com/seqan/chopper.git
