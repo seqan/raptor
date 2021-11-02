@@ -23,14 +23,9 @@ TEST_F(build_from_chopper, pipeline)
     seqan3::test::tmp_filename layout_filename{"raptor_cli_test.layout"};
 
     {// generate sequence (data) input file
-        std::string const expanded_bins = repeat_bins(16);
         std::ofstream file{data_filename.get_path()};
-        auto split_bins = expanded_bins
-                        | std::views::split(' ')
-                        | std::views::transform([](auto &&rng) {
-                            return std::string_view(&*rng.begin(), std::ranges::distance(rng));});
         size_t i{0}; // dummy spec
-        for (auto && file_path : split_bins)
+        for (auto && file_path : get_repeated_bins(16))
             file << file_path << '\t' << i <<'\n';
         file << '\n';
     }

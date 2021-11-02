@@ -18,15 +18,10 @@ TEST_P(build_ibf_partitioned, pipeline)
         GTEST_SKIP() << "Needs dynamic threshold correction";
 
     std::stringstream header{};
-    {
-        std::string const expanded_bins = repeat_bins(number_of_repeated_bins);
+    { // generate input file
         std::ofstream file{"raptor_cli_test.txt"};
-        auto split_bins = expanded_bins
-                        | std::views::split(' ')
-                        | std::views::transform([](auto &&rng) {
-                            return std::string_view(&*rng.begin(), std::ranges::distance(rng));});
         size_t usr_bin_id{0};
-        for (auto && file_path : split_bins)
+        for (auto && file_path : get_repeated_bins(number_of_repeated_bins))
         {
             header << '#' << usr_bin_id++ << '\t' << file_path << '\n';
             file << file_path << '\n';
@@ -84,15 +79,10 @@ TEST_P(build_ibf_partitioned, pipeline)
 TEST_F(build_ibf_partitioned, pipeline_misc)
 {
     std::stringstream header{};
-    {
-        std::string const expanded_bins = repeat_bins(16);
+    { // generate input file
         std::ofstream file{"raptor_cli_test.txt"};
-        auto split_bins = expanded_bins
-                        | std::views::split(' ')
-                        | std::views::transform([](auto &&rng) {
-                            return std::string_view(&*rng.begin(), std::ranges::distance(rng));});
         size_t usr_bin_id{0};
-        for (auto && file_path : split_bins)
+        for (auto && file_path : get_repeated_bins(16))
         {
             header << '#' << usr_bin_id++ << '\t' << file_path << '\n';
             file << file_path << '\n';

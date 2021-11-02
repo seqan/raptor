@@ -14,17 +14,10 @@ TEST_P(build_ibf, with_file)
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
 
-    {
-        std::string const expanded_bins = repeat_bins(number_of_repeated_bins);
+    { // generate input file
         std::ofstream file{"raptor_cli_test.txt"};
-        auto split_bins = expanded_bins
-                        | std::views::split(' ')
-                        | std::views::transform([](auto &&rng) {
-                            return std::string_view(&*rng.begin(), std::ranges::distance(rng));});
-        for (auto && file_path : split_bins)
-        {
+        for (auto && file_path : get_repeated_bins(number_of_repeated_bins))
             file << file_path << '\n';
-        }
         file << '\n';
     }
 
@@ -47,17 +40,10 @@ TEST_P(build_ibf, with_shape)
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
 
-    {
-        std::string const expanded_bins = repeat_bins(number_of_repeated_bins);
+    { // generate input file
         std::ofstream file{"raptor_cli_test.txt"};
-        auto split_bins = expanded_bins
-                        | std::views::split(' ')
-                        | std::views::transform([](auto &&rng) {
-                            return std::string_view(&*rng.begin(), std::ranges::distance(rng));});
-        for (auto && file_path : split_bins)
-        {
+        for (auto && file_path : get_repeated_bins(number_of_repeated_bins))
             file << file_path << '\n';
-        }
         file << '\n';
     }
 
@@ -80,15 +66,10 @@ TEST_P(build_ibf, with_socks_file)
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
 
-    {
-        std::string const expanded_bins = repeat_bins(number_of_repeated_bins);
+    { // generate input file
         std::ofstream file{"raptor_cli_test.txt"};
-        auto split_bins = expanded_bins
-                        | std::views::split(' ')
-                        | std::views::transform([](auto &&rng) {
-                            return std::string_view(&*rng.begin(), std::ranges::distance(rng));});
         bool repeat{false};
-        for (auto && file_path : split_bins)
+        for (auto && file_path : get_repeated_bins(number_of_repeated_bins))
         {
             file << "dummy_color: " << file_path;
             if (repeat)

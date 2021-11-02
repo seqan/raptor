@@ -19,16 +19,11 @@ TEST_P(search_ibf_preprocessing, pipeline)
         GTEST_SKIP() << "Needs dynamic threshold correction";
 
     std::stringstream header{};
-    {
-        std::string const expanded_bins = repeat_bins(number_of_repeated_bins);
+    { // generate input files
         std::ofstream file{"raptor_cli_test.txt"};
         std::ofstream file2{"raptor_cli_test.minimiser"};
-        auto split_bins = expanded_bins
-                        | std::views::split(' ')
-                        | std::views::transform([](auto &&rng) {
-                            return std::string(&*rng.begin(), std::ranges::distance(rng));});
         size_t usr_bin_id{0};
-        for (auto && file_path : split_bins)
+        for (auto && file_path : get_repeated_bins(number_of_repeated_bins))
         {
             file << file_path << '\n';
             auto line = seqan3::detail::to_string("precomputed_minimisers/",
@@ -107,16 +102,11 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
         GTEST_SKIP() << "Needs dynamic threshold correction";
 
     std::stringstream header{};
-    {
-        std::string const expanded_bins = repeat_bins(number_of_repeated_bins);
+    { // generate input files
         std::ofstream file{"raptor_cli_test.txt"};
         std::ofstream file2{"raptor_cli_test.minimiser"};
-        auto split_bins = expanded_bins
-                        | std::views::split(' ')
-                        | std::views::transform([](auto &&rng) {
-                            return std::string(&*rng.begin(), std::ranges::distance(rng));});
         size_t usr_bin_id{0};
-        for (auto && file_path : split_bins)
+        for (auto && file_path : get_repeated_bins(number_of_repeated_bins))
         {
             file << file_path << ".gz\n";
             auto line = seqan3::detail::to_string("precomputed_minimisers/",
@@ -187,15 +177,10 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
 
 TEST_F(search_ibf_preprocessing, pipeline_compressed_index)
 {
-    {
-        std::string const expanded_bins = repeat_bins(16);
+    { // generate input files
         std::ofstream file{"raptor_cli_test.txt"};
         std::ofstream file2{"raptor_cli_test.minimiser"};
-        auto split_bins = expanded_bins
-                        | std::views::split(' ')
-                        | std::views::transform([](auto &&rng) {
-                            return std::string(&*rng.begin(), std::ranges::distance(rng));});
-        for (auto && file_path : split_bins)
+        for (auto && file_path : get_repeated_bins(16))
         {
             file << file_path << '\n';
             file2 << seqan3::detail::to_string("precomputed_minimisers/",

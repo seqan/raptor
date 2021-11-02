@@ -18,15 +18,10 @@ TEST_P(build_ibf_compressed, pipeline)
         GTEST_SKIP() << "Needs dynamic threshold correction";
 
     std::stringstream header{};
-    {
-        std::string const expanded_bins = repeat_bins(number_of_repeated_bins);
+    { // generate input file
         std::ofstream file{"raptor_cli_test.txt"};
-        auto split_bins = expanded_bins
-                        | std::views::split(' ')
-                        | std::views::transform([](auto &&rng) {
-                            return std::string_view(&*rng.begin(), std::ranges::distance(rng));});
         size_t usr_bin_id{0};
-        for (auto && file_path : split_bins)
+        for (auto && file_path : get_repeated_bins(number_of_repeated_bins))
         {
             header << '#' << usr_bin_id++ << '\t' << file_path << '\n';
             file << file_path << '\n';
@@ -89,14 +84,9 @@ TEST_P(build_ibf_compressed, pipeline_socks)
     if (window_size == 23 || number_of_errors != 0)
         GTEST_SKIP() << "SOCKS only supports exact kmers";
 
-    {
-        std::string const expanded_bins = repeat_bins(number_of_repeated_bins);
+    { // generate input file
         std::ofstream file{"raptor_cli_test.txt"};
-        auto split_bins = expanded_bins
-                        | std::views::split(' ')
-                        | std::views::transform([](auto &&rng) {
-                            return std::string_view(&*rng.begin(), std::ranges::distance(rng));});
-        for (auto && file_path : split_bins)
+        for (auto && file_path : get_repeated_bins(number_of_repeated_bins))
         {
             file << "dummy_color: " << file_path << '\n';
         }
