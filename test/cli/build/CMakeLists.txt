@@ -7,6 +7,7 @@
 
 cmake_minimum_required (VERSION 3.8)
 
+add_cli_test (cli_build_from_chopper_test.cpp)
 add_cli_test (cli_build_hibf_test.cpp)
 add_cli_test (cli_build_ibf_compressed_test.cpp)
 add_cli_test (cli_build_ibf_partitioned_test.cpp)
