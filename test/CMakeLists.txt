@@ -51,7 +51,7 @@ macro (add_app_test test_filename test_alternative)
 
     # Create the test target.
     add_executable (${target} ${test_filename})
-    target_link_libraries (${target} "${PROJECT_NAME}_lib" seqan3::seqan3 gtest gtest_main)
+    target_link_libraries (${target} "${PROJECT_NAME}_lib" seqan3::seqan3 gtest gtest_main chopper_count_lib chopper_layout_lib)
 
     # Make seqan3::test available for both cli and api tests.
     target_include_directories (${target} PUBLIC "${SEQAN3_CLONE_DIR}/test/include")

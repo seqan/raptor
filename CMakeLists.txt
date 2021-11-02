@@ -106,3 +106,6 @@ set (RAPTOR_ENABLE_BENCHMARK OFF CACHE BOOL "Compile benchmarks as cli tests.")
 
 enable_testing ()
 add_subdirectory (test EXCLUDE_FROM_ALL)
+
+## Dependency chopper
+add_subdirectory (lib/chopper/src)
