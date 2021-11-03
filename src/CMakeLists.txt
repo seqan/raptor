@@ -1,12 +1,14 @@
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.11)
 
 # Shared interface
 add_library ("raptor_interface" INTERFACE)
-target_link_libraries ("raptor_interface" INTERFACE seqan3::seqan3)
+target_link_libraries ("raptor_interface" INTERFACE seqan3::seqan3 chopper)
 target_include_directories ("raptor_interface" INTERFACE ../include)
-target_include_directories ("raptor_interface" INTERFACE ../lib/lemon/include)
-target_include_directories ("raptor_interface" INTERFACE ../lib/robin-hood-hashing/src/include)
+target_include_directories ("raptor_interface" INTERFACE ${RAPTOR_SUBMODULES_DIR}/chopper/include)
+target_include_directories ("raptor_interface" INTERFACE ${RAPTOR_SUBMODULES_DIR}/lemon/include)
+target_include_directories ("raptor_interface" INTERFACE ${RAPTOR_SUBMODULES_DIR}/robin-hood-hashing/src/include)
 target_compile_options ("raptor_interface" INTERFACE "-pedantic" "-Wall" "-Wextra")
+add_dependencies (raptor_interface chopper)
 
 # Raptor library
 add_library ("raptor_lib" INTERFACE)
