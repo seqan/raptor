@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 
 #include <seqan3/test/expect_range_eq.hpp>
+#include <seqan3/utility/views/repeat_n.hpp>
 #include <seqan3/utility/views/zip.hpp>
 
 #include <raptor/index.hpp>
@@ -99,26 +100,17 @@ protected:
 
 struct raptor_base : public cli_test
 {
-    static inline std::string const repeat_bins(size_t const repetitions) noexcept
+    static inline auto const get_repeated_bins(size_t const repetitions) noexcept
     {
+        using vec_t = std::vector<std::string>;
+
         if (repetitions == 0)
-            return cli_test::data("bin1.fa").string();
+            return seqan3::views::repeat_n(vec_t{cli_test::data("bin1.fa").string()}, 1) | std::views::join;
 
-        std::string result{};
-
-        for (size_t i{0}; i < repetitions; ++i)
-        {
-            result += cli_test::data("bin1.fa");
-            result += ' ';
-            result += cli_test::data("bin2.fa");
-            result += ' ';
-            result += cli_test::data("bin3.fa");
-            result += ' ';
-            result += cli_test::data("bin4.fa");
-            result += ' ';
-        }
-
-        return result;
+        return seqan3::views::repeat_n(vec_t{cli_test::data("bin1.fa"),
+                                             cli_test::data("bin2.fa"),
+                                             cli_test::data("bin3.fa"),
+                                             cli_test::data("bin4.fa")}, repetitions) | std::views::join;
     }
 
     static inline std::filesystem::path const ibf_path(size_t const number_of_repetitions,
