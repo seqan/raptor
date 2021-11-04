@@ -5,7 +5,7 @@
 # shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 # -----------------------------------------------------------------------------------------------------
 
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.11)
 
 include (seqan3_test_files)
 include (seqan3_test_component)
