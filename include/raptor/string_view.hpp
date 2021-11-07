@@ -20,11 +20,23 @@ namespace raptor::detail
         assert(end - begin >= 0);
         return std::string_view{&(*begin), static_cast<size_t>(end - begin)};
     }
+
+    template <typename CharT, typename Traits>
+    constexpr bool ends_with(std::basic_string_view<CharT, Traits> sv, std::basic_string_view<CharT, Traits> suffix) noexcept
+    {
+        return sv.size() >= suffix.size() && sv.compare(sv.size() - suffix.size(), std::basic_string_view<CharT, Traits>::npos, suffix) == 0;
+    }
 #else
     template <typename iterator_t, typename sentinel_t>
     constexpr std::string_view string_view(iterator_t && begin, sentinel_t && end) noexcept
     {
         return std::string_view{std::forward<iterator_t>(begin), std::forward<sentinel_t>(end)};
+    }
+
+    template <typename CharT, typename Traits>
+    constexpr bool ends_with(std::basic_string_view<CharT, Traits> sv, std::basic_string_view<CharT, Traits> suffix) noexcept
+    {
+        return sv.ends_with(suffix);
     }
 #endif
 

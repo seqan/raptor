@@ -19,7 +19,7 @@
 	url = https://github.com/xxsds/sdsl-lite
 	branch = master
 [submodule "lib/lemon"]
-	path = lib/lemon
+	path = lib/submodules/lemon
 	url = https://github.com/seqan/lemon.git
 [submodule "lib/chopper"]
 	path = lib/chopper
