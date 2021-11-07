@@ -21,14 +21,20 @@ TEST_F(build_from_chopper, pipeline)
     seqan3::test::tmp_filename data_filename{"raptor_cli_test.txt"};
     seqan3::test::tmp_filename count_filename{"raptor_cli_test.counts"};
     seqan3::test::tmp_filename layout_filename{"raptor_cli_test.layout"};
+    seqan3::test::tmp_filename index_filename{"raptor.index"};
+    seqan3::test::tmp_filename search_filename{"search.out"};
+    size_t number_of_repeated_bins{16};
+    size_t window_size{19};
+    size_t number_of_errors{0}; // search
 
     {// generate sequence (data) input file
         std::ofstream file{data_filename.get_path()};
         size_t i{0}; // dummy spec
-        for (auto && file_path : get_repeated_bins(16))
-            file << file_path << '\t' << i <<'\n';
-        file << '\n';
+        for (auto && file_path : get_repeated_bins(number_of_repeated_bins))
+            file << file_path << '\t' << ++i <<'\n';
     }
+
+    ASSERT_TRUE(std::filesystem::exists(data_filename.get_path()));
 
     { // generate count file
         const char * argv[] = {"./chopper-count",
@@ -43,6 +49,8 @@ TEST_F(build_from_chopper, pipeline)
         chopper::count::execute(parser);
     }
 
+    ASSERT_TRUE(std::filesystem::exists(count_filename.get_path()));
+
     { // generate layout file
         const char * argv[] = {"./chopper-layout",
                                "--technical-bins", "64",
@@ -54,18 +62,50 @@ TEST_F(build_from_chopper, pipeline)
         chopper::layout::execute(parser);
     }
 
-    cli_test_result const result = execute_app("raptor", "build",
-                                                         "--hibf",
-                                                         "--kmer 19",
-                                                         "--window 19",
-                                                         "--fpr 0.05",
-                                                         "--threads 1",
-                                                         "--output raptor.index",
-                                                         layout_filename.get_path().string());
+    ASSERT_TRUE(std::filesystem::exists(layout_filename.get_path()));
 
-    EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{});
-    ASSERT_EQ(result.exit_code, 0);
+    { // build index
+        cli_test_result const result = execute_app("raptor", "build",
+                                                            "--hibf",
+                                                            "--kmer 19",
+                                                            "--window", std::to_string(window_size),
+                                                            "--fpr 0.05",
+                                                            "--threads 1",
+                                                            "--output ", index_filename.get_path().c_str(),
+                                                            layout_filename.get_path().c_str());
 
-    compare_results<raptor::index_structure::hibf>(data("64bins19window.index"), "raptor.index");
+        EXPECT_EQ(result.out, std::string{});
+        EXPECT_EQ(result.err, std::string{});
+        ASSERT_EQ(result.exit_code, 0);
+    }
+
+    { // check with search if index contains expected input
+        cli_test_result const result = execute_app("raptor", "search",
+                                                            "--output", search_filename.get_path().c_str(),
+                                                            "--error ", std::to_string(number_of_errors),
+                                                            "--hibf",
+                                                            "--index ", index_filename.get_path().c_str(),
+                                                            "--query ", data("query.fq"));
+        EXPECT_EQ(result.exit_code, 0);
+        EXPECT_EQ(result.out, std::string{});
+        EXPECT_EQ(result.err, std::string{});
+
+        std::ifstream in{search_filename.get_path()};
+        std::string line;
+        std::string query_result;
+
+        while (std::getline(in, line) && line[0] == '#' && line[1] != 'Q')
+            if (line.substr(line.size() - 4)[0] != '4') // only file bin4.fa does not contain the query
+                query_result += line.substr(1, std::find(line.begin(), line.end(), '\t') - line.begin() - 1) + ",";
+        query_result.pop_back(); // remove last '.'
+
+        EXPECT_TRUE(std::getline(in, line)); // get query1
+        EXPECT_EQ(line.substr(7), query_result);
+        EXPECT_TRUE(std::getline(in, line)); // get query2
+        EXPECT_EQ(line.substr(7), query_result);
+        EXPECT_TRUE(std::getline(in, line)); // get query3
+        EXPECT_EQ(line.substr(7), query_result);
+
+        EXPECT_FALSE(std::getline(in, line));
+    }
 }
