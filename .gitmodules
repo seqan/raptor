@@ -2,28 +2,47 @@
 	path = lib/seqan3
 	url = https://github.com/seqan/seqan3
 	branch = master
+	shallow = true
+	fetchRecurseSubmodules = false
 [submodule "lib/robin-hood-hashing"]
 	path = lib/robin-hood-hashing
 	url = https://github.com/martinus/robin-hood-hashing.git
 	branch = master
+	shallow = true
+	fetchRecurseSubmodules = false
 [submodule "lib/submodules/cereal"]
 	path = lib/submodules/cereal
 	url = https://github.com/USCiLab/cereal
 	branch = master
+	shallow = true
+	fetchRecurseSubmodules = false
 [submodule "lib/submodules/range-v3"]
 	path = lib/submodules/range-v3
 	url = https://github.com/ericniebler/range-v3
 	branch = master
+	shallow = true
+	fetchRecurseSubmodules = false
 [submodule "lib/submodules/sdsl-lite"]
 	path = lib/submodules/sdsl-lite
 	url = https://github.com/xxsds/sdsl-lite
 	branch = master
+	shallow = true
+	fetchRecurseSubmodules = false
 [submodule "lib/lemon"]
 	path = lib/submodules/lemon
 	url = https://github.com/seqan/lemon.git
+	branch = master
+	shallow = true
+	fetchRecurseSubmodules = false
 [submodule "lib/chopper"]
 	path = lib/chopper
 	url = https://github.com/seqan/chopper.git
+	branch = master
+	shallow = true
+	fetchRecurseSubmodules = false
 [submodule "lib/simde"]
 	path = lib/simde
 	url = https://github.com/simd-everywhere/simde
+	branch = master
+	shallow = true
+	fetchRecurseSubmodules = false
