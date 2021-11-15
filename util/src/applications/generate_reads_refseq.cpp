@@ -84,7 +84,6 @@ void run_program(cmd_arguments const & arguments)
         for (auto && [bin_file, bin_number] : zipped_view)
         {
             std::mt19937_64 rng(bin_number);
-            uint32_t read_counter{bin_number * reads_per_bin};
             // Immediately invoked initialising lambda expession (IIILE).
             std::filesystem::path const out_file = [&] ()
                                                    {
@@ -111,7 +110,7 @@ void run_program(cmd_arguments const & arguments)
                 std::uniform_int_distribution<uint64_t> read_start_dis(0, reference_length - arguments.read_length);
                 for (uint32_t current_read_number = 0;
                     current_read_number < reads_per_record && bin_read_counter < reads_per_bin;
-                    ++current_read_number, ++read_counter, ++bin_read_counter)
+                    ++current_read_number, ++bin_read_counter)
                 {
                     uint64_t const read_start_pos = read_start_dis(rng);
                     std::vector<seqan3::dna4> read = seq
@@ -128,7 +127,7 @@ void run_program(cmd_arguments const & arguments)
                         read[error_pos] = new_base;
                     }
 
-                    fout.emplace_back(read, std::to_string(read_counter), quality);
+                    fout.emplace_back(read, out_file.stem().string() + std::to_string(bin_read_counter), quality);
                 }
             }
         }
