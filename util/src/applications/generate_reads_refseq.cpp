@@ -235,9 +235,6 @@ int main(int argc, char ** argv)
     if (number_of_bins > arguments.number_of_reads)
         throw seqan3::argument_parser_error{"Must simulate at least one read per bin."};
 
-    if (arguments.number_of_reads % number_of_bins)
-        throw seqan3::argument_parser_error{"The number of reads must distribute evenly over the bins."};
-
     for (size_t & weight : arguments.number_of_reads_per_bin) // was initialised with the weights of the bins
         weight = std::ceil((static_cast<double>(weight) / sum_of_weights) * arguments.number_of_reads);
 
