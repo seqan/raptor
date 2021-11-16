@@ -18,6 +18,7 @@ struct cmd_arguments
 {
     std::filesystem::path bin_file_path{};
     std::vector<std::filesystem::path> bin_path{};
+    std::vector<size_t> number_of_reads_per_bin{};
     std::filesystem::path output_directory{};
     uint8_t errors{2u};
     uint32_t read_length{100u};
@@ -77,13 +78,13 @@ void run_program(cmd_arguments const & arguments)
     std::uniform_int_distribution<uint8_t> dna4_rank_dis(0, 3);
 
     size_t const number_of_bins{arguments.bin_path.size()};
-    uint32_t const reads_per_bin = arguments.number_of_reads / number_of_bins;
+    // uint32_t const reads_per_bin = arguments.number_of_reads / number_of_bins;
 
     std::vector<seqan3::phred42> const quality(arguments.read_length, seqan3::assign_rank_to(40u, seqan3::phred42{}));
 
     auto worker = [&](auto && zipped_view, auto &&)
     {
-        for (auto && [bin_file, bin_number] : zipped_view)
+        for (auto && [bin_file, reads_per_bin, bin_number] : zipped_view)
         {
             std::mt19937_64 rng(bin_number);
             // Immediately invoked initialising lambda expession (IIILE).
@@ -137,7 +138,9 @@ void run_program(cmd_arguments const & arguments)
     };
 
     size_t const chunk_size = std::bit_ceil(number_of_bins / arguments.threads);
-    auto chunked_view = seqan3::views::zip(arguments.bin_path, std::views::iota(0u)) | seqan3::views::chunk(chunk_size);
+    auto chunked_view = seqan3::views::zip(arguments.bin_path,
+                                           arguments.number_of_reads_per_bin,
+                                           std::views::iota(0u)) | seqan3::views::chunk(chunk_size);
     seqan3::detail::execution_handler_parallel executioner{arguments.threads};
     executioner.bulk_execute(std::move(worker), std::move(chunked_view), []() {});
 }
@@ -200,13 +203,27 @@ int main(int argc, char ** argv)
     std::string line;
     sharg::input_file_validator validator{};
 
+    size_t sum_of_weights{};
     while (std::getline(istrm, line))
     {
         if (!line.empty())
         {
-            std::filesystem::path bin_path{line};
+            auto tab = std::find(line.begin(), line.end(), '\t');
+
+            // parse file path
+            std::filesystem::path bin_path{line.begin(), tab};
             validator(bin_path);
             arguments.bin_path.push_back(std::move(bin_path));
+
+            // parse weight if given
+            if (tab != line.end())
+            {
+                ++tab;
+                size_t tmp{};
+                std::from_chars(&(*tab), &line[line.size() - 1], tmp);
+                sum_of_weights += tmp;
+                arguments.number_of_reads_per_bin.push_back(tmp); // initialise with weight
+            }
         }
     }
 
@@ -220,6 +237,9 @@ int main(int argc, char ** argv)
 
     if (arguments.number_of_reads % number_of_bins)
         throw sharg::parser_error{"The number of reads must distribute evenly over the bins."};
+
+    for (size_t & weight : arguments.number_of_reads_per_bin) // was initialised with the weights of the bins
+        weight = std::ceil((static_cast<double>(weight) / sum_of_weights) * arguments.number_of_reads);
 
     std::filesystem::create_directory(arguments.output_directory);
     run_program(arguments);
