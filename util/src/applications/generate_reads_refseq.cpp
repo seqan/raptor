@@ -120,7 +120,7 @@ void run_program(cmd_arguments const & arguments)
 
                     for (uint8_t error_count = 0; error_count < arguments.errors; ++error_count)
                     {
-                        uint32_t const error_pos = read_error_position_dis(rng);
+                        uint32_t const error_pos = std::min<size_t>(read_error_position_dis(rng), read.size());
                         seqan3::dna4 const current_base = read[error_pos];
                         seqan3::dna4 new_base = current_base;
                         while (new_base == current_base)
@@ -234,6 +234,9 @@ int main(int argc, char ** argv)
 
     if (number_of_bins > arguments.number_of_reads)
         throw seqan3::argument_parser_error{"Must simulate at least one read per bin."};
+
+    if (number_of_bins != arguments.number_of_reads_per_bin.size())
+        throw seqan3::argument_parser_error{"Something went wrong here."};
 
     for (size_t & weight : arguments.number_of_reads_per_bin) // was initialised with the weights of the bins
         weight = std::ceil((static_cast<double>(weight) / sum_of_weights) * arguments.number_of_reads);
