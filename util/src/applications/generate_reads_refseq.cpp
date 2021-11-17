@@ -108,7 +108,8 @@ void run_program(cmd_arguments const & arguments)
             for (auto const & [seq] : fin)
             {
                 uint64_t const reference_length = std::ranges::size(seq);
-                std::uniform_int_distribution<uint64_t> read_start_dis(0, reference_length - arguments.read_length);
+                uint64_t const dis_range_end = reference_length - std::min<uint64_t>(reference_length, arguments.read_length);
+                std::uniform_int_distribution<uint64_t> read_start_dis(0, dis_range_end);
                 for (uint32_t current_read_number = 0;
                     current_read_number < reads_per_record && bin_read_counter < reads_per_bin;
                     ++current_read_number, ++bin_read_counter)
