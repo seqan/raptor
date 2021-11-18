@@ -93,4 +93,8 @@ add_executable ("generate_reads_refseq" src/applications/generate_reads_refseq.c
 target_link_libraries ("generate_reads_refseq" "common")
 install (TARGETS "generate_reads_refseq" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
+add_executable ("check_fastq" src/applications/check_fastq.cpp)
+target_link_libraries ("check_fastq" "common")
+install (TARGETS "check_fastq" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
 message (STATUS "${FontBold}You can run `make install` to build the application.${FontReset}")
