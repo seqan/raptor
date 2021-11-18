@@ -129,7 +129,10 @@ void run_program(cmd_arguments const & arguments)
                         read[error_pos] = new_base;
                     }
 
-                    fout.emplace_back(read, out_file.stem().string() + std::to_string(bin_read_counter), quality);
+                    std::vector<seqan3::phred42> correct_quality{quality.begin(), quality.begin() + read.size()};
+                    fout.emplace_back(read, out_file.stem().string() + std::to_string(bin_read_counter), correct_quality);
+                    // no clue why std::views::take does not work
+                    // fout.emplace_back(read, out_file.stem().string() + std::to_string(bin_read_counter), (quality | std::views::take(reference_length)));
                 }
             }
         }
