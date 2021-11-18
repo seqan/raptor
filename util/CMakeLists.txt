@@ -130,4 +130,8 @@ target_link_libraries ("generate_reads_refseq" "common")
 add_executable ("ibf_fpr" src/applications/ibf_fpr.cpp)
 target_link_libraries ("ibf_fpr" "common")
 
+add_executable ("check_fastq" src/applications/check_fastq.cpp)
+target_link_libraries ("check_fastq" "common")
+install (TARGETS "check_fastq" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
 message (STATUS "${FontBold}You can run `make install` to build the application.${FontReset}")
