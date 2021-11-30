@@ -49,7 +49,7 @@ TEST_P(build_ibf_partitioned, pipeline)
                                                           "--query ", data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
-    ASSERT_EQ(result2.exit_code, 0);
+    RAPTOR_ASSERT_RESULT(result2);
 
     std::string const expected = [&] ()
     {

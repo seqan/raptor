@@ -55,7 +55,7 @@ TEST_P(search_ibf_preprocessing, pipeline)
                                                           "raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
-    ASSERT_EQ(result2.exit_code, 0);
+    RAPTOR_ASSERT_RESULT(result2);
 
     compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index", false);
 
@@ -137,7 +137,7 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
                                                           "raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
-    ASSERT_EQ(result2.exit_code, 0);
+    RAPTOR_ASSERT_RESULT(result2);
 
     compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index", false);
 
@@ -208,7 +208,7 @@ TEST_F(search_ibf_preprocessing, pipeline_compressed_index)
                                                           "raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
-    ASSERT_EQ(result2.exit_code, 0);
+    RAPTOR_ASSERT_RESULT(result2);
 
     compare_results<raptor::index_structure::ibf_compressed>(ibf_path(16, 23, true), "raptor.index", false);
 }

@@ -49,7 +49,7 @@ TEST_P(build_ibf_compressed, pipeline)
                                                           "--query ", data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
-    ASSERT_EQ(result2.exit_code, 0);
+    RAPTOR_ASSERT_RESULT(result2);
 
     std::string const expected = [&] ()
     {
@@ -111,7 +111,7 @@ TEST_P(build_ibf_compressed, pipeline_socks)
                                                           "--query ", data("query_socks.fq"));
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
-    ASSERT_EQ(result2.exit_code, 0);
+    RAPTOR_ASSERT_RESULT(result2);
 
     std::string const expected = string_from_file(search_result_path(number_of_repeated_bins,
                                                                      window_size,

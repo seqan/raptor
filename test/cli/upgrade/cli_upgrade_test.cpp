@@ -28,7 +28,7 @@ TEST_F(upgrade, ibf)
                                                          "--output raptor.index");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
-    ASSERT_EQ(result.exit_code, 0);
+    RAPTOR_ASSERT_RESULT(result);
 
     compare_results(ibf_path(16, 23), "raptor.index");
 }
@@ -53,7 +53,7 @@ TEST_F(upgrade, compressed_ibf)
                                                          "--output raptor.index");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
-    ASSERT_EQ(result.exit_code, 0);
+    RAPTOR_ASSERT_RESULT(result);
 
     compare_results<raptor::index_structure::ibf_compressed>(ibf_path(16, 23, true), "raptor.index");
 }
@@ -92,7 +92,7 @@ TEST_F(upgrade, partitioned_ibf)
                                                           "--query ", data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
-    ASSERT_EQ(result2.exit_code, 0);
+    RAPTOR_ASSERT_RESULT(result2);
 
     std::string const expected = [&] ()
     {
