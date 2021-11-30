@@ -3,9 +3,12 @@ name: CI misc
 on:
   push:
     branches:
-      # Push events to branches matching refs/heads/master
       - 'master'
   pull_request:
+
+concurrency:
+  group: misc-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 env:
   SEQAN3_NO_VERSION_CHECK: 1
@@ -34,6 +37,7 @@ jobs:
             requires_ccache: false
             skip_build_tests: true
             skip_run_tests: false
+
           - name: "Header gcc11"
             cxx: "g++-11"
             cc: "gcc-11"
@@ -46,6 +50,7 @@ jobs:
             requires_ccache: true
             skip_build_tests: false
             skip_run_tests: true
+
           - name: "Header gcc9"
             cxx: "g++-9"
             cc: "gcc-9"
@@ -84,7 +89,9 @@ jobs:
 
       - name: Install ccache
         if: matrix.requires_ccache
-        run: sudo apt-get install --yes ccache
+        run: |
+          conda install --yes --override-channels --channel conda-forge ccache
+          sudo ln -s $CONDA/bin/ccache /usr/bin/ccache
 
       - name: Install compiler ${{ matrix.cxx }}
         if: matrix.requires_toolchain
@@ -126,14 +133,14 @@ jobs:
           CCACHE_BASEDIR: ${{ github.workspace }}
           CCACHE_DIR: ${{ github.workspace }}/.ccache
           CCACHE_COMPRESS: true
-          CCACHE_COMPRESSLEVEL: 6
-          CCACHE_MAXSIZE: 500M
+          CCACHE_COMPRESSLEVEL: 12
+          CCACHE_MAXSIZE: 50M
           CMAKE_BUILD_PARALLEL_LEVEL: ${{ matrix.build_threads }}
         run: |
-          ccache -p || true
+          ccache -z || true
           cd build
           make -k test
-          ccache -s || true
+          ccache -sv || true
 
       - name: Run tests
         if: ${{!matrix.skip_run_tests}}
