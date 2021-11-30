@@ -7,7 +7,8 @@
 
 #include "../cli_test.hpp"
 
-struct build_ibf_compressed : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, bool, size_t>> {};
+struct build_ibf_compressed : public raptor_base,
+                              public testing::WithParamInterface<std::tuple<size_t, size_t, bool, size_t>> {};
 
 TEST_P(build_ibf_compressed, pipeline)
 {
@@ -40,7 +41,7 @@ TEST_P(build_ibf_compressed, pipeline)
                                                           "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
-    ASSERT_EQ(result1.exit_code, 0);
+    RAPTOR_ASSERT_ZERO_EXIT(result1);
 
     cli_test_result const result2 = execute_app("raptor", "search",
                                                           "--output search.out",
@@ -49,31 +50,9 @@ TEST_P(build_ibf_compressed, pipeline)
                                                           "--query ", data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
-    RAPTOR_ASSERT_RESULT(result2);
+    RAPTOR_ASSERT_ZERO_EXIT(result2);
 
-    std::string const expected = [&] ()
-    {
-        std::string result{header.str()};
-        std::string line{};
-        std::ifstream search_result{search_result_path(number_of_repeated_bins,
-                                                       window_size,
-                                                       number_of_errors)};
-        while (std::getline(search_result, line) && line.substr(0, 6) != "query1")
-        {}
-        result += line;
-        result += '\n';
-        while (std::getline(search_result, line))
-        {
-            result += line;
-            result += '\n';
-        }
-
-        return result;
-    }();
-
-    std::string const actual = string_from_file("search.out");
-
-    EXPECT_EQ(expected, actual);
+    compare_search(number_of_repeated_bins, number_of_errors, "search.out");
 }
 
 TEST_P(build_ibf_compressed, pipeline_socks)
@@ -103,7 +82,7 @@ TEST_P(build_ibf_compressed, pipeline_socks)
                                                           "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
-    ASSERT_EQ(result1.exit_code, 0);
+    RAPTOR_ASSERT_ZERO_EXIT(result1);
 
     cli_test_result const result2 = execute_app("raptor", "socks", "lookup-kmer",
                                                           "--output search.out",
@@ -111,12 +90,11 @@ TEST_P(build_ibf_compressed, pipeline_socks)
                                                           "--query ", data("query_socks.fq"));
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
-    RAPTOR_ASSERT_RESULT(result2);
+    RAPTOR_ASSERT_ZERO_EXIT(result2);
 
     std::string const expected = string_from_file(search_result_path(number_of_repeated_bins,
                                                                      window_size,
-                                                                     number_of_errors,
-                                                                     true),
+                                                                     number_of_errors),
                                                   std::ios::binary);
     std::string const actual = string_from_file("search.out");
 
@@ -126,7 +104,10 @@ TEST_P(build_ibf_compressed, pipeline_socks)
 INSTANTIATE_TEST_SUITE_P(
     build_ibf_compressed_suite,
     build_ibf_compressed,
-    testing::Combine(testing::Values(0, 16, 32), testing::Values(19, 23), testing::Values(true, false), testing::Values(0, 1)),
+    testing::Combine(testing::Values(0, 16, 32),
+                     testing::Values(19, 23),
+                     testing::Values(true, false),
+                     testing::Values(0, 1)),
     [] (testing::TestParamInfo<build_ibf_compressed::ParamType> const & info)
     {
         std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +

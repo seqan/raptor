@@ -10,11 +10,7 @@
 
 #include <seqan3/test/tmp_filename.hpp>
 
-#include <raptor/string_view.hpp>
-
 #include "../cli_test.hpp"
-
-#include "shim.hpp"
 
 struct build_hibf_chopper : public raptor_base {};
 
@@ -28,7 +24,6 @@ TEST_F(build_hibf_chopper, pipeline)
     size_t const number_of_repeated_bins{16};
     size_t const window_size{19};
     size_t const number_of_errors{0}; // search
-    std::string_view const expected_missed_bin{"bin4.fa"}; // only file bin4.fa does not contain the query
 
     { // generate sequence (data) input file
         std::ofstream file{data_filename.get_path()};
@@ -79,7 +74,7 @@ TEST_F(build_hibf_chopper, pipeline)
 
         EXPECT_EQ(result.out, std::string{});
         EXPECT_EQ(result.err, std::string{});
-        RAPTOR_ASSERT_RESULT(result);
+        RAPTOR_ASSERT_ZERO_EXIT(result);
     }
 
     { // check with search if index contains expected input
@@ -91,34 +86,8 @@ TEST_F(build_hibf_chopper, pipeline)
                                                              "--query", data("query.fq"));
         EXPECT_EQ(result.out, std::string{});
         EXPECT_EQ(result.err, std::string{});
-        RAPTOR_ASSERT_RESULT(result);
+        RAPTOR_ASSERT_ZERO_EXIT(result);
     }
 
-    std::ifstream search_result{search_filename.get_path()};
-    std::string line;
-    std::string expected_hits;
-
-    for (size_t i = 0; i < number_of_repeated_bins * 4u; ++i)
-    {
-        ASSERT_TRUE(std::getline(search_result, line));
-        std::string_view line_view{line};
-        if (!raptor::detail::ends_with(line_view, expected_missed_bin))
-            expected_hits += line_view.substr(1, line_view.find('\t'));
-    }
-
-    ASSERT_TRUE(!expected_hits.empty());
-    expected_hits.pop_back(); // remove trailing '\t'
-    std::ranges::replace(expected_hits, '\t', ',');
-
-    ASSERT_TRUE(std::getline(search_result, line));
-    ASSERT_EQ(line, "#QUERY_NAME\tUSER_BINS");
-
-    std::string const query_prefix{"query"};
-    for (char i : {'1','2','3'})
-    {
-        EXPECT_TRUE(std::getline(search_result, line));
-        EXPECT_EQ(line, query_prefix + i + '\t' + expected_hits);
-    }
-
-    EXPECT_FALSE(std::getline(search_result, line));
+    compare_search(number_of_repeated_bins, number_of_errors, search_filename.get_path().c_str());
 }

@@ -30,9 +30,9 @@ TEST_P(build_ibf, with_file)
                                                          "raptor_cli_test.txt");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
-    RAPTOR_ASSERT_RESULT(result);
+    RAPTOR_ASSERT_ZERO_EXIT(result);
 
-    compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
+    compare_index(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
 }
 
 TEST_P(build_ibf, with_shape)
@@ -56,9 +56,9 @@ TEST_P(build_ibf, with_shape)
                                                          "raptor_cli_test.txt");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
-    RAPTOR_ASSERT_RESULT(result);
+    RAPTOR_ASSERT_ZERO_EXIT(result);
 
-    compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
+    compare_index(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
 }
 
 TEST_P(build_ibf, with_socks_file)
@@ -89,9 +89,9 @@ TEST_P(build_ibf, with_socks_file)
                                                          "raptor_cli_test.txt");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
-    RAPTOR_ASSERT_RESULT(result);
+    RAPTOR_ASSERT_ZERO_EXIT(result);
 
-    compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
+    compare_index(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
 }
 
 INSTANTIATE_TEST_SUITE_P(

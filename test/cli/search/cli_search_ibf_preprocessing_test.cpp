@@ -8,7 +8,7 @@
 #include "../cli_test.hpp"
 
 struct search_ibf_preprocessing : public raptor_base,
-                              public testing::WithParamInterface<std::tuple<size_t, size_t, bool, size_t>> {};
+                                  public testing::WithParamInterface<std::tuple<size_t, size_t, bool, size_t>> {};
 
 TEST_P(search_ibf_preprocessing, pipeline)
 {
@@ -46,7 +46,7 @@ TEST_P(search_ibf_preprocessing, pipeline)
                                                           "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
-    ASSERT_EQ(result1.exit_code, 0);
+    RAPTOR_ASSERT_ZERO_EXIT(result1);
 
     cli_test_result const result2 = execute_app("raptor", "build",
                                                           "--size 64k",
@@ -55,9 +55,9 @@ TEST_P(search_ibf_preprocessing, pipeline)
                                                           "raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
-    RAPTOR_ASSERT_RESULT(result2);
+    RAPTOR_ASSERT_ZERO_EXIT(result2);
 
-    compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index", false);
+    compare_index(ibf_path(number_of_repeated_bins, window_size), "raptor.index", compare_extension::no);
 
     cli_test_result const result3 = execute_app("raptor", "search",
                                                           "--output search.out",
@@ -66,31 +66,9 @@ TEST_P(search_ibf_preprocessing, pipeline)
                                                           "--query ", data("query.fq"));
     EXPECT_EQ(result3.out, std::string{});
     EXPECT_EQ(result3.err, std::string{});
-    ASSERT_EQ(result3.exit_code, 0);
+    RAPTOR_ASSERT_ZERO_EXIT(result3);
 
-    std::string const expected = [&] ()
-    {
-        std::string result{header.str()};
-        std::string line{};
-        std::ifstream search_result{search_result_path(number_of_repeated_bins,
-                                                       window_size,
-                                                       number_of_errors)};
-        while (std::getline(search_result, line) && line.substr(0, 6) != "query1")
-        {}
-        result += line;
-        result += '\n';
-        while (std::getline(search_result, line))
-        {
-            result += line;
-            result += '\n';
-        }
-
-        return result;
-    }();
-
-    std::string const actual = string_from_file("search.out");
-
-    EXPECT_EQ(expected, actual);
+    compare_search(number_of_repeated_bins, number_of_errors, "search.out", is_empty::no, is_preprocessed::yes);
 }
 
 TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
@@ -128,7 +106,7 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
                                                           "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
-    ASSERT_EQ(result1.exit_code, 0);
+    RAPTOR_ASSERT_ZERO_EXIT(result1);
 
     cli_test_result const result2 = execute_app("raptor", "build",
                                                           "--size 64k",
@@ -137,9 +115,9 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
                                                           "raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
-    RAPTOR_ASSERT_RESULT(result2);
+    RAPTOR_ASSERT_ZERO_EXIT(result2);
 
-    compare_results(ibf_path(number_of_repeated_bins, window_size), "raptor.index", false);
+    compare_index(ibf_path(number_of_repeated_bins, window_size), "raptor.index", compare_extension::no);
 
     cli_test_result const result3 = execute_app("raptor", "search",
                                                           "--output search.out",
@@ -148,31 +126,9 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
                                                           "--query ", data("query.fq"));
     EXPECT_EQ(result3.out, std::string{});
     EXPECT_EQ(result3.err, std::string{});
-    ASSERT_EQ(result3.exit_code, 0);
+    RAPTOR_ASSERT_ZERO_EXIT(result3);
 
-    std::string const expected = [&] ()
-    {
-        std::string result{header.str()};
-        std::string line{};
-        std::ifstream search_result{search_result_path(number_of_repeated_bins,
-                                                       window_size,
-                                                       number_of_errors)};
-        while (std::getline(search_result, line) && line.substr(0, 6) != "query1")
-        {}
-        result += line;
-        result += '\n';
-        while (std::getline(search_result, line))
-        {
-            result += line;
-            result += '\n';
-        }
-
-        return result;
-    }();
-
-    std::string const actual = string_from_file("search.out");
-
-    EXPECT_EQ(expected, actual);
+    compare_search(number_of_repeated_bins, number_of_errors, "search.out", is_empty::no, is_preprocessed::yes);
 }
 
 TEST_F(search_ibf_preprocessing, pipeline_compressed_index)
@@ -199,7 +155,7 @@ TEST_F(search_ibf_preprocessing, pipeline_compressed_index)
                                                           "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
-    ASSERT_EQ(result1.exit_code, 0);
+    RAPTOR_ASSERT_ZERO_EXIT(result1);
 
     cli_test_result const result2 = execute_app("raptor", "build",
                                                           "--size 64k",
@@ -208,9 +164,11 @@ TEST_F(search_ibf_preprocessing, pipeline_compressed_index)
                                                           "raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
-    RAPTOR_ASSERT_RESULT(result2);
+    RAPTOR_ASSERT_ZERO_EXIT(result2);
 
-    compare_results<raptor::index_structure::ibf_compressed>(ibf_path(16, 23, true), "raptor.index", false);
+    compare_index<raptor::index_structure::ibf_compressed>(ibf_path(16, 23, is_compressed::yes),
+                                                           "raptor.index",
+                                                           compare_extension::no);
 }
 
 INSTANTIATE_TEST_SUITE_P(

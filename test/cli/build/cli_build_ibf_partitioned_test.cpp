@@ -40,7 +40,7 @@ TEST_P(build_ibf_partitioned, pipeline)
                                                           "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
-    ASSERT_EQ(result1.exit_code, 0);
+    RAPTOR_ASSERT_ZERO_EXIT(result1);
 
     cli_test_result const result2 = execute_app("raptor", "search",
                                                           "--output search.out",
@@ -49,31 +49,9 @@ TEST_P(build_ibf_partitioned, pipeline)
                                                           "--query ", data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
-    RAPTOR_ASSERT_RESULT(result2);
+    RAPTOR_ASSERT_ZERO_EXIT(result2);
 
-    std::string const expected = [&] ()
-    {
-        std::string result{header.str()};
-        std::string line{};
-        std::ifstream search_result{search_result_path(number_of_repeated_bins,
-                                                       window_size,
-                                                       number_of_errors)};
-        while (std::getline(search_result, line) && line.substr(0, 6) != "query1")
-        {}
-        result += line;
-        result += '\n';
-        while (std::getline(search_result, line))
-        {
-            result += line;
-            result += '\n';
-        }
-
-        return result;
-    }();
-
-    std::string const actual = string_from_file("search.out");
-
-    EXPECT_EQ(expected, actual);
+    compare_search(number_of_repeated_bins, number_of_errors, "search.out");
 }
 
 TEST_F(build_ibf_partitioned, pipeline_misc)
@@ -100,7 +78,7 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
                                                           "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
-    ASSERT_EQ(result1.exit_code, 0);
+    RAPTOR_ASSERT_ZERO_EXIT(result1);
 
     cli_test_result const result2 = execute_app("raptor", "search",
                                                           "--output search.out",
@@ -109,28 +87,9 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
                                                           "--query ", data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
-    ASSERT_EQ(result2.exit_code, 0);
+    RAPTOR_ASSERT_ZERO_EXIT(result2);
 
-    std::string const expected = [&] ()
-    {
-        std::string const bin_list = [&] ()
-        {
-            std::string result;
-            for (size_t i = 0; i < std::max<size_t>(1, 16 * 4u); ++i)
-            {
-                result += std::to_string(i);
-                result += ',';
-            }
-            result.pop_back();
-            return result;
-        }();
-
-        return header.str() + "query1\t" + bin_list + "\nquery2\t" + bin_list + "\nquery3\t" + bin_list + '\n';
-    }();
-
-    std::string const actual = string_from_file("search.out");
-
-    EXPECT_EQ(expected, actual);
+    compare_search(16, 1 /* Always finds everything */, "search.out");
 
     cli_test_result const result3 = execute_app("raptor", "search",
                                                           "--output search2.out",
@@ -139,33 +98,9 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
                                                           "--query ", data("query_empty.fq"));
     EXPECT_EQ(result3.out, std::string{});
     EXPECT_EQ(result3.err, std::string{});
-    ASSERT_EQ(result3.exit_code, 0);
+    RAPTOR_ASSERT_ZERO_EXIT(result3);
 
-    std::string const expected2 = [&] ()
-    {
-        std::string result{header.str()};
-        std::string line{};
-        std::ifstream search_result{search_result_path(16,
-                                                       23,
-                                                       1,
-                                                       false,
-                                                       true)};
-        while (std::getline(search_result, line) && line.substr(0, 6) != "query1")
-        {}
-        result += line;
-        result += '\n';
-        while (std::getline(search_result, line))
-        {
-            result += line;
-            result += '\n';
-        }
-
-        return result;
-    }();
-
-    std::string const actual2 = string_from_file("search2.out");
-
-    EXPECT_EQ(expected2, actual2);
+    compare_search(16, 1, "search2.out", is_empty::yes);
 }
 
 INSTANTIATE_TEST_SUITE_P(
