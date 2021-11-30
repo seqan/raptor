@@ -24,7 +24,7 @@ TEST_P(build_hibf, with_file)
                                                          pack_path(number_of_repeated_bins));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
-    ASSERT_EQ(result.exit_code, 0);
+    RAPTOR_ASSERT_RESULT(result);
 
     compare_results<raptor::index_structure::hibf>(ibf_path(number_of_repeated_bins, window_size, false, true), "raptor.index");
 }
@@ -44,7 +44,7 @@ TEST_P(build_hibf, with_shape)
                                                          pack_path(number_of_repeated_bins));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
-    ASSERT_EQ(result.exit_code, 0);
+    RAPTOR_ASSERT_RESULT(result);
 
     compare_results<raptor::index_structure::hibf>(ibf_path(number_of_repeated_bins, window_size, false, true), "raptor.index");
 }
@@ -73,7 +73,7 @@ TEST_F(build_hibf, three_levels)
                                                          data("three_levels.pack"));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
-    ASSERT_EQ(result.exit_code, 0);
+    RAPTOR_ASSERT_RESULT(result);
 
     compare_results<raptor::index_structure::hibf>(data("three_levels.hibf"), "raptor.index");
 }

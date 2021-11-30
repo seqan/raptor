@@ -21,7 +21,7 @@ TEST_P(search_ibf, with_error)
                                                          "--error ", std::to_string(number_of_errors),
                                                          "--index ", ibf_path(number_of_repeated_bins, window_size),
                                                          "--query ", data("query.fq"));
-    EXPECT_EQ(result.exit_code, 0);
+    RAPTOR_EXPECT_RESULT(result);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
 
@@ -45,7 +45,7 @@ TEST_P(search_ibf, socks)
                                                          "--output search.out",
                                                          "--index ", ibf_path(number_of_repeated_bins, window_size),
                                                          "--query ", data("query_socks.fq"));
-    EXPECT_EQ(result.exit_code, 0);
+    RAPTOR_EXPECT_RESULT(result);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
 
@@ -68,7 +68,7 @@ TEST_P(search_ibf, threshold)
                                                          "--threshold 0.50",
                                                          "--index ", ibf_path(number_of_repeated_bins, window_size),
                                                          "--query ", data("query.fq"));
-    EXPECT_EQ(result.exit_code, 0);
+    RAPTOR_EXPECT_RESULT(result);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
 
@@ -117,7 +117,7 @@ TEST_P(search_ibf, no_hits)
                                                          "--error ", std::to_string(number_of_errors),
                                                          "--index ", ibf_path(number_of_repeated_bins, window_size),
                                                          "--query ", data("query_empty.fq"));
-    EXPECT_EQ(result.exit_code, 0);
+    RAPTOR_EXPECT_RESULT(result);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
 

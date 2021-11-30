@@ -15,6 +15,13 @@
 
 #include <raptor/index.hpp>
 
+#ifndef RAPTOR_ASSERT_RESULT
+#define RAPTOR_ASSERT_RESULT(arg) ASSERT_EQ(arg.exit_code, 0) << "Command: " << arg.command
+#endif
+#ifndef RAPTOR_EXPECT_RESULT
+#define RAPTOR_EXPECT_RESULT(arg) EXPECT_EQ(arg.exit_code, 0) << "Command: " << arg.command
+#endif
+
 // Provides functions for CLI test implementation.
 struct cli_test : public ::testing::Test
 {
@@ -30,6 +37,7 @@ protected:
     {
         std::string out{};
         std::string err{};
+        std::string command{};
         int exit_code{};
     };
 
@@ -40,17 +48,21 @@ protected:
         cli_test_result result{};
 
         // Assemble the command string and disable version check.
-        std::ostringstream command{};
-        command << "SEQAN3_NO_VERSION_CHECK=1 " << BINDIR;
-        int a[] = {0, ((void)(command << command_items << ' '), 0) ... };
-        (void) a;
+        result.command = [&command_items...] ()
+        {
+            std::ostringstream command{};
+            command << "SEQAN3_NO_VERSION_CHECK=1 " << BINDIR;
+            int a[] = {0, ((void)(command << command_items << ' '), 0) ... };
+            (void) a;
+            return command.str();
+        }();
 
         // Always capture the output streams.
         testing::internal::CaptureStdout();
         testing::internal::CaptureStderr();
 
         // Run the command and return results.
-        result.exit_code = std::system(command.str().c_str());
+        result.exit_code = std::system(result.command.c_str());
         result.out = testing::internal::GetCapturedStdout();
         result.err = testing::internal::GetCapturedStderr();
         return result;

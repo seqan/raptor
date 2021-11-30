@@ -79,7 +79,7 @@ TEST_F(build_hibf_chopper, pipeline)
 
         EXPECT_EQ(result.out, std::string{});
         EXPECT_EQ(result.err, std::string{});
-        ASSERT_EQ(result.exit_code, 0);
+        RAPTOR_ASSERT_RESULT(result);
     }
 
     { // check with search if index contains expected input
@@ -91,7 +91,7 @@ TEST_F(build_hibf_chopper, pipeline)
                                                              "--query", data("query.fq"));
         EXPECT_EQ(result.out, std::string{});
         EXPECT_EQ(result.err, std::string{});
-        ASSERT_EQ(result.exit_code, 0);
+        RAPTOR_ASSERT_RESULT(result);
     }
 
     std::ifstream search_result{search_filename.get_path()};
