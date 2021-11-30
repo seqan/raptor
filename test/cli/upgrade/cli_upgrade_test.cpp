@@ -28,9 +28,9 @@ TEST_F(upgrade, ibf)
                                                          "--output raptor.index");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
-    RAPTOR_ASSERT_RESULT(result);
+    RAPTOR_ASSERT_ZERO_EXIT(result);
 
-    compare_results(ibf_path(16, 23), "raptor.index");
+    compare_index(ibf_path(16, 23), "raptor.index");
 }
 
 TEST_F(upgrade, compressed_ibf)
@@ -53,9 +53,9 @@ TEST_F(upgrade, compressed_ibf)
                                                          "--output raptor.index");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
-    RAPTOR_ASSERT_RESULT(result);
+    RAPTOR_ASSERT_ZERO_EXIT(result);
 
-    compare_results<raptor::index_structure::ibf_compressed>(ibf_path(16, 23, true), "raptor.index");
+    compare_index<raptor::index_structure::ibf_compressed>(ibf_path(16, 23, is_compressed::yes), "raptor.index");
 }
 
 TEST_F(upgrade, partitioned_ibf)
@@ -83,7 +83,7 @@ TEST_F(upgrade, partitioned_ibf)
 
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
-    ASSERT_EQ(result1.exit_code, 0);
+    RAPTOR_ASSERT_ZERO_EXIT(result1);
 
     cli_test_result const result2 = execute_app("raptor", "search",
                                                           "--output search.out",
@@ -92,27 +92,7 @@ TEST_F(upgrade, partitioned_ibf)
                                                           "--query ", data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
-    RAPTOR_ASSERT_RESULT(result2);
+    RAPTOR_ASSERT_ZERO_EXIT(result2);
 
-    std::string const expected = [&] ()
-    {
-        std::string result{header.str()};
-        std::string line{};
-        std::ifstream search_result{search_result_path(16, 23, 1)};
-        while (std::getline(search_result, line) && line.substr(0, 6) != "query1")
-        {}
-        result += line;
-        result += '\n';
-        while (std::getline(search_result, line))
-        {
-            result += line;
-            result += '\n';
-        }
-
-        return result;
-    }();
-
-    std::string const actual = string_from_file("search.out");
-
-    EXPECT_EQ(expected, actual);
+    compare_search(16, 1, "search.out");
 }

@@ -24,9 +24,13 @@ TEST_P(build_hibf, with_file)
                                                          pack_path(number_of_repeated_bins));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
-    RAPTOR_ASSERT_RESULT(result);
+    RAPTOR_ASSERT_ZERO_EXIT(result);
 
-    compare_results<raptor::index_structure::hibf>(ibf_path(number_of_repeated_bins, window_size, false, true), "raptor.index");
+    compare_index<raptor::index_structure::hibf>(ibf_path(number_of_repeated_bins,
+                                                          window_size,
+                                                          is_compressed::no,
+                                                          is_hibf::yes),
+                                                 "raptor.index");
 }
 
 TEST_P(build_hibf, with_shape)
@@ -44,9 +48,13 @@ TEST_P(build_hibf, with_shape)
                                                          pack_path(number_of_repeated_bins));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
-    RAPTOR_ASSERT_RESULT(result);
+    RAPTOR_ASSERT_ZERO_EXIT(result);
 
-    compare_results<raptor::index_structure::hibf>(ibf_path(number_of_repeated_bins, window_size, false, true), "raptor.index");
+    compare_index<raptor::index_structure::hibf>(ibf_path(number_of_repeated_bins,
+                                                          window_size,
+                                                          is_compressed::no,
+                                                          is_hibf::yes),
+                                                 "raptor.index");
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -73,7 +81,7 @@ TEST_F(build_hibf, three_levels)
                                                          data("three_levels.pack"));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
-    RAPTOR_ASSERT_RESULT(result);
+    RAPTOR_ASSERT_ZERO_EXIT(result);
 
-    compare_results<raptor::index_structure::hibf>(data("three_levels.hibf"), "raptor.index");
+    compare_index<raptor::index_structure::hibf>(data("three_levels.hibf"), "raptor.index");
 }
