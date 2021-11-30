@@ -23,23 +23,14 @@ TEST_P(search_hibf, with_error)
                                                          "--hibf",
                                                          "--index ", ibf_path(number_of_repeated_bins,
                                                                               window_size,
-                                                                              false,
-                                                                              true),
+                                                                              is_compressed::no,
+                                                                              is_hibf::yes),
                                                          "--query ", data("query.fq"));
-    EXPECT_EQ(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
 
-    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins,
-                                                                     window_size,
-                                                                     number_of_errors,
-                                                                     false,
-                                                                     false,
-                                                                     true),
-                                                  std::ios::binary);
-    std::string const actual = string_from_file("search.out");
-
-    EXPECT_EQ(expected, actual);
+    compare_search(number_of_repeated_bins, number_of_errors, "search.out");
 }
 
 TEST_P(search_hibf, with_threshold)
@@ -47,44 +38,19 @@ TEST_P(search_hibf, with_threshold)
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
     cli_test_result const result = execute_app("raptor", "search",
-                                                         "--output search_threshold.out",
+                                                         "--output search.out",
                                                          "--threshold 0.50",
                                                          "--hibf",
                                                          "--index ", ibf_path(number_of_repeated_bins,
                                                                               window_size,
-                                                                              false,
-                                                                              true),
+                                                                              is_compressed::no,
+                                                                              is_hibf::yes),
                                                          "--query ", data("query.fq"));
-    EXPECT_EQ(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
 
-    std::string const expected = [&] ()
-    {
-        std::string const bin_list = [&] ()
-        {
-            std::string result;
-            for (size_t i = 0; i < std::max<size_t>(1, number_of_repeated_bins * 4u); ++i)
-            {
-                result += std::to_string(i);
-                result += ',';
-            }
-            result.pop_back();
-            return result;
-        }();
-
-        return "#QUERY_NAME\tUSER_BINS\nquery1\t" + bin_list + "\nquery2\t" + bin_list + "\nquery3\t" + bin_list + '\n';
-    }();
-
-    std::string const actual = [] ()
-    {
-        std::string const str = string_from_file("search_threshold.out");
-        std::string const symbol{'#'};
-
-        return std::string{std::find_end(str.begin(), str.end(), symbol.begin(), symbol.end()), str.end()};
-    }();
-
-    EXPECT_EQ(expected, actual);
+    compare_search(number_of_repeated_bins, 1 /* Always finds everything */, "search.out");
 }
 
 TEST_P(search_hibf, no_hits)
@@ -100,23 +66,14 @@ TEST_P(search_hibf, no_hits)
                                                          "--hibf",
                                                          "--index ", ibf_path(number_of_repeated_bins,
                                                                               window_size,
-                                                                              false,
-                                                                              true),
+                                                                              is_compressed::no,
+                                                                              is_hibf::yes),
                                                          "--query ", data("query_empty.fq"));
-    EXPECT_EQ(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
 
-    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins,
-                                                                     window_size,
-                                                                     number_of_errors,
-                                                                     false,
-                                                                     true,
-                                                                     true),
-                                                  std::ios::binary);
-    std::string const actual = string_from_file("search.out");
-
-    EXPECT_EQ(expected, actual);
+    compare_search(number_of_repeated_bins, number_of_errors, "search.out", is_empty::yes);
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -139,12 +96,9 @@ TEST_F(search_hibf, three_levels)
                                                          "--hibf",
                                                          "--index ", data("three_levels.hibf"),
                                                          "--query ", data("query.fq"));
-    EXPECT_EQ(result.exit_code, 0);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
 
-    std::string const expected = string_from_file(data("three_levels.out"), std::ios::binary);
-    std::string const actual = string_from_file("search.out");
-
-    EXPECT_EQ(expected, actual);
+    compare_search(32, 0, "search.out");
 }

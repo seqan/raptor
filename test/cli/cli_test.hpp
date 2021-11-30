@@ -14,6 +14,16 @@
 #include <seqan3/utility/views/zip.hpp>
 
 #include <raptor/index.hpp>
+#include <raptor/string_view.hpp>
+
+#include "shim.hpp"
+
+#ifndef RAPTOR_ASSERT_ZERO_EXIT
+#define RAPTOR_ASSERT_ZERO_EXIT(arg) ASSERT_EQ(arg.exit_code, 0) << "Command: " << arg.command
+#endif
+#ifndef RAPTOR_ASSERT_FAIL_EXIT
+#define RAPTOR_ASSERT_FAIL_EXIT(arg) ASSERT_NE(arg.exit_code, 0) << "Command: " << arg.command
+#endif
 
 // Provides functions for CLI test implementation.
 struct cli_test : public ::testing::Test
@@ -30,6 +40,7 @@ protected:
     {
         std::string out{};
         std::string err{};
+        std::string command{};
         int exit_code{};
     };
 
@@ -40,17 +51,21 @@ protected:
         cli_test_result result{};
 
         // Assemble the command string and disable version check.
-        std::ostringstream command{};
-        command << "SEQAN3_NO_VERSION_CHECK=1 " << BINDIR;
-        int a[] = {0, ((void)(command << command_items << ' '), 0) ... };
-        (void) a;
+        result.command = [&command_items...] ()
+        {
+            std::ostringstream command{};
+            command << "SEQAN3_NO_VERSION_CHECK=1 " << BINDIR;
+            int a[] = {0, ((void)(command << command_items << ' '), 0) ... };
+            (void) a;
+            return command.str();
+        }();
 
         // Always capture the output streams.
         testing::internal::CaptureStdout();
         testing::internal::CaptureStderr();
 
         // Run the command and return results.
-        result.exit_code = std::system(command.str().c_str());
+        result.exit_code = std::system(result.command.c_str());
         result.out = testing::internal::GetCapturedStdout();
         result.err = testing::internal::GetCapturedStderr();
         return result;
@@ -100,6 +115,57 @@ protected:
 
 struct raptor_base : public cli_test
 {
+    struct strong_bool
+    {
+        enum
+        {
+            yes,
+            no
+        } value;
+
+        strong_bool(decltype(value) v) : value(v) {}
+
+        explicit operator bool() const
+        {
+            return value == strong_bool::yes;
+        }
+
+        bool operator!() const
+        {
+            return value == strong_bool::no;
+        }
+    };
+
+    struct is_compressed : strong_bool
+    {
+        using strong_bool::value;
+        using strong_bool::strong_bool;
+    };
+
+    struct is_hibf : strong_bool
+    {
+        using strong_bool::value;
+        using strong_bool::strong_bool;
+    };
+
+    struct compare_extension : strong_bool
+    {
+        using strong_bool::value;
+        using strong_bool::strong_bool;
+    };
+
+    struct is_preprocessed : strong_bool
+    {
+        using strong_bool::value;
+        using strong_bool::strong_bool;
+    };
+
+    struct is_empty : strong_bool
+    {
+        using strong_bool::value;
+        using strong_bool::strong_bool;
+    };
+
     static inline auto const get_repeated_bins(size_t const repetitions) noexcept
     {
         using vec_t = std::vector<std::string>;
@@ -115,8 +181,8 @@ struct raptor_base : public cli_test
 
     static inline std::filesystem::path const ibf_path(size_t const number_of_repetitions,
                                                        size_t const window_size,
-                                                       bool const compressed = false,
-                                                       bool const hibf = false) noexcept
+                                                       is_compressed const compressed = is_compressed::no,
+                                                       is_hibf const hibf = is_hibf::no) noexcept
     {
         std::string name{};
         name += std::to_string(std::max<int>(1, number_of_repetitions * 4));
@@ -137,31 +203,16 @@ struct raptor_base : public cli_test
 
     static inline std::filesystem::path const search_result_path(size_t const number_of_repetitions,
                                                                  size_t const window_size,
-                                                                 size_t const number_of_errors,
-                                                                 bool const socks = false,
-                                                                 bool const empty = false,
-                                                                 bool const hibf = false) noexcept
+                                                                 size_t const number_of_errors) noexcept
     {
         std::string name{};
         name += std::to_string(std::max<int>(1, number_of_repetitions * 4));
         name += "bins";
-        if (empty)
-        {
-            name += "empty";
-        }
-        else
-        {
-            name += std::to_string(window_size);
-            name += "window";
-            name += std::to_string(number_of_errors);
-            name += "error";
-        }
-        if (socks)
-            name += "socks.out";
-        else if (hibf)
-            name += "hibf.out";
-        else
-            name += ".out";
+        name += std::to_string(window_size);
+        name += "window";
+        name += std::to_string(number_of_errors);
+        name += "error";
+        name += "socks.out";
         return cli_test::data(name);
     }
 
@@ -229,9 +280,9 @@ struct raptor_base : public cli_test
     }
 
     template <typename data_t = raptor::index_structure::ibf>
-    static inline void compare_results(std::filesystem::path const & expected_result,
-                                       std::filesystem::path const & actual_result,
-                                       bool const compare_extension = true)
+    static inline void compare_index(std::filesystem::path const & expected_result,
+                                     std::filesystem::path const & actual_result,
+                                     compare_extension const compare_ext = compare_extension::yes)
     {
         constexpr bool is_ibf = std::same_as<data_t, raptor::index_structure::ibf> ||
                                 std::same_as<data_t, raptor::index_structure::ibf_compressed>;
@@ -284,7 +335,7 @@ struct raptor_base : public cli_test
                     {
                         std::filesystem::path const expected_path(expected_file);
                         std::filesystem::path const actual_path(actual_file);
-                        if (compare_extension)
+                        if (compare_ext)
                             EXPECT_EQ(expected_path.filename(), actual_path.filename());
                         else
                             EXPECT_EQ(expected_path.stem(), actual_path.stem());
@@ -312,5 +363,42 @@ struct raptor_base : public cli_test
             std::ranges::sort(actual_filenames);
             EXPECT_RANGE_EQ(expected_filenames, actual_filenames);
         }
+    }
+
+    static inline void compare_search(size_t const number_of_repeated_bins,
+                                      size_t const number_of_errors,
+                                      std::string_view const filename,
+                                      is_empty const empty = is_empty::no,
+                                      is_preprocessed const preprocessed = is_preprocessed::no)
+    {
+        size_t const number_of_bins{std::max<size_t>(1u, number_of_repeated_bins * 4u)};
+        std::string_view const missed_bin = number_of_errors ? "none" : preprocessed ? "bin4.minimiser" : "bin4.fa";
+        std::ifstream search_result{filename.data()};
+        std::string line;
+        std::string expected_hits;
+
+        for (size_t i = 0; i < number_of_bins; ++i)
+        {
+            ASSERT_TRUE(std::getline(search_result, line));
+            std::string_view line_view{line};
+            if (!empty && !raptor::detail::ends_with(line_view, missed_bin))
+                expected_hits += line_view.substr(1, line_view.find('\t'));
+        }
+
+        if (!expected_hits.empty())
+            expected_hits.pop_back(); // remove trailing '\t'
+        std::ranges::replace(expected_hits, '\t', ',');
+
+        ASSERT_TRUE(std::getline(search_result, line));
+        ASSERT_EQ(line, "#QUERY_NAME\tUSER_BINS");
+
+        std::string const query_prefix{"query"};
+        for (char i : {'1','2','3'})
+        {
+            EXPECT_TRUE(std::getline(search_result, line));
+            EXPECT_EQ(line, query_prefix + i + '\t' + expected_hits);
+        }
+
+        EXPECT_FALSE(std::getline(search_result, line));
     }
 };

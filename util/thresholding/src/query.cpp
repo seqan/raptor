@@ -234,7 +234,7 @@ void compute_simple_model(cmd_arguments const & args,
     size_t kmers_per_window = args.window_size - args.kmer_size + 1;
     size_t kmers_per_pattern = args.pattern_size - args.kmer_size + 1;
     size_t minimal_number_of_minimizers = kmers_per_window == 1 ? kmers_per_pattern :
-                                                                  kmers_per_pattern / (kmers_per_window - 1);
+                                                                  kmers_per_pattern / kmers_per_window;
     size_t maximal_number_of_minimizers = args.pattern_size - args.window_size + 1;
 
     std::vector<size_t> precomp_thresholds;
