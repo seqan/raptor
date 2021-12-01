@@ -14,9 +14,6 @@ TEST_P(build_ibf_partitioned, pipeline)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors, parts, compressed] = GetParam();
 
-    if (window_size == 23 && number_of_errors == 0)
-        GTEST_SKIP() << "Needs dynamic threshold correction";
-
     std::stringstream header{};
     { // generate input file
         std::ofstream file{"raptor_cli_test.txt"};

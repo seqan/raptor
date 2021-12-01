@@ -13,9 +13,6 @@ TEST_P(search_ibf, with_error)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
-    if (window_size == 23 && number_of_errors == 0)
-        GTEST_SKIP() << "Needs dynamic threshold correction";
-
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--output search.out",
                                                          "--error ", std::to_string(number_of_errors),
@@ -33,7 +30,7 @@ TEST_P(search_ibf, socks)
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
     if (window_size == 23 || number_of_errors != 0)
-        GTEST_SKIP() << "SOCKS only supports exact kmers";
+        GTEST_SKIP() << "SOCKS only supports (k,k)-minimizers";
 
     cli_test_result const result = execute_app("raptor", "socks", "lookup-kmer",
                                                          "--output search.out",
@@ -71,9 +68,6 @@ TEST_P(search_ibf, threshold)
 TEST_P(search_ibf, no_hits)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
-
-    if (window_size == 23 && number_of_errors == 0)
-        GTEST_SKIP() << "Needs dynamic threshold correction";
 
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--output search.out",

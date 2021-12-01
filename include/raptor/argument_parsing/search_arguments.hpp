@@ -28,6 +28,8 @@ struct search_arguments
     // Related to thresholding
     double tau{0.99};
     double threshold{};
+    double p_max{0.15};
+    double fpr{0.05};
     uint64_t pattern_size{};
     uint8_t errors{0};
     bool treshold_was_set{false};

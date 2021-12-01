@@ -154,13 +154,13 @@ struct raptor_base : public cli_test
         using strong_bool::strong_bool;
     };
 
-    struct is_preprocessed : strong_bool
+    struct is_empty : strong_bool
     {
         using strong_bool::value;
         using strong_bool::strong_bool;
     };
 
-    struct is_empty : strong_bool
+    struct is_preprocessed : strong_bool
     {
         using strong_bool::value;
         using strong_bool::strong_bool;

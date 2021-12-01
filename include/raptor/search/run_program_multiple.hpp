@@ -13,6 +13,7 @@
 #include <raptor/dna4_traits.hpp>
 #include <raptor/search/do_parallel.hpp>
 #include <raptor/search/load_index.hpp>
+#include <raptor/search/precompute_correction.hpp>
 #include <raptor/search/precompute_threshold.hpp>
 #include <raptor/search/sync_out.hpp>
 
@@ -41,6 +42,7 @@ void run_program_multiple(search_arguments const & arguments)
                                 arguments.pattern_size + 1u - (arguments.errors + 1u) * arguments.shape_size :
                                 0;
     size_t const max_number_of_minimisers = arguments.pattern_size - arguments.window_size + 1;
+    std::vector<size_t> const precomp_correction = precompute_correction(arguments);
     std::vector<size_t> const precomp_thresholds = precompute_threshold(arguments);
 
     auto cereal_worker = [&] ()
@@ -137,16 +139,15 @@ void run_program_multiple(search_arguments const & arguments)
                 counts[counter_id] += counter.bulk_count(minimiser);
                 size_t const minimiser_count{minimiser.size()};
                 size_t current_bin{0};
-
+                size_t const index = std::min(minimiser_count < min_number_of_minimisers ?
+                                            0 :
+                                            minimiser_count - min_number_of_minimisers,
+                                    max_number_of_minimisers - min_number_of_minimisers);
 
                 size_t const threshold = arguments.treshold_was_set ?
                                             static_cast<size_t>(minimiser_count * arguments.threshold) :
                                             kmers_per_window == 1 ? kmer_lemma :
-                                            precomp_thresholds[std::min(minimiser_count < min_number_of_minimisers ?
-                                                                            0 :
-                                                                            minimiser_count - min_number_of_minimisers,
-                                                                        max_number_of_minimisers -
-                                                                            min_number_of_minimisers)] + 2;
+                                            precomp_thresholds[index] + precomp_correction[index];
 
                 for (auto && count : counts[counter_id++])
                 {
