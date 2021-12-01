@@ -319,7 +319,7 @@ struct raptor_base : public cli_test
             auto const & expected_ibfs{expected_index.ibf().ibf_vector}, actual_ibfs{actual_index.ibf().ibf_vector};
             for (auto const & expected_ibf : expected_ibfs)
             {
-                EXPECT_TRUE(std::ranges::find(actual_ibfs, expected_ibf) != actual_ibfs.end());
+                ASSERT_TRUE(std::ranges::find(actual_ibfs, expected_ibf) != actual_ibfs.end());
             }
         }
 
@@ -331,15 +331,15 @@ struct raptor_base : public cli_test
             for (auto const && [expected_list, actual_list] : seqan3::views::zip(all_expected_bins, all_actual_bins))
             {
                 EXPECT_TRUE(std::ranges::distance(expected_list) > 0);
-                    for (auto const && [expected_file, actual_file] : seqan3::views::zip(expected_list, actual_list))
-                    {
-                        std::filesystem::path const expected_path(expected_file);
-                        std::filesystem::path const actual_path(actual_file);
-                        if (compare_ext)
-                            EXPECT_EQ(expected_path.filename(), actual_path.filename());
-                        else
-                            EXPECT_EQ(expected_path.stem(), actual_path.stem());
-                    }
+                for (auto const && [expected_file, actual_file] : seqan3::views::zip(expected_list, actual_list))
+                {
+                    std::filesystem::path const expected_path(expected_file);
+                    std::filesystem::path const actual_path(actual_file);
+                    if (compare_ext)
+                        ASSERT_EQ(expected_path.filename(), actual_path.filename());
+                    else
+                        ASSERT_EQ(expected_path.stem(), actual_path.stem());
+                }
             }
         }
         else
