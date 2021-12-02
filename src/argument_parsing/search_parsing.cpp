@@ -56,6 +56,18 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
                       "If set, this threshold is used instead of the probabilistic models.",
                       arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{0, 1});
+    parser.add_option(arguments.p_max,
+                      '\0',
+                      "p_max",
+                      "Correction.",
+                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
+                      seqan3::arithmetic_range_validator{0, 1});
+    parser.add_option(arguments.fpr,
+                      '\0',
+                      "fpr",
+                      "fpr.",
+                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
+                      seqan3::arithmetic_range_validator{0, 1});
     parser.add_option(arguments.pattern_size,
                       '\0',
                       "pattern",

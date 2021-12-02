@@ -23,7 +23,7 @@
 namespace raptor
 {
 
-void do_cerealisation_out(std::vector<size_t> const & vec, search_arguments const & arguments)
+void write_thresholds(std::vector<size_t> const & vec, search_arguments const & arguments)
 {
     std::filesystem::path filename = arguments.index_file.parent_path() / ("binary_p" + std::to_string(arguments.pattern_size) +
                                                                            "_w" + std::to_string(arguments.window_size) +
@@ -35,7 +35,7 @@ void do_cerealisation_out(std::vector<size_t> const & vec, search_arguments cons
     oarchive(vec);
 }
 
-bool do_cerealisation_in(std::vector<size_t> & vec, search_arguments const & arguments)
+bool read_thresholds(std::vector<size_t> & vec, search_arguments const & arguments)
 {
     std::filesystem::path filename = arguments.index_file.parent_path() / ("binary_p" + std::to_string(arguments.pattern_size) +
                                                                            "_w" + std::to_string(arguments.window_size) +
@@ -55,7 +55,7 @@ std::vector<size_t> precompute_threshold(search_arguments const & arguments)
 {
     std::vector<size_t> thresholds;
 
-    if (arguments.threshold || do_cerealisation_in(thresholds, arguments))
+    if (arguments.threshold || read_thresholds(thresholds, arguments))
         return thresholds;
 
     uint8_t const kmer_size{arguments.shape.size()};
@@ -70,6 +70,8 @@ std::vector<size_t> precompute_threshold(search_arguments const & arguments)
 
     size_t const minimal_number_of_minimizers = kmers_per_pattern / kmers_per_window;
     size_t const maximal_number_of_minimizers = arguments.pattern_size - arguments.window_size + 1;
+
+    thresholds.reserve(maximal_number_of_minimizers - minimal_number_of_minimizers);
 
     std::vector<double> indirect_errors;
     indirect_errors = detail::destroyed_indirectly_by_error(arguments.pattern_size, arguments.window_size, arguments.shape);
@@ -104,7 +106,7 @@ std::vector<size_t> precompute_threshold(search_arguments const & arguments)
     }
     assert(thresholds.size() != 0);
 
-    do_cerealisation_out(thresholds, arguments);
+    write_thresholds(thresholds, arguments);
 
     return thresholds;
 }

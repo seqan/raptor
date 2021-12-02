@@ -15,9 +15,6 @@ TEST_P(build_ibf_compressed, pipeline)
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp, number_of_errors] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
 
-    if (window_size == 23 && number_of_errors == 0)
-        GTEST_SKIP() << "Needs dynamic threshold correction";
-
     std::stringstream header{};
     { // generate input file
         std::ofstream file{"raptor_cli_test.txt"};
@@ -61,7 +58,7 @@ TEST_P(build_ibf_compressed, pipeline_socks)
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
 
     if (window_size == 23 || number_of_errors != 0)
-        GTEST_SKIP() << "SOCKS only supports exact kmers";
+        GTEST_SKIP() << "SOCKS only supports (k,k)-minimizers";
 
     { // generate input file
         std::ofstream file{"raptor_cli_test.txt"};

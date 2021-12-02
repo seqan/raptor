@@ -14,9 +14,6 @@ TEST_P(search_hibf, with_error)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
-    if (window_size == 23 && number_of_errors == 0)
-        GTEST_SKIP() << "Needs dynamic threshold correction";
-
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--output search.out",
                                                          "--error ", std::to_string(number_of_errors),
@@ -57,9 +54,6 @@ TEST_P(search_hibf, no_hits)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
-    if (window_size == 23 && number_of_errors == 0)
-        GTEST_SKIP() << "Needs dynamic threshold correction";
-
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--output search.out",
                                                          "--error ", std::to_string(number_of_errors),
@@ -79,7 +73,7 @@ TEST_P(search_hibf, no_hits)
 INSTANTIATE_TEST_SUITE_P(
     search_hibf_suite,
     search_hibf,
-    testing::Combine(testing::Values(0, 16, 32), testing::Values(19), testing::Values(0, 1)),
+    testing::Combine(testing::Values(0, 16, 32), testing::Values(19, 23), testing::Values(0, 1)),
     [] (testing::TestParamInfo<search_hibf::ParamType> const & info)
     {
         std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +

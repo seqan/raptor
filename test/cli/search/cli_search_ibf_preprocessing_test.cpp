@@ -15,9 +15,6 @@ TEST_P(search_ibf_preprocessing, pipeline)
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp, number_of_errors] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
 
-    if (window_size == 23 && number_of_errors == 0)
-        GTEST_SKIP() << "Needs dynamic threshold correction";
-
     std::stringstream header{};
     { // generate input files
         std::ofstream file{"raptor_cli_test.txt"};
@@ -75,9 +72,6 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
 {
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp, number_of_errors] = GetParam();
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
-
-    if (window_size == 23 && number_of_errors == 0)
-        GTEST_SKIP() << "Needs dynamic threshold correction";
 
     std::stringstream header{};
     { // generate input files
