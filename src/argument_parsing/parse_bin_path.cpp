@@ -7,6 +7,7 @@
 
 #include <raptor/argument_parsing/parse_bin_path.hpp>
 #include <raptor/argument_parsing/validators.hpp>
+#include <raptor/build/hibf/parse_chopper_pack_line.hpp>
 
 namespace raptor
 {
@@ -16,30 +17,36 @@ void impl(std::filesystem::path const & bin_file,
           bool const is_socks,
           bool const is_hibf)
 {
-    if (is_hibf)
-        return;
-
     std::ifstream istrm{bin_file};
     std::string line{};
     std::string color_name{};
     std::string file_name{};
     std::vector<std::string> tmp{};
 
-    while (std::getline(istrm, line))
+    if (is_hibf)
     {
-        if (!line.empty())
+        while (std::getline(istrm, line) && line.substr(0, 6) != "#FILES") {}
+        while (std::getline(istrm, line))
+            bin_path.push_back(std::move(hibf::parse_chopper_pack_line(line).filenames));
+    }
+    else
+    {
+        while (std::getline(istrm, line))
         {
-            tmp.clear();
-            std::stringstream sstream{line};
+            if (!line.empty())
+            {
+                tmp.clear();
+                std::stringstream sstream{line};
 
-            if (is_socks)
-                sstream >> color_name;
+                if (is_socks)
+                    sstream >> color_name;
 
-            while (std::getline(sstream, file_name, ' '))
-                if (!file_name.empty())
-                    tmp.emplace_back(file_name);
+                while (std::getline(sstream, file_name, ' '))
+                    if (!file_name.empty())
+                        tmp.emplace_back(file_name);
 
-            bin_path.emplace_back(tmp);
+                bin_path.emplace_back(tmp);
+            }
         }
     }
 

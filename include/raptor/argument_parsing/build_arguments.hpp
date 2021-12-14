@@ -44,6 +44,7 @@ struct build_arguments
     uint8_t threads{1u};
     bool is_socks{false};
     bool is_hibf{false};
+    bool is_minimiser{false};
 };
 
 } // namespace raptor

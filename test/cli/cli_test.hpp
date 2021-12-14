@@ -344,11 +344,15 @@ struct raptor_base : public cli_test
         }
         else
         {
-            auto filenames = std::views::transform([] (std::vector<std::string> const & filename_list)
+            auto filenames = std::views::transform([compare_ext] (std::vector<std::string> const & filename_list)
             {
                 std::vector<std::string> result{};
-                for (auto const & filename : filename_list)
-                    result.emplace_back(std::filesystem::path{filename}.filename().string());
+                if (compare_ext)
+                    for (auto const & filename : filename_list)
+                        result.emplace_back(std::filesystem::path{filename}.filename().string());
+                else
+                    for (auto const & filename : filename_list)
+                        result.emplace_back(std::filesystem::path{filename}.stem().string());
                 return result;
             });
 
