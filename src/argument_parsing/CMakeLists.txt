@@ -5,7 +5,8 @@ add_library ("raptor_argument_parsing" STATIC build_parsing.cpp
                                               init_shared_meta.cpp
                                               parse_bin_path.cpp
                                               search_parsing.cpp
-                                              upgrade_parsing.cpp)
+                                              upgrade_parsing.cpp
+                                              ../build/hibf/parse_chopper_pack_line.cpp)
 
 target_compile_definitions ("raptor_argument_parsing" PUBLIC
                             "-DRAPTOR_VERSION=\"${CMAKE_PROJECT_VERSION} (${RAPTOR_COMMIT_HASH})\""

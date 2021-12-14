@@ -20,7 +20,7 @@ void raptor_build(build_arguments const & arguments)
         hibf::chopper_build(arguments);
     else if (arguments.compute_minimiser)
         compute_minimiser(arguments);
-    else if (std::filesystem::path{arguments.bin_path[0][0]}.extension() == ".minimiser")
+    else if (arguments.is_minimiser)
         build_from_minimiser(arguments);
     else if (arguments.compressed)
         build_from_files<true>(arguments);

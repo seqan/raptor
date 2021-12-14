@@ -224,25 +224,26 @@ void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
         std::from_chars(arguments.size.data(), arguments.size.data() + arguments.size.size() - 1, size);
         size *= multiplier;
         arguments.bits = size / (((arguments.bins + 63) >> 6) << 6);
+    }
 
-        // ==========================================
-        // Read w and k from minimiser header file
-        // ==========================================
-        if (std::filesystem::path header_file_path = arguments.bin_path[0][0]; header_file_path.extension() == ".minimiser")
-        {
-            header_file_path.replace_extension("header");
-            std::ifstream file_stream{header_file_path};
-            std::string shape_string{};
-            file_stream >> shape_string >> arguments.window_size;
+    // ==========================================
+    // Read w and k from minimiser header file
+    // ==========================================
+    if (std::filesystem::path header_file_path = arguments.bin_path[0][0]; header_file_path.extension() == ".minimiser")
+    {
+        header_file_path.replace_extension("header");
+        std::ifstream file_stream{header_file_path};
+        std::string shape_string{};
+        file_stream >> shape_string >> arguments.window_size;
 
-            uint64_t tmp{};
-            std::from_chars(shape_string.data(),
-                            shape_string.data() + shape_string.size(),
-                            tmp,
-                            2);
+        uint64_t tmp{};
+        std::from_chars(shape_string.data(),
+                        shape_string.data() + shape_string.size(),
+                        tmp,
+                        2);
 
-            arguments.shape = seqan3::shape{seqan3::bin_literal{tmp}};
-        }
+        arguments.shape = seqan3::shape{seqan3::bin_literal{tmp}};
+        arguments.is_minimiser = true;
     }
 
     // ==========================================
