@@ -15,10 +15,11 @@
 namespace raptor::hibf
 {
 
+template <seqan3::data_layout data_layout_mode>
 size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
-                    lemon::ListDigraph::Node const & current_node,
-                    build_data & data,
-                    build_arguments const & arguments,
-                    bool is_root);
+                          lemon::ListDigraph::Node const & current_node,
+                          build_data<data_layout_mode> & data,
+                          build_arguments const & arguments,
+                          bool is_root);
 
 } // namespace raptor::hibf

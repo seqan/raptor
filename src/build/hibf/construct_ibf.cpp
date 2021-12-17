@@ -14,11 +14,12 @@
 namespace raptor::hibf
 {
 
+template <seqan3::data_layout data_layout_mode>
 seqan3::interleaved_bloom_filter<> construct_ibf(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                                                  robin_hood::unordered_flat_set<size_t> & kmers,
                                                  size_t const number_of_bins,
                                                  lemon::ListDigraph::Node const & node,
-                                                 build_data & data,
+                                                 build_data<data_layout_mode> & data,
                                                  build_arguments const & arguments,
                                                  bool is_root)
 {
@@ -30,15 +31,29 @@ seqan3::interleaved_bloom_filter<> construct_ibf(robin_hood::unordered_flat_set<
     seqan3::bin_count const bin_count{node_data.number_of_technical_bins};
     seqan3::interleaved_bloom_filter<> ibf{bin_count, bin_size, seqan3::hash_function_count{arguments.hash}};
 
-    // if (arguments.verbose)
-    // {
-    //     std::cout.imbue( std::locale( std::locale::classic(), new format_integer ) );
-    //     std::cout << "  > Initialised IBF with bin size " << bin_size.get() << std::endl;
-    // }
-
     insert_into_ibf(parent_kmers, kmers, number_of_bins, node_data.max_bin_index, ibf, is_root);
 
     return ibf;
 }
+
+template
+seqan3::interleaved_bloom_filter<>
+construct_ibf<seqan3::data_layout::uncompressed>(robin_hood::unordered_flat_set<size_t> &,
+                                                 robin_hood::unordered_flat_set<size_t> &,
+                                                 size_t const,
+                                                 lemon::ListDigraph::Node const &,
+                                                 build_data<seqan3::data_layout::uncompressed> &,
+                                                 build_arguments const &,
+                                                 bool);
+
+template
+seqan3::interleaved_bloom_filter<>
+construct_ibf<seqan3::data_layout::compressed>(robin_hood::unordered_flat_set<size_t> &,
+                                               robin_hood::unordered_flat_set<size_t> &,
+                                               size_t const,
+                                               lemon::ListDigraph::Node const &,
+                                               build_data<seqan3::data_layout::compressed> &,
+                                               build_arguments const &,
+                                               bool);
 
 } // namespace raptor::hibf

@@ -16,10 +16,13 @@ namespace raptor
 
 void raptor_build(build_arguments const & arguments)
 {
-    if (arguments.is_hibf)
-        hibf::chopper_build(arguments);
-    else if (arguments.compute_minimiser)
+    if (arguments.compute_minimiser)
         compute_minimiser(arguments);
+    else if (arguments.is_hibf)
+        if (arguments.compressed)
+            hibf::chopper_build<seqan3::data_layout::compressed>(arguments);
+        else
+            hibf::chopper_build<seqan3::data_layout::uncompressed>(arguments);
     else if (arguments.is_minimiser)
         build_from_minimiser(arguments);
     else if (arguments.compressed)
