@@ -14,8 +14,8 @@
 namespace raptor::hibf
 {
 
-// data needs to be passed from outside sind the graph in data cannot be moved
-void read_chopper_pack_file(build_data & data, std::string const & chopper_pack_filename)
+template <seqan3::data_layout data_layout_mode>
+void read_chopper_pack_file(build_data<data_layout_mode> & data, std::string const & chopper_pack_filename)
 {
     std::ifstream chopper_pack_file{chopper_pack_filename};
 
@@ -81,5 +81,13 @@ void read_chopper_pack_file(build_data & data, std::string const & chopper_pack_
     data.number_of_user_bins = user_bins;
     data.resize();
 }
+
+template
+void read_chopper_pack_file<seqan3::data_layout::uncompressed>(build_data<seqan3::data_layout::uncompressed> &,
+                                                               std::string const &);
+
+template
+void read_chopper_pack_file<seqan3::data_layout::compressed>(build_data<seqan3::data_layout::compressed> &,
+                                                             std::string const &);
 
 } // namespace raptor::hibf

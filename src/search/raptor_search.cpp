@@ -17,7 +17,10 @@ void raptor_search(search_arguments const & arguments)
 {
     if (arguments.is_hibf)
     {
-        run_program_single_hibf<false>(arguments);
+        if (arguments.compressed)
+            run_program_single_hibf<true>(arguments);
+        else
+            run_program_single_hibf<false>(arguments);
     }
     else if (arguments.parts == 1)
     {

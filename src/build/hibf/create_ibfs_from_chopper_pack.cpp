@@ -14,11 +14,9 @@
 namespace raptor::hibf
 {
 
-void create_ibfs_from_chopper_pack(build_data & data, build_arguments const & arguments)
+template <seqan3::data_layout data_layout_mode>
+void create_ibfs_from_chopper_pack(build_data<data_layout_mode> & data, build_arguments const & arguments)
 {
-    // std::cerr << "[DEBUG] create_ibfs_from_chopper_pack\n"
-    //           << "        &data:          " << &data << '\n'
-    //           << "        &data.node_map: " << &data.node_map << "\n\n";
     read_chopper_pack_file(data, arguments.bin_file);
     lemon::ListDigraph::Node root = data.ibf_graph.nodeFromId(0); // root node = high level IBF node
     robin_hood::unordered_flat_set<size_t> root_kmers{};
@@ -28,5 +26,12 @@ void create_ibfs_from_chopper_pack(build_data & data, build_arguments const & ar
 
     hierarchical_build(root_kmers, root, data, arguments, true);
 }
+
+template
+void create_ibfs_from_chopper_pack<seqan3::data_layout::uncompressed>(build_data<seqan3::data_layout::uncompressed> &,
+                                                                      build_arguments const &);
+template
+void create_ibfs_from_chopper_pack<seqan3::data_layout::compressed>(build_data<seqan3::data_layout::compressed> &,
+                                                                    build_arguments const & arguments);
 
 } // namespace raptor::hibf

@@ -13,6 +13,7 @@
 namespace raptor::hibf
 {
 
-void create_ibfs_from_chopper_pack(build_data & data, build_arguments const & arguments);
+template <seqan3::data_layout data_layout_mode>
+void create_ibfs_from_chopper_pack(build_data<data_layout_mode> & data, build_arguments const & arguments);
 
 } // namespace raptor::hibf
