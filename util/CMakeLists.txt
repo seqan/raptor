@@ -88,6 +88,16 @@ add_executable ("count_minimiser" src/applications/count_minimiser.cpp
 target_link_libraries ("count_minimiser" "common")
 install (TARGETS "count_minimiser" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
+add_executable ("threshold_info" src/applications/threshold_info.cpp
+                                 ../src/search/detail/destroyed_indirectly_by_error.cpp
+                                 ../src/search/detail/enumerate_all_errors.cpp
+                                 ../src/search/detail/pascal_row.cpp
+                                 ../src/search/detail/simple_model.cpp
+                                 ../src/search/precompute_correction.cpp
+                                 ../src/search/precompute_threshold.cpp)
+target_link_libraries ("threshold_info" "common")
+install (TARGETS "threshold_info" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
 add_executable ("apply_taxsbp" src/applications/apply_taxsbp.cpp)
 target_link_libraries ("apply_taxsbp" "common")
 install (TARGETS "apply_taxsbp" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
