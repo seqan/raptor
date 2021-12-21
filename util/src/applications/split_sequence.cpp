@@ -68,7 +68,7 @@ inline void split_sequence(config const & cfg)
     {
         std::string part_as_string = std::to_string(part);
         std::string padded_parts = std::string(n_zero - part_as_string.length(), '0') + part_as_string;
-        std::string filename = "bin_" + padded_parts + ".fasta";
+        std::string filename = "bin_" + padded_parts + ".fa";
         std::filesystem::path out_path = cfg.output_path;
         out_path /= filename;
         seqan3::sequence_file_output output_sequence{out_path};
