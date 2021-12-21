@@ -71,6 +71,7 @@ endif()
 add_library (common INTERFACE)
 target_link_libraries ("common" INTERFACE seqan3::seqan3)
 target_include_directories ("common" INTERFACE ../include)
+target_include_directories ("common" INTERFACE ../lib/robin-hood-hashing/src/include)
 target_compile_options ("common" INTERFACE "-pedantic" "-Wall" "-Wextra")
 
 add_executable ("generate_reads" src/applications/generate_reads.cpp)
@@ -81,7 +82,9 @@ add_executable ("split_sequence" src/applications/split_sequence.cpp)
 target_link_libraries ("split_sequence" "common")
 install (TARGETS "split_sequence" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
-add_executable ("count_minimiser" src/applications/count_minimiser.cpp)
+add_executable ("count_minimiser" src/applications/count_minimiser.cpp
+                                  ../src/argument_parsing/parse_bin_path.cpp
+                                  ../src/build/hibf/parse_chopper_pack_line.cpp)
 target_link_libraries ("count_minimiser" "common")
 install (TARGETS "count_minimiser" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 

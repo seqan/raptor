@@ -12,10 +12,13 @@
 namespace raptor
 {
 
-void impl(std::filesystem::path const & bin_file,
-          std::vector<std::vector<std::string>> & bin_path,
-          bool const is_socks,
-          bool const is_hibf)
+namespace detail
+{
+
+void parse_bin_path(std::filesystem::path const & bin_file,
+                    std::vector<std::vector<std::string>> & bin_path,
+                    bool const is_socks,
+                    bool const is_hibf)
 {
     std::ifstream istrm{bin_file};
     std::string line{};
@@ -53,14 +56,16 @@ void impl(std::filesystem::path const & bin_file,
     bin_validator{}(bin_path);
 }
 
+} // namespace detail
+
 void parse_bin_path(build_arguments & arguments)
 {
-    impl(arguments.bin_file, arguments.bin_path, arguments.is_socks, arguments.is_hibf);
+    detail::parse_bin_path(arguments.bin_file, arguments.bin_path, arguments.is_socks, arguments.is_hibf);
 }
 
 void parse_bin_path(upgrade_arguments & arguments)
 {
-    impl(arguments.bin_file, arguments.bin_path, false, false);
+    detail::parse_bin_path(arguments.bin_file, arguments.bin_path, false, false);
 }
 
 } // namespace raptor

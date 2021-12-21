@@ -13,6 +13,16 @@
 namespace raptor
 {
 
+namespace detail
+{
+
+void parse_bin_path(std::filesystem::path const & bin_file,
+                    std::vector<std::vector<std::string>> & bin_path,
+                    bool const is_socks,
+                    bool const is_hibf);
+
+} // namespace detail
+
 void parse_bin_path(build_arguments & arguments);
 void parse_bin_path(upgrade_arguments & arguments);
 

@@ -5,27 +5,21 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <seqan3/std/filesystem>
+#include <filesystem>
 #include <mutex>
-#include <unordered_set>
 #include <vector>
 
+#include <robin_hood.h>
+
 #include <seqan3/argument_parser/all.hpp>
-#include <seqan3/alphabet/nucleotide/dna4.hpp>
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
-#include <seqan3/io/sequence_file/input.hpp>
 #include <seqan3/search/views/minimiser_hash.hpp>
 #include <seqan3/utility/views/chunk.hpp>
 
-inline constexpr static uint64_t adjust_seed(uint8_t const kmer_size, uint64_t const seed = 0x8F3F73B5CF1C9ADEULL) noexcept
-{
-    return seed >> (64u - 2u * kmer_size);
-}
-
-struct dna4_traits : seqan3::sequence_file_input_default_traits_dna
-{
-    using sequence_alphabet = seqan3::dna4;
-};
+#include <raptor/argument_parsing/parse_bin_path.hpp>
+#include <raptor/argument_parsing/validators.hpp>
+#include <raptor/adjust_seed.hpp>
+#include <raptor/dna4_traits.hpp>
 
 struct config
 {
@@ -33,80 +27,56 @@ struct config
     uint8_t kmer_size{};
     uint8_t threads{1u};
 
-    std::vector<std::filesystem::path> bin_path{};
+    std::filesystem::path bin_file{};
+    std::vector<std::vector<std::string>> bin_path{};
     std::filesystem::path out_path{};
 };
 
-class positive_integer_validator
+void compute_minimisers(config const & cfg)
 {
-public:
-    using option_value_type = size_t;
-
-    positive_integer_validator() = default;
-    positive_integer_validator(bool const is_zero_positive_) : is_zero_positive{is_zero_positive_} {}
-
-    void operator() (option_value_type const & val) const
-    {
-        if (!is_zero_positive && !val)
-        {
-            throw seqan3::validation_error{"The value must be a positive integer."};
-        }
-    }
-
-    std::string get_help_page_message () const
-    {
-        if (is_zero_positive)
-            return "Value must be a positive integer or 0.";
-        else
-            return "Value must be a positive integer.";
-    }
-
-private:
-    bool is_zero_positive{false};
-};
-
-inline void compute_minimisers(config const & cfg)
-{
+    using sequence_file_t = seqan3::sequence_file_input<raptor::dna4_traits, seqan3::fields<seqan3::field::seq>>;
     auto minimiser_view = seqan3::views::minimiser_hash(seqan3::ungapped{cfg.kmer_size},
                                                         seqan3::window_size{cfg.window_size},
-                                                        seqan3::seed{adjust_seed(cfg.kmer_size)});
+                                                        seqan3::seed{raptor::adjust_seed(cfg.kmer_size)});
 
     std::vector<uint64_t> minimiser_counts;
     minimiser_counts.reserve(cfg.bin_path.size());
+    robin_hood::unordered_node_set<uint64_t> all_minimiser_set{};
     std::mutex push_back_mutex;
-    std::unordered_set<uint64_t> all_minimiser_set{};
     std::mutex merge_mutex;
 
     auto worker = [&] (auto && file_range, auto &&)
+    {
+        robin_hood::unordered_flat_set<uint64_t> minimiser_set{};
+
+        for (auto && file_names : file_range)
         {
-            std::unordered_set<uint64_t> minimiser_set{};
-
-            for (auto && file_name : file_range)
+            for (auto && file_name : file_names)
             {
-                seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>> fin{file_name};
-
-                for (auto & [seq] : fin)
-                    for (auto && hash : seq | minimiser_view)
-                        minimiser_set.insert(hash);
-
+                for (auto & [seq] : sequence_file_t{file_name})
                 {
-                    std::lock_guard const lock{push_back_mutex};
-                    minimiser_counts.emplace_back(minimiser_set.size());
+                    auto hash_view = seq | minimiser_view | std::views::common;
+                    minimiser_set.insert(hash_view.begin(), hash_view.end());
                 }
-                {
-                    std::lock_guard const lock{merge_mutex};
-                    all_minimiser_set.merge(minimiser_set);
-                }
-
-                minimiser_set.clear();
             }
-        };
+
+            {
+                std::lock_guard const lock{push_back_mutex};
+                minimiser_counts.emplace_back(minimiser_set.size());
+            }
+            {
+                std::lock_guard const lock{merge_mutex};
+                all_minimiser_set.insert(minimiser_set.begin(), minimiser_set.end());
+            }
+
+            minimiser_set.clear();
+        }
+    };
 
     size_t const chunk_size = std::ceil<size_t>(cfg.bin_path.size() / cfg.threads);
     auto chunked_view = cfg.bin_path | seqan3::views::chunk(chunk_size);
     seqan3::detail::execution_handler_parallel executioner{cfg.threads};
     executioner.bulk_execute(worker, std::move(chunked_view), [](){});
-
 
     std::ofstream output{cfg.out_path.string()};
     output << all_minimiser_set.size() << '\n';
@@ -124,9 +94,9 @@ int main(int argc, char ** argv)
 
     config cfg{};
 
-    parser.add_positional_option(cfg.bin_path,
-                                 "Provide a list of input files (one file per bin).",
-                                 seqan3::input_file_validator<seqan3::sequence_file_input<>>{});
+    parser.add_positional_option(cfg.bin_file,
+                                 "File containing file names.",
+                                 seqan3::input_file_validator{});
 
     parser.add_option(cfg.out_path,
                       '\0',
@@ -140,7 +110,7 @@ int main(int argc, char ** argv)
                       "window",
                       "Choose the window size.",
                       seqan3::option_spec::required,
-                      positive_integer_validator{});
+                      raptor::positive_integer_validator{});
 
     parser.add_option(cfg.kmer_size,
                       '\0',
@@ -154,7 +124,7 @@ int main(int argc, char ** argv)
                       "threads",
                       "Choose the number of threads.",
                       seqan3::option_spec::standard,
-                      positive_integer_validator{});
+                      raptor::positive_integer_validator{});
 
     try
     {
@@ -165,6 +135,8 @@ int main(int argc, char ** argv)
         std::cerr << "[Error] " << ext.what() << '\n';
         std::exit(-1);
     }
+
+    raptor::detail::parse_bin_path(cfg.bin_file, cfg.bin_path, false, false);
 
     compute_minimisers(cfg);
 }
