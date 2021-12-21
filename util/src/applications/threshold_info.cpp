@@ -70,16 +70,38 @@ void threshold_info(raptor::search_arguments const & arguments)
 
     std::ofstream out{arguments.out_file};
 
-    out << 'x' << ','
+    out << "#query: " << arguments.query_file << '\n'
+        << "#output: " << arguments.out_file << '\n'
+        << "#kmer: " << std::to_string(arguments.shape_size) << '\n'
+        << "#window: " << arguments.window_size << '\n'
+        << "#error: " << std::to_string(arguments.errors) << '\n'
+        << "#tau: " << arguments.tau << '\n'
+        << "#p_max: " << arguments.p_max << '\n'
+        << "#fpr: " << arguments.fpr << '\n'
+        << "#pattern: " << arguments.pattern_size << '\n'
+        << "#threads: " << std::to_string(arguments.threads) << '\n'
+        << "##min_number_of_minimisers: " << min_number_of_minimisers << '\n'
+        << "##max_number_of_minimisers: " << max_number_of_minimisers << '\n'
+        << 'x' << ','
         << "#x" << ','
         << "t(x)" << ','
         << "t_p(x)" << ','
         << "t_c(x)" << '\n';
 
-    for (size_t i{min_number_of_minimisers}; i <= max_number_of_minimisers; ++i)
+    if (minimiser_frequencies.empty())
+        return;
+
+    size_t last_non_zero_index{minimiser_frequencies.size() - 1};
+    while (last_non_zero_index && !minimiser_frequencies[last_non_zero_index])
+        --last_non_zero_index;
+    minimiser_frequencies.resize(last_non_zero_index + 1);
+
+    for (size_t i{min_number_of_minimisers}; i <= last_non_zero_index; ++i)
     {
         size_t const minimiser_count{minimiser_frequencies[i]};
-        size_t const index{std::clamp(minimiser_count, min_number_of_minimisers, max_number_of_minimisers) - min_number_of_minimisers};
+        if (!minimiser_count)
+            continue;
+        size_t const index{i - min_number_of_minimisers};
         out << i << ','
             << minimiser_count << ','
             << precomp_thresholds[index] + precomp_correction[index] << ','
