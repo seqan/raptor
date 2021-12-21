@@ -194,6 +194,9 @@ int main(int argc, char ** argv)
         std::exit(-1);
     }
 
+    arguments.shape = seqan3::ungapped{arguments.shape_size};
+    arguments.shape_weight = arguments.shape.count();
+
     std::filesystem::path output_directory = arguments.out_file.parent_path();
     std::error_code ec{};
     std::filesystem::create_directories(output_directory, ec);
