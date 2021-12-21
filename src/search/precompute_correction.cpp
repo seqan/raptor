@@ -23,6 +23,9 @@ namespace raptor
 
 void write_correction(std::vector<size_t> const & vec, search_arguments const & arguments)
 {
+    if (!arguments.write_thresholds)
+        return; // LCOV_EXCL_LINE
+
     std::filesystem::path filename = arguments.index_file.parent_path() / ("correction_p" + std::to_string(arguments.pattern_size) +
                                                                            "_w" + std::to_string(arguments.window_size) +
                                                                            "_k" + arguments.shape.to_string() +
