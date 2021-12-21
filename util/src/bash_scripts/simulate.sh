@@ -38,8 +38,6 @@ echo "Splitting genome into bins"
 $BINARY_DIR/split_sequence --input $bin_dir/ref.fasta --length $bin_length --parts $BIN_NUMBER
 # We do not need the reference anymore
 rm $bin_dir/ref.fasta
-# Rename the bins to .fa
-for i in $bin_dir/*.fasta; do mv $i $bin_dir/$(basename $i .fasta).fa; done
 # Simulate haplotypes for each bin
 echo "Generating haplotypes"
 for i in $bin_dir/*.fa
