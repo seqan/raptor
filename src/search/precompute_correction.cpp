@@ -56,7 +56,7 @@ std::vector<size_t> precompute_correction(search_arguments const & arguments)
 {
     std::vector<size_t> correction;
 
-    if (arguments.threshold || read_correction(correction, arguments))
+    if (arguments.treshold_was_set || read_correction(correction, arguments))
         return correction;
 
     uint8_t const kmer_size{arguments.shape.size()};
