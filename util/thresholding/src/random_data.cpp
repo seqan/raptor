@@ -10,7 +10,7 @@
  * \brief Random data generator.
  */
 
-#include <seqan3/std/filesystem>
+#include <filesystem>
 #include <random>
 
 #include <seqan3/argument_parser/all.hpp>
