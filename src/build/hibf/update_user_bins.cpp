@@ -7,9 +7,6 @@
 
 #include <lemon/list_graph.h> // Must be first include.
 
-#include <seqan3/utility/views/join_with.hpp>
-#include <seqan3/utility/views/to.hpp>
-
 #include <raptor/build/hibf/update_user_bins.hpp>
 
 namespace raptor::hibf
@@ -21,9 +18,16 @@ void update_user_bins(build_data<data_layout_mode> & data,
                       chopper_pack_record const & record)
 {
     size_t const idx = data.request_user_bin_idx();
-    data.hibf.user_bins.filename_of_user_bin(idx) = record.filenames
-                                                  | seqan3::views::join_with(std::string{";"})
-                                                  | seqan3::views::to<std::string>;
+
+    std::string & user_bin_filenames = data.hibf.user_bins.filename_of_user_bin(idx);
+    for (auto const & filename : record.filenames)
+    {
+        user_bin_filenames += filename;
+        user_bin_filenames += ';';
+    }
+    assert(!user_bin_filenames.empty());
+    user_bin_filenames.pop_back();
+
     std::fill_n(filename_indices.begin() + record.bin_indices.back(), record.number_of_bins.back(), idx);
 }
 

@@ -83,7 +83,6 @@ public:
     {
         uint64_t text_length = std::ranges::size(text);
 
-        forward_hashes.clear();
         minimiser_hash.clear();
         minimiser_begin.clear();
         minimiser_end.clear();
@@ -106,10 +105,8 @@ public:
 
 // LCOV_EXCL_START
         // Compute all k-mer hashes for both forward and reverse strand.
-        forward_hashes = text |
-                         seqan3::views::kmer_hash(shape) |
-                         std::views::transform(apply_xor) |
-                         seqan3::views::to<std::vector<uint64_t>>;
+        auto kmer_view = text | seqan3::views::kmer_hash(shape) | std::views::transform(apply_xor);
+        forward_hashes.assign(kmer_view.begin(), kmer_view.end());
 // LCOV_EXCL_STOP
 
         // Choose the minimisers.

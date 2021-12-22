@@ -60,6 +60,7 @@ void run_program(cmd_arguments const & arguments)
         seqan3::sequence_file_output fout{out_file};
 
         uint16_t haplotype_counter{};
+        std::vector<seqan3::dna4> read;
 
         for (auto const & [seq] : fin)
         {
@@ -68,9 +69,8 @@ void run_program(cmd_arguments const & arguments)
             for (uint32_t current_read_number = 0; current_read_number < reads_per_haplotype; ++current_read_number, ++read_counter)
             {
                 uint64_t const read_start_pos = read_start_dis(rng);
-                std::vector<seqan3::dna4> read = seq |
-                                                 seqan3::views::slice(read_start_pos, read_start_pos + arguments.read_length) |
-                                                 seqan3::views::to<std::vector>;
+                auto read_slice = seq | seqan3::views::slice(read_start_pos, read_start_pos + arguments.read_length);
+                read.assign(read_slice.begin(), read_slice.end());
 
                 for (uint8_t error_count = 0; error_count < arguments.max_errors; ++error_count)
                 {

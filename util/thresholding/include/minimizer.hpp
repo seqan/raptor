@@ -94,8 +94,6 @@ public:
     {
         uint64_t text_length = std::ranges::size(text);
 
-        forward_hashes.clear();
-        reverse_hashes.clear();
         minimizer_hash.clear();
         minimizer_begin.clear();
         minimizer_end.clear();
@@ -118,15 +116,11 @@ public:
         };
 
         // Compute all k-mer hashes for both forward and reverse strand.
-        forward_hashes = text |
-                         seqan3::views::kmer_hash(seqan3::ungapped{k}) |
-                         std::views::transform(apply_xor) |
-                         seqan3::views::to<std::vector<uint64_t>>;
+        auto forward_view = text | seqan3::views::kmer_hash(seqan3::ungapped{k}) | std::views::transform(apply_xor);
+        forward_hashes.assign(forward_view.begin(), forward_view.end());
 
-        reverse_hashes = rc_text |
-                         seqan3::views::kmer_hash(seqan3::ungapped{k}) |
-                         std::views::transform(apply_xor) |
-                         seqan3::views::to<std::vector<uint64_t>>;
+        auto reverse_view = rc_text | seqan3::views::kmer_hash(seqan3::ungapped{k}) | std::views::transform(apply_xor);
+        reverse_hashes.assign(reverse_view.begin(), reverse_view.end());
 
         // Choose the minimizers.
         minimizer_hash.reserve(possible_minimizers);
@@ -196,8 +190,6 @@ public:
     {
         uint64_t text_length = std::ranges::size(text);
 
-        forward_hashes.clear();
-        reverse_hashes.clear();
         minimizer_hash.clear();
         minimizer_begin.clear();
         minimizer_end.clear();
@@ -220,15 +212,11 @@ public:
         };
 
         // Compute all k-mer hashes for both forward and reverse strand.
-        forward_hashes = text |
-                         seqan3::views::kmer_hash(seqan3::ungapped{k}) |
-                         std::views::transform(apply_xor) |
-                         seqan3::views::to<std::vector<uint64_t>>;
+        auto forward_view = text | seqan3::views::kmer_hash(seqan3::ungapped{k}) | std::views::transform(apply_xor);
+        forward_hashes.assign(forward_view.begin(), forward_view.end());
 
-        reverse_hashes = rc_text |
-                         seqan3::views::kmer_hash(seqan3::ungapped{k}) |
-                         std::views::transform(apply_xor) |
-                         seqan3::views::to<std::vector<uint64_t>>;
+        auto reverse_view = rc_text | seqan3::views::kmer_hash(seqan3::ungapped{k}) | std::views::transform(apply_xor);
+        reverse_hashes.assign(reverse_view.begin(), reverse_view.end());
 
         // Choose the minimizers.
         minimizer_hash.reserve(possible_minimizers);

@@ -81,18 +81,19 @@ void run_program_single(search_arguments const & arguments)
         std::string result_string{};
         std::vector<uint64_t> minimiser;
 
-        auto hash_view = seqan3::views::minimiser_hash(arguments.shape,
-                                                       seqan3::window_size{arguments.window_size},
-                                                       seqan3::seed{adjust_seed(arguments.shape_weight)});
+        auto hash_adaptor = seqan3::views::minimiser_hash(arguments.shape,
+                                                          seqan3::window_size{arguments.window_size},
+                                                          seqan3::seed{adjust_seed(arguments.shape_weight)});
 
         for (auto && [id, seq] : records | seqan3::views::slice(start, end))
         {
-            minimiser.clear();
             result_string.clear();
             result_string += id;
             result_string += '\t';
 
-            minimiser = seq | hash_view | seqan3::views::to<std::vector<uint64_t>>;
+            auto minimiser_view = seq | hash_adaptor | std::views::common;
+            minimiser.assign(minimiser_view.begin(), minimiser_view.end());
+
             auto & result = counter.bulk_count(minimiser);
             size_t const minimiser_count{minimiser.size()};
             size_t current_bin{0};

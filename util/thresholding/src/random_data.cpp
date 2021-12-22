@@ -60,9 +60,8 @@ void run_program(std::filesystem::path const & out_directory,
             for (size_t i = 0; i < number_of_queries; ++i)
             {
                 size_t start = dis_pos(gen);
-                query_sequence = reference_sequence |
-                                 seqan3::views::slice(start, start + query_length) |
-                                 seqan3::views::to<std::vector<seqan3::dna4>>;
+                auto query_slice = reference_sequence | seqan3::views::slice(start, start + query_length);
+                query_sequence.assign(query_slice.begin(), query_slice.end());
 
                 for (size_t j = 0; j < errors; ++j)
                 {
