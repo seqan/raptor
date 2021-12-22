@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <seqan3/std/filesystem>
+#include <filesystem>
 #include <vector>
 
 #include <seqan3/search/kmer_index/shape.hpp>

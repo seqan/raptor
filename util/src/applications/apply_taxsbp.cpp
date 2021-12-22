@@ -5,7 +5,7 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <seqan3/std/filesystem>
+#include <filesystem>
 
 #include <seqan3/argument_parser/all.hpp>
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>

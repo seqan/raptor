@@ -8,6 +8,7 @@
 #include <chopper/count/execute.hpp>
 #include <chopper/layout/execute.hpp>
 
+#include <seqan3/test/tmp_directory.hpp>
 #include <seqan3/test/tmp_filename.hpp>
 
 #include "../cli_test.hpp"
@@ -16,8 +17,9 @@ struct build_hibf_chopper : public raptor_base {};
 
 TEST_F(build_hibf_chopper, pipeline)
 {
+    seqan3::test::tmp_directory count_dir{};
+    std::filesystem::path const count_prefix = count_dir.path() / "raptor_cli_test";
     seqan3::test::tmp_filename const data_filename{"raptor_cli_test.txt"};
-    seqan3::test::tmp_filename const count_filename{"raptor_cli_test.counts"};
     seqan3::test::tmp_filename const layout_filename{"raptor_cli_test.layout"};
     seqan3::test::tmp_filename const index_filename{"raptor.index"};
     seqan3::test::tmp_filename const search_filename{"search.out"};
@@ -37,24 +39,24 @@ TEST_F(build_hibf_chopper, pipeline)
     { // generate count file
         const char * argv[] = {"./chopper-count",
                                "--kmer-size", "19",
-                               "--window-size", "19",
+                               "--disable-sketch-output",
                                "--column-index", "2",
                                "--threads", "1",
-                               "--data_file", data_filename.get_path().c_str(),
-                               "-o", count_filename.get_path().c_str()};
+                               "--input-file", data_filename.get_path().c_str(),
+                               "--output-prefix", count_prefix.c_str()};
         int const argc = sizeof(argv) / sizeof(*argv);
         seqan3::argument_parser parser{"chopper-count", argc, argv, seqan3::update_notifications::off};
         chopper::count::execute(parser);
     }
 
-    ASSERT_TRUE(std::filesystem::exists(count_filename.get_path()));
+    ASSERT_TRUE(std::filesystem::exists(count_prefix.string() + ".count"));
 
     { // generate layout file
         const char * argv[] = {"./chopper-layout",
-                               "--technical-bins", "64",
+                               "--tmax", "64",
                                "--false-positive-rate", "0.05",
-                               "--filenames", count_filename.get_path().c_str(),
-                               "-o", layout_filename.get_path().c_str()};
+                               "--input-prefix", count_prefix.c_str(),
+                               "--output-file", layout_filename.get_path().c_str()};
         int const argc = sizeof(argv) / sizeof(*argv);
         seqan3::argument_parser parser{"chopper-layout", argc, argv, seqan3::update_notifications::off};
         chopper::layout::execute(parser);
@@ -90,4 +92,5 @@ TEST_F(build_hibf_chopper, pipeline)
     }
 
     compare_search(number_of_repeated_bins, number_of_errors, search_filename.get_path().c_str());
+    count_dir.clean();
 }

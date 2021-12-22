@@ -11,7 +11,7 @@
  */
 
 #include <chrono>
-#include <seqan3/std/filesystem>
+#include <filesystem>
 #include <numeric>
 #include <unordered_set>
 #include <set>
