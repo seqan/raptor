@@ -96,10 +96,9 @@ void run_program_single(search_arguments const & arguments)
             auto & result = counter.bulk_count(minimiser);
             size_t const minimiser_count{minimiser.size()};
             size_t current_bin{0};
-            size_t const index = std::min(minimiser_count < min_number_of_minimisers ?
-                                          0 :
-                                          minimiser_count - min_number_of_minimisers,
-                                 max_number_of_minimisers - min_number_of_minimisers);
+            size_t const index = std::clamp(minimiser_count,
+                                            min_number_of_minimisers,
+                                            max_number_of_minimisers) - min_number_of_minimisers;
 
             size_t const threshold = arguments.treshold_was_set ?
                                          static_cast<size_t>(minimiser_count * arguments.threshold) :

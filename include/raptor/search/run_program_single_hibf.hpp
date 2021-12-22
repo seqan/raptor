@@ -94,10 +94,9 @@ void run_program_single_hibf(search_arguments const & arguments)
 
             minimiser = seq | hash_view | seqan3::views::to<std::vector<uint64_t>>;
             size_t const minimiser_count{minimiser.size()};
-            size_t const index = std::min(minimiser_count < min_number_of_minimisers ?
-                                          0 :
-                                          minimiser_count - min_number_of_minimisers,
-                                 max_number_of_minimisers - min_number_of_minimisers);
+            size_t const index = std::clamp(minimiser_count,
+                                            min_number_of_minimisers,
+                                            max_number_of_minimisers) - min_number_of_minimisers;
 
             size_t const threshold = arguments.treshold_was_set ?
                                          static_cast<size_t>(minimiser_count * arguments.threshold) :
