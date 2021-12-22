@@ -58,7 +58,7 @@ std::vector<size_t> precompute_threshold(search_arguments const & arguments)
 {
     std::vector<size_t> thresholds;
 
-    if (arguments.threshold || read_thresholds(thresholds, arguments))
+    if (arguments.treshold_was_set || read_thresholds(thresholds, arguments))
         return thresholds;
 
     uint8_t const kmer_size{arguments.shape.size()};
