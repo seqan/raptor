@@ -58,6 +58,7 @@ TEST_P(search_hibf, no_hits)
                                                          "--output search.out",
                                                          "--error ", std::to_string(number_of_errors),
                                                          "--hibf",
+                                                         "--tau 0.99",
                                                          "--index ", ibf_path(number_of_repeated_bins,
                                                                               window_size,
                                                                               is_compressed::no,

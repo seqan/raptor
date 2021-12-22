@@ -26,7 +26,7 @@ struct search_arguments
     uint8_t parts{1u};
 
     // Related to thresholding
-    double tau{0.99};
+    double tau{0.9999};
     double threshold{};
     double p_max{0.15};
     double fpr{0.05};
