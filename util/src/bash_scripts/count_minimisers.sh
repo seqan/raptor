@@ -27,7 +27,7 @@ do_task () {
         --kmer $k \
         --threads $THREADS \
         --output $output_dir/$w\_$k.counts \
-        $(seq -f "$bin_dir/bin_%0${#BIN_NUMBER}g.fasta" 0 1 $((BIN_NUMBER-1)))
+        $(seq -f "$bin_dir/bin_%0${#BIN_NUMBER}.0f.fasta" 0 1 $((BIN_NUMBER-1)))
 }
 
 pidlist=""

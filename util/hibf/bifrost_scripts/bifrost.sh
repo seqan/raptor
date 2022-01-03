@@ -37,13 +37,13 @@ if [ "$COPY_INPUT" = true ] ; then
 
     cp -ur $INPUT_DIR/$BIN_NUMBER/bins $working_directory/
 
-    seq -f "$working_directory/bins/bin_%0${#BIN_NUMBER}g.fasta" 0 1 $((BIN_NUMBER-1)) > $working_directory/bins.list
+    seq -f "$working_directory/bins/bin_%0${#BIN_NUMBER}.0f.fasta" 0 1 $((BIN_NUMBER-1)) > $working_directory/bins.list
 
     cp -u $INPUT_DIR/$BIN_NUMBER/reads_e$ERRORS\_$READ_LENGTH/all_10.fastq $working_directory/reads/
     read_file=$working_directory/reads/all_10.fastq
     echo "Done."
 else
-    seq -f "$INPUT_DIR/$BIN_NUMBER/bins/bin_%0${#BIN_NUMBER}g.fasta" 0 1 $((BIN_NUMBER-1)) > $working_directory/bins.list
+    seq -f "$INPUT_DIR/$BIN_NUMBER/bins/bin_%0${#BIN_NUMBER}.0f.fasta" 0 1 $((BIN_NUMBER-1)) > $working_directory/bins.list
     read_file=$INPUT_DIR/$BIN_NUMBER/reads_e$ERRORS\_$READ_LENGTH/all_10.fastq
 fi
 
