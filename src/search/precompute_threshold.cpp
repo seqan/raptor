@@ -63,10 +63,7 @@ std::vector<size_t> precompute_threshold(search_arguments const & arguments)
 
     uint8_t const kmer_size{arguments.shape.size()};
 
-    if (arguments.window_size == kmer_size)
-        return {arguments.pattern_size + 1u > (arguments.errors + 1u) * kmer_size ?
-                arguments.pattern_size + 1u - (arguments.errors + 1u) * kmer_size :
-                0};
+    assert(arguments.window_size != kmer_size); // Only applicable to probabilistic thresholding.
 
     size_t const kmers_per_window = arguments.window_size - kmer_size + 1;
     size_t const kmers_per_pattern = arguments.pattern_size - kmer_size + 1;
