@@ -6,15 +6,24 @@
 # shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 # -----------------------------------------------------------------------------------------------------
 
-/example/runs/raptor_scripts/raptor.sh 0.05 4G 20 20
+set -Eeuo pipefail
+
+# Parameters:
+# FPR
+# (Vanilla) IBF size
+# window size
+# k-mer size
+# cleanup?
+
+/example/runs/raptor_scripts/raptor.sh 0.05 4G 20 20 false
 sleep 1
-/example/runs/raptor_scripts/raptor.sh 0.015 8G 20 20
+/example/runs/raptor_scripts/raptor.sh 0.015 8G 20 20 false
 sleep 1
-/example/runs/raptor_scripts/raptor.sh 0.05 1584M 23 19
+/example/runs/raptor_scripts/raptor.sh 0.05 1584M 23 19 false
 sleep 1
-/example/runs/raptor_scripts/raptor.sh 0.015 3069M 23 19
+/example/runs/raptor_scripts/raptor.sh 0.015 3069M 23 19 false
 sleep 1
-/example/runs/raptor_scripts/raptor.sh 0.05 1584M 24 20
+/example/runs/raptor_scripts/raptor.sh 0.05 1584M 24 20 false
 sleep 1
-/example/runs/raptor_scripts/raptor.sh 0.015 3069M 24 20
+/example/runs/raptor_scripts/raptor.sh 0.015 3069M 24 20 true
 sleep 1

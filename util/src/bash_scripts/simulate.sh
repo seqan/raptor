@@ -7,7 +7,7 @@
 # shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 # -----------------------------------------------------------------------------------------------------
 
-set -e
+set -Eeuo pipefail
 
 BINARY_DIR="<path to built binaries>" # Dir containing "mason_genome", "split_sequence", etc.
 OUT_DIR="<output path>" # Where simulated data should be stored
@@ -57,7 +57,7 @@ do
     read_dir=$output_dir/reads_e$ERRORS\_$read_length
     mkdir -p $read_dir
     list_file=$read_dir/all_bins.txt
-    seq -f "$output_dir/bins/bin_%0${#BIN_NUMBER}g.fasta" 0 1 $((BIN_NUMBER-1)) > $list_file
+    seq -f "$output_dir/bins/bin_%0${#BIN_NUMBER}.0f.fasta" 0 1 $((BIN_NUMBER-1)) > $list_file
     $BINARY_DIR/generate_reads \
         --output $read_dir \
         --max_errors $ERRORS \

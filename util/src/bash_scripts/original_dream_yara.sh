@@ -27,15 +27,15 @@ do_task () {
         echo "[$(date +%H:%M)] Copying input"
         mkdir -p $working_directory/bins/
         mkdir -p $working_directory/reads/
-        for i in $(seq -f "$BIN_DIR/$BIN_NUMBER/bins/bin_%0${#BIN_NUMBER}g.fasta.gz" 0 1 $((BIN_NUMBER-1))); do
+        for i in $(seq -f "$BIN_DIR/$BIN_NUMBER/bins/bin_%0${#BIN_NUMBER}.0f.fasta.gz" 0 1 $((BIN_NUMBER-1))); do
             cp $i $working_directory/bins/
         done
         cp $BIN_DIR/$BIN_NUMBER/reads_e$ERRORS/$READ_LENGTH/all.fastq $working_directory/reads/
-        bin_list=$(seq -f "$working_directory/bins/bin_%0${#BIN_NUMBER}g.fasta.gz" 0 1 $((BIN_NUMBER-1)))
+        bin_list=$(seq -f "$working_directory/bins/bin_%0${#BIN_NUMBER}.0f.fasta.gz" 0 1 $((BIN_NUMBER-1)))
         read_file=$working_directory/reads/all.fastq
         COPY_INPUT=false
     else
-        bin_list=$(seq -f "$BIN_DIR/$BIN_NUMBER/bins/bin_%0${#BIN_NUMBER}g.fasta.gz" 0 1 $((BIN_NUMBER-1)))
+        bin_list=$(seq -f "$BIN_DIR/$BIN_NUMBER/bins/bin_%0${#BIN_NUMBER}.0f.fasta.gz" 0 1 $((BIN_NUMBER-1)))
         read_file=$BIN_DIR/$BIN_NUMBER/reads_e$ERRORS/$READ_LENGTH/all.fastq
     fi
 

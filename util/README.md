@@ -19,7 +19,7 @@ To cluster a data set by taxonomy, you will also need the following tools:
 * [TaxSBP](https://github.com/pirovc/taxsbp)
 
 In case, the bash expression `some/path/bin_{00..63}.fasta` or similar does not work for your shell, an alternative is
-to use `$(BIN_NUMBER=64; seq -f "some/path/bin_%0${#BIN_NUMBER}g.fasta" 0 1 $((BIN_NUMBER-1)))` instead. Replace
+to use `$(BIN_NUMBER=64; seq -f "some/path/bin_%0${#BIN_NUMBER}.0f.fasta" 0 1 $((BIN_NUMBER-1)))` instead. Replace
 `BIN_NUMBER` as needed.
 
 ## Compiling Applications

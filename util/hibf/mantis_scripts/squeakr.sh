@@ -23,7 +23,7 @@ run_squeakr () {
 
 for start in $(seq 0 32 $((BIN_NUMBER-1))); do
     pidlist=""
-    for FASTQ in $(seq -f "$WORKING_DIRECTORY/bins/bin_%0${#BIN_NUMBER}g.fastq" $start 1 $((start+31))); do
+    for FASTQ in $(seq -f "$WORKING_DIRECTORY/bins/bin_%0${#BIN_NUMBER}.0f.fastq" $start 1 $((start+31))); do
         run_squeakr & pidlist="$pidlist $!"
     done
     for job in $pidlist; do
