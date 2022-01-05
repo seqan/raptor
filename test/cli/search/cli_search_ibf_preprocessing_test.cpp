@@ -59,6 +59,7 @@ TEST_P(search_ibf_preprocessing, pipeline)
     cli_test_result const result3 = execute_app("raptor", "search",
                                                           "--output search.out",
                                                           "--error ", std::to_string(number_of_errors),
+                                                          "--p_max 0.4",
                                                           "--index ", "raptor.index",
                                                           "--query ", data("query.fq"));
     EXPECT_EQ(result3.out, std::string{});
@@ -116,6 +117,7 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
     cli_test_result const result3 = execute_app("raptor", "search",
                                                           "--output search.out",
                                                           "--error ", std::to_string(number_of_errors),
+                                                          "--p_max 0.4",
                                                           "--index ", "raptor.index",
                                                           "--query ", data("query.fq"));
     EXPECT_EQ(result3.out, std::string{});

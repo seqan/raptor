@@ -16,6 +16,7 @@ TEST_P(search_ibf, with_error)
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--output search.out",
                                                          "--error ", std::to_string(number_of_errors),
+                                                         "--p_max 0.4",
                                                          "--index ", ibf_path(number_of_repeated_bins, window_size),
                                                          "--query ", data("query.fq"));
     EXPECT_EQ(result.out, std::string{});

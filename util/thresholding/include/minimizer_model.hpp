@@ -345,7 +345,7 @@ std::vector<size_t> precompute_threshold(size_t const pattern_size,
     size_t kmers_per_window = window_size - kmer_size + 1;
     size_t kmers_per_pattern = pattern_size - kmer_size + 1;
 
-    size_t minimal_number_of_minimizers = kmers_per_window == 1 ? kmers_per_pattern : kmers_per_pattern / kmers_per_window;
+    size_t minimal_number_of_minimizers = kmers_per_pattern / kmers_per_window;
     size_t maximal_number_of_minimizers = pattern_size - window_size + 1;
 
     std::vector<double> indirect_errors;

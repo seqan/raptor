@@ -42,6 +42,7 @@ TEST_P(build_ibf_partitioned, pipeline)
     cli_test_result const result2 = execute_app("raptor", "search",
                                                           "--output search.out",
                                                           "--error ", std::to_string(number_of_errors),
+                                                          "--p_max 0.4",
                                                           "--index ", "raptor.index",
                                                           "--query ", data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});
