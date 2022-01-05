@@ -20,10 +20,26 @@ namespace raptor
 {
 
 template <bool compressed>
-void run_program_single(search_arguments const & arguments)
+void search_ibf(search_arguments const & arguments)
 {
     using index_structure_t = std::conditional_t<compressed, index_structure::ibf_compressed, index_structure::ibf>;
     auto index = raptor_index<index_structure_t>{};
+    run_program_single(arguments, std::move(index));
+}
+
+template <bool compressed>
+void search_hibf(search_arguments const & arguments)
+{
+    using index_structure_t = std::conditional_t<compressed, index_structure::hibf_compressed, index_structure::hibf>;
+    auto index = raptor_index<index_structure_t>{};
+    run_program_single(arguments, std::move(index));
+}
+
+template <typename index_t>
+void run_program_single(search_arguments const & arguments, index_t && index)
+{
+    constexpr bool is_ibf = std::same_as<index_t, raptor_index<index_structure::ibf>> ||
+                            std::same_as<index_t, raptor_index<index_structure::ibf_compressed>>;
 
     double index_io_time{0.0};
     double reads_io_time{0.0};
@@ -66,8 +82,13 @@ void run_program_single(search_arguments const & arguments)
 
     auto worker = [&] (size_t const start, size_t const end)
     {
-        auto & ibf = index.ibf();
-        auto counter = ibf.template counting_agent<uint16_t>();
+        auto counter = [&index] ()
+        {
+            if constexpr (is_ibf)
+                return index.ibf().template counting_agent<uint16_t>();
+            else
+                return index.ibf().membership_agent();
+        }();
         std::string result_string{};
         std::vector<uint64_t> minimiser;
 
@@ -84,20 +105,33 @@ void run_program_single(search_arguments const & arguments)
             auto minimiser_view = seq | hash_adaptor | std::views::common;
             minimiser.assign(minimiser_view.begin(), minimiser_view.end());
 
-            auto & result = counter.bulk_count(minimiser);
             size_t const minimiser_count{minimiser.size()};
-            size_t current_bin{0};
-
             size_t const threshold = thresholder.get(minimiser_count);
-            for (auto && count : result)
+
+            if constexpr (is_ibf)
             {
-                if (count >= threshold)
+                auto & result = counter.bulk_count(minimiser);
+                size_t current_bin{0};
+                for (auto && count : result)
                 {
-                    result_string += std::to_string(current_bin);
+                    if (count >= threshold)
+                    {
+                        result_string += std::to_string(current_bin);
+                        result_string += ',';
+                    }
+                    ++current_bin;
+                }
+            }
+            else
+            {
+                auto & result = counter.bulk_contains(minimiser, threshold); // Results contains user bin IDs
+                for (auto && count : result)
+                {
+                    result_string += std::to_string(count);
                     result_string += ',';
                 }
-                ++current_bin;
             }
+
             if (auto & last_char = result_string.back(); last_char == ',')
                 last_char = '\n';
             else
