@@ -41,6 +41,7 @@ TEST_P(build_ibf_compressed, pipeline)
     RAPTOR_ASSERT_ZERO_EXIT(result1);
 
     cli_test_result const result2 = execute_app("raptor", "search",
+                                                          "--fpr 0.05",
                                                           "--output search.out",
                                                           "--error ", std::to_string(number_of_errors),
                                                           "--p_max 0.4",

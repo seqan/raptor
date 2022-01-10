@@ -57,6 +57,7 @@ TEST_P(search_ibf_preprocessing, pipeline)
     compare_index(ibf_path(number_of_repeated_bins, window_size), "raptor.index", compare_extension::no);
 
     cli_test_result const result3 = execute_app("raptor", "search",
+                                                          "--fpr 0.05",
                                                           "--output search.out",
                                                           "--error ", std::to_string(number_of_errors),
                                                           "--p_max 0.4",
@@ -115,6 +116,7 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
     compare_index(ibf_path(number_of_repeated_bins, window_size), "raptor.index", compare_extension::no);
 
     cli_test_result const result3 = execute_app("raptor", "search",
+                                                          "--fpr 0.05",
                                                           "--output search.out",
                                                           "--error ", std::to_string(number_of_errors),
                                                           "--p_max 0.4",

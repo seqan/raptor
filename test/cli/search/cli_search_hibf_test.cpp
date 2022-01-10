@@ -15,6 +15,7 @@ TEST_P(search_hibf, with_error)
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
     cli_test_result const result = execute_app("raptor", "search",
+                                                         "--fpr 0.05",
                                                          "--output search.out",
                                                          "--error ", std::to_string(number_of_errors),
                                                          "--p_max 0.4",
@@ -36,6 +37,7 @@ TEST_P(search_hibf, with_threshold)
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
     cli_test_result const result = execute_app("raptor", "search",
+                                                         "--fpr 0.05",
                                                          "--output search.out",
                                                          "--threshold 0.50",
                                                          "--hibf",
@@ -56,6 +58,7 @@ TEST_P(search_hibf, no_hits)
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
     cli_test_result const result = execute_app("raptor", "search",
+                                                         "--fpr 0.05",
                                                          "--output search.out",
                                                          "--error ", std::to_string(number_of_errors),
                                                          "--hibf",
@@ -87,6 +90,7 @@ INSTANTIATE_TEST_SUITE_P(
 TEST_F(search_hibf, three_levels)
 {
     cli_test_result const result = execute_app("raptor", "search",
+                                                         "--fpr 0.05",
                                                          "--output search.out",
                                                          "--error 0",
                                                          "--hibf",

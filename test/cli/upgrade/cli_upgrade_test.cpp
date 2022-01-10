@@ -86,6 +86,7 @@ TEST_F(upgrade, partitioned_ibf)
     RAPTOR_ASSERT_ZERO_EXIT(result1);
 
     cli_test_result const result2 = execute_app("raptor", "search",
+                                                          "--fpr 0.05",
                                                           "--output search.out",
                                                           "--error 1",
                                                           "--index raptor.index",
