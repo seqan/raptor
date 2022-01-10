@@ -112,7 +112,7 @@ void threshold_info(raptor::search_arguments const & arguments)
 
 void init_search_parser(seqan3::argument_parser & parser, raptor::search_arguments & arguments)
 {
-    arguments.write_thresholds = false;
+    arguments.cache_thresholds = false;
     parser.add_option(arguments.query_file,
                       '\0',
                       "query",

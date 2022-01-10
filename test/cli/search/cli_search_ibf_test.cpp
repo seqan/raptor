@@ -85,6 +85,40 @@ TEST_P(search_ibf, no_hits)
     compare_search(number_of_repeated_bins, number_of_errors, "search.out", is_empty::yes);
 }
 
+TEST_F(search_ibf, cache_thresholds)
+{
+    size_t const number_of_repeated_bins{16};
+    uint32_t const window_size{23};
+    uint8_t const number_of_errors{1};
+
+    {
+        cli_test_result const result = execute_app("raptor", "search",
+                                                            "--fpr 0.05",
+                                                            "--cache-thresholds",
+                                                            "--output search.out",
+                                                            "--error ", std::to_string(number_of_errors),
+                                                            "--p_max 0.4",
+                                                            "--index ", ibf_path(number_of_repeated_bins, window_size),
+                                                            "--query ", data("query.fq"));
+        EXPECT_EQ(result.out, std::string{});
+        EXPECT_EQ(result.err, std::string{});
+        RAPTOR_ASSERT_ZERO_EXIT(result);
+    }
+
+    cli_test_result const result = execute_app("raptor", "search",
+                                                         "--fpr 0.05",
+                                                         "--output search.out",
+                                                         "--error ", std::to_string(number_of_errors),
+                                                         "--p_max 0.4",
+                                                         "--index ", ibf_path(number_of_repeated_bins, window_size),
+                                                         "--query ", data("query.fq"));
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
+
+    compare_search(number_of_repeated_bins, number_of_errors, "search.out");
+}
+
 INSTANTIATE_TEST_SUITE_P(
     search_ibf_suite,
     search_ibf,

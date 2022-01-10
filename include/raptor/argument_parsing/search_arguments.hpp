@@ -45,7 +45,7 @@ struct search_arguments
     bool write_time{false};
     bool is_socks{false};
     bool is_hibf{false};
-    bool write_thresholds{true};
+    bool cache_thresholds{false};
 };
 
 } // namespace raptor

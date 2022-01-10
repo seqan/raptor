@@ -79,6 +79,14 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
                       "The numer of threads to use.",
                       seqan3::option_spec::standard,
                       positive_integer_validator{});
+    parser.add_flag(arguments.cache_thresholds,
+                    '\0',
+                    "cache-thresholds",
+                    "Stores the computed thresholds with an unique name next to the index. In the next search call, "
+                    "the stored thresholds can be re-used instead of computed again.\n"
+                    "Two files are stored:\n"
+                    "\\fBthreshold_*.bin\\fP: Depends on pattern, window, kmer/shape, errors, and tau.\n"
+                    "\\fBcorrection_*.bin\\fP: Depends on pattern, window, kmer/shape, p_max, and fpr.");
     parser.add_flag(arguments.is_hibf,
                     '\0',
                     "hibf",
