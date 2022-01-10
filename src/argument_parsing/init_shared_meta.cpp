@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------------------------------
-// Copyright (c) 2006-2021, Knut Reinert & Freie Universität Berlin
-// Copyright (c) 2016-2021, Knut Reinert & MPI für molekulare Genetik
+// Copyright (c) 2006-2022, Knut Reinert & Freie Universität Berlin
+// Copyright (c) 2016-2022, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ void init_shared_meta(seqan3::argument_parser & parser)
     parser.info.email = "enrico.seiler@fu-berlin.de";
     parser.info.long_copyright = R"(BSD 3-Clause License
 
-Copyright (c) 2021, Enrico Seiler
+Copyright (c) 2022, Enrico Seiler
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
