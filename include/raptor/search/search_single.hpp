@@ -19,24 +19,8 @@
 namespace raptor
 {
 
-template <bool compressed>
-void search_ibf(search_arguments const & arguments)
-{
-    using index_structure_t = std::conditional_t<compressed, index_structure::ibf_compressed, index_structure::ibf>;
-    auto index = raptor_index<index_structure_t>{};
-    run_program_single(arguments, std::move(index));
-}
-
-template <bool compressed>
-void search_hibf(search_arguments const & arguments)
-{
-    using index_structure_t = std::conditional_t<compressed, index_structure::hibf_compressed, index_structure::hibf>;
-    auto index = raptor_index<index_structure_t>{};
-    run_program_single(arguments, std::move(index));
-}
-
 template <typename index_t>
-void run_program_single(search_arguments const & arguments, index_t && index)
+void search_single(search_arguments const & arguments, index_t && index)
 {
     constexpr bool is_ibf = std::same_as<index_t, raptor_index<index_structure::ibf>> ||
                             std::same_as<index_t, raptor_index<index_structure::ibf_compressed>>;
