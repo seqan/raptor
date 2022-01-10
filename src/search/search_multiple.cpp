@@ -5,14 +5,13 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#pragma once
-
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <raptor/adjust_seed.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/search/do_parallel.hpp>
 #include <raptor/search/load_index.hpp>
+#include <raptor/search/search_multiple.hpp>
 #include <raptor/search/sync_out.hpp>
 #include <raptor/search/threshold.hpp>
 
@@ -20,7 +19,7 @@ namespace raptor
 {
 
 template <bool compressed>
-void run_program_multiple(search_arguments const & arguments)
+void search_multiple(search_arguments const & arguments)
 {
     using index_structure_t = std::conditional_t<compressed, index_structure::ibf_compressed, index_structure::ibf>;
     auto index = raptor_index<index_structure_t>{};
@@ -167,5 +166,11 @@ void run_program_multiple(search_arguments const & arguments)
     }
 // LCOV_EXCL_STOP
 }
+
+template
+void search_multiple<false>(search_arguments const & arguments);
+
+template
+void search_multiple<true>(search_arguments const & arguments);
 
 } // namespace raptor
