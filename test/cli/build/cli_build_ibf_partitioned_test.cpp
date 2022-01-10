@@ -40,6 +40,7 @@ TEST_P(build_ibf_partitioned, pipeline)
     RAPTOR_ASSERT_ZERO_EXIT(result1);
 
     cli_test_result const result2 = execute_app("raptor", "search",
+                                                          "--fpr 0.05",
                                                           "--output search.out",
                                                           "--error ", std::to_string(number_of_errors),
                                                           "--p_max 0.4",
@@ -79,6 +80,7 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
     RAPTOR_ASSERT_ZERO_EXIT(result1);
 
     cli_test_result const result2 = execute_app("raptor", "search",
+                                                          "--fpr 0.05",
                                                           "--output search.out",
                                                           "--threshold 0.5",
                                                           "--index ", "raptor.index",
@@ -90,6 +92,7 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
     compare_search(16, 1 /* Always finds everything */, "search.out");
 
     cli_test_result const result3 = execute_app("raptor", "search",
+                                                          "--fpr 0.05",
                                                           "--output search2.out",
                                                           "--error 1",
                                                           "--index ", "raptor.index",

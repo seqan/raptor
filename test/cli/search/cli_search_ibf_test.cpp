@@ -14,6 +14,7 @@ TEST_P(search_ibf, with_error)
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
     cli_test_result const result = execute_app("raptor", "search",
+                                                         "--fpr 0.05",
                                                          "--output search.out",
                                                          "--error ", std::to_string(number_of_errors),
                                                          "--p_max 0.4",
@@ -55,6 +56,7 @@ TEST_P(search_ibf, threshold)
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
     cli_test_result const result = execute_app("raptor", "search",
+                                                         "--fpr 0.05",
                                                          "--output search.out",
                                                          "--threshold 0.50",
                                                          "--index ", ibf_path(number_of_repeated_bins, window_size),
@@ -71,6 +73,7 @@ TEST_P(search_ibf, no_hits)
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
     cli_test_result const result = execute_app("raptor", "search",
+                                                         "--fpr 0.05",
                                                          "--output search.out",
                                                          "--error ", std::to_string(number_of_errors),
                                                          "--index ", ibf_path(number_of_repeated_bins, window_size),

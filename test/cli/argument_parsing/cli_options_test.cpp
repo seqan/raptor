@@ -282,6 +282,7 @@ TEST_F(argparse_build, wrong_parts)
 TEST_F(argparse_search, ibf_missing)
 {
     cli_test_result const result = execute_app("raptor", "search",
+                                                         "--fpr 0.05",
                                                          "--query ", data("query.fq"),
                                                          "--output search.out");
     EXPECT_EQ(result.out, std::string{});
@@ -292,6 +293,7 @@ TEST_F(argparse_search, ibf_missing)
 TEST_F(argparse_search, ibf_wrong)
 {
     cli_test_result const result = execute_app("raptor", "search",
+                                                         "--fpr 0.05",
                                                          "--query ", data("query.fq"),
                                                          "--index foo.index",
                                                          "--output search.out");
@@ -303,6 +305,7 @@ TEST_F(argparse_search, ibf_wrong)
 TEST_F(argparse_search, query_missing)
 {
     cli_test_result const result = execute_app("raptor", "search",
+                                                         "--fpr 0.05",
                                                          "--index ", tmp_index_file.file_path,
                                                          "--output search.out");
     EXPECT_EQ(result.out, std::string{});
@@ -313,6 +316,7 @@ TEST_F(argparse_search, query_missing)
 TEST_F(argparse_search, query_wrong)
 {
     cli_test_result const result = execute_app("raptor", "search",
+                                                         "--fpr 0.05",
                                                          "--query foo.fasta",
                                                          "--index ", tmp_index_file.file_path,
                                                          "--output search.out");
@@ -325,6 +329,7 @@ TEST_F(argparse_search, query_wrong)
 TEST_F(argparse_search, output_missing)
 {
     cli_test_result const result = execute_app("raptor", "search",
+                                                         "--fpr 0.05",
                                                          "--query ", data("query.fq"),
                                                          "--index ", tmp_index_file.file_path);
     EXPECT_EQ(result.out, std::string{});
@@ -335,11 +340,31 @@ TEST_F(argparse_search, output_missing)
 TEST_F(argparse_search, old_index)
 {
     cli_test_result const result = execute_app("raptor", "search",
+                                                         "--fpr 0.05",
                                                          "--query ", data("query.fq"),
                                                          "--index ", data("1_1.index"),
                                                          "--output search.out");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Unsupported index version. Check raptor upgrade.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
+TEST_F(argparse_search, temporary_warning)
+{
+    cli_test_result const result = execute_app("raptor", "search",
+                                                         "--query ", data("query.fq"),
+                                                         "--index ", data("1_1.index"),
+                                                         "--output search.out");
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[WARNING] The search needs the FPR that was used for building the index.\n"
+                                      "          Currently, the default value of 0.05 is used.\n"
+                                      "          If the index was built with a different FPR, the search results are "
+                                      "not reliable.\n"
+                                      "          The final version will store the FPR in the index and this parameter "
+                                      "will be removed.\n"
+                                      "          To disable this warning, explicitly pass the FPR to raptor search "
+                                      "(--fpr 0.05).\n"
+                                      "[Error] Unsupported index version. Check raptor upgrade.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 

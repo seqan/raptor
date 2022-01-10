@@ -81,6 +81,7 @@ TEST_F(build_hibf_chopper, pipeline)
 
     { // check with search if index contains expected input
         cli_test_result const result = execute_app("raptor", "search",
+                                                             "--fpr 0.05",
                                                              "--output", search_filename.get_path(),
                                                              "--error", std::to_string(number_of_errors),
                                                              "--hibf",

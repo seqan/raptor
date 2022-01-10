@@ -47,7 +47,7 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
     parser.add_option(arguments.tau,
                       '\0',
                       "tau",
-                      "Threshold for probabilistic models.",
+                      "Used in the dynamic thresholding. The higher tau, the lower the threshold.",
                       arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{0, 1});
     parser.add_option(arguments.threshold,
@@ -59,13 +59,13 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
     parser.add_option(arguments.p_max,
                       '\0',
                       "p_max",
-                      "Correction.",
+                      "Used in the dynamic thresholding. The higher p_max, the lower the threshold.",
                       arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{0, 1});
     parser.add_option(arguments.fpr,
                       '\0',
                       "fpr",
-                      "fpr.",
+                      "The false positive rate used for building the index.",
                       arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{0, 1});
     parser.add_option(arguments.pattern_size,
@@ -132,6 +132,21 @@ void search_parsing(seqan3::argument_parser & parser, bool const is_socks)
     catch (seqan3::validation_error const & e)
     {
         validator(arguments.index_file);
+    }
+
+    // ==========================================
+    // Temporary.
+    // ==========================================
+    if (!arguments.treshold_was_set && !arguments.is_socks && !parser.is_option_set("fpr"))
+    {
+        std::cerr << "[WARNING] The search needs the FPR that was used for building the index.\n"
+                  << "          Currently, the default value of "
+                  << std::setprecision(4)
+                  << arguments.fpr
+                  << " is used.\n"
+                  << "          If the index was built with a different FPR, the search results are not reliable.\n"
+                  << "          The final version will store the FPR in the index and this parameter will be removed.\n"
+                  << "          To disable this warning, explicitly pass the FPR to raptor search (--fpr 0.05).\n";
     }
 
     // ==========================================
