@@ -20,7 +20,7 @@ void read_chopper_pack_file(build_data<data_layout_mode> & data, std::string con
     std::ifstream chopper_pack_file{chopper_pack_filename};
 
     if (!chopper_pack_file.good() || !chopper_pack_file.is_open())
-        throw std::logic_error{"Could not open file " + chopper_pack_filename + " for reading"}; // LCOV_EXCL_LINE
+        throw std::logic_error{"Could not open file " + chopper_pack_filename + " for reading"}; // GCOVR_EXCL_LINE
 
     // parse header
     // -------------------------------------------------------------------------

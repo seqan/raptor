@@ -9,7 +9,7 @@
 
 #include <string_view>
 
-//LCOV_EXCL_START
+//GCOVR_EXCL_START
 namespace raptor::detail
 {
 
@@ -41,4 +41,4 @@ namespace raptor::detail
 #endif
 
 } // namespace raptor::detail
-//LCOV_EXCL_STOP
+//GCOVR_EXCL_STOP

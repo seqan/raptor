@@ -100,18 +100,25 @@ set (SEQAN3_CEREAL ON CACHE BOOL "Require cereal to be present.")
 set (SEQAN3_SUBMODULES_DIR "${RAPTOR_SUBMODULES_DIR}")
 find_package (SeqAn3 QUIET REQUIRED HINTS ${RAPTOR_SUBMODULES_DIR}/seqan3/build_system)
 
+# Allow to include CMake scripts from seqan3.
+list (APPEND CMAKE_MODULE_PATH "${SEQAN3_CLONE_DIR}/test/cmake/")
+
 # Define cmake configuration flags to configure and build external projects with the same flags as specified for
 # this project.
 set (SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "")
+list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "--no-warn-unused-cli")
 list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
-list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_C_COMPILER_LAUNCHER=${CMAKE_C_COMPILER_LAUNCHER}")
 list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}")
 list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
-list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_CXX_COMPILER_LAUNCHER=${CMAKE_CXX_COMPILER_LAUNCHER}")
 list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}")
 list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}")
+
+# Use ccache.
+set (RAPTOR_USE_CCACHE ON CACHE BOOL "Use ccache if available.")
+include (${CMAKE_CURRENT_LIST_DIR}/cmake/raptor_require_ccache.cmake)
+raptor_require_ccache ()
 
 # Dependency: chopper
 set (RAPTOR_CHOPPER_PATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libchopper_count_lib.a")
@@ -148,16 +155,6 @@ set_target_properties (chopper_layout PROPERTIES IMPORTED_LOCATION "${CMAKE_LIBR
 
 add_library (chopper INTERFACE IMPORTED)
 set_property (TARGET chopper PROPERTY INTERFACE_LINK_LIBRARIES chopper_count chopper_layout)
-
-# Allow to include CMake scripts from seqan3.
-list (APPEND CMAKE_MODULE_PATH "${SEQAN3_CLONE_DIR}/test/cmake/")
-
-# Use ccache.
-set (RAPTOR_USE_CCACHE ON CACHE BOOL "Use ccache if available.")
-if (RAPTOR_USE_CCACHE)
-     include (seqan3_require_ccache)
-     seqan3_require_ccache ()
-endif ()
 
 # Add the application.
 add_subdirectory (src)

@@ -75,13 +75,13 @@ void upgrade_parsing(seqan3::argument_parser & parser)
     std::error_code ec{};
     std::filesystem::create_directories(output_directory, ec);
 
-// LCOV_EXCL_START
+// GCOVR_EXCL_START
     if (!output_directory.empty() && ec)
         throw seqan3::argument_parser_error{seqan3::detail::to_string("Failed to create directory\"",
                                                                       output_directory.c_str(),
                                                                       "\": ",
                                                                       ec.message())};
-// LCOV_EXCL_STOP
+// GCOVR_EXCL_STOP
 
     if (arguments.parts == 1)
     {
