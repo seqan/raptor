@@ -168,11 +168,11 @@ private:
                                      result.push_back("bgzf");
                                  #endif
                                  return result;
-                             }()}; // LCOV_EXCL_LINE
+                             }()}; // GCOVR_EXCL_LINE
     std::vector<std::string> combined_extensions{[&] ()
                              {
                                  if (compression_extensions.empty())
-                                    return sequence_extensions; // LCOV_EXCL_LINE
+                                    return sequence_extensions; // GCOVR_EXCL_LINE
                                  std::vector<std::string> result;
                                  for (auto && sequence_extension : sequence_extensions)
                                  {

@@ -166,13 +166,13 @@ void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
     std::error_code ec{};
     std::filesystem::create_directories(output_directory, ec);
 
-// LCOV_EXCL_START
+// GCOVR_EXCL_START
     if (!output_directory.empty() && ec)
         throw seqan3::argument_parser_error{seqan3::detail::to_string("Failed to create directory\"",
                                                                       output_directory.c_str(),
                                                                       "\": ",
                                                                       ec.message())};
-// LCOV_EXCL_STOP
+// GCOVR_EXCL_STOP
 
     if (!is_compute_minimiser_set)
     {
@@ -200,7 +200,7 @@ void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
 
         switch (std::tolower(arguments.size.back()))
         {
-    // LCOV_EXCL_START
+    // GCOVR_EXCL_START
             case 't':
                 multiplier = 8ull * 1024ull * 1024ull * 1024ull * 1024ull;
                 break;
@@ -210,14 +210,14 @@ void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
             case 'm':
                 multiplier = 8ull * 1024ull * 1024ull;
                 break;
-    // LCOV_EXCL_STOP
+    // GCOVR_EXCL_STOP
             case 'k':
                 multiplier = 8ull * 1024ull;
                 break;
-    // LCOV_EXCL_START
+    // GCOVR_EXCL_START
             default:
                 throw seqan3::argument_parser_error{"Use {k, m, g, t} to pass size. E.g., --size 8g."};
-    // LCOV_EXCL_STOP
+    // GCOVR_EXCL_STOP
         }
 
         size_t size{};
