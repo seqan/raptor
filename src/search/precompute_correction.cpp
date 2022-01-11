@@ -21,16 +21,35 @@
 namespace raptor
 {
 
+std::string const correction_filename(search_arguments const & arguments)
+{
+    std::stringstream stream{};
+    stream << "correction_"
+           << std::hex
+           << arguments.pattern_size
+           << '_'
+           << arguments.window_size
+           << '_'
+           << arguments.shape.to_ulong()
+           << '_'
+           << arguments.p_max
+           << '_'
+           << arguments.fpr
+           << ".bin";
+    std::string result = stream.str();
+    if (auto it = result.find("0."); it != std::string::npos)
+        result.replace(it, 2, "");
+    if (auto it = result.find("0."); it != std::string::npos)
+        result.replace(it, 2, "");
+    return result;
+}
+
 void write_correction(std::vector<size_t> const & vec, search_arguments const & arguments)
 {
-    if (!arguments.write_thresholds)
-        return; // LCOV_EXCL_LINE
+    if (!arguments.cache_thresholds)
+        return;
 
-    std::filesystem::path filename = arguments.index_file.parent_path() / ("correction_p" + std::to_string(arguments.pattern_size) +
-                                                                           "_w" + std::to_string(arguments.window_size) +
-                                                                           "_k" + arguments.shape.to_string() +
-                                                                           "_p_max" + std::to_string(arguments.p_max) +
-                                                                           "_fpr" + std::to_string(arguments.fpr));
+    std::filesystem::path filename = arguments.index_file.parent_path() / correction_filename(arguments);
     std::ofstream os{filename, std::ios::binary};
     cereal::BinaryOutputArchive oarchive{os};
     oarchive(vec);
@@ -38,11 +57,7 @@ void write_correction(std::vector<size_t> const & vec, search_arguments const & 
 
 bool read_correction(std::vector<size_t> & vec, search_arguments const & arguments)
 {
-    std::filesystem::path filename = arguments.index_file.parent_path() / ("correction_p" + std::to_string(arguments.pattern_size) +
-                                                                           "_w" + std::to_string(arguments.window_size) +
-                                                                           "_k" + arguments.shape.to_string() +
-                                                                           "_p_max" + std::to_string(arguments.p_max) +
-                                                                           "_fpr" + std::to_string(arguments.fpr));
+    std::filesystem::path filename = arguments.index_file.parent_path() / correction_filename(arguments);
     if (!std::filesystem::exists(filename))
         return false;
 

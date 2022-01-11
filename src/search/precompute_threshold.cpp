@@ -23,16 +23,33 @@
 namespace raptor
 {
 
+std::string const threshold_filename(search_arguments const & arguments)
+{
+    std::stringstream stream{};
+    stream << "threshold_"
+           << std::hex
+           << arguments.pattern_size
+           << '_'
+           << arguments.window_size
+           << '_'
+           << arguments.shape.to_ulong()
+           << '_'
+           << static_cast<uint16_t>(arguments.errors)
+           << '_'
+           << arguments.tau
+           << ".bin";
+    std::string result = stream.str();
+    if (auto it = result.find("0."); it != std::string::npos)
+        result.replace(it, 2, "");
+    return result;
+}
+
 void write_thresholds(std::vector<size_t> const & vec, search_arguments const & arguments)
 {
-    if (!arguments.write_thresholds)
-        return; // LCOV_EXCL_LINE
+    if (!arguments.cache_thresholds)
+        return;
 
-    std::filesystem::path filename = arguments.index_file.parent_path() / ("binary_p" + std::to_string(arguments.pattern_size) +
-                                                                           "_w" + std::to_string(arguments.window_size) +
-                                                                           "_k" + arguments.shape.to_string() +
-                                                                           "_e" + std::to_string(arguments.errors) +
-                                                                           "_tau" + std::to_string(arguments.tau));
+    std::filesystem::path filename = arguments.index_file.parent_path() / threshold_filename(arguments);
     std::ofstream os{filename, std::ios::binary};
     cereal::BinaryOutputArchive oarchive{os};
     oarchive(vec);
@@ -40,11 +57,7 @@ void write_thresholds(std::vector<size_t> const & vec, search_arguments const & 
 
 bool read_thresholds(std::vector<size_t> & vec, search_arguments const & arguments)
 {
-    std::filesystem::path filename = arguments.index_file.parent_path() / ("binary_p" + std::to_string(arguments.pattern_size) +
-                                                                           "_w" + std::to_string(arguments.window_size) +
-                                                                           "_k" + arguments.shape.to_string() +
-                                                                           "_e" + std::to_string(arguments.errors) +
-                                                                           "_tau" + std::to_string(arguments.tau));
+    std::filesystem::path filename = arguments.index_file.parent_path() / threshold_filename(arguments);
     if (!std::filesystem::exists(filename))
         return false;
 
