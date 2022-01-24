@@ -56,7 +56,7 @@ TEST_F(build_hibf_chopper, pipeline)
                                "--tmax", "64",
                                "--false-positive-rate", "0.05",
                                "--input-prefix", count_prefix.c_str(),
-                               "--output-file", layout_filename.get_path().c_str()};
+                               "--output-filename", layout_filename.get_path().c_str()};
         int const argc = sizeof(argv) / sizeof(*argv);
         seqan3::argument_parser parser{"chopper-layout", argc, argv, seqan3::update_notifications::off};
         chopper::layout::execute(parser);

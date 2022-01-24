@@ -11,6 +11,8 @@
 #include <cassert>
 #include <seqan3/std/charconv>
 
+#include <chopper/prefixes.hpp>
+
 #include <raptor/build/hibf/bin_prefixes.hpp>
 #include <raptor/build/hibf/parse_chopper_pack_header.hpp>
 #include <raptor/string_view.hpp>
@@ -50,7 +52,11 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
 
     std::string line;
 
-    std::getline(chopper_pack_file, line); // read first line
+    while (std::getline(chopper_pack_file, line) &&
+           line.size() >= 2 &&
+           std::string_view{line}.substr(0, 1) == chopper::prefix::header &&
+           std::string_view{line}.substr(1, 1) == chopper::prefix::header_config); // skip config in header
+
     assert(line[0] == '#'); // we are reading header lines
     assert(line.substr(1, hibf_prefix.size()) == hibf_prefix); // first line should always be High level IBF
 
