@@ -12,9 +12,10 @@ project (raptor_utility)
 
 # Make Release default build type
 if (NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE Release CACHE STRING
-         "Choose the type of build, options are: Debug Release RelWithDebInfo"
-         FORCE)
+    set (CMAKE_BUILD_TYPE
+         Release
+         CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo" FORCE
+    )
 endif ()
 
 # Specify the directories where to store the built archives, libraries and executables
@@ -66,7 +67,7 @@ if (RAPTOR_UTILITY_BUILD_DREAM_YARA)
     message ("-- Configuring DREAM-Yara - done")
 else ()
     message ("-- DREAM-Yara will not be built. Enable via 'cmake -DRAPTOR_UTILITY_BUILD_DREAM_YARA=1 .'")
-endif()
+endif ()
 
 add_library (common INTERFACE)
 target_link_libraries ("common" INTERFACE seqan3::seqan3)
@@ -82,19 +83,21 @@ add_executable ("split_sequence" src/applications/split_sequence.cpp)
 target_link_libraries ("split_sequence" "common")
 install (TARGETS "split_sequence" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
-add_executable ("count_minimiser" src/applications/count_minimiser.cpp
-                                  ../src/argument_parsing/parse_bin_path.cpp
-                                  ../src/build/hibf/parse_chopper_pack_line.cpp)
+add_executable ("count_minimiser" ../src/argument_parsing/parse_bin_path.cpp
+                                  ../src/build/hibf/parse_chopper_pack_line.cpp src/applications/count_minimiser.cpp
+)
 target_link_libraries ("count_minimiser" "common")
 install (TARGETS "count_minimiser" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
-add_executable ("threshold_info" src/applications/threshold_info.cpp
-                                 ../src/search/detail/destroyed_indirectly_by_error.cpp
-                                 ../src/search/detail/enumerate_all_errors.cpp
-                                 ../src/search/detail/pascal_row.cpp
-                                 ../src/search/detail/simple_model.cpp
-                                 ../src/search/precompute_correction.cpp
-                                 ../src/search/precompute_threshold.cpp)
+add_executable ("threshold_info"
+                ../src/search/detail/destroyed_indirectly_by_error.cpp
+                ../src/search/detail/enumerate_all_errors.cpp
+                ../src/search/detail/pascal_row.cpp
+                ../src/search/detail/simple_model.cpp
+                ../src/search/precompute_correction.cpp
+                ../src/search/precompute_threshold.cpp
+                src/applications/threshold_info.cpp
+)
 target_link_libraries ("threshold_info" "common")
 install (TARGETS "threshold_info" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 

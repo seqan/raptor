@@ -16,12 +16,16 @@ set (FontBold "${Esc}[1m")
 set (FontReset "${Esc}[m")
 
 # Fallback to these values if there is no git or no git repository
-set (RAPTOR_COMMIT_DATE "2021-08-20--no-git"
+set (RAPTOR_COMMIT_DATE
+     "2021-08-20--no-git"
      CACHE STRING
-     "Set to provide a commit date if git is not available or the source directory is not a git repository.")
-set (RAPTOR_COMMIT_HASH "74f815358db47037e93a56b826a9df3692e55680--no-git"
+           "Set to provide a commit date if git is not available or the source directory is not a git repository."
+)
+set (RAPTOR_COMMIT_HASH
+     "74f815358db47037e93a56b826a9df3692e55680--no-git"
      CACHE STRING
-     "Set to provide a commit hash if git is not available or the source directory is not a git repository.")
+           "Set to provide a commit hash if git is not available or the source directory is not a git repository."
+)
 
 # Extract git commit hash and date
 find_package (Git QUIET)
@@ -30,21 +34,21 @@ if (GIT_FOUND)
     execute_process (COMMAND "${GIT_EXECUTABLE}" -C "${CMAKE_SOURCE_DIR}" rev-parse
                      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
                      RESULT_VARIABLE is_no_git_repository
-                     ERROR_QUIET)
+                     ERROR_QUIET
+    )
 
     if (NOT is_no_git_repository)
         execute_process (COMMAND "${GIT_EXECUTABLE}" describe --always --abbrev=40 --dirty
                          WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
                          OUTPUT_VARIABLE RAPTOR_COMMIT_HASH
-                         ERROR_QUIET
-                         OUTPUT_STRIP_TRAILING_WHITESPACE)
+                         ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
 
-        execute_process (COMMAND
-                         "${GIT_EXECUTABLE}" log -1 --format=%ad --date=short
+        execute_process (COMMAND "${GIT_EXECUTABLE}" log -1 --format=%ad --date=short
                          WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
                          OUTPUT_VARIABLE RAPTOR_COMMIT_DATE
-                         ERROR_QUIET
-                         OUTPUT_STRIP_TRAILING_WHITESPACE)
+                         ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
     endif ()
 endif ()
 
@@ -52,27 +56,34 @@ endif ()
 
 # Make Release default build type
 if (NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE Release CACHE STRING
-         "Choose the type of build, options are: Debug Release Coverage RelWithDebInfo MinSizeRel."
-         FORCE)
+    set (CMAKE_BUILD_TYPE
+         Release
+         CACHE STRING "Choose the type of build, options are: Debug Release Coverage RelWithDebInfo MinSizeRel." FORCE
+    )
 endif ()
 
-set (RAPTOR_SUBMODULES_DIR "${CMAKE_CURRENT_LIST_DIR}/lib" CACHE STRING "Directory containing submodules.")
+set (RAPTOR_SUBMODULES_DIR
+     "${CMAKE_CURRENT_LIST_DIR}/lib"
+     CACHE STRING "Directory containing submodules."
+)
 
 include (CheckCXXCompilerFlag)
 
-set (RAPTOR_NATIVE_BUILD ON CACHE BOOL "Optimize build for current architecture.")
+set (RAPTOR_NATIVE_BUILD
+     ON
+     CACHE BOOL "Optimize build for current architecture."
+)
 if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug" OR "${CMAKE_BUILD_TYPE}" MATCHES "Coverage")
-     message (STATUS "${FontBold}Native build disabled due to Debug/Coverage build.${FontReset}")
+    message (STATUS "${FontBold}Native build disabled due to Debug/Coverage build.${FontReset}")
 elseif (RAPTOR_NATIVE_BUILD)
-     message (STATUS "${FontBold}Native build enabled. Built binaries will be optimized for this system.${FontReset}")
-          set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+    message (STATUS "${FontBold}Native build enabled. Built binaries will be optimized for this system.${FontReset}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 else ()
-     message (STATUS "${FontBold}Native build disabled. Detecting popcnt support.${FontReset}")
-     check_cxx_compiler_flag ("-mpopcnt" RAPTOR_HAS_POPCNT)
-     if (RAPTOR_HAS_POPCNT)
-          set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
-     endif ()
+    message (STATUS "${FontBold}Native build disabled. Detecting popcnt support.${FontReset}")
+    check_cxx_compiler_flag ("-mpopcnt" RAPTOR_HAS_POPCNT)
+    if (RAPTOR_HAS_POPCNT)
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
+    endif ()
 endif ()
 
 check_cxx_compiler_flag ("-fopenmp" RAPTOR_HAS_OPENMP)
@@ -96,7 +107,10 @@ set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # Dependency: SeqAn3.
-set (SEQAN3_CEREAL ON CACHE BOOL "Require cereal to be present.")
+set (SEQAN3_CEREAL
+     ON
+     CACHE BOOL "Require cereal to be present."
+)
 set (SEQAN3_SUBMODULES_DIR "${RAPTOR_SUBMODULES_DIR}")
 find_package (SeqAn3 QUIET REQUIRED HINTS ${RAPTOR_SUBMODULES_DIR}/seqan3/build_system)
 
@@ -116,7 +130,10 @@ list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${PROJEC
 list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}")
 
 # Use ccache.
-set (RAPTOR_USE_CCACHE ON CACHE BOOL "Use ccache if available.")
+set (RAPTOR_USE_CCACHE
+     ON
+     CACHE BOOL "Use ccache if available."
+)
 include (${CMAKE_CURRENT_LIST_DIR}/cmake/raptor_require_ccache.cmake)
 raptor_require_ccache ()
 
@@ -127,31 +144,34 @@ list (APPEND RAPTOR_CHOPPER_PATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libchopper_l
 if (EXISTS "${RAPTOR_CHOPPER_PATH}")
     add_custom_target (chopper_lib)
 else ()
-     set (RAPTOR_CHOPPER_ARGS "${SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS}")
-     list (APPEND RAPTOR_CHOPPER_ARGS "-DCHOPPER_SUBMODULES_DIR=${RAPTOR_SUBMODULES_DIR}")
-     list (APPEND RAPTOR_CHOPPER_ARGS "-DSEQAN3_SUBMODULES_DIR=${RAPTOR_SUBMODULES_DIR}")
-     list (APPEND RAPTOR_CHOPPER_ARGS "-DCMAKE_INSTALL_LIBDIR=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
-     list (APPEND RAPTOR_CHOPPER_ARGS "-DCMAKE_INSTALL_BINDIR=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+    set (RAPTOR_CHOPPER_ARGS "${SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS}")
+    list (APPEND RAPTOR_CHOPPER_ARGS "-DCHOPPER_SUBMODULES_DIR=${RAPTOR_SUBMODULES_DIR}")
+    list (APPEND RAPTOR_CHOPPER_ARGS "-DSEQAN3_SUBMODULES_DIR=${RAPTOR_SUBMODULES_DIR}")
+    list (APPEND RAPTOR_CHOPPER_ARGS "-DCMAKE_INSTALL_LIBDIR=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+    list (APPEND RAPTOR_CHOPPER_ARGS "-DCMAKE_INSTALL_BINDIR=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
     include (ExternalProject)
-    ExternalProject_Add (
-        chopper_lib
-        PREFIX chopper_lib
-        SOURCE_DIR "${RAPTOR_SUBMODULES_DIR}/chopper"
-        DOWNLOAD_COMMAND ""
-        CMAKE_ARGS "${RAPTOR_CHOPPER_ARGS}"
-        BUILD_BYPRODUCTS "${RAPTOR_CHOPPER_PATH}"
-        UPDATE_DISCONNECTED 1
+    ExternalProject_Add (chopper_lib
+                         PREFIX chopper_lib
+                         SOURCE_DIR "${RAPTOR_SUBMODULES_DIR}/chopper"
+                         DOWNLOAD_COMMAND ""
+                         CMAKE_ARGS "${RAPTOR_CHOPPER_ARGS}"
+                         BUILD_BYPRODUCTS "${RAPTOR_CHOPPER_PATH}"
+                         UPDATE_DISCONNECTED 1
     )
 endif ()
 
 add_library (chopper_count STATIC IMPORTED)
 add_dependencies (chopper_count chopper_lib)
-set_target_properties (chopper_count PROPERTIES IMPORTED_LOCATION "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libchopper_count_lib.a")
+set_target_properties (chopper_count PROPERTIES IMPORTED_LOCATION
+                                                "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libchopper_count_lib.a"
+)
 
 add_library (chopper_layout STATIC IMPORTED)
 add_dependencies (chopper_layout chopper_lib)
-set_target_properties (chopper_layout PROPERTIES IMPORTED_LOCATION "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libchopper_layout_lib.a")
+set_target_properties (chopper_layout PROPERTIES IMPORTED_LOCATION
+                                                 "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libchopper_layout_lib.a"
+)
 
 add_library (chopper INTERFACE IMPORTED)
 set_property (TARGET chopper PROPERTY INTERFACE_LINK_LIBRARIES chopper_count chopper_layout)
@@ -166,7 +186,10 @@ add_subdirectory (doc EXCLUDE_FROM_ALL)
 
 ## TEST
 
-set (RAPTOR_ENABLE_BENCHMARK OFF CACHE BOOL "Compile benchmarks as cli tests.")
+set (RAPTOR_ENABLE_BENCHMARK
+     OFF
+     CACHE BOOL "Compile benchmarks as cli tests."
+)
 
 enable_testing ()
 add_subdirectory (test EXCLUDE_FROM_ALL)

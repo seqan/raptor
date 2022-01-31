@@ -26,7 +26,8 @@ if (${DOXYGEN_FOUND})
                        COMMAND ${DOXYGEN_EXECUTABLE}
                        WORKING_DIRECTORY ${APP_TEMPLATE_DOXYGEN_OUTPUT_DIR}
                        COMMENT "Generating (developer) API documentation with Doxygen."
-                       VERBATIM)
+                       VERBATIM
+    )
     message (STATUS "${FontBold}You can run `make doc` to build api documentation.${FontReset}")
 else ()
     message (STATUS "Doxygen not found.")

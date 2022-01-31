@@ -16,7 +16,7 @@
 #    downloaded file, allowing connection to the remote location to be avoided altogether if the local directory already
 #    has a file from an earlier download that matches the specified hash.
 #
-# CONFIGURE <true|false> (required):
+# CONFIGURE <true|false> (default=false):
 #    If true, replace "@data_dir@" inside files with the actual data directory.
 function (declare_internal_datasource)
     set (options "")
@@ -32,10 +32,10 @@ function (declare_internal_datasource)
     file ("${hash_algorithm}" "${ARG_URL}" actual_hash_value)
 
     if (NOT "${expected_hash_value}" STREQUAL "${actual_hash_value}")
-        message (SEND_ERROR "DOWNLOAD HASH mismatch\n"
-                            "  for file: [${ARG_FILE}]\n"
+        message (SEND_ERROR "DOWNLOAD HASH mismatch\n  for file: [${ARG_FILE}]\n"
                             "    expected hash: [${expected_hash_value}]\n"
-                            "      actual hash: [${actual_hash_value}]\n")
+                            "      actual hash: [${actual_hash_value}]\n"
+        )
     endif ()
 
     file (MAKE_DIRECTORY ${data_dir})
