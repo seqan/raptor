@@ -22,31 +22,20 @@ namespace raptor::detail
 struct forward_strand_minimiser
 {
 private:
-    //!\brief The alphabet type.
-    using alphabet_t = seqan3::dna4;
-    //!\brief The text type.
-    using text_t = seqan3::dna4_vector;
-
     //!\brief The window size of the minimiser.
-    uint64_t window_size{23};
+    uint64_t window_size{};
     //!\brief The shape to use.
-    seqan3::shape shape{seqan3::ungapped{20u}};
+    seqan3::shape shape{};
     //!\brief The size of the shape.
-    uint8_t shape_size{shape.size()};
+    uint8_t shape_size{};
     //!\brief Random but fixed value to xor k-mers with. Counteracts consecutive minimisers.
-    uint64_t seed{adjust_seed(shape.count())};
-
+    uint64_t seed{};
     //!\brief Stores the k-mer hashes of the forward strand.
-    std::vector<uint64_t> forward_hashes;
+    std::vector<uint64_t> forward_hashes{};
 
 public:
-
-    //!\brief Stores the hashes of the minimisers.
-    std::vector<uint64_t> minimiser_hash;
     //!\brief Stores the begin positions of the minimisers.
     std::vector<uint64_t> minimiser_begin;
-    //!\brief Stores the end positions of the minimisers.
-    std::vector<uint64_t> minimiser_end;
 
     forward_strand_minimiser() = default; //!< Defaulted
     forward_strand_minimiser(forward_strand_minimiser const &) = default; //!< Defaulted
@@ -64,7 +53,9 @@ public:
                              seqan3::shape const shape_,
                              uint64_t const seed_ = 0x8F3F73B5CF1C9ADE) :
         window_size{window_size_.v}, shape{shape_}, shape_size{shape.size()}, seed{adjust_seed(shape.count(), seed_)}
-    {}
+    {
+        assert(window_size >= shape_size);
+    }
 
     /*!\brief Resize the minimiser.
      * \param[in] window_size_ The new window size.
@@ -77,92 +68,60 @@ public:
         shape = shape_;
         shape_size = shape.size();
         seed = adjust_seed(shape.count(), seed_);
+        assert(window_size >= shape_size);
     }
 
-    void compute(text_t const & text)
+    void compute(std::vector<seqan3::dna4> const & text)
     {
-        uint64_t text_length = std::ranges::size(text);
+        assert(window_size && shape_size && seed); // Forgot to initialise/resize?
 
-        minimiser_hash.clear();
+        size_t const text_length = text.size();
+        assert(shape_size <= text_length);
+        assert(window_size <= text_length);
+
+        uint64_t const max_number_of_minimiser = text_length - window_size + 1u;
+        uint64_t const kmers_per_window = window_size - shape_size + 1u;
+
         minimiser_begin.clear();
-        minimiser_end.clear();
+        minimiser_begin.reserve(max_number_of_minimiser);
 
-// GCOVR_EXCL_START
-        // Return empty vector if text is shorter than k.
-        if (shape_size > text_length)
-            return;
-// GCOVR_EXCL_STOP
-
-        uint64_t possible_minimisers = text_length > window_size ? text_length - window_size + 1u : 1u;
-        assert(window_size >= shape_size);
-        uint64_t kmers_per_window = window_size - shape_size + 1u;
-
-        // Helper lambda for xor'ing values depending on `do_xor`.
-        auto apply_xor = [this] (uint64_t const val)
-        {
-            return val ^ seed;
-        };
-
-// GCOVR_EXCL_START
-        // Compute all k-mer hashes for both forward and reverse strand.
+        // Compute all k-mer hashes.
+        auto apply_xor = [this] (uint64_t const value) { return value ^ seed; };
         auto kmer_view = text | seqan3::views::kmer_hash(shape) | std::views::transform(apply_xor);
         forward_hashes.assign(kmer_view.begin(), kmer_view.end());
-// GCOVR_EXCL_STOP
 
-        // Choose the minimisers.
-        minimiser_hash.reserve(possible_minimisers);
-        minimiser_begin.reserve(possible_minimisers);
-        minimiser_end.reserve(possible_minimisers);
-
-        // Stores hash, begin and end for all k-mers in the window
-        std::deque<std::tuple<uint64_t, uint64_t, uint64_t>> window_values;
+        // Stores hash and begin for all k-mers in the window
+        std::deque<std::pair<uint64_t, uint64_t>> window_hashes;
 
         // Initialisation. We need to compute all hashes for the first window.
         for (uint64_t i = 0; i < kmers_per_window; ++i)
-            window_values.emplace_back(forward_hashes[i], i, i + shape_size - 1);
+            window_hashes.emplace_back(forward_hashes[i], i);
 
-        auto min = std::min_element(std::begin(window_values), std::end(window_values));
-        minimiser_hash.push_back(std::get<0>(*min));
-        minimiser_begin.push_back(std::get<1>(*min));
-        minimiser_end.push_back(std::get<2>(*min));
+        // The minimum hash is the minimiser. Store the begin position.
+        auto min = std::min_element(std::begin(window_hashes), std::end(window_hashes));
+        minimiser_begin.push_back(min->second);
 
         // For the following windows, we remove the first window k-mer (is now not in window) and add the new k-mer
-        // that results from the window shifting
-        bool minimiser_changed{false};
-        for (uint64_t i = 1; i < possible_minimisers; ++i)
+        // that results from the window shifting.
+        for (uint64_t i = kmers_per_window; i < max_number_of_minimiser; ++i)
         {
-            // Shift the window.
-            // If current minimiser leaves the window, we need to decide on a new one.
-            if (min == std::begin(window_values))
+            // Already store the new hash without removing the first one.
+            uint64_t const new_hash{forward_hashes[i + kmers_per_window - 1]}; // Already did kmers_per_window - 1 many
+            window_hashes.emplace_back(new_hash, i);
+
+            if (new_hash < min->second) // New hash is the minimum.
             {
-                window_values.pop_front();
-                min = std::min_element(std::begin(window_values), std::end(window_values));
-                minimiser_changed = true;
+                min = std::prev(std::end(window_hashes));
+                minimiser_begin.push_back(min->second);
             }
-            else
+            else if (min == std::begin(window_hashes)) // Minimum is the yet-to-be-removed begin of the window.
             {
-                window_values.pop_front();
+                // The first hash will be removed, the last one is caught by the previous if.
+                min = std::min_element(++std::begin(window_hashes), std::prev(std::end(window_hashes)));
+                minimiser_begin.push_back(min->second);
             }
 
-// GCOVR_EXCL_START
-            window_values.emplace_back(forward_hashes[kmers_per_window - 1 + i],
-                                       kmers_per_window + i - 1,
-                                       kmers_per_window + i + shape_size - 2);
-// GCOVR_EXCL_STOP
-
-            if (std::get<0>(window_values.back()) < std::get<0>(*min))
-            {
-                min = std::prev(std::end(window_values));
-                minimiser_changed = true;
-            }
-
-            if (minimiser_changed)
-            {
-                minimiser_hash.push_back(std::get<0>(*min));
-                minimiser_begin.push_back(std::get<1>(*min));
-                minimiser_end.push_back(std::get<2>(*min));
-                minimiser_changed = false;
-            }
+            window_hashes.pop_front(); // Remove the first k-mer.
         }
         return;
     }
