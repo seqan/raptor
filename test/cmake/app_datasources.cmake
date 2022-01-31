@@ -46,19 +46,18 @@ function (declare_datasource)
     # create data folder
     file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data)
 
-    ExternalProject_Add (
-        "${datasource_name}"
-        URL "${ARG_URL}"
-        URL_HASH "${ARG_URL_HASH}"
-        DOWNLOAD_NAME "${ARG_FILE}"
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ""
-        INSTALL_COMMAND
-            ${CMAKE_COMMAND} -E create_symlink <DOWNLOADED_FILE> ${CMAKE_CURRENT_BINARY_DIR}/data/${ARG_FILE}
-        TEST_COMMAND ""
-        PREFIX "${CMAKE_CURRENT_BINARY_DIR}/_datasources"
-        DOWNLOAD_NO_EXTRACT TRUE # don't extract archive files like .tar.gz.
-        ${ARG_UNPARSED_ARGUMENTS}
+    ExternalProject_Add ("${datasource_name}"
+                         URL "${ARG_URL}"
+                         URL_HASH "${ARG_URL_HASH}"
+                         DOWNLOAD_NAME "${ARG_FILE}"
+                         CONFIGURE_COMMAND ""
+                         BUILD_COMMAND ""
+                         INSTALL_COMMAND ${CMAKE_COMMAND} -E create_symlink <DOWNLOADED_FILE>
+                                         ${CMAKE_CURRENT_BINARY_DIR}/data/${ARG_FILE}
+                         TEST_COMMAND ""
+                         PREFIX "${CMAKE_CURRENT_BINARY_DIR}/_datasources"
+                         DOWNLOAD_NO_EXTRACT TRUE # don't extract archive files like .tar.gz.
+                         ${ARG_UNPARSED_ARGUMENTS}
     )
 endfunction ()
 
