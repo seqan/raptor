@@ -20,54 +20,67 @@ std::vector<double> destroyed_indirectly_by_error(size_t const pattern_size,
                                                   seqan3::shape const shape)
 {
     uint8_t const kmer_size{shape.size()};
+    size_t const max_number_of_minimiser{pattern_size - window_size + 1};
+    size_t const iterations{10'000};
 
-    using alphabet_t = seqan3::dna4;
-    using rank_type = decltype(seqan3::to_rank(alphabet_t{}));
-    rank_type max_rank = seqan3::alphabet_size<alphabet_t> - 1;
-
-    std::mt19937_64 gen(0x1D2B8284D988C4D0);
-    std::uniform_int_distribution<> dis(0, max_rank);
-    std::uniform_int_distribution<> dis2(0, pattern_size - 1);
-    std::vector<uint8_t> mins(pattern_size, false);
-    std::vector<uint8_t> minse(pattern_size, false);
-    std::vector<double> result(window_size - kmer_size + 1, 0);
-    std::vector<alphabet_t> sequence;
-    sequence.reserve(pattern_size);
-
-    for (size_t iteration = 0; iteration < 10'000; ++iteration)
+    std::mt19937_64 gen{0x1D2B8284D988C4D0};
+    std::uniform_int_distribution<size_t> random_error_position{0u, pattern_size - 1u};
+    std::uniform_int_distribution<uint8_t> random_dna4_rank{0u, 3u};
+    auto random_dna = [&random_dna4_rank, &gen] ()
     {
-        sequence.clear();
-        std::fill(mins.begin(), mins.end(), false);
-        std::fill(minse.begin(), minse.end(), false);
+        return seqan3::assign_rank_to(random_dna4_rank(gen), seqan3::dna4{});
+    };
 
-        for (size_t i = 0; i < pattern_size; ++i)
-            sequence.push_back(seqan3::assign_rank_to(dis(gen), alphabet_t{}));
+    std::vector<seqan3::dna4> sequence(pattern_size);
 
-        forward_strand_minimiser mini{window{static_cast<uint32_t>(window_size)}, shape};
-        mini.compute(sequence);
-        for (auto x : mini.minimiser_begin)
-            mins[x] = true;
+    // Minimiser begin positions of original sequence
+    std::vector<uint8_t> minimiser_positions(max_number_of_minimiser, false);
+    // Minimiser begin positions after introducing one error into the sequence
+    std::vector<uint8_t> minimiser_positions_error(max_number_of_minimiser, false);
+    // One error affects at most all minimisers, there are pattern_size - window_size + 1 many
+    std::vector<double> result(max_number_of_minimiser, 0.0);
+    forward_strand_minimiser fwd_minimiser{window{static_cast<uint32_t>(window_size)}, shape};
 
-        size_t error_pos = dis2(gen) % pattern_size;
-        rank_type new_base = dis(gen) % seqan3::alphabet_size<alphabet_t>;
-        while (new_base == seqan3::to_rank(sequence[error_pos]))
-            new_base =  dis(gen) % seqan3::alphabet_size<alphabet_t>;
-        sequence[error_pos] = seqan3::assign_rank_to(new_base, alphabet_t{});
+    for (size_t iteration = 0; iteration < iterations; ++iteration)
+    {
+        std::ranges::fill(minimiser_positions, 0u);
+        std::ranges::fill(minimiser_positions_error, 0u);
+        std::ranges::generate(sequence, random_dna);
 
-        mini.compute(sequence);
-        for (auto x : mini.minimiser_begin)
-            minse[x] = true;
+        // Minimiser begin positions of original sequence
+        fwd_minimiser.compute(sequence);
+        for (auto pos : fwd_minimiser.minimiser_begin)
+            minimiser_positions[pos] = true;
 
-        size_t count = 0;
+        // Introduce one error
+        size_t const error_position = random_error_position(gen);
+        uint8_t new_rank{random_dna4_rank(gen)};
+        while (new_rank == seqan3::to_rank(sequence[error_position]))
+            new_rank = random_dna4_rank(gen);
+        sequence[error_position] = seqan3::assign_rank_to(new_rank, seqan3::dna4{});
 
-        for (size_t i = 0; i < pattern_size; ++i)
-            count += (mins[i] != minse[i]) && (error_pos < i || i + kmer_size < error_pos);
+        // Minimiser begin positions after introducing one error into the sequence
+        fwd_minimiser.compute(sequence);
+        for (auto pos : fwd_minimiser.minimiser_begin)
+            minimiser_positions_error[pos] = true;
 
-        ++result[count];
+        // Determine number of affected minimisers
+        size_t affected_minimiser{};
+        // An error destroyed a minimiser indirectly iff
+        // (1) A minimiser begin position changed and
+        // (2) The error occurs before the window or after the window
+        for (size_t i = 0; i < max_number_of_minimiser; ++i)
+        {
+            affected_minimiser += (minimiser_positions[i] != minimiser_positions_error[i]) && // (1)
+                                  ((error_position < i) || (i + kmer_size < error_position)); // (2)
+        }
+
+        ++result[affected_minimiser];
     }
 
+    // Convert counts to a distribution
     for (auto & x : result)
-        x /= 10'000;
+        x /= iterations;
 
     return result;
 }
