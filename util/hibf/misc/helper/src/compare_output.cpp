@@ -9,7 +9,7 @@
 int main(int argc, char ** argv)
 {
     if (argc != 4)
-        throw std::runtime_error{"Please provide query.names user_bin.ids and mantis.results"};
+        throw std::runtime_error{"Please provide query.names user_bin.ids and mantis.results"}; // $FILENAME_USER_BIN_IDS $FILENAME_MANTIS_READY_TO_COMPARE $FILENAME_RAPTOR_READY_TO_COMPARE
 
     std::ifstream user_bin_ids_file{argv[1]};
 
@@ -64,25 +64,33 @@ int main(int argc, char ** argv)
         {
             std::string mantis_str = [] (auto v) { std::string s; for (auto c : v) s.push_back(c); return s; }(*mantis_it);
             std::string raptor_str = [] (auto v) { std::string s; for (auto c : v) s.push_back(c); return s; }(*raptor_it);
+            // Should also work:
+            // std::string_view mantis_str{*mantis_it};
+            // std::string_view raptor_str{*raptor_it};
             uint64_t mantis_value = std::atoi(mantis_str.data());
             uint64_t raptor_value = std::atoi(raptor_str.data());
 
-            if (mantis_value == query_id)
-                found_query_id_in_mantis = true;
-            if (raptor_value == query_id)
-                found_query_id_in_raptor = true;
+            found_query_id_in_mantis = found_query_id_in_mantis || mantis_value == query_id;
+            found_query_id_in_raptor = found_query_id_in_raptor || raptor_value == query_id;
+            // Was:
+            // if (mantis_value == query_id)
+            //     found_query_id_in_mantis = true;
+            // if (raptor_value == query_id)
+            //     found_query_id_in_raptor = true;
 
-            if (mantis_value != raptor_value)
+            if (mantis_value != raptor_value) // If mantis results are empty, then...?
             {
                 if (mantis_value < raptor_value)
                 {
-                    (raptor_value != query_id) ? ++false_negatives : uint64_t{};
+                    // (raptor_value != query_id) ? ++false_negatives : uint64_t{};
+                    false_negatives += (raptor_value != query_id);
                     ++all;
                     ++mantis_it;
                 }
                 else
                 {
-                    (raptor_value != query_id) ? ++false_positives : uint64_t{};
+                    // (raptor_value != query_id) ? ++false_positives : uint64_t{};
+                    false_positives += (raptor_value != query_id);
                     ++raptor_it;
                 }
             }
@@ -97,11 +105,10 @@ int main(int argc, char ** argv)
         while (mantis_it != mantis_fields_view.end()) // process the rest of mantis
         {
             std::string mantis_str = [] (auto v) { std::string s; for (auto c : v) s.push_back(c); return s; }(*mantis_it);
-            std::string query_name{mantis_query_name.begin(), mantis_query_name.begin() + mantis_query_name.find("genomic") + 7};
-            uint64_t query_id = user_bin_ids[query_name];
+            // std::string query_name{mantis_query_name.begin(), mantis_query_name.begin() + mantis_query_name.find("genomic") + 7};
+            // uint64_t query_id = user_bin_ids[query_name];
             uint64_t mantis_value = std::atoi(mantis_str.data());
-            if (mantis_value == query_id)
-                found_query_id_in_mantis = true;
+            found_query_id_in_mantis = found_query_id_in_mantis || mantis_value == query_id;
             ++false_negatives;
             ++mantis_it;
         }
@@ -109,12 +116,13 @@ int main(int argc, char ** argv)
         while (raptor_it != raptor_fields_view.end()) // process the rest of raptor if any
         {
             std::string raptor_str = [] (auto v) { std::string s; for (auto c : v) s.push_back(c); return s; }(*raptor_it);
-            std::string query_name{mantis_query_name.begin(), mantis_query_name.begin() + mantis_query_name.find("genomic") + 7};
-            uint64_t query_id = user_bin_ids[query_name];
+            // std::string query_name{mantis_query_name.begin(), mantis_query_name.begin() + mantis_query_name.find("genomic") + 7};
+            // uint64_t query_id = user_bin_ids[query_name];
             uint64_t raptor_value = std::atoi(raptor_str.data());
             if (raptor_value == query_id)
                 found_query_id_in_raptor = true;
-            (raptor_value != query_id) ? ++false_positives : uint64_t{};
+            else
+                ++false_positives;
             ++raptor_it;
         }
 
