@@ -49,7 +49,7 @@ int main(int argc, char ** argv)
     mantis_result_out << query_names[i] << '\t';
     std::string kmer_count_str{line.begin() + line.find('\t') + 1, line.end()};
     int kmer_count = std::atoi(kmer_count_str.data());
-    mantis_threshold = kmer_count - (kmer_size * number_of_errors);
+    mantis_threshold = kmer_count - (kmer_size * number_of_errors) - 1; // why -1 ?
     ++i;
 
     while (std::getline(mantis_result_in, line))
