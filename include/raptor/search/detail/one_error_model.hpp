@@ -7,11 +7,13 @@
 
 #pragma once
 
-#include <raptor/argument_parsing/search_arguments.hpp>
+#include <vector>
 
-namespace raptor
+namespace raptor::detail
 {
 
-std::vector<size_t> precompute_correction(search_arguments const & arguments);
+[[nodiscard]] std::vector<double> one_error_model(size_t const kmer_size,
+                                                  double const p_mean,
+                                                  std::vector<double> const & affected_by_one_error_indirectly_prob);
 
-} // namespace raptor
+} // namespace raptor::detail

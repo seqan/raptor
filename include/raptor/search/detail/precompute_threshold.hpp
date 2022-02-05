@@ -7,14 +7,11 @@
 
 #pragma once
 
-#include <utility>
-#include <vector>
+#include <raptor/argument_parsing/search_arguments.hpp>
 
 namespace raptor::detail
 {
 
-std::tuple<double, std::vector<double>> simple_model(size_t const kmer_size,
-                                                     std::vector<double> const & proba_x,
-                                                     std::vector<double> const & indirect_errors);
+[[nodiscard]] std::vector<size_t> precompute_threshold(search_arguments const & arguments);
 
 } // namespace raptor::detail

@@ -12,6 +12,6 @@
 namespace raptor::detail
 {
 
-std::vector<size_t> pascal_row(size_t const n);
+[[nodiscard]] std::vector<double> pascal_row(size_t const n);
 
 } // namespace raptor::detail

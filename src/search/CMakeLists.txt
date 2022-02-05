@@ -1,12 +1,12 @@
 cmake_minimum_required (VERSION 3.11)
 
 add_library ("raptor_search" STATIC
-             detail/destroyed_indirectly_by_error.cpp
-             detail/enumerate_all_errors.cpp
+             detail/one_indirect_error_model.cpp
+             detail/multiple_error_model.cpp
              detail/pascal_row.cpp
-             detail/simple_model.cpp
-             precompute_correction.cpp
-             precompute_threshold.cpp
+             detail/one_error_model.cpp
+             detail/precompute_correction.cpp
+             detail/precompute_threshold.cpp
              raptor_search.cpp
              search_hibf.cpp
              search_ibf.cpp

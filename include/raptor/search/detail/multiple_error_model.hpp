@@ -12,6 +12,8 @@
 namespace raptor::detail
 {
 
-double enumerate_all_errors(size_t const number_of_minimizers, size_t const errors, std::vector<double> const & proba);
+[[nodiscard]] std::vector<double> multiple_error_model(size_t const number_of_minimisers,
+                                                       size_t const errors,
+                                                       std::vector<double> const & affected_by_one_error_prob);
 
 } // namespace raptor::detail
