@@ -7,15 +7,8 @@
 
 #pragma once
 
-#include <seqan3/search/views/minimiser_hash.hpp>
-
-#include <raptor/adjust_seed.hpp>
-#include <raptor/dna4_traits.hpp>
-#include <raptor/search/do_parallel.hpp>
-#include <raptor/search/load_index.hpp>
-#include <raptor/search/precompute_correction.hpp>
-#include <raptor/search/precompute_threshold.hpp>
-#include <raptor/search/sync_out.hpp>
+#include <raptor/search/detail/precompute_correction.hpp>
+#include <raptor/search/detail/precompute_threshold.hpp>
 
 namespace raptor
 {
@@ -54,8 +47,8 @@ public:
             size_t const kmers_per_pattern = arguments.pattern_size - arguments.shape_size + 1;
             minimal_number_of_minimizers = kmers_per_pattern / kmers_per_window;
             maximal_number_of_minimizers = arguments.pattern_size - arguments.window_size + 1;
-            precomp_correction = precompute_correction(arguments);
-            precomp_thresholds = precompute_threshold(arguments);
+            precomp_correction = detail::precompute_correction(arguments);
+            precomp_thresholds = detail::precompute_threshold(arguments);
         }
     }
 

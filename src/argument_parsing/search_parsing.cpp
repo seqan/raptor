@@ -82,8 +82,8 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
     parser.add_flag(arguments.cache_thresholds,
                     '\0',
                     "cache-thresholds",
-                    "Stores the computed thresholds with an unique name next to the index. In the next search call, "
-                    "the stored thresholds can be re-used instead of computed again.\n"
+                    "Stores the computed thresholds with an unique name next to the index. In the next search call "
+                    "using this option, the stored thresholds are re-used.\n"
                     "Two files are stored:\n"
                     "\\fBthreshold_*.bin\\fP: Depends on pattern, window, kmer/shape, errors, and tau.\n"
                     "\\fBcorrection_*.bin\\fP: Depends on pattern, window, kmer/shape, p_max, and fpr.");

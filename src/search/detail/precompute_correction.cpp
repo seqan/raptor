@@ -11,17 +11,17 @@
  */
 
 #include <fstream>
-#include <numeric>
 
 #include <cereal/types/vector.hpp>
 
+#include <raptor/search/detail/logspace.hpp>
 #include <raptor/search/detail/pascal_row.hpp>
-#include <raptor/search/precompute_correction.hpp>
+#include <raptor/search/detail/precompute_correction.hpp>
 
-namespace raptor
+namespace raptor::detail
 {
 
-std::string const correction_filename(search_arguments const & arguments)
+[[nodiscard]] std::string const correction_filename(search_arguments const & arguments)
 {
     std::stringstream stream{};
     stream << "correction_"
@@ -58,7 +58,7 @@ void write_correction(std::vector<size_t> const & vec, search_arguments const & 
 bool read_correction(std::vector<size_t> & vec, search_arguments const & arguments)
 {
     std::filesystem::path filename = arguments.index_file.parent_path() / correction_filename(arguments);
-    if (!std::filesystem::exists(filename))
+    if (!arguments.cache_thresholds || !std::filesystem::exists(filename))
         return false;
 
     std::ifstream is{filename, std::ios::binary};
@@ -67,45 +67,46 @@ bool read_correction(std::vector<size_t> & vec, search_arguments const & argumen
     return true;
 }
 
-std::vector<size_t> precompute_correction(search_arguments const & arguments)
+[[nodiscard]] std::vector<size_t> precompute_correction(search_arguments const & arguments)
 {
+    uint8_t const kmer_size{arguments.shape.size()};
+    assert(arguments.window_size != kmer_size); // Use k-mer lemma.
+    assert(!arguments.treshold_was_set); // Use percentage.
+
     std::vector<size_t> correction;
 
-    if (arguments.treshold_was_set || read_correction(correction, arguments))
+    if (read_correction(correction, arguments))
         return correction;
 
-    uint8_t const kmer_size{arguments.shape.size()};
+    double const fpr{std::log(arguments.fpr)};
+    double const inv_fpr{std::log(1.0 - arguments.fpr)};
+    double const log_p_max{std::log(arguments.p_max)};
+    size_t const kmers_per_window{arguments.window_size - kmer_size + 1};
+    size_t const kmers_per_pattern{arguments.pattern_size - kmer_size + 1};
+    size_t const minimal_number_of_minimisers{kmers_per_pattern / kmers_per_window};
+    size_t const maximal_number_of_minimisers{arguments.pattern_size - arguments.window_size + 1};
 
-    assert(arguments.window_size != kmer_size); // Only applicable to probabilistic thresholding.
+    correction.reserve(maximal_number_of_minimisers - minimal_number_of_minimisers + 1);
 
-    size_t const kmers_per_window = arguments.window_size - kmer_size + 1;
-    size_t const kmers_per_pattern = arguments.pattern_size - kmer_size + 1;
-
-    size_t const minimal_number_of_minimizers = kmers_per_pattern / kmers_per_window;
-    size_t const maximal_number_of_minimizers = arguments.pattern_size - arguments.window_size + 1;
-
-    correction.reserve(maximal_number_of_minimizers - minimal_number_of_minimizers);
-
-    double const fpr{arguments.fpr};
-    double const inv_fpr{1.0 - fpr};
-
-    auto binom = [&fpr, &inv_fpr] (std::vector<size_t> const & binom_coeff,
-                                       size_t const number_of_minimizers,
-                                       size_t const number_of_fp)
+    auto binom = [&fpr, &inv_fpr] (std::vector<double> const & binom_coeff,
+                                   size_t const number_of_minimisers,
+                                   size_t const number_of_fp)
     {
-        return binom_coeff[number_of_fp] *
-               std::pow(fpr, number_of_fp) *
-               std::pow(inv_fpr, number_of_minimizers - number_of_fp);
+        return binom_coeff[number_of_fp] +
+               number_of_fp * fpr +
+               (number_of_minimisers - number_of_fp) * inv_fpr;
     };
 
-    // Iterate over the possible number of minimizers
-    for (size_t number_of_minimizers = minimal_number_of_minimizers;
-        number_of_minimizers <= maximal_number_of_minimizers;
-        ++number_of_minimizers)
+    // Iterate over the possible number of minimisers.
+    for (size_t number_of_minimisers = minimal_number_of_minimisers;
+         number_of_minimisers <= maximal_number_of_minimisers;
+         ++number_of_minimisers)
     {
         size_t number_of_fp{1u};
-        std::vector<size_t> const binom_coeff = detail::pascal_row(number_of_minimizers);
-        while (binom(binom_coeff, number_of_minimizers, number_of_fp) >= arguments.p_max)
+        std::vector<double> const binom_coeff{detail::pascal_row(number_of_minimisers)};
+        // How many FPs to expect for a given fpr and number of minimisers?
+        // The probability of seeing this many FP must be below p_max.
+        while (binom(binom_coeff, number_of_minimisers, number_of_fp) >= log_p_max)
             ++number_of_fp;
 
         correction.push_back(number_of_fp - 1);
@@ -117,4 +118,4 @@ std::vector<size_t> precompute_correction(search_arguments const & arguments)
     return correction;
 }
 
-} // namespace raptor
+} // namespace raptor::detail

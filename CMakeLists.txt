@@ -106,6 +106,10 @@ set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
+# Require compression libs.
+find_package (ZLIB QUIET REQUIRED)
+find_package (BZip2 QUIET REQUIRED)
+
 # Dependency: SeqAn3.
 set (SEQAN3_CEREAL
      ON
@@ -174,7 +178,7 @@ set_target_properties (chopper_layout PROPERTIES IMPORTED_LOCATION
 )
 
 add_library (chopper INTERFACE IMPORTED)
-set_property (TARGET chopper PROPERTY INTERFACE_LINK_LIBRARIES chopper_count chopper_layout)
+set_property (TARGET chopper PROPERTY INTERFACE_LINK_LIBRARIES chopper_count chopper_layout ZLIB::ZLIB BZip2::BZip2)
 
 # Add the application.
 add_subdirectory (src)

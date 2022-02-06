@@ -9,11 +9,11 @@
 
 #include <seqan3/search/kmer_index/shape.hpp>
 
-#include <raptor/search/detail/destroyed_indirectly_by_error.hpp>
+#include <raptor/search/detail/one_indirect_error_model.hpp>
 
 TEST(issue, 142)
 {
     std::vector<double> const destroyed_by_error =
-        raptor::detail::destroyed_indirectly_by_error(15u, 6u, seqan3::ungapped{4u});
+        raptor::detail::one_indirect_error_model(15u, 6u, seqan3::ungapped{4u});
 }
 

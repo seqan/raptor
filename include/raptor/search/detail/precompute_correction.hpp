@@ -9,9 +9,9 @@
 
 #include <raptor/argument_parsing/search_arguments.hpp>
 
-namespace raptor
+namespace raptor::detail
 {
 
-std::vector<size_t> compute_simple_model(search_arguments const & arguments);
+[[nodiscard]] std::vector<size_t> precompute_correction(search_arguments const & arguments);
 
-} // namespace raptor
+} // namespace raptor::detail

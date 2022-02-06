@@ -12,8 +12,8 @@
 namespace raptor::detail
 {
 
-std::vector<double> destroyed_indirectly_by_error(size_t const pattern_size,
-                                                  size_t const window_size,
-                                                  seqan3::shape const shape);
+[[nodiscard]] std::vector<double> one_indirect_error_model(size_t const pattern_size,
+                                                           size_t const window_size,
+                                                           seqan3::shape const shape);
 
 } // namespace raptor::detail

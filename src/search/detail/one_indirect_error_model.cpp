@@ -7,17 +7,15 @@
 
 #include <random>
 
-#include <seqan3/alphabet/nucleotide/dna4.hpp>
-
-#include <raptor/search/detail/destroyed_indirectly_by_error.hpp>
+#include <raptor/search/detail/one_indirect_error_model.hpp>
 #include <raptor/search/detail/forward_strand_minimiser.hpp>
 
 namespace raptor::detail
 {
 
-std::vector<double> destroyed_indirectly_by_error(size_t const pattern_size,
-                                                  size_t const window_size,
-                                                  seqan3::shape const shape)
+[[nodiscard]] std::vector<double> one_indirect_error_model(size_t const pattern_size,
+                                                           size_t const window_size,
+                                                           seqan3::shape const shape)
 {
     uint8_t const kmer_size{shape.size()};
     size_t const max_number_of_minimiser{pattern_size - window_size + 1};
@@ -78,9 +76,10 @@ std::vector<double> destroyed_indirectly_by_error(size_t const pattern_size,
         ++result[affected_minimiser];
     }
 
-    // Convert counts to a distribution
-    for (auto & x : result)
-        x /= iterations;
+    // Convert counts to log probabilities
+    double const log_iterations{std::log(iterations)};
+    for (double & x : result)
+        x = std::log(x) - log_iterations;
 
     return result;
 }
