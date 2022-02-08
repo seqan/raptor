@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <raptor/search/detail/precompute_correction.hpp>
-#include <raptor/search/detail/precompute_threshold.hpp>
+#include <raptor/threshold/precompute_correction.hpp>
+#include <raptor/threshold/precompute_threshold.hpp>
 
-namespace raptor
+namespace raptor::threshold
 {
 
 class threshold
@@ -23,20 +23,21 @@ public:
     threshold & operator=(threshold &&) = default;
     ~threshold() = default;
 
-    threshold(search_arguments const & arguments)
+    threshold(threshold_parameters const & arguments)
     {
-        size_t const kmers_per_window = arguments.window_size - arguments.shape_size + 1;
+        uint8_t const kmer_size{arguments.shape.size()};
+        size_t const kmers_per_window = arguments.window_size - kmer_size + 1;
 
-        if (arguments.treshold_was_set)
+        if (!std::isnan(arguments.percentage))
         {
             threshold_kind = threshold_kinds::percentage;
-            threshold_percentage = arguments.threshold;
+            threshold_percentage = arguments.percentage;
         }
         else if (kmers_per_window == 1u)
         {
             threshold_kind = threshold_kinds::lemma;
             size_t const kmer_lemma_minuend = arguments.pattern_size + 1u;
-            size_t const kmer_lemma_subtrahend = (arguments.errors + 1u) * arguments.shape_size;
+            size_t const kmer_lemma_subtrahend = (arguments.errors + 1u) * kmer_size;
             kmer_lemma = kmer_lemma_minuend > kmer_lemma_subtrahend ?
                          kmer_lemma_minuend - kmer_lemma_subtrahend :
                          0;
@@ -44,11 +45,11 @@ public:
         else
         {
             threshold_kind = threshold_kinds::probabilistic;
-            size_t const kmers_per_pattern = arguments.pattern_size - arguments.shape_size + 1;
+            size_t const kmers_per_pattern = arguments.pattern_size - kmer_size + 1;
             minimal_number_of_minimizers = kmers_per_pattern / kmers_per_window;
             maximal_number_of_minimizers = arguments.pattern_size - arguments.window_size + 1;
-            precomp_correction = detail::precompute_correction(arguments);
-            precomp_thresholds = detail::precompute_threshold(arguments);
+            precomp_correction = precompute_correction(arguments);
+            precomp_thresholds = precompute_threshold(arguments);
         }
     }
 
@@ -88,4 +89,4 @@ private:
     double threshold_percentage{};
 };
 
-} // namespace raptor
+} // namespace raptor::threshold

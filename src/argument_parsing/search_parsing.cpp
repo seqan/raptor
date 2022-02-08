@@ -127,8 +127,6 @@ void search_parsing(seqan3::argument_parser & parser, bool const is_socks)
         seqan3::input_file_validator<seqan3::sequence_file_input<>>{}(arguments.query_file);
     }
 
-    arguments.treshold_was_set = parser.is_option_set("threshold");
-
     bool partitioned{false};
     seqan3::input_file_validator validator{};
 
@@ -145,7 +143,7 @@ void search_parsing(seqan3::argument_parser & parser, bool const is_socks)
     // ==========================================
     // Temporary.
     // ==========================================
-    if (!arguments.treshold_was_set && !arguments.is_socks && !parser.is_option_set("fpr"))
+    if (!parser.is_option_set("threshold") && !arguments.is_socks && !parser.is_option_set("fpr"))
     {
         std::cerr << "[WARNING] The search needs the FPR that was used for building the index.\n"
                   << "          Currently, the default value of "

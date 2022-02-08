@@ -5,10 +5,10 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <raptor/search/detail/multiple_error_model.hpp>
-#include <raptor/search/detail/logspace.hpp>
+#include <raptor/threshold/multiple_error_model.hpp>
+#include <raptor/threshold/logspace.hpp>
 
-namespace raptor::detail
+namespace raptor::threshold
 {
 
 // affected_by_error [2, 0, 1] => 3 errors. First affects minimisers, second none, third one minimiser.
@@ -71,4 +71,4 @@ void impl(size_t const minimisers_to_affect,
     return affected_by_e_errors;
 }
 
-} // namespace raptor::detail
+} // namespace raptor::threshold

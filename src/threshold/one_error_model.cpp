@@ -5,11 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <raptor/search/detail/logspace.hpp>
-#include <raptor/search/detail/pascal_row.hpp>
-#include <raptor/search/detail/one_error_model.hpp>
+#include <raptor/threshold/logspace.hpp>
+#include <raptor/threshold/pascal_row.hpp>
+#include <raptor/threshold/one_error_model.hpp>
 
-namespace raptor::detail
+namespace raptor::threshold
 {
 
 [[nodiscard]] std::vector<double> one_error_model(size_t const kmer_size,
@@ -49,4 +49,4 @@ namespace raptor::detail
 }
 
 
-} // namespace raptor::detail
+} // namespace raptor::threshold

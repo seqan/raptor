@@ -12,6 +12,8 @@
 
 #include <seqan3/search/kmer_index/shape.hpp>
 
+#include <raptor/threshold/threshold_parameters.hpp>
+
 namespace raptor
 {
 
@@ -27,12 +29,11 @@ struct search_arguments
 
     // Related to thresholding
     double tau{0.9999};
-    double threshold{};
+    double threshold{std::numeric_limits<double>::quiet_NaN()};
     double p_max{0.15};
     double fpr{0.05};
     uint64_t pattern_size{};
     uint8_t errors{0};
-    bool treshold_was_set{false};
 
     // Related to IBF
     std::filesystem::path index_file{};
@@ -46,6 +47,23 @@ struct search_arguments
     bool is_socks{false};
     bool is_hibf{false};
     bool cache_thresholds{false};
+
+    raptor::threshold::threshold_parameters make_threshold_parameters() const noexcept
+    {
+        return
+        {
+            .window_size{window_size},
+            .shape{shape},
+            .pattern_size{pattern_size},
+            .errors{errors},
+            .percentage{threshold},
+            .p_max{p_max},
+            .fpr{fpr},
+            .tau{tau},
+            .cache_thresholds{cache_thresholds},
+            .output_directory{index_file.parent_path()}
+        };
+    }
 };
 
 } // namespace raptor
