@@ -36,6 +36,8 @@ int main(int argc, char ** argv)
     std::cout << "Processing Results from " << argv[2] << " and " << argv[3] << "... ";
 
     std::string mantis_line, raptor_line;
+    std::ofstream false_positives_file{"raptor.fps"};
+    std::ofstream false_negatives_file{"raptor.fns"};
     uint64_t false_positives{0};
     uint64_t false_negatives{0};
     uint64_t line_no{0};
@@ -82,15 +84,21 @@ int main(int argc, char ** argv)
             {
                 if (mantis_value < raptor_value)
                 {
-                    // (raptor_value != query_id) ? ++false_negatives : uint64_t{};
-                    false_negatives += (raptor_value != query_id);
+                    if (raptor_value != query_id)
+                    {
+                        false_negatives_file << mantis_query_name << ":" << mantis_value << '\n';
+                        ++false_negatives;
+                    }
                     ++all;
                     ++mantis_it;
                 }
                 else
                 {
-                    // (raptor_value != query_id) ? ++false_positives : uint64_t{};
-                    false_positives += (raptor_value != query_id);
+                    if (raptor_value != query_id)
+                    {
+                        false_positives_file << raptor_query_name << ":" << raptor_value << '\n';
+                        ++false_positives;
+                    }
                     ++raptor_it;
                 }
             }
@@ -105,24 +113,30 @@ int main(int argc, char ** argv)
         while (mantis_it != mantis_fields_view.end()) // process the rest of mantis
         {
             std::string mantis_str = [] (auto v) { std::string s; for (auto c : v) s.push_back(c); return s; }(*mantis_it);
-            // std::string query_name{mantis_query_name.begin(), mantis_query_name.begin() + mantis_query_name.find("genomic") + 7};
+            std::string query_name{mantis_query_name.begin(), mantis_query_name.begin() + mantis_query_name.find("genomic") + 7};
             // uint64_t query_id = user_bin_ids[query_name];
             uint64_t mantis_value = std::atoi(mantis_str.data());
             found_query_id_in_mantis = found_query_id_in_mantis || mantis_value == query_id;
             ++false_negatives;
+            false_negatives_file << query_name << ":" << mantis_value << '\n';
             ++mantis_it;
         }
 
         while (raptor_it != raptor_fields_view.end()) // process the rest of raptor if any
         {
             std::string raptor_str = [] (auto v) { std::string s; for (auto c : v) s.push_back(c); return s; }(*raptor_it);
-            // std::string query_name{mantis_query_name.begin(), mantis_query_name.begin() + mantis_query_name.find("genomic") + 7};
+            std::string query_name{mantis_query_name.begin(), mantis_query_name.begin() + mantis_query_name.find("genomic") + 7};
             // uint64_t query_id = user_bin_ids[query_name];
             uint64_t raptor_value = std::atoi(raptor_str.data());
             if (raptor_value == query_id)
+            {
                 found_query_id_in_raptor = true;
+            }
             else
+            {
+                false_positives_file << query_name << ":" << raptor_value << '\n';
                 ++false_positives;
+            }
             ++raptor_it;
         }
 
