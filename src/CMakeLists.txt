@@ -12,7 +12,7 @@ add_dependencies (raptor_interface chopper)
 # Raptor library
 add_library ("raptor_lib" INTERFACE)
 target_link_libraries ("raptor_lib" INTERFACE "raptor_argument_parsing" "raptor_build" "raptor_build_hibf"
-                                              "raptor_search" "raptor_upgrade"
+                                              "raptor_search" "raptor_threshold" "raptor_upgrade"
 )
 
 # Raptor executable
@@ -22,4 +22,5 @@ target_link_libraries ("raptor" PUBLIC "raptor_lib")
 add_subdirectory (argument_parsing)
 add_subdirectory (build)
 add_subdirectory (search)
+add_subdirectory (threshold)
 add_subdirectory (upgrade)

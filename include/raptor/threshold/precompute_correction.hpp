@@ -7,13 +7,11 @@
 
 #pragma once
 
-#include <vector>
+#include <raptor/threshold/threshold_parameters.hpp>
 
-namespace raptor::detail
+namespace raptor::threshold
 {
 
-[[nodiscard]] std::vector<double> one_error_model(size_t const kmer_size,
-                                                  double const p_mean,
-                                                  std::vector<double> const & affected_by_one_error_indirectly_prob);
+[[nodiscard]] std::vector<size_t> precompute_correction(threshold_parameters const & arguments);
 
-} // namespace raptor::detail
+} // namespace raptor::threshold

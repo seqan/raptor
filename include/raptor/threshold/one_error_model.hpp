@@ -9,9 +9,11 @@
 
 #include <vector>
 
-namespace raptor::detail
+namespace raptor::threshold
 {
 
-[[nodiscard]] std::vector<double> pascal_row(size_t const n);
+[[nodiscard]] std::vector<double> one_error_model(size_t const kmer_size,
+                                                  double const p_mean,
+                                                  std::vector<double> const & affected_by_one_error_indirectly_prob);
 
-} // namespace raptor::detail
+} // namespace raptor::threshold

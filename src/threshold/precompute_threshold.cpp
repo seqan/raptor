@@ -14,16 +14,16 @@
 
 #include <cereal/types/vector.hpp>
 
-#include <raptor/search/detail/logspace.hpp>
-#include <raptor/search/detail/multiple_error_model.hpp>
-#include <raptor/search/detail/one_error_model.hpp>
-#include <raptor/search/detail/one_indirect_error_model.hpp>
-#include <raptor/search/detail/precompute_threshold.hpp>
+#include <raptor/threshold/logspace.hpp>
+#include <raptor/threshold/multiple_error_model.hpp>
+#include <raptor/threshold/one_error_model.hpp>
+#include <raptor/threshold/one_indirect_error_model.hpp>
+#include <raptor/threshold/precompute_threshold.hpp>
 
-namespace raptor::detail
+namespace raptor::threshold
 {
 
-[[nodiscard]] std::string const threshold_filename(search_arguments const & arguments)
+[[nodiscard]] std::string const threshold_filename(threshold_parameters const & arguments)
 {
     std::stringstream stream{};
     stream << "threshold_"
@@ -44,20 +44,20 @@ namespace raptor::detail
     return result;
 }
 
-void write_thresholds(std::vector<size_t> const & vec, search_arguments const & arguments)
+void write_thresholds(std::vector<size_t> const & vec, threshold_parameters const & arguments)
 {
     if (!arguments.cache_thresholds)
         return;
 
-    std::filesystem::path filename = arguments.index_file.parent_path() / threshold_filename(arguments);
+    std::filesystem::path filename = arguments.output_directory / threshold_filename(arguments);
     std::ofstream os{filename, std::ios::binary};
     cereal::BinaryOutputArchive oarchive{os};
     oarchive(vec);
 }
 
-bool read_thresholds(std::vector<size_t> & vec, search_arguments const & arguments)
+bool read_thresholds(std::vector<size_t> & vec, threshold_parameters const & arguments)
 {
-    std::filesystem::path filename = arguments.index_file.parent_path() / threshold_filename(arguments);
+    std::filesystem::path filename = arguments.output_directory / threshold_filename(arguments);
     if (!arguments.cache_thresholds || !std::filesystem::exists(filename))
         return false;
 
@@ -67,11 +67,11 @@ bool read_thresholds(std::vector<size_t> & vec, search_arguments const & argumen
     return true;
 }
 
-[[nodiscard]] std::vector<size_t> precompute_threshold(search_arguments const & arguments)
+[[nodiscard]] std::vector<size_t> precompute_threshold(threshold_parameters const & arguments)
 {
     uint8_t const kmer_size{arguments.shape.size()};
     assert(arguments.window_size != kmer_size); // Use k-mer lemma.
-    assert(!arguments.treshold_was_set); // Use percentage.
+    assert(std::isnan(arguments.percentage)); // Use percentage.
 
     std::vector<size_t> thresholds;
 
@@ -88,9 +88,9 @@ bool read_thresholds(std::vector<size_t> & vec, search_arguments const & argumen
 
     // Probability that i minimisers are indirectly affected by one error.
     std::vector<double> const affected_by_one_error_indirectly_prob{
-        detail::one_indirect_error_model(arguments.pattern_size,
-                                         arguments.window_size,
-                                         arguments.shape)
+        one_indirect_error_model(arguments.pattern_size,
+                                 arguments.window_size,
+                                 arguments.shape)
     };
 
     // Iterate over the possible number of minimisers.
@@ -103,16 +103,16 @@ bool read_thresholds(std::vector<size_t> & vec, search_arguments const & argumen
 
         // Probability that i minimisers are affected by one error (directly or indirectly).
         std::vector<double> const affected_by_one_error_prob{
-            detail::one_error_model(kmer_size,
-                                    uniform_start_index_prob,
-                                    affected_by_one_error_indirectly_prob)
+            one_error_model(kmer_size,
+                            uniform_start_index_prob,
+                            affected_by_one_error_indirectly_prob)
         };
 
         // Probability that i minimisers are affected e errors.
         std::vector<double> const affected_by_e_errors_prob{
-            detail::multiple_error_model(number_of_minimisers,
-                                         arguments.errors,
-                                         affected_by_one_error_prob)
+            multiple_error_model(number_of_minimisers,
+                                 arguments.errors,
+                                 affected_by_one_error_prob)
         };
 
         // The fraction of covered cases.
@@ -134,4 +134,4 @@ bool read_thresholds(std::vector<size_t> & vec, search_arguments const & argumen
     return thresholds;
 }
 
-} // namespace raptor::detail
+} // namespace raptor::threshold

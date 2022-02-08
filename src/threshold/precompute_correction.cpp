@@ -14,14 +14,14 @@
 
 #include <cereal/types/vector.hpp>
 
-#include <raptor/search/detail/logspace.hpp>
-#include <raptor/search/detail/pascal_row.hpp>
-#include <raptor/search/detail/precompute_correction.hpp>
+#include <raptor/threshold/logspace.hpp>
+#include <raptor/threshold/pascal_row.hpp>
+#include <raptor/threshold/precompute_correction.hpp>
 
-namespace raptor::detail
+namespace raptor::threshold
 {
 
-[[nodiscard]] std::string const correction_filename(search_arguments const & arguments)
+[[nodiscard]] std::string const correction_filename(threshold_parameters const & arguments)
 {
     std::stringstream stream{};
     stream << "correction_"
@@ -44,20 +44,20 @@ namespace raptor::detail
     return result;
 }
 
-void write_correction(std::vector<size_t> const & vec, search_arguments const & arguments)
+void write_correction(std::vector<size_t> const & vec, threshold_parameters const & arguments)
 {
     if (!arguments.cache_thresholds)
         return;
 
-    std::filesystem::path filename = arguments.index_file.parent_path() / correction_filename(arguments);
+    std::filesystem::path filename = arguments.output_directory / correction_filename(arguments);
     std::ofstream os{filename, std::ios::binary};
     cereal::BinaryOutputArchive oarchive{os};
     oarchive(vec);
 }
 
-bool read_correction(std::vector<size_t> & vec, search_arguments const & arguments)
+bool read_correction(std::vector<size_t> & vec, threshold_parameters const & arguments)
 {
-    std::filesystem::path filename = arguments.index_file.parent_path() / correction_filename(arguments);
+    std::filesystem::path filename = arguments.output_directory / correction_filename(arguments);
     if (!arguments.cache_thresholds || !std::filesystem::exists(filename))
         return false;
 
@@ -67,11 +67,11 @@ bool read_correction(std::vector<size_t> & vec, search_arguments const & argumen
     return true;
 }
 
-[[nodiscard]] std::vector<size_t> precompute_correction(search_arguments const & arguments)
+[[nodiscard]] std::vector<size_t> precompute_correction(threshold_parameters const & arguments)
 {
     uint8_t const kmer_size{arguments.shape.size()};
     assert(arguments.window_size != kmer_size); // Use k-mer lemma.
-    assert(!arguments.treshold_was_set); // Use percentage.
+    assert(std::isnan(arguments.percentage)); // Use percentage.
 
     std::vector<size_t> correction;
 
@@ -103,7 +103,7 @@ bool read_correction(std::vector<size_t> & vec, search_arguments const & argumen
          ++number_of_minimisers)
     {
         size_t number_of_fp{1u};
-        std::vector<double> const binom_coeff{detail::pascal_row(number_of_minimisers)};
+        std::vector<double> const binom_coeff{pascal_row(number_of_minimisers)};
         // How many FPs to expect for a given fpr and number of minimisers?
         // The probability of seeing this many FP must be below p_max.
         while (binom(binom_coeff, number_of_minimisers, number_of_fp) >= log_p_max)
@@ -118,4 +118,4 @@ bool read_correction(std::vector<size_t> & vec, search_arguments const & argumen
     return correction;
 }
 
-} // namespace raptor::detail
+} // namespace raptor::threshold

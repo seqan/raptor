@@ -13,7 +13,7 @@
 #include <raptor/search/load_index.hpp>
 #include <raptor/search/search_multiple.hpp>
 #include <raptor/search/sync_out.hpp>
-#include <raptor/search/threshold.hpp>
+#include <raptor/threshold/threshold.hpp>
 
 namespace raptor
 {
@@ -60,7 +60,7 @@ void search_multiple(search_arguments const & arguments)
         synced_out << "#QUERY_NAME\tUSER_BINS\n";
     }
 
-    threshold const thresholder{arguments};
+    raptor::threshold::threshold const thresholder{arguments.make_threshold_parameters()};
 
     for (auto && chunked_records : fin | seqan3::views::chunk((1ULL<<20)*10))
     {

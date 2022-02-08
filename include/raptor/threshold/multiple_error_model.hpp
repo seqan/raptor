@@ -7,11 +7,13 @@
 
 #pragma once
 
-#include <raptor/argument_parsing/search_arguments.hpp>
+#include <vector>
 
-namespace raptor::detail
+namespace raptor::threshold
 {
 
-[[nodiscard]] std::vector<size_t> precompute_threshold(search_arguments const & arguments);
+[[nodiscard]] std::vector<double> multiple_error_model(size_t const number_of_minimisers,
+                                                       size_t const errors,
+                                                       std::vector<double> const & affected_by_one_error_prob);
 
-} // namespace raptor::detail
+} // namespace raptor::threshold

@@ -15,7 +15,7 @@
 #include <raptor/adjust_seed.hpp>
 #include <raptor/strong_types.hpp>
 
-namespace raptor::detail
+namespace raptor::threshold
 {
 
 // Minimiser without looking at reverse complement
@@ -127,5 +127,5 @@ public:
     }
 };
 
-} // namespace raptor::detail
+} // namespace raptor::threshold
 

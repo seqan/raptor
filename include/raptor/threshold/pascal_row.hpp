@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <raptor/argument_parsing/search_arguments.hpp>
+#include <vector>
 
-namespace raptor::detail
+namespace raptor::threshold
 {
 
-[[nodiscard]] std::vector<size_t> precompute_correction(search_arguments const & arguments);
+[[nodiscard]] std::vector<double> pascal_row(size_t const n);
 
-} // namespace raptor::detail
+} // namespace raptor::threshold

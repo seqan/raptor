@@ -14,7 +14,7 @@
 #include <raptor/search/do_parallel.hpp>
 #include <raptor/search/load_index.hpp>
 #include <raptor/search/sync_out.hpp>
-#include <raptor/search/threshold.hpp>
+#include <raptor/threshold/threshold.hpp>
 
 namespace raptor
 {
@@ -62,7 +62,7 @@ void search_single(search_arguments const & arguments, index_t && index)
         synced_out << "#QUERY_NAME\tUSER_BINS\n";
     }
 
-    threshold const thresholder{arguments};
+    raptor::threshold::threshold const thresholder{arguments.make_threshold_parameters()};
 
     auto worker = [&] (size_t const start, size_t const end)
     {

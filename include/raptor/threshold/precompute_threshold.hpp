@@ -5,21 +5,13 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <cmath>
+#pragma once
 
-#include <raptor/search/detail/pascal_row.hpp>
+#include <raptor/threshold/threshold_parameters.hpp>
 
-namespace raptor::detail
+namespace raptor::threshold
 {
 
-[[nodiscard]] std::vector<double> pascal_row(size_t const n)
-{
-    std::vector<double> result(n + 1);
+[[nodiscard]] std::vector<size_t> precompute_threshold(threshold_parameters const & arguments);
 
-    for (size_t i = 1; i <= n; ++i)
-        result[i] = result[i - 1] + std::log((n + 1 - i) / i);
-
-    return result;
-}
-
-} // namespace raptor::detail
+} // namespace raptor::threshold

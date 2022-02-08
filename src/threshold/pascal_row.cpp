@@ -5,15 +5,21 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#pragma once
+#include <cmath>
 
-#include <vector>
+#include <raptor/threshold/pascal_row.hpp>
 
-namespace raptor::detail
+namespace raptor::threshold
 {
 
-[[nodiscard]] std::vector<double> multiple_error_model(size_t const number_of_minimisers,
-                                                       size_t const errors,
-                                                       std::vector<double> const & affected_by_one_error_prob);
+[[nodiscard]] std::vector<double> pascal_row(size_t const n)
+{
+    std::vector<double> result(n + 1);
 
-} // namespace raptor::detail
+    for (size_t i = 1; i <= n; ++i)
+        result[i] = result[i - 1] + std::log((n + 1 - i) / i);
+
+    return result;
+}
+
+} // namespace raptor::threshold

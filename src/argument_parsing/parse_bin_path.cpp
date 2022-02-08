@@ -60,12 +60,12 @@ void parse_bin_path(std::filesystem::path const & bin_file,
 
 void parse_bin_path(build_arguments & arguments)
 {
-    detail::parse_bin_path(arguments.bin_file, arguments.bin_path, arguments.is_socks, arguments.is_hibf);
+    raptor::detail::parse_bin_path(arguments.bin_file, arguments.bin_path, arguments.is_socks, arguments.is_hibf);
 }
 
 void parse_bin_path(upgrade_arguments & arguments)
 {
-    detail::parse_bin_path(arguments.bin_file, arguments.bin_path, false, false);
+    raptor::detail::parse_bin_path(arguments.bin_file, arguments.bin_path, false, false);
 }
 
 } // namespace raptor

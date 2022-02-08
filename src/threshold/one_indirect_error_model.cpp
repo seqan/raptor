@@ -7,10 +7,10 @@
 
 #include <random>
 
-#include <raptor/search/detail/one_indirect_error_model.hpp>
-#include <raptor/search/detail/forward_strand_minimiser.hpp>
+#include <raptor/threshold/one_indirect_error_model.hpp>
+#include <raptor/threshold/forward_strand_minimiser.hpp>
 
-namespace raptor::detail
+namespace raptor::threshold
 {
 
 [[nodiscard]] std::vector<double> one_indirect_error_model(size_t const pattern_size,
@@ -84,4 +84,4 @@ namespace raptor::detail
     return result;
 }
 
-} // namespace raptor::detail
+} // namespace raptor::threshold
