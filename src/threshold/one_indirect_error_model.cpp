@@ -35,8 +35,8 @@ namespace raptor::threshold
     std::vector<uint8_t> minimiser_positions(max_number_of_minimiser, false);
     // Minimiser begin positions after introducing one error into the sequence
     std::vector<uint8_t> minimiser_positions_error(max_number_of_minimiser, false);
-    // One error affects at most all minimisers, there are pattern_size - window_size + 1 many
-    std::vector<double> result(max_number_of_minimiser, 0.0);
+    // In the worst case, one error can indirectly affect w minimisers
+    std::vector<double> result(window_size + 1, 0.0);
     forward_strand_minimiser fwd_minimiser{window{static_cast<uint32_t>(window_size)}, shape};
 
     for (size_t iteration = 0; iteration < iterations; ++iteration)

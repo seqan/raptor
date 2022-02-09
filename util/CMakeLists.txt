@@ -90,12 +90,12 @@ target_link_libraries ("count_minimiser" "common")
 install (TARGETS "count_minimiser" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 add_executable ("threshold_info"
-                ../src/search/detail/destroyed_indirectly_by_error.cpp
-                ../src/search/detail/enumerate_all_errors.cpp
-                ../src/search/detail/pascal_row.cpp
-                ../src/search/detail/simple_model.cpp
-                ../src/search/precompute_correction.cpp
-                ../src/search/precompute_threshold.cpp
+                ../src/threshold/one_indirect_error_model.cpp
+                ../src/threshold/multiple_error_model.cpp
+                ../src/threshold/pascal_row.cpp
+                ../src/threshold/one_error_model.cpp
+                ../src/threshold/precompute_correction.cpp
+                ../src/threshold/precompute_threshold.cpp
                 src/applications/threshold_info.cpp
 )
 target_link_libraries ("threshold_info" "common")

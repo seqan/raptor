@@ -11,7 +11,7 @@
 namespace raptor::threshold
 {
 
-// affected_by_error [2, 0, 1] => 3 errors. First affects minimisers, second none, third one minimiser.
+// affected_by_error [2, 0, 1] => 3 errors. First affects two minimisers, second none, third one minimiser.
 // current_error: All possible error configs are enumerated. current_error describes which error is to be enumerated.
 void impl(size_t const minimisers_to_affect,
           std::vector<double> const & affected_by_one_error_prob,
@@ -25,7 +25,6 @@ void impl(size_t const minimisers_to_affect,
         double current_prob{};
 
         // The probability that the errors affect minimisers in this specific way.
-
         for (size_t i = 0; i < current_error; ++i)
             current_prob += affected_by_one_error_prob[affected_by_error[i]];
         // Then the other errors must not affect any minimisers.
@@ -51,12 +50,14 @@ void impl(size_t const minimisers_to_affect,
                                                        size_t const errors,
                                                        std::vector<double> const & affected_by_one_error_prob)
 {
-    std::vector<double> affected_by_e_errors(number_of_minimisers + 1, 0);
+    size_t const window_size{affected_by_one_error_prob.size() - 1};
+    size_t const max_affected{std::clamp<size_t>(errors * window_size, 0u, number_of_minimisers)};
+    std::vector<double> affected_by_e_errors(max_affected + 1, 0);
 
     double sum{logspace::negative_inf};
 
     // Enumerate all combinations which lead to i many affected minimisers using e errors.
-    for (size_t i = 0; i < number_of_minimisers; ++i)
+    for (size_t i = 0; i <= max_affected; ++i)
     {
         double result{logspace::negative_inf};
         impl(i, affected_by_one_error_prob, std::vector<size_t>(errors, 0), 0, result);
