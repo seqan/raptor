@@ -17,37 +17,40 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 #include <seqan3/utility/views/chunk.hpp>
 
+#include <raptor/argument_parsing/search_arguments.hpp>
 #include <raptor/argument_parsing/validators.hpp>
 #include <raptor/adjust_seed.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/search/do_parallel.hpp>
-#include <raptor/search/precompute_correction.hpp>
-#include <raptor/search/precompute_threshold.hpp>
+#include <raptor/threshold/precompute_correction.hpp>
+#include <raptor/threshold/precompute_threshold.hpp>
 
 void threshold_info(raptor::search_arguments const & arguments)
 {
     double compute_time{};
 
-    std::vector<size_t> const precomp_correction = raptor::precompute_correction(arguments);
-    std::vector<size_t> const precomp_thresholds = raptor::precompute_threshold(arguments);
+    uint8_t const kmer_size{arguments.shape.size()};
+    size_t const kmers_per_window = arguments.window_size - kmer_size + 1;
+    size_t const kmers_per_pattern = arguments.pattern_size - kmer_size + 1;
+    size_t const minimal_number_of_minimizers = kmers_per_pattern / kmers_per_window;
+    size_t const maximal_number_of_minimizers = arguments.pattern_size - arguments.window_size + 1;
 
-    size_t const kmers_per_window = arguments.window_size - arguments.shape_size + 1;
-    size_t const kmers_per_pattern = arguments.pattern_size - arguments.shape_size + 1;
-    size_t const min_number_of_minimisers = std::ceil(kmers_per_pattern / static_cast<double>(kmers_per_window));
-    size_t const max_number_of_minimisers = arguments.pattern_size - arguments.window_size + 1;
+    auto const parameters = arguments.make_threshold_parameters();
+    std::vector<size_t> const precomp_correction = raptor::threshold::precompute_correction(parameters);
+    std::vector<size_t> const precomp_thresholds = raptor::threshold::precompute_threshold(parameters);
 
     seqan3::sequence_file_input<raptor::dna4_traits, seqan3::fields<seqan3::field::seq>> fin{arguments.query_file};
     using record_type = typename decltype(fin)::record_type;
     std::vector<record_type> records{};
 
-    std::vector<size_t> minimiser_frequencies(max_number_of_minimisers + 1);
+    std::vector<size_t> minimiser_frequencies(maximal_number_of_minimizers + 1);
     std::mutex min_freq_mutex;
 
     auto worker = [&] (size_t const start, size_t const end)
     {
-        auto hash_adaptor = seqan3::views::minimiser_hash(seqan3::ungapped{arguments.shape_size},
+        auto hash_adaptor = seqan3::views::minimiser_hash(seqan3::ungapped{kmer_size},
                                                           seqan3::window_size{arguments.window_size},
-                                                          seqan3::seed{raptor::adjust_seed(arguments.shape_size)});
+                                                          seqan3::seed{raptor::adjust_seed(kmer_size)});
 
         for (auto && [seq] : records | seqan3::views::slice(start, end))
         {
@@ -72,7 +75,7 @@ void threshold_info(raptor::search_arguments const & arguments)
 
     out << "#query: " << arguments.query_file << '\n'
         << "#output: " << arguments.out_file << '\n'
-        << "#kmer: " << std::to_string(arguments.shape_size) << '\n'
+        << "#kmer: " << std::to_string(kmer_size) << '\n'
         << "#window: " << arguments.window_size << '\n'
         << "#error: " << std::to_string(arguments.errors) << '\n'
         << "#tau: " << arguments.tau << '\n'
@@ -80,8 +83,8 @@ void threshold_info(raptor::search_arguments const & arguments)
         << "#fpr: " << arguments.fpr << '\n'
         << "#pattern: " << arguments.pattern_size << '\n'
         << "#threads: " << std::to_string(arguments.threads) << '\n'
-        << "##min_number_of_minimisers: " << min_number_of_minimisers << '\n'
-        << "##max_number_of_minimisers: " << max_number_of_minimisers << '\n'
+        << "##minimal_number_of_minimizers: " << minimal_number_of_minimizers << '\n'
+        << "##maximal_number_of_minimizers: " << maximal_number_of_minimizers << '\n'
         << 'x' << ','
         << "#x" << ','
         << "t(x)" << ','
@@ -96,12 +99,12 @@ void threshold_info(raptor::search_arguments const & arguments)
         --last_non_zero_index;
     minimiser_frequencies.resize(last_non_zero_index + 1);
 
-    for (size_t i{min_number_of_minimisers}; i <= last_non_zero_index; ++i)
+    for (size_t i{minimal_number_of_minimizers}; i <= last_non_zero_index; ++i)
     {
         size_t const minimiser_count{minimiser_frequencies[i]};
         if (!minimiser_count)
             continue;
-        size_t const index{i - min_number_of_minimisers};
+        size_t const index{i - minimal_number_of_minimizers};
         out << i << ','
             << minimiser_count << ','
             << precomp_thresholds[index] + precomp_correction[index] << ','
@@ -134,7 +137,7 @@ void init_search_parser(seqan3::argument_parser & parser, raptor::search_argumen
                       '\0',
                       "window",
                       "The window size.",
-                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
+                      seqan3::option_spec::standard,
                       raptor::positive_integer_validator{});
     parser.add_option(arguments.errors,
                       '\0',
@@ -195,7 +198,6 @@ int main(int argc, char ** argv)
     }
 
     arguments.shape = seqan3::ungapped{arguments.shape_size};
-    arguments.shape_weight = arguments.shape.count();
 
     std::filesystem::path output_directory = arguments.out_file.parent_path();
     std::error_code ec{};
