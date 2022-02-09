@@ -115,12 +115,21 @@ bool read_thresholds(std::vector<size_t> & vec, threshold_parameters const & arg
                                  affected_by_one_error_prob)
         };
 
+        // Max number of affected minimisers as predicted by `multiple_error_model`. Used for a check when adding
+        // the probabilities.
+        // This check is not strictly necessary, but in case of floating point number inaccuracies, it prevents
+        // adding all probabilities in `affected_by_e_errors_prob`.
+        // While `affected_by_e_errors_prob` computes all probabilities according to a theoretical worst case,
+        // in practice, there are probabilites of 0 starting at a certain number of affected minimisers.
+        size_t const max_affected = std::ranges::find(affected_by_e_errors_prob, logspace::negative_inf) -
+                                    affected_by_e_errors_prob.begin();
+
         // The fraction of covered cases.
         double cumulative_prob{affected_by_e_errors_prob[0]};
         // How many minimisers are affected at most...
         size_t affected_minimisers{};
         // such that threshold holds with a probability of at least (1 - tau)?
-        while (cumulative_prob < log_tau)
+        while (cumulative_prob < log_tau && affected_minimisers < max_affected)
             cumulative_prob = logspace::add(cumulative_prob, affected_by_e_errors_prob[++affected_minimisers]);
 
         assert(affected_minimisers <= number_of_minimisers);
