@@ -41,7 +41,8 @@ int main(int argc, char ** argv)
     uint64_t false_positives{0};
     uint64_t false_negatives{0};
     uint64_t line_no{0};
-    uint64_t all{0};
+    uint64_t all_mantis{0};
+    uint64_t all_raptor{0};
 
     while (std::getline(mantis_result, mantis_line) && std::getline(raptor_result, raptor_line))
     {
@@ -89,7 +90,7 @@ int main(int argc, char ** argv)
                         false_negatives_file << mantis_query_name << ":" << mantis_value << '\n';
                         ++false_negatives;
                     }
-                    ++all;
+                    ++all_mantis;
                     ++mantis_it;
                 }
                 else
@@ -99,12 +100,14 @@ int main(int argc, char ** argv)
                         false_positives_file << raptor_query_name << ":" << raptor_value << '\n';
                         ++false_positives;
                     }
+                    ++all_raptor;
                     ++raptor_it;
                 }
             }
             else
             {
-                 ++all;
+                 ++all_mantis;
+                 ++all_raptor;
                  ++mantis_it;
                  ++raptor_it;
             }
@@ -119,6 +122,7 @@ int main(int argc, char ** argv)
             found_query_id_in_mantis = found_query_id_in_mantis || mantis_value == query_id;
             ++false_negatives;
             false_negatives_file << query_name << ":" << mantis_value << '\n';
+            ++all_mantis;
             ++mantis_it;
         }
 
@@ -137,6 +141,7 @@ int main(int argc, char ** argv)
                 false_positives_file << query_name << ":" << raptor_value << '\n';
                 ++false_positives;
             }
+            ++all_raptor;
             ++raptor_it;
         }
 
@@ -160,7 +165,8 @@ int main(int argc, char ** argv)
         std::cerr << "WARNING: Missing line of raptor in comparison: " << raptor_line;
 
     std::cout << std::endl;
-    std::cout << "Taking mantis as the truth set all:" << all << std::endl;
-    std::cout << "False positives: " << false_positives << std::endl;
-    std::cout << "False negatives: " << false_negatives << std::endl;
+    std::cout << "Mantis total #hits:" << all_mantis << std::endl;
+    std::cout << "Raptor total #hits:" << all_raptor << std::endl;
+    std::cout << "#False positives raptor: " << false_positives << std::endl;
+    std::cout << "#False negatives raptor: " << false_negatives << std::endl;
 }
