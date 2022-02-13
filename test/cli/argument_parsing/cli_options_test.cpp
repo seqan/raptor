@@ -353,7 +353,8 @@ TEST_F(argparse_search, temporary_warning)
 {
     cli_test_result const result = execute_app("raptor", "search",
                                                          "--query ", data("query.fq"),
-                                                         "--index ", data("1_1.index"),
+                                                         "--index ", data("1bins23window.index"),
+                                                         "--pattern 60",
                                                          "--output search.out");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[WARNING] The search needs the FPR that was used for building the index.\n"
@@ -363,9 +364,8 @@ TEST_F(argparse_search, temporary_warning)
                                       "          The final version will store the FPR in the index and this parameter "
                                       "will be removed.\n"
                                       "          To disable this warning, explicitly pass the FPR to raptor search "
-                                      "(--fpr 0.05).\n"
-                                      "[Error] Unsupported index version. Check raptor upgrade.\n"});
-    RAPTOR_ASSERT_FAIL_EXIT(result);
+                                      "(--fpr 0.05).\n"});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
 }
 
 TEST_F(argparse_upgrade, kmer_window)
