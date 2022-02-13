@@ -17,6 +17,18 @@
 namespace raptor
 {
 
+// Printing a custom default value for argument_parser.
+std::ostream & operator<<(std::ostream & s, pattern_size const &)
+{
+    return s << "Median of sequence lengths in query file";
+}
+
+// Parsing input from argument_parser.
+std::istream & operator>>(std::istream & s, pattern_size & pattern_size_)
+{
+    return s >> pattern_size_.v;
+}
+
 void init_search_parser(seqan3::argument_parser & parser, search_arguments & arguments)
 {
     init_shared_meta(parser);
@@ -68,10 +80,10 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
                       "The false positive rate used for building the index.",
                       arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{0, 1});
-    parser.add_option(arguments.pattern_size,
+    parser.add_option(arguments.pattern_size_strong,
                       '\0',
                       "pattern",
-                      "The pattern size. Default: Use median of sequence lengths in query file.",
+                      "The pattern size.",
                       arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
     parser.add_option(arguments.threads,
                       '\0',
@@ -141,33 +153,25 @@ void search_parsing(seqan3::argument_parser & parser, bool const is_socks)
     }
 
     // ==========================================
-    // Temporary.
-    // ==========================================
-    if (!parser.is_option_set("threshold") && !arguments.is_socks && !parser.is_option_set("fpr"))
-    {
-        std::cerr << "[WARNING] The search needs the FPR that was used for building the index.\n"
-                  << "          Currently, the default value of "
-                  << std::setprecision(4)
-                  << arguments.fpr
-                  << " is used.\n"
-                  << "          If the index was built with a different FPR, the search results are not reliable.\n"
-                  << "          The final version will store the FPR in the index and this parameter will be removed.\n"
-                  << "          To disable this warning, explicitly pass the FPR to raptor search (--fpr 0.05).\n";
-    }
-
-    // ==========================================
     // Process --pattern.
     // ==========================================
-    if (!arguments.is_socks && !arguments.pattern_size)
+    if (!arguments.is_socks)
     {
-        std::vector<uint64_t> sequence_lengths{};
-        seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>> query_in{arguments.query_file};
-        for (auto & [seq] : query_in | seqan3::views::async_input_buffer(16))
+        if (!parser.is_option_set("pattern"))
         {
-            sequence_lengths.push_back(std::ranges::size(seq));
+            std::vector<uint64_t> sequence_lengths{};
+            seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>> query_in{arguments.query_file};
+            for (auto & [seq] : query_in | seqan3::views::async_input_buffer(16))
+            {
+                sequence_lengths.push_back(std::ranges::size(seq));
+            }
+            std::sort(sequence_lengths.begin(), sequence_lengths.end());
+            arguments.pattern_size = sequence_lengths[sequence_lengths.size()/2];
         }
-        std::sort(sequence_lengths.begin(), sequence_lengths.end());
-        arguments.pattern_size = sequence_lengths[sequence_lengths.size()/2];
+        else
+        {
+            arguments.pattern_size  = arguments.pattern_size_strong.v;
+        }
     }
 
     // ==========================================
@@ -189,6 +193,23 @@ void search_parsing(seqan3::argument_parser & parser, bool const is_socks)
         arguments.bin_path = tmp.bin_path();
         if (arguments.is_socks)
             arguments.pattern_size = arguments.shape_size;
+    }
+
+    // ==========================================
+    // Temporary.
+    // ==========================================
+    if (arguments.shape_size != arguments.window_size &&
+        !parser.is_option_set("threshold") &&
+        !parser.is_option_set("fpr") )
+    {
+        std::cerr << "[WARNING] The search needs the FPR that was used for building the index.\n"
+                  << "          Currently, the default value of "
+                  << std::setprecision(4)
+                  << arguments.fpr
+                  << " is used.\n"
+                  << "          If the index was built with a different FPR, the search results are not reliable.\n"
+                  << "          The final version will store the FPR in the index and this parameter will be removed.\n"
+                  << "          To disable this warning, explicitly pass the FPR to raptor search (--fpr 0.05).\n";
     }
 
     // ==========================================
