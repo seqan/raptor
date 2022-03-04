@@ -1,3 +1,10 @@
+// -----------------------------------------------------------------------------------------------------
+// Copyright (c) 2006-2022, Knut Reinert & Freie Universität Berlin
+// Copyright (c) 2016-2022, Knut Reinert & MPI für molekulare Genetik
+// This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
+// shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
+// -----------------------------------------------------------------------------------------------------
+
 #include <cassert>
 #include <charconv>
 #include <fstream>
@@ -8,6 +15,9 @@
 #include <robin_hood.h>
 
 #include <raptor/argument_parsing/validators.hpp>
+
+#include "check_output_file.hpp"
+#include "parse_user_bin_ids.hpp"
 
 struct config
 {
@@ -33,25 +43,6 @@ std::vector<std::string> parse_query_names(std::filesystem::path const & query_n
         query_names.push_back(line_buffer);
     std::cout << "Done" << std::endl;
     return query_names;
-}
-
-robin_hood::unordered_map<std::string, uint64_t> parse_user_bin_ids(std::filesystem::path const & user_bin_ids_file)
-{
-    std::string line_buffer{};
-    robin_hood::unordered_map<std::string, uint64_t> ub_name_to_id;
-    std::ifstream user_bin_ids_in{user_bin_ids_file};
-
-    std::cout << "Reading " << user_bin_ids_file << " ... " << std::flush;
-    // Contains lines: "some_number <tab> reference_name"
-    while (std::getline(user_bin_ids_in, line_buffer))
-    {
-        auto tab_it{line_buffer.begin() + line_buffer.find('\t')};
-        std::string_view id_value{line_buffer.begin(), tab_it};
-        std::string_view name_key{++tab_it, line_buffer.end()};
-        ub_name_to_id.emplace(name_key, std::atoi(id_value.data()));
-    }
-    std::cout << "Done" << std::endl;
-    return ub_name_to_id;
 }
 
 // ## Threshold:
@@ -98,7 +89,9 @@ void normalise_output(config const & cfg)
     // All query names
     std::vector<std::string> const query_names{parse_query_names(cfg.query_names_file)};
     // map[reference_name] = number
+    std::cout << "Reading " << cfg.user_bin_ids_file << " ... " << std::flush;
     robin_hood::unordered_map<std::string, uint64_t> const ub_name_to_id{parse_user_bin_ids(cfg.user_bin_ids_file)};
+    std::cout << "Done" << std::endl;
 
     // Process mantis results
     std::ifstream mantis_result_in{cfg.mantis_result_file};
@@ -241,19 +234,6 @@ void init_parser(seqan3::argument_parser & parser, config & cfg)
                       "Reduce kmer threshold by this much.",
                       seqan3::option_spec::required,
                       raptor::positive_integer_validator{true});
-}
-
-void check_output_file(std::filesystem::path const & output_file)
-{
-    std::filesystem::path const output_directory = output_file.parent_path();
-    std::error_code ec{};
-    std::filesystem::create_directories(output_directory, ec);
-
-    if (!output_directory.empty() && ec)
-        throw seqan3::argument_parser_error{seqan3::detail::to_string("Failed to create directory\"",
-                                                                      output_directory.c_str(),
-                                                                      "\": ",
-                                                                      ec.message())};
 }
 
 int main(int argc, char ** argv)

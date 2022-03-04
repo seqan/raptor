@@ -51,4 +51,8 @@ add_executable ("normalise_mantis_output" applications/normalise_mantis_output.c
 target_link_libraries ("normalise_mantis_output" "common")
 install (TARGETS "normalise_mantis_output" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
+add_executable ("compare_mantis_raptor_output" applications/compare_mantis_raptor_output.cpp)
+target_link_libraries ("compare_mantis_raptor_output" "common")
+install (TARGETS "compare_mantis_raptor_output" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
 message (STATUS "${FontBold}You can run `make install` to build the application.${FontReset}")
