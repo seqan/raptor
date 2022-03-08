@@ -35,11 +35,38 @@ auto find_tab(std::string const & str)
     return str.begin() + pos;
 }
 
+/* The input is the outer iterator of a split view. We use a comma as delimiter for multiple hits, i.e. a line
+ * may look like:
+ * `GCF_000005825.2_ASM582v2_genomic100 <tab> 0,283,7288` = `<read_name>\t<hits>`.
+ * We extract the `<hits>` part and apply a split_view on it.
+ *
+ * The split view has two iterators/ranges: outer and inner:
+ * [0 283 7288]
+ *  ^
+ *  outer_it = split_view.begin()
+ *
+ * [0 283 7288]
+ *    ^
+ *    ++outer_it;
+ *
+ * [ 2 8 3 ] = inner_range = *outer_it
+ *   ^
+ *   inner_it = inner_range.begin()
+ *
+ * In GCC12, one could create a string_view from a split_view (inner_range) directly, since a split_view preserves
+ * contiguous and other properties. In GCC12, the pre-GCC12 split_view is called lazy_split_view.
+ *
+ * Pre-GCC12, the split_view is lazy and does not preserve contiguous_range. Therefore, a string_view must be
+ * constructed in a bit more complicated manner:
+ * * get address of inner_it; this is the first character
+ * * get length of inner_range
+ * * construct string_view from pointer and length
+ */
 auto extract_hit(auto const & outer_it)
 {
-    auto const inner_it = *outer_it;
-    char const * const first_char = std::addressof(*(inner_it.begin()));
-    auto const length = std::ranges::distance(inner_it);
+    auto const & inner_range = *outer_it;
+    char const * const first_char = std::addressof(*(inner_range.begin()));
+    auto const length = std::ranges::distance(inner_range);
 
     uint64_t result{};
     std::from_chars(first_char, first_char + length, result);
@@ -76,7 +103,7 @@ void compare_results(config const & cfg)
     auto parse_original_bin = [&query_name_buffer, &ub_name_to_id] (std::string_view const & line)
     {
         // E.g., "GCF_000005825.2_ASM582v2_genomic106". 106 is the read number.
-        // find() returns an iterator to the "g" of "genomic". `+7` moves the iterator to "1", which is the end
+        // find() returns an iterator to the 'g' of "genomic". `+7` moves the iterator to '1', which is the end
         // of the bin name.
         query_name_buffer.assign(line.begin(), line.begin() + line.find("genomic") + 7);
         return ub_name_to_id.at(query_name_buffer);
@@ -120,7 +147,7 @@ void compare_results(config const & cfg)
                 {
                     if (raptor_hit_bin != original_bin)
                     {
-                        false_negatives_file << query_name << ":" << mantis_hit_bin << '\n';
+                        false_negatives_file << query_name << ':' << mantis_hit_bin << '\n';
                         ++false_negatives;
                     }
                     ++mantis_hit_count;
@@ -130,7 +157,7 @@ void compare_results(config const & cfg)
                 {
                     if (raptor_hit_bin != original_bin)
                     {
-                        false_positives_file << query_name << ":" << raptor_hit_bin << '\n';
+                        false_positives_file << query_name << ':' << raptor_hit_bin << '\n';
                         ++false_positives;
                     }
                     ++raptor_hit_count;
@@ -151,7 +178,7 @@ void compare_results(config const & cfg)
         {
             uint64_t const mantis_hit_bin{extract_hit(mantis_it)};
             mantis_found_correct_bin = mantis_found_correct_bin || mantis_hit_bin == original_bin;
-            false_negatives_file << query_name << ":" << mantis_hit_bin << '\n';
+            false_negatives_file << query_name << ':' << mantis_hit_bin << '\n';
             ++false_negatives;
             ++mantis_hit_count;
             ++mantis_it;
@@ -162,7 +189,7 @@ void compare_results(config const & cfg)
         {
             uint64_t const raptor_hit_bin{extract_hit(raptor_it)};
             raptor_found_correct_bin = raptor_found_correct_bin || raptor_hit_bin == original_bin;
-            false_positives_file << query_name << ":" << raptor_hit_bin << '\n';
+            false_positives_file << query_name << ':' << raptor_hit_bin << '\n';
             ++false_positives;
             ++raptor_hit_count;
             ++raptor_it;
@@ -172,16 +199,16 @@ void compare_results(config const & cfg)
         {
             ++mantis_miss;
             missing_ground_truths_file << "Line " << line_no << ": "
-                                       << "Could not find query " << query_name << " "
-                                       << "(" << query_name_buffer << ":" << original_bin << ") "
+                                       << "Could not find query " << query_name << ' '
+                                       << '(' << query_name_buffer << ':' << original_bin << ") "
                                        << "in its respective genome in mantis.\n";
         }
         if (!raptor_found_correct_bin)
         {
             ++raptor_miss;
             missing_ground_truths_file << "Line " << line_no << ": "
-                                       << "Could not find query " << query_name << " "
-                                       << "(" << query_name_buffer << ":" << original_bin << ") "
+                                       << "Could not find query " << query_name << ' '
+                                       << '(' << query_name_buffer << ':' << original_bin << ") "
                                        << "in its respective genome in raptor.\n";
         }
 
