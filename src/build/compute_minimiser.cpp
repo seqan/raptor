@@ -105,7 +105,7 @@ void compute_minimiser(build_arguments const & arguments)
             std::ofstream outfile{output_path, std::ios::binary};
             for (auto && hash : minimiser_table)
             {
-                if (hash.second > cutoff)
+                if (hash.second >= cutoff)
                 {
                     outfile.write(reinterpret_cast<const char*>(&hash.first), sizeof(hash.first));
                     ++count;
