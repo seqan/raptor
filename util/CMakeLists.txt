@@ -134,6 +134,10 @@ add_executable ("check_fastq" src/applications/check_fastq.cpp)
 target_link_libraries ("check_fastq" "common")
 install (TARGETS "check_fastq" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
+add_executable ("compare_amr_genes" hibf/misc/helper/src/compare_amr_genes.cpp)
+target_link_libraries ("compare_amr_genes" "common")
+install (TARGETS "compare_amr_genes" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
 add_executable ("create_comparable_output" hibf/misc/helper/src/create_comparable_output.cpp)
 target_link_libraries ("create_comparable_output" "common")
 install (TARGETS "create_comparable_output" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
