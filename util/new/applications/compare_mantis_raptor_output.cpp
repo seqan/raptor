@@ -227,41 +227,41 @@ void compare_results(config const & cfg)
     }
 
     stats_file << "Mantis total:\t" << mantis_hit_count << '\n';
-    stats_file << "Mantis miss:\t" << mantis_miss << '\n';
+    stats_file << "Mantis miss: \t" << mantis_miss << '\n';
     stats_file << "Raptor total:\t" << raptor_hit_count << '\n';
-    stats_file << "Raptor miss:\t" << raptor_miss << '\n';
-    stats_file << "Raptor FP:\t" << false_positives << '\n';
-    stats_file << "Raptor FN:\t" << false_negatives << '\n';
+    stats_file << "Raptor miss: \t" << raptor_miss << '\n';
+    stats_file << "Raptor FP:   \t" << false_positives << '\n';
+    stats_file << "Raptor FN:   \t" << false_negatives << '\n';
 
     if (missing_lines)
         std::cout << "[WARNING] Somes lines were missing. See "
-                  << cfg.output_directory.c_str()
-                  << "missing_lines.warn\n";
+                  << (cfg.output_directory / "missing_lines.warn")
+                  << '\n';
 
     if (mantis_miss || raptor_miss)
         std::cout << "[Info] Missing ground truths are listed in "
-                  << cfg.output_directory.c_str()
-                  << "missing_ground_truth.warn\n";
+                  << (cfg.output_directory / "missing_ground_truth.warn")
+                  << '\n';
 
     std::cout << "[Info] False positives: "
-                << cfg.output_directory.c_str()
-                << "raptor.fps\n";
+              << (cfg.output_directory / "raptor.fps")
+              << '\n';
 
     std::cout << "[Info] False negatives: "
-                << cfg.output_directory.c_str()
-                << "raptor.fns\n";
+              << (cfg.output_directory / "raptor.fns")
+              << '\n';
 
     std::cout << "[Info] Statistics: "
-                << cfg.output_directory.c_str()
-                << "stats.tsv\n";
+              << (cfg.output_directory / "stats.tsv")
+              << '\n';
 
     std::cout << "[Info] Content of stats.tsv:\n"
               << "       Mantis total:\t" << mantis_hit_count << '\n'
-              << "       Mantis miss:\t" << mantis_miss << '\n'
+              << "       Mantis miss: \t" << mantis_miss << '\n'
               << "       Raptor total:\t" << raptor_hit_count << '\n'
-              << "       Raptor miss:\t" << raptor_miss << '\n'
-              << "       Raptor FP:\t" << false_positives << '\n'
-              << "       Raptor FN:\t" << false_negatives << '\n';
+              << "       Raptor miss: \t" << raptor_miss << '\n'
+              << "       Raptor FP:   \t" << false_positives << '\n'
+              << "       Raptor FN:   \t" << false_negatives << '\n';
 }
 
 void init_parser(seqan3::argument_parser & parser, config & cfg)

@@ -21,9 +21,10 @@
 
 struct config
 {
-    size_t kmer_size{};
-    size_t number_of_errors{};
-    size_t threshold_grace{};
+    double percentage{};
+    // size_t kmer_size{};
+    // size_t number_of_errors{};
+    // size_t threshold_grace{};
 
     std::filesystem::path query_names_file{};
     std::filesystem::path user_bin_ids_file{};
@@ -37,11 +38,11 @@ std::vector<std::string> parse_query_names(std::filesystem::path const & query_n
     std::vector<std::string> query_names;
     std::ifstream query_names_in{query_names_file};
 
-    std::cout << "Reading " << query_names_file << " ... " << std::flush;
+    std::cerr << "Reading " << query_names_file << " ... " << std::flush;
     // Contains lines: "query_name"
     while (std::getline(query_names_in, line_buffer))
         query_names.push_back(line_buffer);
-    std::cout << "Done" << std::endl;
+    std::cerr << "Done" << std::endl;
     return query_names;
 }
 
@@ -64,7 +65,8 @@ std::vector<std::string> parse_query_names(std::filesystem::path const & query_n
 class thresholder
 {
 private:
-    size_t const destroyed_kmers{};
+    // size_t const destroyed_kmers{};
+    double const percentage{};
 
 public:
     thresholder() = default;
@@ -75,13 +77,22 @@ public:
     ~thresholder() = default;
 
     explicit thresholder(config const & cfg) :
-        destroyed_kmers(cfg.number_of_errors * cfg.kmer_size + cfg.threshold_grace)
+        percentage(cfg.percentage)
     {}
 
     [[nodiscard]] constexpr size_t get(size_t const kmer_count) const noexcept
     {
-        return (kmer_count > destroyed_kmers) ? (kmer_count - destroyed_kmers) : 0u;
+        return static_cast<size_t>(percentage * kmer_count);
     }
+
+    // explicit thresholder(config const & cfg) :
+    //     destroyed_kmers(cfg.number_of_errors * cfg.kmer_size + cfg.threshold_grace)
+    // {}
+
+    // [[nodiscard]] constexpr size_t get(size_t const kmer_count) const noexcept
+    // {
+    //     return (kmer_count > destroyed_kmers) ? (kmer_count - destroyed_kmers) : 0u;
+    // }
 };
 
 void normalise_output(config const & cfg)
@@ -89,9 +100,9 @@ void normalise_output(config const & cfg)
     // All query names
     std::vector<std::string> const query_names{parse_query_names(cfg.query_names_file)};
     // map[reference_name] = number
-    std::cout << "Reading " << cfg.user_bin_ids_file << " ... " << std::flush;
+    std::cerr << "Reading " << cfg.user_bin_ids_file << " ... " << std::flush;
     robin_hood::unordered_map<std::string, uint64_t> const ub_name_to_id{parse_user_bin_ids(cfg.user_bin_ids_file)};
-    std::cout << "Done" << std::endl;
+    std::cerr << "Done" << std::endl;
 
     // Process mantis results
     std::ifstream mantis_result_in{cfg.mantis_result_file};
@@ -153,7 +164,7 @@ void normalise_output(config const & cfg)
         }
     };
 
-    std::cout << "Processing " << cfg.mantis_result_file << " ... " << std::flush;
+    std::cerr << "Processing " << cfg.mantis_result_file << " ... " << std::flush;
 
     // First line.
     if (std::getline(mantis_result_in, line_buffer))
@@ -188,7 +199,7 @@ void normalise_output(config const & cfg)
     // Write last results.
     process_results();
 
-    std::cout << "Done" << std::endl;
+    std::cerr << "Done" << std::endl;
 }
 
 void init_parser(seqan3::argument_parser & parser, config & cfg)
@@ -216,24 +227,30 @@ void init_parser(seqan3::argument_parser & parser, config & cfg)
                       "output_file",
                       "Provide a path to the output.",
                       seqan3::option_spec::required);
-    parser.add_option(cfg.kmer_size,
+    parser.add_option(cfg.percentage,
                       '\0',
-                      "kmer_size",
-                      "The k-mer size.",
+                      "percentage",
+                      "Percentage of kmers in a query that need to be found to qualify as a hit.",
                       seqan3::option_spec::required,
-                      seqan3::arithmetic_range_validator{1, 32});
-    parser.add_option(cfg.number_of_errors,
-                      '\0',
-                      "errors",
-                      "The number of errors.",
-                      seqan3::option_spec::required,
-                      raptor::positive_integer_validator{true});
-    parser.add_option(cfg.threshold_grace,
-                      '\0',
-                      "threshold_grace",
-                      "Reduce kmer threshold by this much.",
-                      seqan3::option_spec::required,
-                      raptor::positive_integer_validator{true});
+                      seqan3::arithmetic_range_validator{0, 1});
+    // parser.add_option(cfg.kmer_size,
+    //                   '\0',
+    //                   "kmer_size",
+    //                   "The k-mer size.",
+    //                   seqan3::option_spec::required,
+    //                   seqan3::arithmetic_range_validator{1, 32});
+    // parser.add_option(cfg.number_of_errors,
+    //                   '\0',
+    //                   "errors",
+    //                   "The number of errors.",
+    //                   seqan3::option_spec::required,
+    //                   raptor::positive_integer_validator{true});
+    // parser.add_option(cfg.threshold_grace,
+    //                   '\0',
+    //                   "threshold_grace",
+    //                   "Reduce kmer threshold by this much.",
+    //                   seqan3::option_spec::required,
+    //                   raptor::positive_integer_validator{true});
 }
 
 int main(int argc, char ** argv)
