@@ -9,7 +9,7 @@
 int main(int argc, char ** argv)
 {
     if (argc != 4)
-        throw std::runtime_error{"Please provide query.names user_bin.ids and mantis.results"}; // $FILENAME_USER_BIN_IDS $FILENAME_MANTIS_READY_TO_COMPARE $FILENAME_RAPTOR_READY_TO_COMPARE
+        throw std::runtime_error{"Please provide user_bin.id mantis.ready and raptor.ready"}; // $FILENAME_USER_BIN_IDS $FILENAME_MANTIS_READY_TO_COMPARE $FILENAME_RAPTOR_READY_TO_COMPARE
 
     std::ifstream user_bin_ids_file{argv[1]};
 

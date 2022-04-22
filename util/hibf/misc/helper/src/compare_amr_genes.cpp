@@ -25,10 +25,10 @@ int main(int argc, char ** argv)
 
     std::cout << "Reading in user bin ids from raptor header in " << argv[1] << "... ";
     std::string line;
-    while (std::getline(raptor_result, line) && line[0] == '#')
+    while (std::getline(raptor_result, line) && line[0] == '#' && line[1] != 'Q')
     {
-        std::string value{line.begin(), line.begin() + line.find('\t')};
-        std::string key{line.begin() + line.find_last_of('/') + 1, line.begin() + line.find_first_of('.')};
+        std::string const value{line.begin(), line.begin() + line.find('\t')};
+        std::string const key{line.begin() + line.find_last_of('/') + 1, line.begin() + line.find_first_of('.')};
         uint64_t value_as_number = std::atoi(value.data());
         user_bin_ids.emplace(key, value_as_number);
     }
