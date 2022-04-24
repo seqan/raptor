@@ -48,8 +48,8 @@ list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${PROJEC
 list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}")
 
 # Use ccache.
-include (seqan3_require_ccache)
-seqan3_require_ccache ()
+include (../cmake/raptor_require_ccache.cmake)
+raptor_require_ccache ()
 
 # Optionally build mason and DREAM-Yara.
 option (RAPTOR_UTILITY_BUILD_MASON "Build mason. Needed to generate artificial data set." OFF)
@@ -81,17 +81,14 @@ target_compile_options ("common" INTERFACE "-pedantic" "-Wall" "-Wextra")
 
 add_executable ("generate_reads" src/applications/generate_reads.cpp)
 target_link_libraries ("generate_reads" "common")
-install (TARGETS "generate_reads" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 add_executable ("split_sequence" src/applications/split_sequence.cpp)
 target_link_libraries ("split_sequence" "common")
-install (TARGETS "split_sequence" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 add_executable ("count_minimiser" ../src/argument_parsing/parse_bin_path.cpp
                                   ../src/build/hibf/parse_chopper_pack_line.cpp src/applications/count_minimiser.cpp
 )
 target_link_libraries ("count_minimiser" "common")
-install (TARGETS "count_minimiser" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 add_executable ("threshold_info"
                 ../src/threshold/multiple_error_model.cpp
@@ -103,14 +100,11 @@ add_executable ("threshold_info"
                 src/applications/threshold_info.cpp
 )
 target_link_libraries ("threshold_info" "common")
-install (TARGETS "threshold_info" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 add_executable ("apply_taxsbp" src/applications/apply_taxsbp.cpp)
 target_link_libraries ("apply_taxsbp" "common")
-install (TARGETS "apply_taxsbp" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 add_executable ("generate_reads_refseq" src/applications/generate_reads_refseq.cpp)
 target_link_libraries ("generate_reads_refseq" "common")
-install (TARGETS "generate_reads_refseq" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 message (STATUS "${FontBold}You can run `make install` to build the application.${FontReset}")
