@@ -99,6 +99,7 @@ void compare_results(config const & cfg)
     uint64_t raptor_hit_count{};
     uint64_t raptor_miss{};
 
+#if 1
     std::string query_name_buffer{};
     auto parse_original_bin = [&query_name_buffer, &ub_name_to_id] (std::string_view const & line)
     {
@@ -108,7 +109,28 @@ void compare_results(config const & cfg)
         query_name_buffer.assign(line.begin(), line.begin() + line.find("genomic") + 7);
         return ub_name_to_id.at(query_name_buffer);
     };
-
+#else
+    std::array<char, 24> read_id_buffer;
+    std::string query_name_buffer{};
+    constexpr std::string_view bin_prefix{"bin_"};
+    auto parse_original_bin = [&read_id_buffer, &query_name_buffer, &ub_name_to_id, &bin_prefix] (std::string_view const & line)
+    {
+        // E.g., "GCF_000005825.2_ASM582v2_genomic106". 106 is the read number.
+        // find() returns an iterator to the 'g' of "genomic". `+7` moves the iterator to '1', which is the end
+        // of the bin name.
+        uint64_t result{};
+        std::from_chars(line.data(), line.data() + line.size(), result);
+        result &= 0b1111'1111'1111'1111'1111;
+        result >>= 4u;
+        auto [ptr, ec] = std::to_chars(read_id_buffer.data(), read_id_buffer.data() + read_id_buffer.size(), result);
+        (void) ec;
+        query_name_buffer.assign(bin_prefix);
+        std::string_view const read_id{read_id_buffer.data(), ptr};
+        query_name_buffer.append(std::string(5u - read_id.size(), '0'));
+        query_name_buffer.append(read_id);
+        return ub_name_to_id.at(query_name_buffer);
+    };
+#endif
     auto parse_query_name = [&mantis_line, &raptor_line] (auto const & mantis_tab_it, auto const & raptor_tab_it)
     {
         std::string_view const mantis_query_name{mantis_line.begin(), mantis_tab_it};

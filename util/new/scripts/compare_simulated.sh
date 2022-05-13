@@ -7,15 +7,15 @@ LANG=C # For sort
 ## -----------------------------------------------------------------------------
 
 # The original read file.
-READFILE=/project/archive-index-data/data/RefSeqCG_arc_bac/RefSeqCG_arc_bac-queries-1mMio-length250-2errors.fastq.only250.fastq
+READFILE=/project/archive-index-data/data/simulated_data/65536/reads_e2_250/all_10.fastq
 # Mantis query results file.
-MANTIS_RESULTS=/project/archive-index-data/smehringer/mantis_bench/mantis_query_result.txt
+MANTIS_RESULTS=/project/archive-index-data/seiler/nature_hibf/runs/mantis/65536/result.txt
 # Raptor query results file.
-RAPTOR_RESULTS=/project/archive-index-data/seiler/kmer_RefSeq/250_out.txt
+RAPTOR_RESULTS=/dev/shm/seiler/raptor_bench/65536/0.015/24_20_256.out
 # Contains compare_mantis_raptor_output and normalise_mantis_output.
-RAPTOR_UTIL=/project/archive-index-data/seiler/raptor/build/util2/bin
+RAPTOR_UTIL=/project/archive-index-data/seiler/raptor/build/util2_debug/bin
 # Where to write output.
-WORKDIR=/project/archive-index-data/seiler/kmer_RefSeq/compare
+WORKDIR=/project/archive-index-data/seiler/nature_hibf/runs/65K_raptor_mantis
 
 ## -----------------------------------------------------------------------------
 ## Output
@@ -33,7 +33,7 @@ WORKDIR=/project/archive-index-data/seiler/kmer_RefSeq/compare
 ## -----------------------------------------------------------------------------
 
 mkdir -p ${WORKDIR}
-cp "$0" ${WORKDIR}/compare.sh
+cp "$0" ${WORKDIR}/script.sh
 
 # Colors
 DEFAULT='\033[0m'
@@ -66,6 +66,7 @@ else
     grep --extended-regexp "^#" ${RAPTOR_RESULTS} \
     | sed 's;/.*/;;g' \
     | sed 's;\.fna.gz;;g' \
+    | sed 's;\.fasta;;g' \
     | sed 's;\.minimiser;;g' \
     | tr --delete '#' \
     > ${user_bin_ids}
@@ -82,7 +83,7 @@ else
         --user_bin_ids ${user_bin_ids} \
         --mantis_results ${MANTIS_RESULTS} \
         --output_file /dev/stdout \
-        --percentage 0.7 \
+        --percentage 0.70 \
     2> >(awk '$0="    "$0' >&2) \
     | sort > ${mantis_normalised}
 fi

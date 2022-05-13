@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
-LANG=C # For sort
+export LC_ALL=C
+export LANG=C
 
 ## -----------------------------------------------------------------------------
 ## Input
@@ -33,7 +34,7 @@ WORKDIR=/project/archive-index-data/seiler/kmer_RefSeq/compare
 ## -----------------------------------------------------------------------------
 
 mkdir -p ${WORKDIR}
-cp "$0" ${WORKDIR}/compare.sh
+cp "$0" ${WORKDIR}/$(basename $0).sh
 
 # Colors
 DEFAULT='\033[0m'
