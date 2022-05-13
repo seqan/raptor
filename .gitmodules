@@ -18,7 +18,7 @@
 	fetchRecurseSubmodules = false
 [submodule "lib/submodules/range-v3"]
 	path = lib/submodules/range-v3
-	url = https://github.com/ericniebler/range-v3
+	url = https://github.com/seqan/range-v3
 	branch = master
 	shallow = true
 	fetchRecurseSubmodules = false
