@@ -14,7 +14,6 @@
 #include <seqan3/utility/views/zip.hpp>
 
 #include <raptor/index.hpp>
-#include <raptor/string_view.hpp>
 
 #include "shim.hpp"
 
@@ -385,7 +384,7 @@ struct raptor_base : public cli_test
         {
             ASSERT_TRUE(std::getline(search_result, line));
             std::string_view line_view{line};
-            if (!empty && !raptor::detail::ends_with(line_view, missed_bin))
+            if (!empty && !line_view.ends_with(missed_bin))
                 expected_hits += line_view.substr(1, line_view.find('\t'));
         }
 

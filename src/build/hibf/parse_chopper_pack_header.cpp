@@ -7,7 +7,7 @@
 
 #include <lemon/list_graph.h> /// Must be first include.
 
-#include <seqan3/std/algorithm>
+#include <algorithm>
 #include <cassert>
 #include <seqan3/std/charconv>
 
@@ -15,7 +15,6 @@
 
 #include <raptor/build/hibf/bin_prefixes.hpp>
 #include <raptor/build/hibf/parse_chopper_pack_header.hpp>
-#include <raptor/string_view.hpp>
 
 namespace raptor::hibf
 {
@@ -62,7 +61,7 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
 
     // parse High Level max bin index
     assert(line.substr(hibf_prefix.size() + 2, 11) == "max_bin_id:");
-    std::string_view const hibf_max_bin_str{raptor::detail::string_view(line.begin() + 27, line.end())};
+    std::string_view const hibf_max_bin_str{line.begin() + 27, line.end()};
 
     auto high_level_node = ibf_graph.addNode(); // high-level node = root node
     node_map.set(high_level_node, {0, parse_first_bin(hibf_max_bin_str), 0, lemon::INVALID, {}});
@@ -75,15 +74,12 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
         assert(line.substr(1, merged_bin_prefix.size()) == merged_bin_prefix);
 
         // parse header line
-        std::string_view const indices_str{
-            raptor::detail::string_view(line.begin() + 1 /*#*/ + merged_bin_prefix.size() + 1 /*_*/,
-                                        std::find(line.begin() + merged_bin_prefix.size() + 2,
-                                                  line.end(),
-                                                  ' '))};
+        std::string_view const indices_str{line.begin() + 1 /*#*/ + merged_bin_prefix.size() + 1 /*_*/,
+                                           std::find(line.begin() + merged_bin_prefix.size() + 2, line.end(), ' ')};
 
         assert(line.substr(merged_bin_prefix.size() + indices_str.size() + 3, 11) == "max_bin_id:");
-        std::string_view const max_id_str{
-            raptor::detail::string_view(line.begin() + merged_bin_prefix.size() + indices_str.size() + 14, line.end())};
+        std::string_view const max_id_str{line.begin() + merged_bin_prefix.size() + indices_str.size() + 14,
+                                          line.end()};
 
         header_records.emplace_back(parse_bin_indices(indices_str), parse_first_bin(max_id_str));
     }

@@ -5,7 +5,7 @@
 # shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 # -----------------------------------------------------------------------------------------------------
 
-cmake_minimum_required (VERSION 3.11)
+cmake_minimum_required (VERSION 3.15)
 
 # Set directories for test output files, input data and binaries.
 file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/output)
@@ -13,10 +13,8 @@ add_definitions (-DOUTPUTDIR=\"${CMAKE_CURRENT_BINARY_DIR}/output/\")
 add_definitions (-DDATADIR=\"${CMAKE_CURRENT_BINARY_DIR}/data/\")
 add_definitions (-DBINDIR=\"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/\")
 
-set (SEQAN3_TEST_CLONE_DIR "${PROJECT_BINARY_DIR}/vendor/googletest")
-
-include (seqan3_require_test)
-seqan3_require_test ()
+include (raptor_require_test)
+raptor_require_test ()
 
 # Build tests just before their execution, because they have not been built with "all" target.
 # The trick is here to provide a cmake file as a directory property that executes the build command.
@@ -44,7 +42,7 @@ macro (add_app_test test_filename test_alternative)
 
     # Create the test target.
     add_executable (${target} ${test_filename})
-    target_link_libraries (${target} "${PROJECT_NAME}_lib" seqan3::seqan3 gtest gtest_main)
+    target_link_libraries (${target} "${PROJECT_NAME}_lib" gtest gtest_main)
 
     # Make seqan3::test available for both cli and api tests.
     target_include_directories (${target} SYSTEM PUBLIC "${SEQAN3_CLONE_DIR}/test/include")
@@ -102,9 +100,8 @@ else ()
 endif ()
 
 if (RAPTOR_ENABLE_BENCHMARK)
-    set (SEQAN3_BENCHMARK_CLONE_DIR "${PROJECT_BINARY_DIR}/vendor/benchmark")
-    include (seqan3_require_benchmark)
-    seqan3_require_benchmark ()
+    include (raptor_require_benchmark)
+    raptor_require_benchmark ()
     add_subdirectory (benchmark)
 endif ()
 

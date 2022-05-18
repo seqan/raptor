@@ -9,7 +9,6 @@
 #include <seqan3/std/ranges>
 
 #include <raptor/build/hibf/parse_chopper_pack_line.hpp>
-#include <raptor/string_view.hpp>
 
 namespace raptor::hibf
 {
@@ -25,7 +24,7 @@ chopper_pack_record parse_chopper_pack_line(std::string const & current_line)
     while (field_end != buffer_end && *field_end != '\t') ++field_end;
 
     // parse filenames
-    std::string_view const filenames{raptor::detail::string_view(buffer.begin(), field_end)};
+    std::string_view const filenames{buffer.begin(), field_end};
     for (auto const && filename : filenames | std::views::split(';'))
     {
         auto const common_view = filename | std::views::common;

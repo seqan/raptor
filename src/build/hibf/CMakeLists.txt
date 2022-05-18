@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.11)
+cmake_minimum_required (VERSION 3.15)
 
 add_library ("raptor_build_hibf" STATIC
              bin_size_in_bits.cpp

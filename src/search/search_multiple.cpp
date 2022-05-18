@@ -68,7 +68,7 @@ void search_multiple(search_arguments const & arguments)
 
         records.clear();
         auto start = std::chrono::high_resolution_clock::now();
-        std::ranges::move(chunked_records, std::cpp20::back_inserter(records));
+        std::ranges::move(chunked_records, std::back_inserter(records));
         auto end = std::chrono::high_resolution_clock::now();
         reads_io_time += std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
 

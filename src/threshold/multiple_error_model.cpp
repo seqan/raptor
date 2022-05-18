@@ -5,6 +5,8 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
+#include <algorithm>
+
 #include <raptor/threshold/multiple_error_model.hpp>
 #include <raptor/threshold/logspace.hpp>
 
