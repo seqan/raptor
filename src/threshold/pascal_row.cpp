@@ -6,6 +6,7 @@
 // -----------------------------------------------------------------------------------------------------
 
 #include <cmath>
+#include <cstddef>
 
 #include <raptor/threshold/pascal_row.hpp>
 

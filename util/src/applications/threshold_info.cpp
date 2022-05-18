@@ -66,7 +66,7 @@ void threshold_info(raptor::search_arguments const & arguments, std::string cons
     for (auto && record_batch : fin | seqan3::views::chunk((1ULL<<20)))
     {
         records.clear();
-        std::ranges::move(record_batch, std::cpp20::back_inserter(records));
+        std::ranges::move(record_batch, std::back_inserter(records));
 
         raptor::do_parallel(worker, records.size(), arguments.threads, compute_time);
     }

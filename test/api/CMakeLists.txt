@@ -5,6 +5,6 @@
 # shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 # -----------------------------------------------------------------------------------------------------
 
-cmake_minimum_required (VERSION 3.11)
+cmake_minimum_required (VERSION 3.15)
 
 add_api_test (issue_142.cpp)

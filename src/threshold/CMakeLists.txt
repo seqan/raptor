@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.11)
+cmake_minimum_required (VERSION 3.15)
 
 add_library ("raptor_threshold" STATIC
              one_indirect_error_model.cpp

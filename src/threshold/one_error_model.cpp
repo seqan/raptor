@@ -5,6 +5,7 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
+#include <cstddef>
 #include <numeric>
 
 #include <raptor/threshold/logspace.hpp>

@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CMAKE_VERSION: 3.11.4
+  CMAKE_VERSION: 3.15.4
   SEQAN3_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
 
@@ -22,33 +22,36 @@ defaults:
 jobs:
   build:
     name: ${{ matrix.name }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 120
     strategy:
       fail-fast: true
       matrix:
         include:
-          - name: "Coverage gcc11"
-            cxx: "g++-11"
-            cc: "gcc-11"
+          - name: "Coverage gcc12"
+            cxx: "g++-12"
+            cc: "gcc-12"
             build: coverage
             build_type: Coverage
+            cxx_flags: "-std=c++23"
+
+          - name: "gcc12"
+            cxx: "g++-12"
+            cc: "gcc-12"
+            build_type: Release
+            cxx_flags: "-std=c++23"
 
           - name: "gcc11"
             cxx: "g++-11"
             cc: "gcc-11"
             build_type: Release
+            cxx_flags: "-std=c++23"
 
           - name: "gcc10"
             cxx: "g++-10"
             cc: "gcc-10"
             build_type: Release
-
-          - name: "gcc9 (c++2a)"
-            cxx: "g++-9"
-            cc: "gcc-9"
-            build_type: Release
-            cxx_flags: "-std=c++2a"
+            cxx_flags: "-std=c++20"
 
     steps:
       - name: Checkout

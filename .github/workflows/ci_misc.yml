@@ -21,7 +21,7 @@ defaults:
 jobs:
   build:
     name: ${{ matrix.name }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 120
     strategy:
       fail-fast: false
@@ -31,34 +31,50 @@ jobs:
             build: documentation
             build_threads: 2
             test_threads: 2
-            cmake: 3.11.4
-            doxygen: 1.9.1
+            cmake: 3.15.4
+            doxygen: 1.9.4
             requires_toolchain: false
             requires_ccache: false
             skip_build_tests: true
             skip_run_tests: false
 
-          - name: "Header gcc11"
-            cxx: "g++-11"
-            cc: "gcc-11"
+          - name: "Header gcc12"
+            cxx: "g++-12"
+            cc: "gcc-12"
+            cxx_flags: "-std=c++23"
             build_type: Release
             build: header
             build_threads: 2
             test_threads: 2
-            cmake: 3.11.4
+            cmake: 3.15.4
             requires_toolchain: true
             requires_ccache: true
             skip_build_tests: false
             skip_run_tests: true
 
-          - name: "Header gcc9"
-            cxx: "g++-9"
-            cc: "gcc-9"
+          - name: "Header gcc11"
+            cxx: "g++-11"
+            cc: "gcc-11"
+            cxx_flags: "-std=c++23"
             build_type: Release
             build: header
             build_threads: 2
             test_threads: 2
-            cmake: 3.11.4
+            cmake: 3.15.4
+            requires_toolchain: true
+            requires_ccache: true
+            skip_build_tests: false
+            skip_run_tests: true
+
+          - name: "Header gcc10"
+            cxx: "g++-10"
+            cc: "gcc-10"
+            cxx_flags: "-std=c++20"
+            build_type: Release
+            build: header
+            build_threads: 2
+            test_threads: 2
+            cmake: 3.15.4
             requires_toolchain: true
             requires_ccache: true
             skip_build_tests: false

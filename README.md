@@ -30,7 +30,7 @@ brew install brewsci/bio/raptor
 <details><summary>Prerequisites (click to expand)</summary>
 
 * CMake >= 3.8
-* GCC 9, 10 or 11 (most recent minor version)
+* GCC 10, 11 or 12 (most recent minor version)
 * git
 
 Refer to the [Seqan3 Setup Tutorial](https://docs.seqan.de/seqan/3-master-user/setup.html) for more in depth
