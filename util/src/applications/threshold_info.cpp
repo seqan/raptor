@@ -25,7 +25,7 @@
 #include <raptor/threshold/precompute_correction.hpp>
 #include <raptor/threshold/precompute_threshold.hpp>
 
-void threshold_info(raptor::search_arguments const & arguments)
+void threshold_info(raptor::search_arguments const & arguments, std::string const & shape_string)
 {
     double compute_time{};
 
@@ -76,6 +76,7 @@ void threshold_info(raptor::search_arguments const & arguments)
     out << "#query: " << arguments.query_file << '\n'
         << "#output: " << arguments.out_file << '\n'
         << "#kmer: " << std::to_string(kmer_size) << '\n'
+        << "#shape: " << shape_string << '\n'
         << "#window: " << arguments.window_size << '\n'
         << "#error: " << std::to_string(arguments.errors) << '\n'
         << "#tau: " << arguments.tau << '\n'
@@ -85,6 +86,11 @@ void threshold_info(raptor::search_arguments const & arguments)
         << "#threads: " << std::to_string(arguments.threads) << '\n'
         << "##minimal_number_of_minimizers: " << minimal_number_of_minimizers << '\n'
         << "##maximal_number_of_minimizers: " << maximal_number_of_minimizers << '\n'
+        << "##x: Number of minimizers\n"
+        << "###x: Number reads with x minimizers\n"
+        << "##t(x): Total threshold = t_p(x) + t_c(x)\n"
+        << "##t_p(x): Probabilistic threshold\n"
+        << "##t_c(x): Correction term\n"
         << 'x' << ','
         << "#x" << ','
         << "t(x)" << ','
@@ -113,7 +119,9 @@ void threshold_info(raptor::search_arguments const & arguments)
     }
 }
 
-void init_search_parser(seqan3::argument_parser & parser, raptor::search_arguments & arguments)
+void init_search_parser(seqan3::argument_parser & parser,
+                        raptor::search_arguments & arguments,
+                        std::string & shape_string)
 {
     arguments.cache_thresholds = false;
     parser.add_option(arguments.query_file,
@@ -130,9 +138,15 @@ void init_search_parser(seqan3::argument_parser & parser, raptor::search_argumen
     parser.add_option(arguments.shape_size,
                       '\0',
                       "kmer",
-                      "The k-mer size.",
+                      "The k-mer size. Mutually exclusive with --shape.",
                       seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{1, 32});
+    parser.add_option(shape_string,
+                      '\0',
+                      "shape",
+                      "The shape to use for k-mers. Mutually exclusive with --kmer.",
+                      seqan3::option_spec::standard,
+                      seqan3::regex_validator{"[01]+"});
     parser.add_option(arguments.window_size,
                       '\0',
                       "window",
@@ -185,7 +199,8 @@ int main(int argc, char ** argv)
     parser.info.version = "0.0.1";
 
     raptor::search_arguments arguments{};
-    init_search_parser(parser, arguments);
+    std::string shape_string{};
+    init_search_parser(parser, arguments, shape_string);
 
     try
     {
@@ -197,7 +212,25 @@ int main(int argc, char ** argv)
         std::exit(-1);
     }
 
-    arguments.shape = seqan3::ungapped{arguments.shape_size};
+    if (parser.is_option_set("shape"))
+    {
+        if (parser.is_option_set("kmer"))
+            throw seqan3::argument_parser_error{"You cannot set both shape and k-mer arguments."};
+
+        uint64_t tmp{};
+
+        std::from_chars(shape_string.data(),
+                        shape_string.data() + shape_string.size(),
+                        tmp,
+                        2);
+
+        arguments.shape = seqan3::shape{seqan3::bin_literal{tmp}};
+    }
+    else
+    {
+        arguments.shape = seqan3::shape{seqan3::ungapped{arguments.shape_size}};
+        shape_string.assign(arguments.shape_size, '1');
+    }
 
     std::filesystem::path output_directory = arguments.out_file.parent_path();
     std::error_code ec{};
@@ -221,5 +254,5 @@ int main(int argc, char ** argv)
         arguments.pattern_size = sequence_lengths[sequence_lengths.size()/2];
     }
 
-    threshold_info(arguments);
+    threshold_info(arguments, shape_string);
 }
