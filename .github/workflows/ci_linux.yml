@@ -5,6 +5,9 @@ on:
     branches:
       - 'master'
   pull_request:
+    types:
+      - unlabeled
+  workflow_dispatch:
 
 concurrency:
   group: linux-${{ github.event.pull_request.number || github.ref }}
@@ -24,8 +27,9 @@ jobs:
     name: ${{ matrix.name }}
     runs-on: ubuntu-22.04
     timeout-minutes: 120
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'clang-format'
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - name: "Coverage gcc12"
