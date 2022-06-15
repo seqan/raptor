@@ -16,9 +16,9 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 #include <seqan3/utility/views/chunk.hpp>
 
+#include <raptor/adjust_seed.hpp>
 #include <raptor/argument_parsing/parse_bin_path.hpp>
 #include <raptor/argument_parsing/validators.hpp>
-#include <raptor/adjust_seed.hpp>
 #include <raptor/dna4_traits.hpp>
 
 struct config
@@ -45,7 +45,7 @@ void compute_minimisers(config const & cfg)
     std::mutex push_back_mutex;
     std::mutex merge_mutex;
 
-    auto worker = [&] (auto && file_range, auto &&)
+    auto worker = [&](auto && file_range, auto &&)
     {
         robin_hood::unordered_flat_set<uint64_t> minimiser_set{};
 
@@ -76,7 +76,7 @@ void compute_minimisers(config const & cfg)
     size_t const chunk_size = std::ceil<size_t>(cfg.bin_path.size() / cfg.threads);
     auto chunked_view = cfg.bin_path | seqan3::views::chunk(chunk_size);
     seqan3::detail::execution_handler_parallel executioner{cfg.threads};
-    executioner.bulk_execute(worker, std::move(chunked_view), [](){});
+    executioner.bulk_execute(worker, std::move(chunked_view), []() {});
 
     std::ofstream output{cfg.out_path.string()};
     output << all_minimiser_set.size() << '\n';
@@ -94,9 +94,11 @@ int main(int argc, char ** argv)
 
     config cfg{};
 
+    // clang-format off
     parser.add_positional_option(cfg.bin_file,
                                  "File containing file names.",
                                  seqan3::input_file_validator{});
+    // clang-format on
 
     parser.add_option(cfg.out_path,
                       '\0',

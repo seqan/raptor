@@ -50,7 +50,8 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.)";
     parser.info.short_copyright = "BSD 3-Clause License";
-    parser.info.short_description = "A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences.";
+    parser.info.short_description =
+        "A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences.";
     parser.info.url = "https://github.com/seqan/raptor";
     parser.info.version = RAPTOR_VERSION;
 }

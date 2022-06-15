@@ -30,7 +30,8 @@ namespace raptor
  *
  * `seed XOR kmer` will then always have 4 leading ones.
  */
-inline constexpr static uint64_t adjust_seed(uint8_t const kmer_size, uint64_t const seed = 0x8F3F73B5CF1C9ADEULL) noexcept
+static inline constexpr uint64_t adjust_seed(uint8_t const kmer_size,
+                                             uint64_t const seed = 0x8F3F73B5CF1C9ADEULL) noexcept
 {
     return seed >> (64u - 2u * kmer_size);
 }

@@ -37,7 +37,7 @@ void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
     size_t const number_of_mutex = (data.node_map[current_node].number_of_technical_bins + 63) / 64;
     std::vector<std::mutex> local_ibf_mutex(number_of_mutex);
 
-    auto worker = [&] (auto && index, auto &&)
+    auto worker = [&](auto && index, auto &&)
     {
         auto & child = children[index];
 
@@ -71,26 +71,23 @@ void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
     }
 
     seqan3::detail::execution_handler_parallel executioner{number_of_threads};
-    executioner.bulk_execute(std::move(worker), std::move(indices), [] () {});
+    executioner.bulk_execute(std::move(worker), std::move(indices), []() {});
 }
 
-template
-void loop_over_children<seqan3::data_layout::uncompressed>(robin_hood::unordered_flat_set<size_t> &,
-                                                           seqan3::interleaved_bloom_filter<> &,
-                                                           std::vector<int64_t> &,
-                                                           lemon::ListDigraph::Node const &,
-                                                           build_data<seqan3::data_layout::uncompressed> &,
-                                                           build_arguments const &,
-                                                           bool);
+template void loop_over_children<seqan3::data_layout::uncompressed>(robin_hood::unordered_flat_set<size_t> &,
+                                                                    seqan3::interleaved_bloom_filter<> &,
+                                                                    std::vector<int64_t> &,
+                                                                    lemon::ListDigraph::Node const &,
+                                                                    build_data<seqan3::data_layout::uncompressed> &,
+                                                                    build_arguments const &,
+                                                                    bool);
 
-
-template
-void loop_over_children<seqan3::data_layout::compressed>(robin_hood::unordered_flat_set<size_t> &,
-                                                         seqan3::interleaved_bloom_filter<> &,
-                                                         std::vector<int64_t> &,
-                                                         lemon::ListDigraph::Node const &,
-                                                         build_data<seqan3::data_layout::compressed> &,
-                                                         build_arguments const &,
-                                                         bool);
+template void loop_over_children<seqan3::data_layout::compressed>(robin_hood::unordered_flat_set<size_t> &,
+                                                                  seqan3::interleaved_bloom_filter<> &,
+                                                                  std::vector<int64_t> &,
+                                                                  lemon::ListDigraph::Node const &,
+                                                                  build_data<seqan3::data_layout::compressed> &,
+                                                                  build_arguments const &,
+                                                                  bool);
 
 } // namespace raptor::hibf

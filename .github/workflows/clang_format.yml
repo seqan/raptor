@@ -1,0 +1,163 @@
+name: Raptor lint
+
+on:
+  pull_request_target:
+
+env:
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -exo pipefail {0}
+
+jobs:
+  # Cancel other workflows that are dependent on this workflow by adding jobs that have the same concurrency group.
+  cancel_linux:
+    name: Cancel Linux
+    concurrency:
+      group: linux-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "Cancel Linux"
+        run: echo "Cancelling Linux"
+  cancel_macos:
+    name: Cancel macOS
+    concurrency:
+      group: macos-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "Cancel macOS"
+        run: echo "Cancelling macOS"
+  cancel_misc:
+    name: Cancel Misc
+    concurrency:
+      group: misc-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "Cancel Misc"
+        run: echo "Cancelling Misc"
+  lint:
+    name: clang-format
+    concurrency:
+      group: clang-format-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - name: Add label
+        env:
+            GITHUB_TOKEN: ${{ secrets.SEQAN_ACTIONS_PAT }}
+            PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr edit $PR_URL --add-label "clang-format"
+
+      # How many commits need to be fetched such that the branch point of the PR branch is visible when fetching the
+      # upstream?
+      - name: Get fetch depth
+        id: fetch_depth
+        env:
+          GITHUB_TOKEN: ${{ secrets.SEQAN_ACTIONS_PAT }}
+          COMMIT_RANGE: ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}
+        run: |
+          QUERY="/repos/${{ github.repository }}/compare/${COMMIT_RANGE}"
+          ANSWER=$(gh api -H "Accept: application/vnd.github.v3+json" ${QUERY})
+          NBEHIND=$(jq '.behind_by' <<< "${ANSWER}")
+          echo "::set-output name=depth::$(( ${NBEHIND} + 1 ))"
+          echo "::set-output name=pr_depth::$(( ${{ github.event.pull_request.commits }} + 1 ))"
+
+      - name: Checkout Raptor
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          path: raptor
+          fetch-depth: ${{ steps.fetch_depth.outputs.pr_depth }}
+          submodules: false
+
+      # Comments on each git line:
+      # Checkout new branch that will be rebased. Actual PR branch remains untouched.
+      # Add the upstream repository.
+      # Disallow (accidental) pushes to upstream.
+      # Fetch the upstream. Fetch as many commits such that the branch point of the PR branch is visible.
+      # For rebasing, use last commit's user name.
+      # For rebasing, use last commit's user email.
+      # Rebase on upstream.
+      - name: Rebase on upstream
+        run: |
+          cd raptor
+          git checkout -b seqan_clang_format_rebase_${{ github.event.pull_request.head.ref }}
+          git remote add upstream ${{ github.event.pull_request.base.repo.html_url }}
+          git remote set-url --push upstream nopush
+          git fetch --depth ${{ steps.fetch_depth.outputs.depth }} upstream ${{ github.event.pull_request.base.ref }}
+          git config user.name "$(git log -1 --format='%cn' ${{ github.event.pull_request.head.sha }})"
+          git config user.email "$(git log -1 --format='%ce' ${{ github.event.pull_request.head.sha }})"
+          git rebase upstream/${{ github.event.pull_request.base.ref }}
+
+      - name: Copy upstream .clang-format
+        run: |
+          cd raptor
+          git show upstream/${{ github.event.pull_request.base.ref }}:.clang-format | \
+          tee ${{ github.workspace }}/.clang-format
+
+      # Get filenames (--name-only) of added, copied, modified, renamed, changed (ACMRT) files relative to the base
+      # branch (github.event.pull_request.base.sha).
+      # Exclude contrib include folder, exclude submodules folder.
+      # Include only hpp and cpp files as well as files in the std include folder.
+      # { grep ... || test $? = 1; } ensures that grep exits with code 0 on empty output.
+      - name: Get changed files
+        id: changed_files
+        run: |
+          cd raptor
+          LIST=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} | \
+          { grep -v -E "(lib/)" || test $? = 1; } | \
+          { grep -E "(.cpp|.hpp)" || test $? = 1; } | xargs)
+          echo "::set-output name=list::$LIST"
+
+      - name: Install clang-format
+        if: ${{ steps.changed_files.outputs.list }}
+        run: |
+          echo 'APT::Acquire::Retries "5";' | sudo tee -a /etc/apt/apt.conf.d/80-retries > /dev/null
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo apt-add-repository --no-update --yes "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy main"
+          sudo apt-get update
+          sudo apt-get install --yes clang-format-15
+
+      - name: Run clang-format
+        if: ${{ steps.changed_files.outputs.list }}
+        run: |
+          cd raptor
+          git checkout ${{ github.event.pull_request.head.ref }}
+          echo "${{ steps.changed_files.outputs.list }}" | \
+          xargs clang-format-15 --style=file:${{ github.workspace }}/.clang-format -i
+
+      - name: Import GPG key
+        if: ${{ steps.changed_files.outputs.list }}
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          workdir: raptor
+          gpg_private_key: ${{ secrets.SEQAN_ACTIONS_GPG_KEY }}
+          passphrase: ${{ secrets.SEQAN_ACTIONS_GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Commit changes
+        if: ${{ steps.changed_files.outputs.list }}
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: seqan-actions[bot]
+          author_email: seqan-actions@users.noreply.github.com
+          message: '[MISC] clang-format'
+          cwd: './raptor'
+
+      # Wait for 5 seconds such that workflows triggered by adding the label run on the newest commit.
+      - name: Defer workflow
+        if: ${{ steps.changed_files.outputs.list }}
+        run: sleep 5
+
+      - name: Remove label
+        env:
+            GITHUB_TOKEN: ${{ secrets.SEQAN_ACTIONS_PAT }}
+            PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr edit $PR_URL --remove-label "clang-format"

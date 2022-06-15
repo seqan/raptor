@@ -20,7 +20,7 @@ struct cmd_arguments
     std::filesystem::path output_directory{};
     uint8_t errors{2u};
     uint32_t read_length{100u};
-    uint32_t number_of_reads{1ULL<<20};
+    uint32_t number_of_reads{1ULL << 20};
     uint64_t threads{1u};
 };
 
@@ -41,9 +41,10 @@ public:
     using option_value_type = size_t;
 
     positive_integer_validator() = default;
-    positive_integer_validator(bool const is_zero_positive_) : is_zero_positive{is_zero_positive_} {}
+    positive_integer_validator(bool const is_zero_positive_) : is_zero_positive{is_zero_positive_}
+    {}
 
-    void operator() (option_value_type const & val) const
+    void operator()(option_value_type const & val) const
     {
         if (!is_zero_positive && !val)
         {
@@ -51,7 +52,7 @@ public:
         }
     }
 
-    std::string get_help_page_message () const
+    std::string get_help_page_message() const
     {
         if (is_zero_positive)
             return "Value must be a positive integer or 0.";
@@ -79,23 +80,23 @@ void run_program(cmd_arguments const & arguments)
 
     std::vector<seqan3::phred42> const quality(arguments.read_length, seqan3::assign_rank_to(40u, seqan3::phred42{}));
 
-    auto worker = [&] (auto && zipped_view, auto &&)
+    auto worker = [&](auto && zipped_view, auto &&)
     {
         for (auto && [bin_file, bin_number] : zipped_view)
         {
             std::mt19937_64 rng(bin_number);
             uint32_t read_counter{bin_number * reads_per_bin};
             // Immediately invoked initialising lambda expession (IIILE).
-            std::filesystem::path const out_file = [&] ()
-                                                   {
-                                                       std::filesystem::path out_file = arguments.output_directory;
-                                                       if (bin_file.extension() == ".gz")
-                                                           out_file /= bin_file.stem().stem();
-                                                       else
-                                                           out_file /= bin_file.stem();
-                                                       out_file += ".fastq";
-                                                       return out_file;
-                                                    }();
+            std::filesystem::path const out_file = [&]()
+            {
+                std::filesystem::path out_file = arguments.output_directory;
+                if (bin_file.extension() == ".gz")
+                    out_file /= bin_file.stem().stem();
+                else
+                    out_file /= bin_file.stem();
+                out_file += ".fastq";
+                return out_file;
+            }();
 
             size_t const number_of_records{count_records_in_fasta(bin_file)};
             uint32_t const reads_per_record = (reads_per_bin + number_of_records - 1) / number_of_records;
@@ -111,11 +112,12 @@ void run_program(cmd_arguments const & arguments)
                 uint64_t const reference_length = std::ranges::size(seq);
                 std::uniform_int_distribution<uint64_t> read_start_dis(0, reference_length - arguments.read_length);
                 for (uint32_t current_read_number = 0;
-                    current_read_number < reads_per_record && bin_read_counter < reads_per_bin;
-                    ++current_read_number, ++read_counter, ++bin_read_counter)
+                     current_read_number < reads_per_record && bin_read_counter < reads_per_bin;
+                     ++current_read_number, ++read_counter, ++bin_read_counter)
                 {
                     uint64_t const read_start_pos = read_start_dis(rng);
-                    auto read_slice = seq | seqan3::views::slice(read_start_pos, read_start_pos + arguments.read_length);
+                    auto read_slice =
+                        seq | seqan3::views::slice(read_start_pos, read_start_pos + arguments.read_length);
                     read.assign(read_slice.begin(), read_slice.end());
 
                     for (uint8_t error_count = 0; error_count < arguments.errors; ++error_count)
@@ -137,7 +139,7 @@ void run_program(cmd_arguments const & arguments)
     size_t const chunk_size = std::bit_ceil(number_of_bins / arguments.threads);
     auto chunked_view = seqan3::views::zip(arguments.bin_path, std::views::iota(0u)) | seqan3::views::chunk(chunk_size);
     seqan3::detail::execution_handler_parallel executioner{arguments.threads};
-    executioner.bulk_execute(std::move(worker), std::move(chunked_view), [](){});
+    executioner.bulk_execute(std::move(worker), std::move(chunked_view), []() {});
 }
 
 void initialise_argument_parser(seqan3::argument_parser & parser, cmd_arguments & arguments)
@@ -189,7 +191,7 @@ int main(int argc, char ** argv)
     initialise_argument_parser(myparser, arguments);
     try
     {
-         myparser.parse();
+        myparser.parse();
     }
     catch (seqan3::argument_parser_error const & ext)
     {

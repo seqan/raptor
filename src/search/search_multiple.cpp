@@ -24,7 +24,8 @@ void search_multiple(search_arguments const & arguments)
     using index_structure_t = std::conditional_t<compressed, index_structure::ibf_compressed, index_structure::ibf>;
     auto index = raptor_index<index_structure_t>{};
 
-    seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::id, seqan3::field::seq>> fin{arguments.query_file};
+    seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::id, seqan3::field::seq>> fin{
+        arguments.query_file};
     using record_type = typename decltype(fin)::record_type;
     std::vector<record_type> records{};
 
@@ -32,7 +33,7 @@ void search_multiple(search_arguments const & arguments)
     double reads_io_time{0.0};
     double compute_time{0.0};
 
-    auto cereal_worker = [&] ()
+    auto cereal_worker = [&]()
     {
         load_index(index, arguments, 0, index_io_time);
     };
@@ -62,7 +63,7 @@ void search_multiple(search_arguments const & arguments)
 
     raptor::threshold::threshold const thresholder{arguments.make_threshold_parameters()};
 
-    for (auto && chunked_records : fin | seqan3::views::chunk((1ULL<<20)*10))
+    for (auto && chunked_records : fin | seqan3::views::chunk((1ULL << 20) * 10))
     {
         auto cereal_handle = std::async(std::launch::async, cereal_worker);
 
@@ -74,8 +75,9 @@ void search_multiple(search_arguments const & arguments)
 
         cereal_handle.wait();
 
-        std::vector<seqan3::counting_vector<uint16_t>> counts(records.size(),
-                                                              seqan3::counting_vector<uint16_t>(index.ibf().bin_count(), 0));
+        std::vector<seqan3::counting_vector<uint16_t>> counts(
+            records.size(),
+            seqan3::counting_vector<uint16_t>(index.ibf().bin_count(), 0));
 
         auto count_task = [&](size_t const start, size_t const end)
         {
@@ -89,7 +91,7 @@ void search_multiple(search_arguments const & arguments)
 
             for (auto && [id, seq] : records | seqan3::views::slice(start, end))
             {
-                (void) id;
+                (void)id;
                 auto & result = counter.bulk_count(seq | hash_view);
                 counts[counter_id++] += result;
             }
@@ -151,26 +153,21 @@ void search_multiple(search_arguments const & arguments)
         do_parallel(output_task, records.size(), arguments.threads, compute_time);
     }
 
-// GCOVR_EXCL_START
+    // GCOVR_EXCL_START
     if (arguments.write_time)
     {
         std::filesystem::path file_path{arguments.out_file};
         file_path += ".time";
         std::ofstream file_handle{file_path};
         file_handle << "Index I/O\tReads I/O\tCompute\n";
-        file_handle << std::fixed
-                    << std::setprecision(2)
-                    << index_io_time << '\t'
-                    << reads_io_time << '\t'
+        file_handle << std::fixed << std::setprecision(2) << index_io_time << '\t' << reads_io_time << '\t'
                     << compute_time;
     }
-// GCOVR_EXCL_STOP
+    // GCOVR_EXCL_STOP
 }
 
-template
-void search_multiple<false>(search_arguments const & arguments);
+template void search_multiple<false>(search_arguments const & arguments);
 
-template
-void search_multiple<true>(search_arguments const & arguments);
+template void search_multiple<true>(search_arguments const & arguments);
 
 } // namespace raptor

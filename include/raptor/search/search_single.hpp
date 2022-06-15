@@ -22,20 +22,21 @@ namespace raptor
 template <typename index_t>
 void search_single(search_arguments const & arguments, index_t && index)
 {
-    constexpr bool is_ibf = std::same_as<index_t, raptor_index<index_structure::ibf>> ||
-                            std::same_as<index_t, raptor_index<index_structure::ibf_compressed>>;
+    constexpr bool is_ibf = std::same_as<index_t, raptor_index<index_structure::ibf>>
+                         || std::same_as<index_t, raptor_index<index_structure::ibf_compressed>>;
 
     double index_io_time{0.0};
     double reads_io_time{0.0};
     double compute_time{0.0};
 
-    auto cereal_worker = [&] ()
+    auto cereal_worker = [&]()
     {
         load_index(index, arguments, index_io_time);
     };
     auto cereal_handle = std::async(std::launch::async, cereal_worker);
 
-    seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::id, seqan3::field::seq>> fin{arguments.query_file};
+    seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::id, seqan3::field::seq>> fin{
+        arguments.query_file};
     using record_type = typename decltype(fin)::record_type;
     std::vector<record_type> records{};
 
@@ -64,9 +65,9 @@ void search_single(search_arguments const & arguments, index_t && index)
 
     raptor::threshold::threshold const thresholder{arguments.make_threshold_parameters()};
 
-    auto worker = [&] (size_t const start, size_t const end)
+    auto worker = [&](size_t const start, size_t const end)
     {
-        auto counter = [&index] ()
+        auto counter = [&index]()
         {
             if constexpr (is_ibf)
                 return index.ibf().template counting_agent<uint16_t>();
@@ -124,7 +125,7 @@ void search_single(search_arguments const & arguments, index_t && index)
         }
     };
 
-    for (auto && chunked_records : fin | seqan3::views::chunk((1ULL<<20)*10))
+    for (auto && chunked_records : fin | seqan3::views::chunk((1ULL << 20) * 10))
     {
         records.clear();
         auto start = std::chrono::high_resolution_clock::now();
@@ -137,20 +138,17 @@ void search_single(search_arguments const & arguments, index_t && index)
         do_parallel(worker, records.size(), arguments.threads, compute_time);
     }
 
-// GCOVR_EXCL_START
+    // GCOVR_EXCL_START
     if (arguments.write_time)
     {
         std::filesystem::path file_path{arguments.out_file};
         file_path += ".time";
         std::ofstream file_handle{file_path};
         file_handle << "Index I/O\tReads I/O\tCompute\n";
-        file_handle << std::fixed
-                    << std::setprecision(2)
-                    << index_io_time << '\t'
-                    << reads_io_time << '\t'
+        file_handle << std::fixed << std::setprecision(2) << index_io_time << '\t' << reads_io_time << '\t'
                     << compute_time;
     }
-// GCOVR_EXCL_STOP
+    // GCOVR_EXCL_STOP
 }
 
 } // namespace raptor

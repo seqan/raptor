@@ -36,8 +36,7 @@ seqan3::interleaved_bloom_filter<> construct_ibf(robin_hood::unordered_flat_set<
     return ibf;
 }
 
-template
-seqan3::interleaved_bloom_filter<>
+template seqan3::interleaved_bloom_filter<>
 construct_ibf<seqan3::data_layout::uncompressed>(robin_hood::unordered_flat_set<size_t> &,
                                                  robin_hood::unordered_flat_set<size_t> &,
                                                  size_t const,
@@ -46,8 +45,7 @@ construct_ibf<seqan3::data_layout::uncompressed>(robin_hood::unordered_flat_set<
                                                  build_arguments const &,
                                                  bool);
 
-template
-seqan3::interleaved_bloom_filter<>
+template seqan3::interleaved_bloom_filter<>
 construct_ibf<seqan3::data_layout::compressed>(robin_hood::unordered_flat_set<size_t> &,
                                                robin_hood::unordered_flat_set<size_t> &,
                                                size_t const,

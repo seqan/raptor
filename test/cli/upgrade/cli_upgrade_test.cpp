@@ -7,7 +7,8 @@
 
 #include "../cli_test.hpp"
 
-struct upgrade : public raptor_base {};
+struct upgrade : public raptor_base
+{};
 
 TEST_F(upgrade, ibf)
 {
@@ -20,12 +21,14 @@ TEST_F(upgrade, ibf)
         file << '\n';
     }
 
-    cli_test_result const result = execute_app("raptor", "upgrade",
-                                                         "--kmer 19",
-                                                         "--window 23",
-                                                         "--bins raptor_cli_test.txt",
-                                                         "--input ", data("1_1.index"),
-                                                         "--output raptor.index");
+    cli_test_result const result = execute_app("raptor",
+                                               "upgrade",
+                                               "--kmer 19",
+                                               "--window 23",
+                                               "--bins raptor_cli_test.txt",
+                                               "--input ",
+                                               data("1_1.index"),
+                                               "--output raptor.index");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
@@ -44,13 +47,15 @@ TEST_F(upgrade, compressed_ibf)
         file << '\n';
     }
 
-    cli_test_result const result = execute_app("raptor", "upgrade",
-                                                         "--kmer 19",
-                                                         "--window 23",
-                                                         "--compressed",
-                                                         "--bins raptor_cli_test.txt",
-                                                         "--input ", data("1_1c.index"),
-                                                         "--output raptor.index");
+    cli_test_result const result = execute_app("raptor",
+                                               "upgrade",
+                                               "--kmer 19",
+                                               "--window 23",
+                                               "--compressed",
+                                               "--bins raptor_cli_test.txt",
+                                               "--input ",
+                                               data("1_1c.index"),
+                                               "--output raptor.index");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
@@ -73,24 +78,28 @@ TEST_F(upgrade, partitioned_ibf)
         file << '\n';
     }
 
-    cli_test_result const result1 = execute_app("raptor", "upgrade",
-                                                          "--kmer 19",
-                                                          "--window 23",
-                                                          "--bins raptor_cli_test.txt",
-                                                          "--input ", data("1_1.index"),
-                                                          "--output raptor.index",
-                                                          "--parts 4");
+    cli_test_result const result1 = execute_app("raptor",
+                                                "upgrade",
+                                                "--kmer 19",
+                                                "--window 23",
+                                                "--bins raptor_cli_test.txt",
+                                                "--input ",
+                                                data("1_1.index"),
+                                                "--output raptor.index",
+                                                "--parts 4");
 
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result1);
 
-    cli_test_result const result2 = execute_app("raptor", "search",
-                                                          "--fpr 0.05",
-                                                          "--output search.out",
-                                                          "--error 1",
-                                                          "--index raptor.index",
-                                                          "--query ", data("query.fq"));
+    cli_test_result const result2 = execute_app("raptor",
+                                                "search",
+                                                "--fpr 0.05",
+                                                "--output search.out",
+                                                "--error 1",
+                                                "--index raptor.index",
+                                                "--query ",
+                                                data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result2);

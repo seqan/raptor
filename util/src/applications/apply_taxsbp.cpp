@@ -9,11 +9,10 @@
 
 #include <seqan3/argument_parser/all.hpp>
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
+#include <seqan3/core/debug_stream.hpp>
 #include <seqan3/io/sequence_file/input.hpp>
 #include <seqan3/io/sequence_file/output.hpp>
 #include <seqan3/utility/views/chunk.hpp>
-
-#include <seqan3/core/debug_stream.hpp>
 
 struct config
 {
@@ -33,9 +32,10 @@ public:
     using option_value_type = size_t;
 
     positive_integer_validator() = default;
-    positive_integer_validator(bool const is_zero_positive_) : is_zero_positive{is_zero_positive_} {}
+    positive_integer_validator(bool const is_zero_positive_) : is_zero_positive{is_zero_positive_}
+    {}
 
-    void operator() (option_value_type const & val) const
+    void operator()(option_value_type const & val) const
     {
         if (!is_zero_positive && !val)
         {
@@ -43,7 +43,7 @@ public:
         }
     }
 
-    std::string get_help_page_message () const
+    std::string get_help_page_message() const
     {
         if (is_zero_positive)
             return "Value must be a positive integer or 0.";
@@ -80,12 +80,12 @@ inline std::unordered_map<std::string, std::filesystem::path> parse_assembly_sum
 
         while (std::getline(file, line))
         {
-            auto split_line = line
-                            | std::views::split('\t')
-                            | std::views::transform([] (auto && rng)
-                              {
-                                  return std::string_view(std::addressof(*rng.begin()), std::ranges::distance(rng));
-                              });
+            auto split_line = line | std::views::split('\t')
+                            | std::views::transform(
+                                  [](auto && rng)
+                                  {
+                                      return std::string_view(std::addressof(*rng.begin()), std::ranges::distance(rng));
+                                  });
 
             auto it = split_line.begin();
             assembly_accession = *it; // [0]
@@ -122,12 +122,12 @@ inline std::unordered_map<std::string, std::string> parse_genome_updater_accessi
 
         while (std::getline(file, line))
         {
-            auto split_line = line
-                            | std::views::split('\t')
-                            | std::views::transform([] (auto && rng)
-                              {
-                                  return std::string_view(std::addressof(*rng.begin()), std::ranges::distance(rng));
-                              });
+            auto split_line = line | std::views::split('\t')
+                            | std::views::transform(
+                                  [](auto && rng)
+                                  {
+                                      return std::string_view(std::addressof(*rng.begin()), std::ranges::distance(rng));
+                                  });
 
             auto it = split_line.begin();
             std::advance(it, 1);
@@ -160,12 +160,12 @@ inline std::unordered_map<uint64_t, std::vector<std::string>> parse_sbp_binning(
 
         while (std::getline(file, line))
         {
-            auto split_line = line
-                            | std::views::split('\t')
-                            | std::views::transform([] (auto && rng)
-                              {
-                                  return std::string_view(std::addressof(*rng.begin()), std::ranges::distance(rng));
-                              });
+            auto split_line = line | std::views::split('\t')
+                            | std::views::transform(
+                                  [](auto && rng)
+                                  {
+                                      return std::string_view(std::addressof(*rng.begin()), std::ranges::distance(rng));
+                                  });
 
             auto it = split_line.begin();
             refseq_accession = *it; // [0]
@@ -187,54 +187,62 @@ inline void apply_taxsbp(config const & cfg)
 {
     using namespace std::literals;
 
-    std::unordered_map<std::string, std::filesystem::path> const assembly_accession_to_path{parse_assembly_summary(cfg)};
-    std::unordered_map<std::string, std::string> const refseq_to_assembly_accession{parse_genome_updater_accession(cfg)};
+    std::unordered_map<std::string, std::filesystem::path> const assembly_accession_to_path{
+        parse_assembly_summary(cfg)};
+    std::unordered_map<std::string, std::string> const refseq_to_assembly_accession{
+        parse_genome_updater_accession(cfg)};
     std::unordered_map<uint64_t, std::vector<std::string>> const bin_to_refseq_accession{parse_sbp_binning(cfg)};
     size_t const num_bins = bin_to_refseq_accession.size();
     size_t const n_zero = std::to_string(num_bins).length();
 
-    auto worker = [&] (auto && chunk_view, auto &&)
+    auto worker = [&](auto && chunk_view, auto &&)
+    {
+        for (uint64_t bin_index : chunk_view)
         {
-            for (uint64_t bin_index : chunk_view)
+            std::string bin_index_as_string = std::to_string(bin_index);
+            std::string padded_bin_index =
+                std::string(n_zero - bin_index_as_string.length(), '0') + bin_index_as_string;
+            std::string filename = "bin_"s + padded_bin_index + ".fasta"s + (!cfg.skip_gzip ? ".gz"s : ""s);
+
+            std::filesystem::path output_path = cfg.output_directory;
+            output_path /= filename;
+
+            seqan3::sequence_file_output output_file{output_path};
+            output_file.options.fasta_blank_before_id = false;
+
+            if (auto bin_to_refseq = bin_to_refseq_accession.find(bin_index);
+                bin_to_refseq != bin_to_refseq_accession.end())
             {
-                std::string bin_index_as_string = std::to_string(bin_index);
-                std::string padded_bin_index = std::string(n_zero - bin_index_as_string.length(), '0') + bin_index_as_string;
-                std::string filename = "bin_"s + padded_bin_index + ".fasta"s + (!cfg.skip_gzip ? ".gz"s : ""s);
-
-                std::filesystem::path output_path = cfg.output_directory;
-                output_path /= filename;
-
-                seqan3::sequence_file_output output_file{output_path};
-                output_file.options.fasta_blank_before_id = false;
-
-                if (auto bin_to_refseq = bin_to_refseq_accession.find(bin_index); bin_to_refseq != bin_to_refseq_accession.end())
+                for (auto && refseq_accession : bin_to_refseq->second)
                 {
-                    for (auto && refseq_accession : bin_to_refseq->second)
+                    if (auto refseq_to_assembly = refseq_to_assembly_accession.find(refseq_accession);
+                        refseq_to_assembly != refseq_to_assembly_accession.end())
                     {
-                        if (auto refseq_to_assembly = refseq_to_assembly_accession.find(refseq_accession); refseq_to_assembly != refseq_to_assembly_accession.end())
+                        if (auto assembly_to_path = assembly_accession_to_path.find(refseq_to_assembly->second);
+                            assembly_to_path != assembly_accession_to_path.end())
                         {
-                            if (auto assembly_to_path = assembly_accession_to_path.find(refseq_to_assembly->second); assembly_to_path != assembly_accession_to_path.end())
+                            seqan3::sequence_file_input<char_traits,
+                                                        seqan3::fields<seqan3::field::seq, seqan3::field::id>>
+                                input_file{assembly_to_path->second};
+                            for (auto && [seq, id] : input_file)
                             {
-                                seqan3::sequence_file_input<char_traits, seqan3::fields<seqan3::field::seq, seqan3::field::id>> input_file{assembly_to_path->second};
-                                for (auto && [seq, id] : input_file)
+                                if (id.substr(0, refseq_accession.size()) == refseq_accession)
                                 {
-                                    if (id.substr(0, refseq_accession.size()) == refseq_accession)
-                                    {
-                                        output_file.emplace_back(seq, id);
-                                        break;
-                                    }
+                                    output_file.emplace_back(seq, id);
+                                    break;
                                 }
                             }
                         }
                     }
                 }
             }
-        };
+        }
+    };
 
     size_t const chunk_size = std::bit_ceil(num_bins / cfg.threads);
     auto chunked_view = std::views::iota(0u, num_bins) | seqan3::views::chunk(chunk_size);
     seqan3::detail::execution_handler_parallel executioner{cfg.threads};
-    executioner.bulk_execute(std::move(worker), std::move(chunked_view), [](){});
+    executioner.bulk_execute(std::move(worker), std::move(chunked_view), []() {});
 }
 
 int main(int argc, char ** argv)
@@ -282,10 +290,7 @@ int main(int argc, char ** argv)
                       seqan3::option_spec::required,
                       seqan3::input_file_validator{});
 
-    parser.add_flag(cfg.skip_gzip,
-                    '\0',
-                    "skip_gzip",
-                    "Whether to skip gzipping the output files.");
+    parser.add_flag(cfg.skip_gzip, '\0', "skip_gzip", "Whether to skip gzipping the output files.");
 
     parser.add_option(cfg.threads,
                       '\0',

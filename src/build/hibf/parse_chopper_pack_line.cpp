@@ -5,8 +5,8 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <seqan3/std/charconv>
 #include <ranges>
+#include <seqan3/std/charconv>
 
 #include <raptor/build/hibf/parse_chopper_pack_line.hpp>
 
@@ -21,7 +21,8 @@ chopper_pack_record parse_chopper_pack_line(std::string const & current_line)
     std::string_view const buffer{current_line};
     auto const buffer_end{buffer.end()};
     auto field_end = buffer.begin();
-    while (field_end != buffer_end && *field_end != '\t') ++field_end;
+    while (field_end != buffer_end && *field_end != '\t')
+        ++field_end;
 
     // parse filenames
     std::string_view const filenames{buffer.begin(), field_end};
@@ -38,14 +39,16 @@ chopper_pack_record parse_chopper_pack_line(std::string const & current_line)
         ++field_end; // skip tab or ;
         field_end = std::from_chars(field_end, buffer_end, tmp).ptr;
         result.bin_indices.push_back(tmp);
-    } while (field_end != buffer_end && *field_end != '\t');
+    }
+    while (field_end != buffer_end && *field_end != '\t');
 
     do // read number of technical bins
     {
         ++field_end; // skip tab or ;
         field_end = std::from_chars(field_end, buffer_end, tmp).ptr;
         result.number_of_bins.push_back(tmp);
-    } while (field_end != buffer_end && *field_end != '\t');
+    }
+    while (field_end != buffer_end && *field_end != '\t');
 
     return result;
 }

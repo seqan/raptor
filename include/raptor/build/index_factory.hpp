@@ -28,7 +28,8 @@ public:
     index_factory & operator=(index_factory &&) = default;
     ~index_factory() = default;
 
-    explicit index_factory(build_arguments const & args) : arguments{std::addressof(args)} {}
+    explicit index_factory(build_arguments const & args) : arguments{std::addressof(args)}
+    {}
 
     template <typename view_t = int>
     [[nodiscard]] auto operator()(view_t && hash_filter_view = 0) const
@@ -53,7 +54,7 @@ private:
 
         raptor_index<> index{*arguments};
 
-        auto hash_view = [&] ()
+        auto hash_view = [&]()
         {
             if constexpr (std::same_as<view_t, int>)
             {
@@ -66,11 +67,11 @@ private:
                 return seqan3::views::minimiser_hash(arguments->shape,
                                                      seqan3::window_size{arguments->window_size},
                                                      seqan3::seed{adjust_seed(arguments->shape.count())})
-                       | hash_filter_view;
+                     | hash_filter_view;
             }
         };
 
-        auto worker = [&] (auto && zipped_view, auto &&)
+        auto worker = [&](auto && zipped_view, auto &&)
         {
             auto & ibf = index.ibf();
 

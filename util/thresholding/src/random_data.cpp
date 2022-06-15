@@ -26,10 +26,9 @@ void run_program(std::filesystem::path const & out_directory,
                  size_t const seed)
 {
     std::mt19937_64 gen(seed);
-    std::uniform_int_distribution<uint8_t> dis_dna(0, 3); // dna4
+    std::uniform_int_distribution<uint8_t> dis_dna(0, 3);                                  // dna4
     std::uniform_int_distribution<size_t> dis_pos(0, reference_length - query_length - 1); // positions
-    std::uniform_int_distribution<size_t> dis_err(0, query_length - 1); // errors
-
+    std::uniform_int_distribution<size_t> dis_err(0, query_length - 1);                    // errors
 
     // =========================================================================
     // Reference
@@ -113,14 +112,30 @@ void initialize_argument_parser(seqan3::argument_parser & parser, cmd_arguments 
     parser.info.short_description = "This programs creates random data for testing purposes.";
     parser.info.version = "1.0.0";
 
-    parser.add_option(args.output_file, '\0', "out", "The output directory where the files will be located.",
-                      seqan3::option_spec::required, seqan3::output_directory_validator{});
-    parser.add_option(args.reference_length, '\0', "reference-size", "The length of the reference.",
-                      seqan3::option_spec::standard, seqan3::arithmetic_range_validator{1, 1'000'000'000});
-    parser.add_option(args.number_of_queries, '\0', "number-of-queries", "The number of queries.",
-                      seqan3::option_spec::standard, seqan3::arithmetic_range_validator{1, 1'000'000'000});
-    parser.add_option(args.query_length, '\0', "query_length", "The length of the queries.",
-                      seqan3::option_spec::standard, seqan3::arithmetic_range_validator{1, 1'000'000});
+    parser.add_option(args.output_file,
+                      '\0',
+                      "out",
+                      "The output directory where the files will be located.",
+                      seqan3::option_spec::required,
+                      seqan3::output_directory_validator{});
+    parser.add_option(args.reference_length,
+                      '\0',
+                      "reference-size",
+                      "The length of the reference.",
+                      seqan3::option_spec::standard,
+                      seqan3::arithmetic_range_validator{1, 1'000'000'000});
+    parser.add_option(args.number_of_queries,
+                      '\0',
+                      "number-of-queries",
+                      "The number of queries.",
+                      seqan3::option_spec::standard,
+                      seqan3::arithmetic_range_validator{1, 1'000'000'000});
+    parser.add_option(args.query_length,
+                      '\0',
+                      "query_length",
+                      "The length of the queries.",
+                      seqan3::option_spec::standard,
+                      seqan3::arithmetic_range_validator{1, 1'000'000});
     parser.add_option(args.min_error, '\0', "min_error", "The minimal number of errors.");
     parser.add_option(args.max_error, '\0', "max_error", "The maximal number of errors.");
     parser.add_option(args.seed, '\0', "seed", "The seed to use.", seqan3::option_spec::advanced);
@@ -137,7 +152,7 @@ int main(int argc, char ** argv)
     {
         myparser.parse();
         if (args.min_error > args.max_error)
-           throw seqan3::parser_invalid_argument{"The minimum number of errors cannot be greater than the maximum."};
+            throw seqan3::parser_invalid_argument{"The minimum number of errors cannot be greater than the maximum."};
     }
     catch (seqan3::argument_parser_error const & ext)
     {

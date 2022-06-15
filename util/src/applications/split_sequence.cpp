@@ -7,8 +7,8 @@
 
 #include <filesystem>
 
-#include <seqan3/argument_parser/all.hpp>
 #include <seqan3/alphabet/nucleotide/dna4.hpp>
+#include <seqan3/argument_parser/all.hpp>
 #include <seqan3/io/sequence_file/input.hpp>
 #include <seqan3/io/sequence_file/output.hpp>
 #include <seqan3/utility/views/chunk.hpp>
@@ -34,9 +34,10 @@ public:
     using option_value_type = size_t;
 
     positive_integer_validator() = default;
-    positive_integer_validator(bool const is_zero_positive_) : is_zero_positive{is_zero_positive_} {}
+    positive_integer_validator(bool const is_zero_positive_) : is_zero_positive{is_zero_positive_}
+    {}
 
-    void operator() (option_value_type const & val) const
+    void operator()(option_value_type const & val) const
     {
         if (!is_zero_positive && !val)
         {
@@ -44,7 +45,7 @@ public:
         }
     }
 
-    std::string get_help_page_message () const
+    std::string get_help_page_message() const
     {
         if (is_zero_positive)
             return "Value must be a positive integer or 0.";

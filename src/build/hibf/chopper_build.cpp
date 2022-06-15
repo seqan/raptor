@@ -36,12 +36,8 @@ void chopper_build(build_arguments const & arguments)
     store_index(arguments.out_path, index, arguments);
 }
 
-template
-void chopper_build<seqan3::data_layout::uncompressed>(build_arguments const &);
+template void chopper_build<seqan3::data_layout::uncompressed>(build_arguments const &);
 
-template
-void chopper_build<seqan3::data_layout::compressed>(build_arguments const &);
+template void chopper_build<seqan3::data_layout::compressed>(build_arguments const &);
 
 } // namespace raptor::hibf
-
-

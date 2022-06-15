@@ -24,7 +24,8 @@ public:
     sync_out & operator=(sync_out &&) = default;
     ~sync_out() = default;
 
-    sync_out(std::filesystem::path const & path) : file{path} {}
+    sync_out(std::filesystem::path const & path) : file{path}
+    {}
 
     template <typename t>
     void write(t && data)

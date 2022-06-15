@@ -13,7 +13,7 @@ namespace raptor::logspace
 {
 
 constexpr double ln_2{0.693147180559945309417232121458176568L};
-constexpr double negative_inf{- std::numeric_limits<double>::infinity()};
+constexpr double negative_inf{-std::numeric_limits<double>::infinity()};
 
 //!\brief The log of a sum of two log terms.
 // Produces correct result if either term is -inf.

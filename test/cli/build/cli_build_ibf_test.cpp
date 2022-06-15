@@ -7,7 +7,8 @@
 
 #include "../cli_test.hpp"
 
-struct build_ibf : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, bool>> {};
+struct build_ibf : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, bool>>
+{};
 
 TEST_P(build_ibf, with_file)
 {
@@ -21,13 +22,16 @@ TEST_P(build_ibf, with_file)
         file << '\n';
     }
 
-    cli_test_result const result = execute_app("raptor", "build",
-                                                         "--kmer 19",
-                                                         "--window ", std::to_string(window_size),
-                                                         "--size 64k",
-                                                         "--threads ", run_parallel ? "2" : "1",
-                                                         "--output raptor.index",
-                                                         "raptor_cli_test.txt");
+    cli_test_result const result = execute_app("raptor",
+                                               "build",
+                                               "--kmer 19",
+                                               "--window ",
+                                               std::to_string(window_size),
+                                               "--size 64k",
+                                               "--threads ",
+                                               run_parallel ? "2" : "1",
+                                               "--output raptor.index",
+                                               "raptor_cli_test.txt");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
@@ -47,13 +51,16 @@ TEST_P(build_ibf, with_shape)
         file << '\n';
     }
 
-    cli_test_result const result = execute_app("raptor", "build",
-                                                         "--shape 1111111111111111111",
-                                                         "--window ", std::to_string(window_size),
-                                                         "--size 64k",
-                                                         "--threads ", run_parallel ? "2" : "1",
-                                                         "--output raptor.index",
-                                                         "raptor_cli_test.txt");
+    cli_test_result const result = execute_app("raptor",
+                                               "build",
+                                               "--shape 1111111111111111111",
+                                               "--window ",
+                                               std::to_string(window_size),
+                                               "--size 64k",
+                                               "--threads ",
+                                               run_parallel ? "2" : "1",
+                                               "--output raptor.index",
+                                               "raptor_cli_test.txt");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
@@ -80,13 +87,17 @@ TEST_P(build_ibf, with_socks_file)
         file << '\n';
     }
 
-    cli_test_result const result = execute_app("raptor", "socks", "build",
-                                                         "--kmer 19",
-                                                         "--window ", std::to_string(window_size),
-                                                         "--size 64k",
-                                                         "--threads ", run_parallel ? "2" : "1",
-                                                         "--output raptor.index",
-                                                         "raptor_cli_test.txt");
+    cli_test_result const result = execute_app("raptor",
+                                               "socks",
+                                               "build",
+                                               "--kmer 19",
+                                               "--window ",
+                                               std::to_string(window_size),
+                                               "--size 64k",
+                                               "--threads ",
+                                               run_parallel ? "2" : "1",
+                                               "--output raptor.index",
+                                               "raptor_cli_test.txt");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
@@ -94,14 +105,15 @@ TEST_P(build_ibf, with_socks_file)
     compare_index(ibf_path(number_of_repeated_bins, window_size), "raptor.index");
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    build_ibf_suite,
-    build_ibf,
-    testing::Combine(testing::Values(0, 16, 32), testing::Values(19, 23), testing::Values(true, false)),
-    [] (testing::TestParamInfo<build_ibf::ParamType> const & info)
-    {
-        std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
-                           std::to_string(std::get<1>(info.param)) + "_window_" +
-                           (std::get<2>(info.param) ? "parallel" : "serial");
-        return name;
-    });
+INSTANTIATE_TEST_SUITE_P(build_ibf_suite,
+                         build_ibf,
+                         testing::Combine(testing::Values(0, 16, 32),
+                                          testing::Values(19, 23),
+                                          testing::Values(true, false)),
+                         [](testing::TestParamInfo<build_ibf::ParamType> const & info)
+                         {
+                             std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_"
+                                              + std::to_string(std::get<1>(info.param)) + "_window_"
+                                              + (std::get<2>(info.param) ? "parallel" : "serial");
+                             return name;
+                         });

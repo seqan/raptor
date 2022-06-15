@@ -38,9 +38,7 @@ public:
             threshold_kind = threshold_kinds::lemma;
             size_t const kmer_lemma_minuend = arguments.pattern_size + 1u;
             size_t const kmer_lemma_subtrahend = (arguments.errors + 1u) * kmer_size;
-            kmer_lemma = kmer_lemma_minuend > kmer_lemma_subtrahend ?
-                         kmer_lemma_minuend - kmer_lemma_subtrahend :
-                         0;
+            kmer_lemma = kmer_lemma_minuend > kmer_lemma_subtrahend ? kmer_lemma_minuend - kmer_lemma_subtrahend : 0;
         }
         else
         {
@@ -57,18 +55,17 @@ public:
     {
         switch (threshold_kind)
         {
-            case threshold_kinds::lemma:
-                return kmer_lemma;
-            case threshold_kinds::percentage:
-                return static_cast<size_t>(minimiser_count * threshold_percentage);
-            default:
-            {
-                assert(threshold_kind == threshold_kinds::probabilistic);
-                size_t const index = std::clamp(minimiser_count,
-                                                minimal_number_of_minimizers,
-                                                maximal_number_of_minimizers) - minimal_number_of_minimizers;
-                return precomp_thresholds[index] + precomp_correction[index];
-            }
+        case threshold_kinds::lemma:
+            return kmer_lemma;
+        case threshold_kinds::percentage:
+            return static_cast<size_t>(minimiser_count * threshold_percentage);
+        default:
+        {
+            assert(threshold_kind == threshold_kinds::probabilistic);
+            size_t const index = std::clamp(minimiser_count, minimal_number_of_minimizers, maximal_number_of_minimizers)
+                               - minimal_number_of_minimizers;
+            return precomp_thresholds[index] + precomp_correction[index];
+        }
         }
     }
 

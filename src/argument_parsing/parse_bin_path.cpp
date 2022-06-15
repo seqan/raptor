@@ -28,7 +28,8 @@ void parse_bin_path(std::filesystem::path const & bin_file,
 
     if (is_hibf)
     {
-        while (std::getline(istrm, line) && line.substr(0, 6) != "#FILES") {}
+        while (std::getline(istrm, line) && line.substr(0, 6) != "#FILES")
+        {}
         while (std::getline(istrm, line))
             bin_path.push_back(std::move(hibf::parse_chopper_pack_line(line).filenames));
     }

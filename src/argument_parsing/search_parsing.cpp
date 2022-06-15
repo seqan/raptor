@@ -32,12 +32,13 @@ std::istream & operator>>(std::istream & s, pattern_size & pattern_size_)
 void init_search_parser(seqan3::argument_parser & parser, search_arguments & arguments)
 {
     init_shared_meta(parser);
-    parser.info.examples = {"raptor search --error 2 --index raptor.index --query queries.fastq --output search.output"};
+    parser.info.examples = {
+        "raptor search --error 2 --index raptor.index --query queries.fastq --output search.output"};
     parser.add_option(arguments.index_file,
                       '\0',
                       "index",
-                      arguments.is_socks ? "Provide a valid path to an index." :
-                                           "Provide a valid path to an index. Parts: Without suffix _0",
+                      arguments.is_socks ? "Provide a valid path to an index."
+                                         : "Provide a valid path to an index. Parts: Without suffix _0",
                       seqan3::option_spec::required);
     parser.add_option(arguments.query_file,
                       '\0',
@@ -99,6 +100,7 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
                     "Two files are stored:\n"
                     "\\fBthreshold_*.bin\\fP: Depends on pattern, window, kmer/shape, errors, and tau.\n"
                     "\\fBcorrection_*.bin\\fP: Depends on pattern, window, kmer/shape, p_max, and fpr.");
+    // clang-format off
     parser.add_flag(arguments.is_hibf,
                     '\0',
                     "hibf",
@@ -109,6 +111,7 @@ void init_search_parser(seqan3::argument_parser & parser, search_arguments & arg
                     "time",
                     "Write timing file.",
                     seqan3::option_spec::advanced);
+    // clang-format on
 }
 
 void search_parsing(seqan3::argument_parser & parser, bool const is_socks)
@@ -126,13 +129,11 @@ void search_parsing(seqan3::argument_parser & parser, bool const is_socks)
     std::error_code ec{};
     std::filesystem::create_directories(output_directory, ec);
 
-// GCOVR_EXCL_START
+    // GCOVR_EXCL_START
     if (!output_directory.empty() && ec)
-        throw seqan3::argument_parser_error{seqan3::detail::to_string("Failed to create directory\"",
-                                                                      output_directory.c_str(),
-                                                                      "\": ",
-                                                                      ec.message())};
-// GCOVR_EXCL_STOP
+        throw seqan3::argument_parser_error{
+            seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
+    // GCOVR_EXCL_STOP
 
     if (!arguments.is_socks)
     {
@@ -166,11 +167,11 @@ void search_parsing(seqan3::argument_parser & parser, bool const is_socks)
                 sequence_lengths.push_back(std::ranges::size(seq));
             }
             std::sort(sequence_lengths.begin(), sequence_lengths.end());
-            arguments.pattern_size = sequence_lengths[sequence_lengths.size()/2];
+            arguments.pattern_size = sequence_lengths[sequence_lengths.size() / 2];
         }
         else
         {
-            arguments.pattern_size  = arguments.pattern_size_strong.v;
+            arguments.pattern_size = arguments.pattern_size_strong.v;
         }
     }
 
@@ -178,8 +179,8 @@ void search_parsing(seqan3::argument_parser & parser, bool const is_socks)
     // Read window and kmer size, and the bin paths.
     // ==========================================
     {
-        std::ifstream is{partitioned ? arguments.index_file.string() + std::string{"_0"} :
-                                       arguments.index_file.string(),
+        std::ifstream is{partitioned ? arguments.index_file.string() + std::string{"_0"}
+                                     : arguments.index_file.string(),
                          std::ios::binary};
         cereal::BinaryInputArchive iarchive{is};
         raptor_index<> tmp{};
@@ -198,14 +199,11 @@ void search_parsing(seqan3::argument_parser & parser, bool const is_socks)
     // ==========================================
     // Temporary.
     // ==========================================
-    if (arguments.shape_size != arguments.window_size &&
-        !parser.is_option_set("threshold") &&
-        !parser.is_option_set("fpr") )
+    if (arguments.shape_size != arguments.window_size && !parser.is_option_set("threshold")
+        && !parser.is_option_set("fpr"))
     {
         std::cerr << "[WARNING] The search needs the FPR that was used for building the index.\n"
-                  << "          Currently, the default value of "
-                  << std::setprecision(4)
-                  << arguments.fpr
+                  << "          Currently, the default value of " << std::setprecision(4) << arguments.fpr
                   << " is used.\n"
                   << "          If the index was built with a different FPR, the search results are not reliable.\n"
                   << "          The final version will store the FPR in the index and this parameter will be removed.\n"

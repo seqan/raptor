@@ -12,9 +12,9 @@
 
 #pragma once
 
-#include <vector>
 #include <cinttypes>
 #include <random>
+#include <vector>
 
 #include <seqan3/utility/views/zip.hpp>
 
@@ -133,7 +133,6 @@ private:
     std::vector<uint64_t> forward_hashes;
 
 public:
-
     //!\brief Stores the hashes of the minimizers.
     std::vector<uint64_t> minimizer_hash;
     //!\brief Stores the begin positions of the minimizers.
@@ -141,12 +140,12 @@ public:
     //!\brief Stores the end positions of the minimizers.
     std::vector<uint64_t> minimizer_end;
 
-    boring_minimizer() = default;                                        //!< Defaulted
-    boring_minimizer(boring_minimizer const &) = default;                       //!< Defaulted
-    boring_minimizer(boring_minimizer &&) = default;                            //!< Defaulted
-    boring_minimizer & operator=(boring_minimizer const &) = default;           //!< Defaulted
-    boring_minimizer & operator=(boring_minimizer &&) = default;                //!< Defaulted
-    ~boring_minimizer() = default;                                       //!< Defaulted
+    boring_minimizer() = default;                                     //!< Defaulted
+    boring_minimizer(boring_minimizer const &) = default;             //!< Defaulted
+    boring_minimizer(boring_minimizer &&) = default;                  //!< Defaulted
+    boring_minimizer & operator=(boring_minimizer const &) = default; //!< Defaulted
+    boring_minimizer & operator=(boring_minimizer &&) = default;      //!< Defaulted
+    ~boring_minimizer() = default;                                    //!< Defaulted
 
     /*!\brief Constructs a minimizer from given k-mer, window size and a seed.
      * \param[in] w_    The window size.
@@ -154,7 +153,9 @@ public:
      * \param[in] seed_ The seed to use. Default: 0x8F3F73B5CF1C9ADE.
      */
     boring_minimizer(window const w_, kmer const k_, uint64_t const seed_ = 0x8F3F73B5CF1C9ADE) :
-        w{w_.v}, k{k_.v}, seed{seed_}
+        w{w_.v},
+        k{k_.v},
+        seed{seed_}
     {}
 
     /*!\brief Resize the minimizer.
@@ -187,7 +188,7 @@ public:
         uint64_t kmers_per_window = w - k + 1u;
 
         // Helper lambda for xor'ing values depending on `do_xor`.
-        auto apply_xor = [this] (uint64_t const val)
+        auto apply_xor = [this](uint64_t const val)
         {
             return val ^ seed;
         };
@@ -254,7 +255,8 @@ public:
 };
 
 template <seqan3::alphabet alphabet_t>
-std::vector<double> destroyed_indirectly_by_error(size_t const pattern_size, size_t const window_size, uint8_t const kmer_size)
+std::vector<double>
+destroyed_indirectly_by_error(size_t const pattern_size, size_t const window_size, uint8_t const kmer_size)
 {
     using rank_type = decltype(seqan3::to_rank(alphabet_t{}));
     rank_type max_rank = seqan3::alphabet_size<alphabet_t> - 1;
@@ -280,22 +282,19 @@ std::vector<double> destroyed_indirectly_by_error(size_t const pattern_size, siz
             mins[x] = true;
 
         size_t error_pos = dis2(gen) % pattern_size;
-        rank_type new_base =  dis(gen) % seqan3::alphabet_size<alphabet_t>;
+        rank_type new_base = dis(gen) % seqan3::alphabet_size<alphabet_t>;
         while (new_base == seqan3::to_rank(sequence[error_pos]))
-            new_base =  dis(gen) % seqan3::alphabet_size<alphabet_t>;
+            new_base = dis(gen) % seqan3::alphabet_size<alphabet_t>;
         sequence[error_pos] = seqan3::assign_rank_to(new_base, alphabet_t{});
-
 
         mini.compute(sequence);
         for (auto x : mini.minimizer_begin)
             minse[x] = true;
 
-
-
         size_t count = 0;
 
         for (size_t i = 0; i < mins.size(); ++i)
-            count += mins[i] != minse[i] &&  (error_pos < i || i + kmer_size < error_pos);
+            count += mins[i] != minse[i] && (error_pos < i || i + kmer_size < error_pos);
 
         std::fill(mins.begin(), mins.end(), false);
         std::fill(minse.begin(), minse.end(), false);
@@ -306,9 +305,7 @@ std::vector<double> destroyed_indirectly_by_error(size_t const pattern_size, siz
     return result;
 }
 
-double impl_2(size_t const pos,
-              size_t const kmer_size,
-              double const p_mean)
+double impl_2(size_t const pos, size_t const kmer_size, double const p_mean)
 {
     double result = 0;
     for (size_t i = 0; i < kmer_size - pos - 1; ++i)
@@ -317,9 +314,8 @@ double impl_2(size_t const pos,
     return result * std::pow(p_mean, pos);
 }
 
-std::vector<double> destroyed_by_overlapping_errors(size_t const pattern_size,
-                                                    uint8_t const kmer_size,
-                                                    double const p_mean)
+std::vector<double>
+destroyed_by_overlapping_errors(size_t const pattern_size, uint8_t const kmer_size, double const p_mean)
 {
     std::vector<double> result(kmer_size, 0);
 
@@ -353,7 +349,9 @@ std::vector<size_t> precompute_threshold(size_t const pattern_size,
         indirect_errors = destroyed_indirectly_by_error<seqan3::dna4>(pattern_size, window_size, kmer_size);
 
     // Iterate over the possible number of minimizers
-    for (size_t number_of_minimizers = minimal_number_of_minimizers; number_of_minimizers <= maximal_number_of_minimizers; ++number_of_minimizers)
+    for (size_t number_of_minimizers = minimal_number_of_minimizers;
+         number_of_minimizers <= maximal_number_of_minimizers;
+         ++number_of_minimizers)
     {
         std::vector<double> proba_x(kmers_per_pattern, 0);
         for (auto & x : proba_x)
@@ -388,7 +386,7 @@ std::vector<size_t> precompute_threshold(size_t const pattern_size,
                 x /= sum;
         }
 
-        double n =0;
+        double n = 0;
         for (size_t i = 0; i < number_of_minimizers; ++i)
         {
             if (with_overlapping_errors)

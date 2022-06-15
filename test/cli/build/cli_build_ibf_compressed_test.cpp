@@ -7,8 +7,10 @@
 
 #include "../cli_test.hpp"
 
-struct build_ibf_compressed : public raptor_base,
-                              public testing::WithParamInterface<std::tuple<size_t, size_t, bool, size_t>> {};
+struct build_ibf_compressed :
+    public raptor_base,
+    public testing::WithParamInterface<std::tuple<size_t, size_t, bool, size_t>>
+{};
 
 TEST_P(build_ibf_compressed, pipeline)
 {
@@ -28,25 +30,32 @@ TEST_P(build_ibf_compressed, pipeline)
         file << '\n';
     }
 
-    cli_test_result const result1 = execute_app("raptor", "build",
-                                                          "--kmer 19",
-                                                          "--window ", std::to_string(window_size),
-                                                          "--size 64k",
-                                                          "--threads ", run_parallel ? "2" : "1",
-                                                          "--output raptor.index",
-                                                          "--compressed",
-                                                          "raptor_cli_test.txt");
+    cli_test_result const result1 = execute_app("raptor",
+                                                "build",
+                                                "--kmer 19",
+                                                "--window ",
+                                                std::to_string(window_size),
+                                                "--size 64k",
+                                                "--threads ",
+                                                run_parallel ? "2" : "1",
+                                                "--output raptor.index",
+                                                "--compressed",
+                                                "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result1);
 
-    cli_test_result const result2 = execute_app("raptor", "search",
-                                                          "--fpr 0.05",
-                                                          "--output search.out",
-                                                          "--error ", std::to_string(number_of_errors),
-                                                          "--p_max 0.4",
-                                                          "--index ", "raptor.index",
-                                                          "--query ", data("query.fq"));
+    cli_test_result const result2 = execute_app("raptor",
+                                                "search",
+                                                "--fpr 0.05",
+                                                "--output search.out",
+                                                "--error ",
+                                                std::to_string(number_of_errors),
+                                                "--p_max 0.4",
+                                                "--index ",
+                                                "raptor.index",
+                                                "--query ",
+                                                data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result2);
@@ -71,50 +80,55 @@ TEST_P(build_ibf_compressed, pipeline_socks)
         file << '\n';
     }
 
-    cli_test_result const result1 = execute_app("raptor", "socks", "build",
-                                                          "--kmer 19",
-                                                          "--window ", std::to_string(window_size),
-                                                          "--size 64k",
-                                                          "--threads ", run_parallel ? "2" : "1",
-                                                          "--output raptor.index",
-                                                          "--compressed",
-                                                          "raptor_cli_test.txt");
+    cli_test_result const result1 = execute_app("raptor",
+                                                "socks",
+                                                "build",
+                                                "--kmer 19",
+                                                "--window ",
+                                                std::to_string(window_size),
+                                                "--size 64k",
+                                                "--threads ",
+                                                run_parallel ? "2" : "1",
+                                                "--output raptor.index",
+                                                "--compressed",
+                                                "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result1);
 
-    cli_test_result const result2 = execute_app("raptor", "socks", "lookup-kmer",
-                                                          "--output search.out",
-                                                          "--index ", "raptor.index",
-                                                          "--query ", data("query_socks.fq"));
+    cli_test_result const result2 = execute_app("raptor",
+                                                "socks",
+                                                "lookup-kmer",
+                                                "--output search.out",
+                                                "--index ",
+                                                "raptor.index",
+                                                "--query ",
+                                                data("query_socks.fq"));
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result2);
 
-    std::string const expected = string_from_file(search_result_path(number_of_repeated_bins,
-                                                                     window_size,
-                                                                     number_of_errors),
-                                                  std::ios::binary);
+    std::string const expected =
+        string_from_file(search_result_path(number_of_repeated_bins, window_size, number_of_errors), std::ios::binary);
     std::string const actual = string_from_file("search.out");
 
     EXPECT_EQ(expected, actual);
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    build_ibf_compressed_suite,
-    build_ibf_compressed,
-    testing::Combine(testing::Values(0, 16, 32),
-                     testing::Values(19, 23),
-                     testing::Values(true, false),
-                     testing::Values(0, 1)),
-    [] (testing::TestParamInfo<build_ibf_compressed::ParamType> const & info)
-    {
-        std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
-                        std::to_string(std::get<1>(info.param)) + "_window_" +
-                        (std::get<2>(info.param) ? "parallel" : "serial") +
-                        std::to_string(std::get<3>(info.param)) + "_error";
-        return name;
-    });
+INSTANTIATE_TEST_SUITE_P(build_ibf_compressed_suite,
+                         build_ibf_compressed,
+                         testing::Combine(testing::Values(0, 16, 32),
+                                          testing::Values(19, 23),
+                                          testing::Values(true, false),
+                                          testing::Values(0, 1)),
+                         [](testing::TestParamInfo<build_ibf_compressed::ParamType> const & info)
+                         {
+                             std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_"
+                                              + std::to_string(std::get<1>(info.param)) + "_window_"
+                                              + (std::get<2>(info.param) ? "parallel" : "serial")
+                                              + std::to_string(std::get<3>(info.param)) + "_error";
+                             return name;
+                         });
 
 TEST_F(build_ibf_compressed, wrong_compression)
 {

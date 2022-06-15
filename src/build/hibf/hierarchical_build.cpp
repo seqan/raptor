@@ -34,7 +34,8 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
     robin_hood::unordered_flat_set<size_t> kmers{};
 
     // initialize lower level IBF
-    size_t const max_bin_tbs = initialise_max_bin_kmers(kmers, ibf_positions, filename_indices, current_node, data, arguments);
+    size_t const max_bin_tbs =
+        initialise_max_bin_kmers(kmers, ibf_positions, filename_indices, current_node, data, arguments);
     auto && ibf = construct_ibf(parent_kmers, kmers, max_bin_tbs, current_node, data, arguments, is_root);
     kmers.clear(); // reduce memory peak
 
@@ -68,18 +69,16 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
     return ibf_pos;
 }
 
-template
-size_t hierarchical_build<seqan3::data_layout::uncompressed>(robin_hood::unordered_flat_set<size_t> &,
-                                                             lemon::ListDigraph::Node const &,
-                                                             build_data<seqan3::data_layout::uncompressed> &,
-                                                             build_arguments const &,
-                                                             bool);
+template size_t hierarchical_build<seqan3::data_layout::uncompressed>(robin_hood::unordered_flat_set<size_t> &,
+                                                                      lemon::ListDigraph::Node const &,
+                                                                      build_data<seqan3::data_layout::uncompressed> &,
+                                                                      build_arguments const &,
+                                                                      bool);
 
-template
-size_t hierarchical_build<seqan3::data_layout::compressed>(robin_hood::unordered_flat_set<size_t> &,
-                                                           lemon::ListDigraph::Node const &,
-                                                           build_data<seqan3::data_layout::compressed> &,
-                                                           build_arguments const &,
-                                                           bool);
+template size_t hierarchical_build<seqan3::data_layout::compressed>(robin_hood::unordered_flat_set<size_t> &,
+                                                                    lemon::ListDigraph::Node const &,
+                                                                    build_data<seqan3::data_layout::compressed> &,
+                                                                    build_arguments const &,
+                                                                    bool);
 
 } // namespace raptor::hibf

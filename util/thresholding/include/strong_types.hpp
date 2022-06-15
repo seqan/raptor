@@ -13,12 +13,27 @@
 #pragma once
 
 //!\brief Strong type for passing the window size.
-struct window { uint64_t v; };
+struct window
+{
+    uint64_t v;
+};
 //!\brief Strong type for passing the kmer size.
-struct kmer { uint8_t v; };
+struct kmer
+{
+    uint8_t v;
+};
 //!\brief Strong type for passing number of bins.
-struct bins { uint64_t v; };
+struct bins
+{
+    uint64_t v;
+};
 //!\brief Strong type for passing number of bits.
-struct bits { uint64_t v; };
+struct bits
+{
+    uint64_t v;
+};
 //!\brief Strong type for passing number of hash functions.
-struct hashes { uint64_t v; };
+struct hashes
+{
+    uint64_t v;
+};

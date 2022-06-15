@@ -28,11 +28,13 @@ void init_upgrade_parser(seqan3::argument_parser & parser, upgrade_arguments & a
                       "input",
                       "The index to upgrade. Parts: Without suffix _0",
                       seqan3::option_spec::required);
+    // clang-format off
     parser.add_option(arguments.out_file,
                       '\0',
                       "output",
                       "Path to new index.",
                       seqan3::option_spec::required);
+    // clang-format on
     parser.add_option(arguments.window_size,
                       '\0',
                       "window",
@@ -51,10 +53,12 @@ void init_upgrade_parser(seqan3::argument_parser & parser, upgrade_arguments & a
                       "Original index consisted of this many parts.",
                       seqan3::option_spec::standard,
                       power_of_two_validator{});
+    // clang-format off
     parser.add_flag(arguments.compressed,
                     '\0',
                     "compressed",
                     "Original index was compressed.");
+    // clang-format on
 }
 
 void upgrade_parsing(seqan3::argument_parser & parser)
@@ -75,13 +79,11 @@ void upgrade_parsing(seqan3::argument_parser & parser)
     std::error_code ec{};
     std::filesystem::create_directories(output_directory, ec);
 
-// GCOVR_EXCL_START
+    // GCOVR_EXCL_START
     if (!output_directory.empty() && ec)
-        throw seqan3::argument_parser_error{seqan3::detail::to_string("Failed to create directory\"",
-                                                                      output_directory.c_str(),
-                                                                      "\": ",
-                                                                      ec.message())};
-// GCOVR_EXCL_STOP
+        throw seqan3::argument_parser_error{
+            seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
+    // GCOVR_EXCL_STOP
 
     if (arguments.parts == 1)
     {

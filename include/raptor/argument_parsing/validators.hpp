@@ -19,13 +19,13 @@ struct power_of_two_validator
 {
     using option_value_type = size_t;
 
-    void operator() (option_value_type const & val) const
+    void operator()(option_value_type const & val) const
     {
         if (!std::has_single_bit(val))
             throw seqan3::validation_error{"The value must be a power of two."};
     }
 
-    static std::string get_help_page_message ()
+    static std::string get_help_page_message()
     {
         return "Value must be a power of two.";
     }
@@ -43,7 +43,8 @@ public:
     positive_integer_validator & operator=(positive_integer_validator &&) = default;
     ~positive_integer_validator() = default;
 
-    explicit positive_integer_validator(bool const is_zero_positive_) : is_zero_positive{is_zero_positive_} {}
+    explicit positive_integer_validator(bool const is_zero_positive_) : is_zero_positive{is_zero_positive_}
+    {}
 
     void operator()(window const & val) const
     {
@@ -56,7 +57,7 @@ public:
             throw seqan3::validation_error{"The value must be a positive integer."};
     }
 
-    std::string get_help_page_message () const
+    std::string get_help_page_message() const
     {
         if (is_zero_positive)
             return "Value must be a positive integer or 0.";
@@ -80,19 +81,28 @@ public:
     size_validator & operator=(size_validator &&) = default;
     ~size_validator() = default;
 
-    explicit size_validator(std::string const & pattern) : expression{pattern} {}
+    explicit size_validator(std::string const & pattern) : expression{pattern}
+    {}
 
     void operator()(option_value_type const & cmp) const
     {
         if (!std::regex_match(cmp, expression))
-            throw seqan3::validation_error{seqan3::detail::to_string("Value ", cmp, " must be an integer followed by [k,m,g,t] (case insensitive).")};
+            throw seqan3::validation_error{
+                seqan3::detail::to_string("Value ",
+                                          cmp,
+                                          " must be an integer followed by [k,m,g,t] (case insensitive).")};
     }
 
     template <std::ranges::forward_range range_type>
         requires std::convertible_to<std::ranges::range_value_t<range_type>, option_value_type const &>
     void operator()(range_type const & v) const
     {
-         std::for_each(v.begin(), v.end(), [&] (auto cmp) { (*this)(cmp); });
+        std::for_each(v.begin(),
+                      v.end(),
+                      [&](auto cmp)
+                      {
+                          (*this)(cmp);
+                      });
     }
 
     std::string get_help_page_message() const
@@ -116,7 +126,7 @@ public:
     bin_validator & operator=(bin_validator &&) = default;
     ~bin_validator() = default;
 
-    void operator() (option_value_type const & values) const
+    void operator()(option_value_type const & values) const
     {
         if (values.empty())
             throw seqan3::validation_error{"The list of input files cannot be empty."};
@@ -148,40 +158,44 @@ public:
         return seqan3::detail::to_string("The file must contain at least one file path per line, with multiple paths "
                                          "being separated by a whitespace. Each line in the file corresponds to one "
                                          "bin. Valid extensions for the paths in the file are [minimiser] when "
-                                         " preprocessing, and ", sequence_extensions,
-                                         #if defined(SEQAN3_HAS_BZIP2) || defined(SEQAN3_HAS_ZLIB)
-                                         ", possibly followed by ", compression_extensions,
-                                         #endif
+                                         " preprocessing, and ",
+                                         sequence_extensions,
+#if defined(SEQAN3_HAS_BZIP2) || defined(SEQAN3_HAS_ZLIB)
+                                         ", possibly followed by ",
+                                         compression_extensions,
+#endif
                                          " otherwise. ");
     }
 
 private:
-    std::vector<std::string> sequence_extensions{seqan3::detail::valid_file_extensions<typename seqan3::sequence_file_input<>::valid_formats>()};
-    std::vector<std::string> compression_extensions{[&] ()
-                             {
-                                 std::vector<std::string> result;
-                                 #ifdef SEQAN3_HAS_BZIP2
-                                     result.push_back("bz2");
-                                 #endif
-                                 #ifdef SEQAN3_HAS_ZLIB
-                                     result.push_back("gz");
-                                     result.push_back("bgzf");
-                                 #endif
-                                 return result;
-                             }()}; // GCOVR_EXCL_LINE
-    std::vector<std::string> combined_extensions{[&] ()
-                             {
-                                 if (compression_extensions.empty())
-                                    return sequence_extensions; // GCOVR_EXCL_LINE
-                                 std::vector<std::string> result;
-                                 for (auto && sequence_extension : sequence_extensions)
-                                 {
-                                     result.push_back(sequence_extension);
-                                     for (auto && compression_extension : compression_extensions)
-                                         result.push_back(sequence_extension + std::string{'.'} + compression_extension);
-                                 }
-                                return result;
-                             }()};
+    std::vector<std::string> sequence_extensions{
+        seqan3::detail::valid_file_extensions<typename seqan3::sequence_file_input<>::valid_formats>()};
+    std::vector<std::string> compression_extensions{[&]()
+                                                    {
+                                                        std::vector<std::string> result;
+#ifdef SEQAN3_HAS_BZIP2
+                                                        result.push_back("bz2");
+#endif
+#ifdef SEQAN3_HAS_ZLIB
+                                                        result.push_back("gz");
+                                                        result.push_back("bgzf");
+#endif
+                                                        return result;
+                                                    }()}; // GCOVR_EXCL_LINE
+    std::vector<std::string> combined_extensions{
+        [&]()
+        {
+            if (compression_extensions.empty())
+                return sequence_extensions; // GCOVR_EXCL_LINE
+            std::vector<std::string> result;
+            for (auto && sequence_extension : sequence_extensions)
+            {
+                result.push_back(sequence_extension);
+                for (auto && compression_extension : compression_extensions)
+                    result.push_back(sequence_extension + std::string{'.'} + compression_extension);
+            }
+            return result;
+        }()};
     seqan3::input_file_validator<> minimiser_file_validator{{"minimiser"}};
 
 public:

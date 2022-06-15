@@ -12,7 +12,7 @@
 #include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
 
 #ifndef RAPTOR_HIBF_HAS_COUNT
-#define RAPTOR_HIBF_HAS_COUNT 0
+#    define RAPTOR_HIBF_HAS_COUNT 0
 #endif
 
 namespace raptor
@@ -98,12 +98,14 @@ public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    hierarchical_interleaved_bloom_filter() = default; //!< Defaulted.
+    hierarchical_interleaved_bloom_filter() = default;                                              //!< Defaulted.
     hierarchical_interleaved_bloom_filter(hierarchical_interleaved_bloom_filter const &) = default; //!< Defaulted.
-    hierarchical_interleaved_bloom_filter & operator=(hierarchical_interleaved_bloom_filter const &) = default; //!< Defaulted.
+    hierarchical_interleaved_bloom_filter &
+    operator=(hierarchical_interleaved_bloom_filter const &) = default;                        //!< Defaulted.
     hierarchical_interleaved_bloom_filter(hierarchical_interleaved_bloom_filter &&) = default; //!< Defaulted.
-    hierarchical_interleaved_bloom_filter & operator=(hierarchical_interleaved_bloom_filter &&) = default; //!< Defaulted.
-    ~hierarchical_interleaved_bloom_filter() = default; //!< Defaulted.
+    hierarchical_interleaved_bloom_filter &
+    operator=(hierarchical_interleaved_bloom_filter &&) = default; //!< Defaulted.
+    ~hierarchical_interleaved_bloom_filter() = default;            //!< Defaulted.
 
     //!\}
 
@@ -216,13 +218,14 @@ public:
     auto operator[](size_t const ibf_idx) const
     {
         return ibf_bin_to_filename_position[ibf_idx]
-               | std::views::transform([this] (int64_t i)
-                 {
-                    if (i == -1)
-                        return std::string{};
-                    else
-                        return user_bin_filenames[i];
-                 });
+             | std::views::transform(
+                   [this](int64_t i)
+                   {
+                       if (i == -1)
+                           return std::string{};
+                       else
+                           return user_bin_filenames[i];
+                   });
     }
 
     //!\brief Returns the filename index of the `ibf_idx`th IBF for bin `bin_idx`.
@@ -306,7 +309,7 @@ private:
                     bulk_contains_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
                 sum = 0u;
             }
-            else if (bin + 1u == result.size() || // last bin
+            else if (bin + 1u == result.size() ||                                                    // last bin
                      current_filename_index != hibf_ptr->user_bins.filename_index(ibf_idx, bin + 1)) // end of split bin
             {
                 if (sum >= threshold)
@@ -320,19 +323,18 @@ public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    membership_agent() = default; //!< Defaulted.
-    membership_agent(membership_agent const &) = default; //!< Defaulted.
+    membership_agent() = default;                                     //!< Defaulted.
+    membership_agent(membership_agent const &) = default;             //!< Defaulted.
     membership_agent & operator=(membership_agent const &) = default; //!< Defaulted.
-    membership_agent(membership_agent &&) = default; //!< Defaulted.
-    membership_agent & operator=(membership_agent &&) = default; //!< Defaulted.
-    ~membership_agent() = default; //!< Defaulted.
+    membership_agent(membership_agent &&) = default;                  //!< Defaulted.
+    membership_agent & operator=(membership_agent &&) = default;      //!< Defaulted.
+    ~membership_agent() = default;                                    //!< Defaulted.
 
     /*!\brief Construct a membership_agent for an existing hierarchical_interleaved_bloom_filter.
      * \private
      * \param hibf The hierarchical_interleaved_bloom_filter.
      */
-    explicit membership_agent(hibf_t const & hibf) :
-        hibf_ptr(std::addressof(hibf))
+    explicit membership_agent(hibf_t const & hibf) : hibf_ptr(std::addressof(hibf))
     {}
     //!\}
 
@@ -377,7 +379,8 @@ public:
     // `bulk_contains` cannot be called on a temporary, since the object the returned reference points to
     // is immediately destroyed.
     template <std::ranges::range value_range_t>
-    [[nodiscard]] std::vector<int64_t> const & bulk_contains(value_range_t && values, size_t const threshold) && noexcept = delete;
+    [[nodiscard]] std::vector<int64_t> const & bulk_contains(value_range_t && values,
+                                                             size_t const threshold) && noexcept = delete;
     //!\}
 };
 
@@ -415,7 +418,7 @@ private:
                     bulk_count_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
                 sum = 0u;
             }
-            else if (bin + 1u == result.size() || // last bin
+            else if (bin + 1u == result.size() ||                                                    // last bin
                      current_filename_index != hibf_ptr->user_bins.filename_index(ibf_idx, bin + 1)) // end of split bin
             {
                 if (sum >= threshold)
@@ -429,19 +432,20 @@ public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    counting_agent_type() = default; //!< Defaulted.
-    counting_agent_type(counting_agent_type const &) = default; //!< Defaulted.
+    counting_agent_type() = default;                                        //!< Defaulted.
+    counting_agent_type(counting_agent_type const &) = default;             //!< Defaulted.
     counting_agent_type & operator=(counting_agent_type const &) = default; //!< Defaulted.
-    counting_agent_type(counting_agent_type &&) = default; //!< Defaulted.
-    counting_agent_type & operator=(counting_agent_type &&) = default; //!< Defaulted.
-    ~counting_agent_type() = default; //!< Defaulted.
+    counting_agent_type(counting_agent_type &&) = default;                  //!< Defaulted.
+    counting_agent_type & operator=(counting_agent_type &&) = default;      //!< Defaulted.
+    ~counting_agent_type() = default;                                       //!< Defaulted.
 
     /*!\brief Construct a counting_agent_type for an existing hierarchical_interleaved_bloom_filter.
      * \private
      * \param hibf The hierarchical_interleaved_bloom_filter.
      */
     explicit counting_agent_type(hibf_t const & hibf) :
-        hibf_ptr(std::addressof(hibf)), result_buffer(hibf_ptr->user_bins.num_user_bins())
+        hibf_ptr(std::addressof(hibf)),
+        result_buffer(hibf_ptr->user_bins.num_user_bins())
     {}
     //!\}
 
@@ -468,7 +472,8 @@ public:
      * hibf::hierarchical_interleaved_bloom_filter::counting_agent_type for each thread.
      */
     template <std::ranges::forward_range value_range_t>
-    [[nodiscard]] seqan3::counting_vector<value_t> const & bulk_count(value_range_t && values, size_t const threshold = 1u) & noexcept
+    [[nodiscard]] seqan3::counting_vector<value_t> const & bulk_count(value_range_t && values,
+                                                                      size_t const threshold = 1u) & noexcept
     {
         assert(hibf_ptr != nullptr);
         assert(threshold > 0u);
@@ -488,7 +493,8 @@ public:
     // `bulk_count` cannot be called on a temporary, since the object the returned reference points to
     // is immediately destroyed.
     template <std::ranges::range value_range_t>
-    [[nodiscard]] seqan3::counting_vector<value_t> const & bulk_count(value_range_t && values, size_t const threshold = 1u) && noexcept = delete;
+    [[nodiscard]] seqan3::counting_vector<value_t> const & bulk_count(value_range_t && values,
+                                                                      size_t const threshold = 1u) && noexcept = delete;
     //!\}
 };
 #endif // RAPTOR_HIBF_HAS_COUNT

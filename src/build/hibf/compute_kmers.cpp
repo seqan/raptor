@@ -25,7 +25,7 @@ void compute_kmers(robin_hood::unordered_flat_set<size_t> & kmers,
         {
             std::ifstream infile{filename, std::ios::binary};
 
-            while(infile.read(reinterpret_cast<char*>(&minimiser_value), sizeof(minimiser_value)))
+            while (infile.read(reinterpret_cast<char *>(&minimiser_value), sizeof(minimiser_value)))
                 kmers.insert(minimiser_value);
         }
     }
@@ -34,9 +34,11 @@ void compute_kmers(robin_hood::unordered_flat_set<size_t> & kmers,
         using sequence_file_t = seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>>;
         for (auto const & filename : record.filenames)
             for (auto && [seq] : sequence_file_t{filename})
-                for (auto hash : seq | seqan3::views::minimiser_hash(arguments.shape,
-                                                                     seqan3::window_size{arguments.window_size},
-                                                                     seqan3::seed{adjust_seed(arguments.shape.count())}))
+                for (auto hash :
+                     seq
+                         | seqan3::views::minimiser_hash(arguments.shape,
+                                                         seqan3::window_size{arguments.window_size},
+                                                         seqan3::seed{adjust_seed(arguments.shape.count())}))
                     kmers.insert(hash);
     }
 }

@@ -19,10 +19,8 @@ void search_hibf(search_arguments const & arguments)
     search_single(arguments, std::move(index));
 }
 
-template
-void search_hibf<false>(search_arguments const & arguments);
+template void search_hibf<false>(search_arguments const & arguments);
 
-template
-void search_hibf<true>(search_arguments const & arguments);
+template void search_hibf<true>(search_arguments const & arguments);
 
 } // namespace raptor

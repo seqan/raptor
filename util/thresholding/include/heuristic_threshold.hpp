@@ -35,7 +35,8 @@ struct heuristic_threshold
     ~heuristic_threshold() = default;
 
     heuristic_threshold(minimizer const & mini) :
-        minimizer_begin{mini.minimizer_begin}, minimizer_end{mini.minimizer_end}
+        minimizer_begin{mini.minimizer_begin},
+        minimizer_end{mini.minimizer_end}
     {}
 
     inline void compute_coverage()
@@ -44,17 +45,20 @@ struct heuristic_threshold
         uint64_t end_pos{0};
 
         auto unique_minimizer_end = minimizer_end;
-        unique_minimizer_end.erase(unique(unique_minimizer_end.begin(), unique_minimizer_end.end()), unique_minimizer_end.end());
+        unique_minimizer_end.erase(unique(unique_minimizer_end.begin(), unique_minimizer_end.end()),
+                                   unique_minimizer_end.end());
 
         auto unique_minimizer_begin = minimizer_begin;
-        unique_minimizer_begin.erase(unique(unique_minimizer_begin.begin(), unique_minimizer_begin.end()), unique_minimizer_begin.end());
+        unique_minimizer_begin.erase(unique(unique_minimizer_begin.begin(), unique_minimizer_begin.end()),
+                                     unique_minimizer_begin.end());
 
         coverage_begin.push_back(unique_minimizer_begin[0]);
         coverage.push_back(1);
 
         while ((begin_pos < unique_minimizer_begin.size()) || (end_pos < unique_minimizer_end.size()))
         {
-            uint64_t begin = begin_pos < unique_minimizer_begin.size() ? unique_minimizer_begin[begin_pos] : 0xFFFFFFFFFFFFFFFFULL;
+            uint64_t begin =
+                begin_pos < unique_minimizer_begin.size() ? unique_minimizer_begin[begin_pos] : 0xFFFFFFFFFFFFFFFFULL;
             uint64_t end = unique_minimizer_end[end_pos];
             // Overlap
             if (begin < end)

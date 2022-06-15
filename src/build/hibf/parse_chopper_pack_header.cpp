@@ -5,11 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <lemon/list_graph.h> /// Must be first include.
-
 #include <algorithm>
 #include <cassert>
 #include <seqan3/std/charconv>
+
+#include <lemon/list_graph.h> /// Must be first include.
 
 #include <chopper/prefixes.hpp>
 
@@ -23,7 +23,7 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
                                  lemon::ListDigraph::NodeMap<node_data> & node_map,
                                  std::istream & chopper_pack_file)
 {
-    auto parse_bin_indices = [] (std::string_view const & buffer)
+    auto parse_bin_indices = [](std::string_view const & buffer)
     {
         std::vector<size_t> result;
 
@@ -42,7 +42,7 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
         return result;
     }; // GCOVR_EXCL_LINE
 
-    auto parse_first_bin = [] (std::string_view const & buffer)
+    auto parse_first_bin = [](std::string_view const & buffer)
     {
         size_t tmp{};
         std::from_chars(&buffer[0], &buffer[0] + buffer.size(), tmp);
@@ -51,12 +51,12 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
 
     std::string line;
 
-    while (std::getline(chopper_pack_file, line) &&
-           line.size() >= 2 &&
-           std::string_view{line}.substr(0, 1) == chopper::prefix::header &&
-           std::string_view{line}.substr(1, 1) == chopper::prefix::header_config); // skip config in header
+    while (std::getline(chopper_pack_file, line) && line.size() >= 2
+           && std::string_view{line}.substr(0, 1) == chopper::prefix::header
+           && std::string_view{line}.substr(1, 1) == chopper::prefix::header_config)
+        ; // skip config in header
 
-    assert(line[0] == '#'); // we are reading header lines
+    assert(line[0] == '#');                                    // we are reading header lines
     assert(line.substr(1, hibf_prefix.size()) == hibf_prefix); // first line should always be High level IBF
 
     // parse High Level max bin index
@@ -85,7 +85,11 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
     }
 
     // sort records ascending by the number of bin indices (corresponds to the IBF levels)
-    std::ranges::sort(header_records, [] (auto const & r, auto const & l) { return r.first.size() < l.first.size(); });
+    std::ranges::sort(header_records,
+                      [](auto const & r, auto const & l)
+                      {
+                          return r.first.size() < l.first.size();
+                      });
 
     for (auto const & [bin_indices, max_id] : header_records)
     {

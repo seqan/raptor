@@ -52,7 +52,7 @@ void init_parser(seqan3::argument_parser & parser, config & cfg)
 
 size_t bin_size_in_bits(config const & cfg, size_t const elements)
 {
-    double const numerator{- static_cast<double>(elements * cfg.hash)};
+    double const numerator{-static_cast<double>(elements * cfg.hash)};
     double const denominator{std::log(1.0 - std::exp(std::log(cfg.fpr) / cfg.hash))};
     double const result{std::ceil(numerator / denominator)};
     return result;
@@ -72,19 +72,14 @@ double compute_fp_correction(config const & cfg)
 
 void print_results(size_t const fp_count, size_t const all_kmers, size_t const elements)
 {
-    std::cout << "fp_count: "
-              << fp_count
-              << '\n'
-              << "fp_rate: "
-              << std::fixed
-              << std::setprecision(3)
-              << static_cast<double>(fp_count) / (all_kmers - elements)
-              << '\n';
+    std::cout << "fp_count: " << fp_count << '\n'
+              << "fp_rate: " << std::fixed << std::setprecision(3)
+              << static_cast<double>(fp_count) / (all_kmers - elements) << '\n';
 }
 
 void single_tb(config const & cfg)
 {
-    size_t const all_kmers{1ULL<<cfg.kmer_size};
+    size_t const all_kmers{1ULL << cfg.kmer_size};
     seqan3::interleaved_bloom_filter ibf{seqan3::bin_count{1u}, seqan3::bin_size{bin_size_in_bits(cfg)}};
     auto agent = ibf.membership_agent();
     robin_hood::unordered_set<uint64_t> inserted_values{};
@@ -113,10 +108,9 @@ void single_tb(config const & cfg)
 
 void multiple_tb(config const & cfg, size_t const bin_size)
 {
-    size_t const all_kmers{1ULL<<cfg.kmer_size};
+    size_t const all_kmers{1ULL << cfg.kmer_size};
     size_t const elements_per_bin{(cfg.elements + cfg.splits - 1) / cfg.splits}; // ceil for positive integers
-    seqan3::interleaved_bloom_filter ibf{seqan3::bin_count{cfg.splits},
-                                         seqan3::bin_size{bin_size}};
+    seqan3::interleaved_bloom_filter ibf{seqan3::bin_count{cfg.splits}, seqan3::bin_size{bin_size}};
     auto agent = ibf.membership_agent();
     robin_hood::unordered_set<uint64_t> all_values{};
     std::vector<robin_hood::unordered_set<uint64_t>> inserted_values(cfg.splits, robin_hood::unordered_set<uint64_t>{});
