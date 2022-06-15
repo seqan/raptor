@@ -6,7 +6,7 @@
 // -----------------------------------------------------------------------------------------------------
 
 #include <seqan3/std/charconv>
-#include <seqan3/std/ranges>
+#include <ranges>
 
 #include <raptor/build/hibf/parse_chopper_pack_line.hpp>
 

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <seqan3/std/ranges>
+#include <ranges>
 
 #include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
 
