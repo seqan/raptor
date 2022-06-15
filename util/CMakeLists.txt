@@ -107,4 +107,7 @@ target_link_libraries ("apply_taxsbp" "common")
 add_executable ("generate_reads_refseq" src/applications/generate_reads_refseq.cpp)
 target_link_libraries ("generate_reads_refseq" "common")
 
+add_executable ("ibf_fpr" src/applications/ibf_fpr.cpp)
+target_link_libraries ("ibf_fpr" "common")
+
 message (STATUS "${FontBold}You can run `make install` to build the application.${FontReset}")
