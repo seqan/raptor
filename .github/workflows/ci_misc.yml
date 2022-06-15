@@ -82,7 +82,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: raptor
           fetch-depth: 2
@@ -115,7 +115,7 @@ jobs:
 
       - name: Load ccache
         if: matrix.requires_ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ matrix.name }}-ccache-${{ github.ref }}-${{ github.run_number }}
@@ -139,7 +139,7 @@ jobs:
           mkdir build
           cd build
           cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                          -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
+                          -DCMAKE_CXX_FLAGS="-Werror ${{ matrix.cxx_flags }} -Wno-interference-size" \
                           -DRAPTOR_NATIVE_BUILD=OFF \
                           -DRAPTOR_HEADER_TEST_ONLY=${{ matrix.build == 'header' && 'ON' || 'OFF'}}
 

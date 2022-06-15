@@ -28,19 +28,27 @@ jobs:
       fail-fast: true
       matrix:
         include:
+          - name: "gcc12"
+            cxx: "g++-12"
+            cc: "gcc-12"
+            build_type: Release
+            cxx_flags: "-std=c++23"
+
           - name: "gcc11"
             cxx: "g++-11"
             cc: "gcc-11"
             build_type: Release
+            cxx_flags: "-std=c++23"
 
           - name: "gcc10"
             cxx: "g++-10"
             cc: "gcc-10"
             build_type: Release
+            cxx_flags: "-std=c++20"
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: raptor
           fetch-depth: 2
@@ -59,7 +67,7 @@ jobs:
         run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_via_brew.sh gcc $(echo "${{ matrix.cxx }}" | sed "s/g++-//g")
 
       - name: Load ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.ref }}-${{ github.run_number }}
@@ -82,7 +90,7 @@ jobs:
           mkdir build
           cd build
           cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                          -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
+                          -DCMAKE_CXX_FLAGS="-Werror ${{ matrix.cxx_flags }} -Wno-interference-size" \
                           -DRAPTOR_NATIVE_BUILD=OFF
 
       - name: Build tests
