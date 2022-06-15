@@ -27,11 +27,11 @@ void create_ibfs_from_chopper_pack(build_data<data_layout_mode> & data, build_ar
     hierarchical_build(root_kmers, root, data, arguments, true);
 }
 
-template
-void create_ibfs_from_chopper_pack<seqan3::data_layout::uncompressed>(build_data<seqan3::data_layout::uncompressed> &,
-                                                                      build_arguments const &);
-template
-void create_ibfs_from_chopper_pack<seqan3::data_layout::compressed>(build_data<seqan3::data_layout::compressed> &,
-                                                                    build_arguments const & arguments);
+template void
+create_ibfs_from_chopper_pack<seqan3::data_layout::uncompressed>(build_data<seqan3::data_layout::uncompressed> &,
+                                                                 build_arguments const &);
+template void
+create_ibfs_from_chopper_pack<seqan3::data_layout::compressed>(build_data<seqan3::data_layout::compressed> &,
+                                                               build_arguments const & arguments);
 
 } // namespace raptor::hibf

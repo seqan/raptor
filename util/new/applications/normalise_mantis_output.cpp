@@ -76,8 +76,7 @@ public:
     thresholder & operator=(thresholder &&) = default;
     ~thresholder() = default;
 
-    explicit thresholder(config const & cfg) :
-        percentage(cfg.percentage)
+    explicit thresholder(config const & cfg) : percentage(cfg.percentage)
     {}
 
     [[nodiscard]] constexpr size_t get(size_t const kmer_count) const noexcept
@@ -108,7 +107,7 @@ void normalise_output(config const & cfg)
     std::ifstream mantis_result_in{cfg.mantis_result_file};
     std::ofstream mantis_result_out{cfg.output_file};
     thresholder const threshold{cfg}; // Helper for computing the threshold.
-    size_t mantis_threshold{}; // Needs to be set for each query.
+    size_t mantis_threshold{};        // Needs to be set for each query.
     size_t current_query_number{};
     std::vector<uint64_t> results;
 
@@ -129,14 +128,14 @@ void normalise_output(config const & cfg)
     // [...]/GCF_016128175.1_ASM1612817v1_genomic.squeakr       205
     // [...]/GCF_020162095.1_ASM2016209v1_genomic.squeakr       1
     // seq1    219
-    auto parse_user_bin_id = [&ub_name_buffer, &ub_name_to_id] (std::string const & line)
+    auto parse_user_bin_id = [&ub_name_buffer, &ub_name_to_id](std::string const & line)
     {
         ub_name_buffer.assign(line.begin() + line.find_last_of('/') + 1, // Skip absolute path
-                              line.begin() + line.find_last_of('.')); // Skip .squeakr extension
+                              line.begin() + line.find_last_of('.'));    // Skip .squeakr extension
         return ub_name_to_id.at(ub_name_buffer);
     };
 
-    auto parse_kmer_count = [] (std::string const & line)
+    auto parse_kmer_count = [](std::string const & line)
     {
         size_t result{};
         std::string_view const sv{line.begin() + line.find('\t') + 1, // Skip seqX
@@ -145,7 +144,7 @@ void normalise_output(config const & cfg)
         return result;
     };
 
-    auto process_results = [&results, &result_buffer, &mantis_result_out] ()
+    auto process_results = [&results, &result_buffer, &mantis_result_out]()
     {
         if (!results.empty())
         {

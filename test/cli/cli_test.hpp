@@ -18,22 +18,20 @@
 #include "shim.hpp"
 
 #ifndef RAPTOR_ASSERT_ZERO_EXIT
-#define RAPTOR_ASSERT_ZERO_EXIT(arg) ASSERT_EQ(arg.exit_code, 0) << "Command: " << arg.command
+#    define RAPTOR_ASSERT_ZERO_EXIT(arg) ASSERT_EQ(arg.exit_code, 0) << "Command: " << arg.command
 #endif
 #ifndef RAPTOR_ASSERT_FAIL_EXIT
-#define RAPTOR_ASSERT_FAIL_EXIT(arg) ASSERT_NE(arg.exit_code, 0) << "Command: " << arg.command
+#    define RAPTOR_ASSERT_FAIL_EXIT(arg) ASSERT_NE(arg.exit_code, 0) << "Command: " << arg.command
 #endif
 
 // Provides functions for CLI test implementation.
 struct cli_test : public ::testing::Test
 {
 private:
-
     // Holds the original work directory where Gtest has been started.
     std::filesystem::path original_workdir{};
 
 protected:
-
     // Result struct for captured streams and exit code.
     struct cli_test_result
     {
@@ -50,12 +48,12 @@ protected:
         cli_test_result result{};
 
         // Assemble the command string and disable version check.
-        result.command = [&command_items...] ()
+        result.command = [&command_items...]()
         {
             std::ostringstream command{};
             command << "SEQAN3_NO_VERSION_CHECK=1 " << BINDIR;
-            int a[] = {0, ((void)(command << command_items << ' '), 0) ... };
-            (void) a;
+            int a[] = {0, ((void)(command << command_items << ' '), 0)...};
+            (void)a;
             return command.str();
         }();
 
@@ -81,10 +79,8 @@ protected:
     {
         // Assemble the directory name.
         ::testing::TestInfo const * const info = ::testing::UnitTest::GetInstance()->current_test_info();
-        std::filesystem::path const test_dir{std::string{OUTPUTDIR} +
-                                             std::string{info->test_case_name()} +
-                                             std::string{"."} +
-                                             std::string{info->name()}};
+        std::filesystem::path const test_dir{std::string{OUTPUTDIR} + std::string{info->test_case_name()}
+                                             + std::string{"."} + std::string{info->name()}};
         try
         {
             std::filesystem::remove_all(test_dir);              // delete the directory if it exists
@@ -103,7 +99,7 @@ protected:
     {
         try
         {
-            std::filesystem::current_path(original_workdir);    // restore the original work dir
+            std::filesystem::current_path(original_workdir); // restore the original work dir
         }
         catch (std::exception const & exc)
         {
@@ -122,7 +118,8 @@ struct raptor_base : public cli_test
             no
         } value;
 
-        strong_bool(decltype(value) v) : value(v) {}
+        strong_bool(decltype(value) v) : value(v)
+        {}
 
         explicit operator bool() const
         {
@@ -137,32 +134,32 @@ struct raptor_base : public cli_test
 
     struct is_compressed : strong_bool
     {
-        using strong_bool::value;
         using strong_bool::strong_bool;
+        using strong_bool::value;
     };
 
     struct is_hibf : strong_bool
     {
-        using strong_bool::value;
         using strong_bool::strong_bool;
+        using strong_bool::value;
     };
 
     struct compare_extension : strong_bool
     {
-        using strong_bool::value;
         using strong_bool::strong_bool;
+        using strong_bool::value;
     };
 
     struct is_empty : strong_bool
     {
-        using strong_bool::value;
         using strong_bool::strong_bool;
+        using strong_bool::value;
     };
 
     struct is_preprocessed : strong_bool
     {
-        using strong_bool::value;
         using strong_bool::strong_bool;
+        using strong_bool::value;
     };
 
     static inline auto const get_repeated_bins(size_t const repetitions) noexcept
@@ -175,7 +172,9 @@ struct raptor_base : public cli_test
         return seqan3::views::repeat_n(vec_t{cli_test::data("bin1.fa"),
                                              cli_test::data("bin2.fa"),
                                              cli_test::data("bin3.fa"),
-                                             cli_test::data("bin4.fa")}, repetitions) | std::views::join;
+                                             cli_test::data("bin4.fa")},
+                                       repetitions)
+             | std::views::join;
     }
 
     static inline std::filesystem::path const ibf_path(size_t const number_of_repetitions,
@@ -283,10 +282,10 @@ struct raptor_base : public cli_test
                                      std::filesystem::path const & actual_result,
                                      compare_extension const compare_ext = compare_extension::yes)
     {
-        constexpr bool is_ibf = std::same_as<data_t, raptor::index_structure::ibf> ||
-                                std::same_as<data_t, raptor::index_structure::ibf_compressed>;
-        constexpr bool is_hibf = std::same_as<data_t, raptor::index_structure::hibf> ||
-                                 std::same_as<data_t, raptor::index_structure::hibf_compressed>;
+        constexpr bool is_ibf = std::same_as<data_t, raptor::index_structure::ibf>
+                             || std::same_as<data_t, raptor::index_structure::ibf_compressed>;
+        constexpr bool is_hibf = std::same_as<data_t, raptor::index_structure::hibf>
+                              || std::same_as<data_t, raptor::index_structure::hibf_compressed>;
 
         static_assert(is_ibf || is_hibf);
 
@@ -308,24 +307,24 @@ struct raptor_base : public cli_test
         EXPECT_EQ(expected_index.parts(), actual_index.parts());
         EXPECT_EQ(expected_index.compressed(), actual_index.compressed());
 
-        if constexpr(is_ibf)
+        if constexpr (is_ibf)
         {
-            auto const & expected_ibf{expected_index.ibf()}, actual_ibf{actual_index.ibf()};
+            auto const &expected_ibf{expected_index.ibf()}, actual_ibf{actual_index.ibf()};
             EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs<data_t::data_layout_mode>(expected_ibf, actual_ibf);
         }
         else
         {
-            auto const & expected_ibfs{expected_index.ibf().ibf_vector}, actual_ibfs{actual_index.ibf().ibf_vector};
+            auto const &expected_ibfs{expected_index.ibf().ibf_vector}, actual_ibfs{actual_index.ibf().ibf_vector};
             for (auto const & expected_ibf : expected_ibfs)
             {
                 ASSERT_TRUE(std::ranges::find(actual_ibfs, expected_ibf) != actual_ibfs.end());
             }
         }
 
-        auto const & all_expected_bins{expected_index.bin_path()}, all_actual_bins{actual_index.bin_path()};
+        auto const &all_expected_bins{expected_index.bin_path()}, all_actual_bins{actual_index.bin_path()};
         EXPECT_EQ(std::ranges::distance(all_expected_bins), std::ranges::distance(all_actual_bins));
 
-        if constexpr(is_ibf)
+        if constexpr (is_ibf)
         {
             for (auto const && [expected_list, actual_list] : seqan3::views::zip(all_expected_bins, all_actual_bins))
             {
@@ -343,17 +342,18 @@ struct raptor_base : public cli_test
         }
         else
         {
-            auto filenames = std::views::transform([compare_ext] (std::vector<std::string> const & filename_list)
-            {
-                std::vector<std::string> result{};
-                if (compare_ext)
-                    for (auto const & filename : filename_list)
-                        result.emplace_back(std::filesystem::path{filename}.filename().string());
-                else
-                    for (auto const & filename : filename_list)
-                        result.emplace_back(std::filesystem::path{filename}.stem().string());
-                return result;
-            });
+            auto filenames = std::views::transform(
+                [compare_ext](std::vector<std::string> const & filename_list)
+                {
+                    std::vector<std::string> result{};
+                    if (compare_ext)
+                        for (auto const & filename : filename_list)
+                            result.emplace_back(std::filesystem::path{filename}.filename().string());
+                    else
+                        for (auto const & filename : filename_list)
+                            result.emplace_back(std::filesystem::path{filename}.stem().string());
+                    return result;
+                });
 
             auto expected_filenames_view = all_expected_bins | filenames;
             auto actual_filenames_view = all_actual_bins | filenames;
@@ -396,7 +396,7 @@ struct raptor_base : public cli_test
         ASSERT_EQ(line, "#QUERY_NAME\tUSER_BINS");
 
         std::string const query_prefix{"query"};
-        for (char i : {'1','2','3'})
+        for (char i : {'1', '2', '3'})
         {
             EXPECT_TRUE(std::getline(search_result, line));
             EXPECT_EQ(line, query_prefix + i + '\t' + expected_hits);

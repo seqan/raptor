@@ -7,8 +7,10 @@
 
 #include "../cli_test.hpp"
 
-struct search_ibf_preprocessing : public raptor_base,
-                                  public testing::WithParamInterface<std::tuple<size_t, size_t, bool, size_t>> {};
+struct search_ibf_preprocessing :
+    public raptor_base,
+    public testing::WithParamInterface<std::tuple<size_t, size_t, bool, size_t>>
+{};
 
 TEST_P(search_ibf_preprocessing, pipeline)
 {
@@ -33,36 +35,45 @@ TEST_P(search_ibf_preprocessing, pipeline)
         file << '\n';
     }
 
-    cli_test_result const result1 = execute_app("raptor", "build",
-                                                          "--kmer 19",
-                                                          "--window ", std::to_string(window_size),
-                                                          "--compute-minimiser",
-                                                          "--disable-cutoffs",
-                                                          "--threads ", run_parallel ? "2" : "1",
-                                                          "--output precomputed_minimisers",
-                                                          "raptor_cli_test.txt");
+    cli_test_result const result1 = execute_app("raptor",
+                                                "build",
+                                                "--kmer 19",
+                                                "--window ",
+                                                std::to_string(window_size),
+                                                "--compute-minimiser",
+                                                "--disable-cutoffs",
+                                                "--threads ",
+                                                run_parallel ? "2" : "1",
+                                                "--output precomputed_minimisers",
+                                                "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result1);
 
-    cli_test_result const result2 = execute_app("raptor", "build",
-                                                          "--size 64k",
-                                                          "--threads ", run_parallel ? "2" : "1",
-                                                          "--output raptor.index",
-                                                          "raptor_cli_test.minimiser");
+    cli_test_result const result2 = execute_app("raptor",
+                                                "build",
+                                                "--size 64k",
+                                                "--threads ",
+                                                run_parallel ? "2" : "1",
+                                                "--output raptor.index",
+                                                "raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result2);
 
     compare_index(ibf_path(number_of_repeated_bins, window_size), "raptor.index", compare_extension::no);
 
-    cli_test_result const result3 = execute_app("raptor", "search",
-                                                          "--fpr 0.05",
-                                                          "--output search.out",
-                                                          "--error ", std::to_string(number_of_errors),
-                                                          "--p_max 0.4",
-                                                          "--index ", "raptor.index",
-                                                          "--query ", data("query.fq"));
+    cli_test_result const result3 = execute_app("raptor",
+                                                "search",
+                                                "--fpr 0.05",
+                                                "--output search.out",
+                                                "--error ",
+                                                std::to_string(number_of_errors),
+                                                "--p_max 0.4",
+                                                "--index ",
+                                                "raptor.index",
+                                                "--query ",
+                                                data("query.fq"));
     EXPECT_EQ(result3.out, std::string{});
     EXPECT_EQ(result3.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result3);
@@ -93,35 +104,44 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
         file << '\n';
     }
 
-    cli_test_result const result1 = execute_app("raptor", "build",
-                                                          "--kmer 19",
-                                                          "--window ", std::to_string(window_size),
-                                                          "--compute-minimiser",
-                                                          "--threads ", run_parallel ? "2" : "1",
-                                                          "--output precomputed_minimisers",
-                                                          "raptor_cli_test.txt");
+    cli_test_result const result1 = execute_app("raptor",
+                                                "build",
+                                                "--kmer 19",
+                                                "--window ",
+                                                std::to_string(window_size),
+                                                "--compute-minimiser",
+                                                "--threads ",
+                                                run_parallel ? "2" : "1",
+                                                "--output precomputed_minimisers",
+                                                "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result1);
 
-    cli_test_result const result2 = execute_app("raptor", "build",
-                                                          "--size 64k",
-                                                          "--threads ", run_parallel ? "2" : "1",
-                                                          "--output raptor.index",
-                                                          "raptor_cli_test.minimiser");
+    cli_test_result const result2 = execute_app("raptor",
+                                                "build",
+                                                "--size 64k",
+                                                "--threads ",
+                                                run_parallel ? "2" : "1",
+                                                "--output raptor.index",
+                                                "raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result2);
 
     compare_index(ibf_path(number_of_repeated_bins, window_size), "raptor.index", compare_extension::no);
 
-    cli_test_result const result3 = execute_app("raptor", "search",
-                                                          "--fpr 0.05",
-                                                          "--output search.out",
-                                                          "--error ", std::to_string(number_of_errors),
-                                                          "--p_max 0.4",
-                                                          "--index ", "raptor.index",
-                                                          "--query ", data("query.fq"));
+    cli_test_result const result3 = execute_app("raptor",
+                                                "search",
+                                                "--fpr 0.05",
+                                                "--output search.out",
+                                                "--error ",
+                                                std::to_string(number_of_errors),
+                                                "--p_max 0.4",
+                                                "--index ",
+                                                "raptor.index",
+                                                "--query ",
+                                                data("query.fq"));
     EXPECT_EQ(result3.out, std::string{});
     EXPECT_EQ(result3.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result3);
@@ -144,22 +164,24 @@ TEST_F(search_ibf_preprocessing, pipeline_compressed_index)
         file << '\n';
     }
 
-    cli_test_result const result1 = execute_app("raptor", "build",
-                                                          "--kmer 19",
-                                                          "--window 23",
-                                                          "--compute-minimiser",
-                                                          "--disable-cutoffs",
-                                                          "--output precomputed_minimisers",
-                                                          "raptor_cli_test.txt");
+    cli_test_result const result1 = execute_app("raptor",
+                                                "build",
+                                                "--kmer 19",
+                                                "--window 23",
+                                                "--compute-minimiser",
+                                                "--disable-cutoffs",
+                                                "--output precomputed_minimisers",
+                                                "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result1);
 
-    cli_test_result const result2 = execute_app("raptor", "build",
-                                                          "--size 64k",
-                                                          "--output raptor.index",
-                                                          "--compressed",
-                                                          "raptor_cli_test.minimiser");
+    cli_test_result const result2 = execute_app("raptor",
+                                                "build",
+                                                "--size 64k",
+                                                "--output raptor.index",
+                                                "--compressed",
+                                                "raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result2);
@@ -169,18 +191,17 @@ TEST_F(search_ibf_preprocessing, pipeline_compressed_index)
                                                            compare_extension::no);
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    search_ibf_preprocessing_suite,
-    search_ibf_preprocessing,
-    testing::Combine(testing::Values(0, 16, 32),
-                     testing::Values(19, 23),
-                     testing::Values(true, false),
-                     testing::Values(0, 1)),
-    [] (testing::TestParamInfo<search_ibf_preprocessing::ParamType> const & info)
-    {
-        std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_" +
-                        std::to_string(std::get<1>(info.param)) + "_window_" +
-                        (std::get<2>(info.param) ? "parallel" : "serial") +
-                        std::to_string(std::get<3>(info.param)) + "_error";
-        return name;
-    });
+INSTANTIATE_TEST_SUITE_P(search_ibf_preprocessing_suite,
+                         search_ibf_preprocessing,
+                         testing::Combine(testing::Values(0, 16, 32),
+                                          testing::Values(19, 23),
+                                          testing::Values(true, false),
+                                          testing::Values(0, 1)),
+                         [](testing::TestParamInfo<search_ibf_preprocessing::ParamType> const & info)
+                         {
+                             std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_"
+                                              + std::to_string(std::get<1>(info.param)) + "_window_"
+                                              + (std::get<2>(info.param) ? "parallel" : "serial")
+                                              + std::to_string(std::get<3>(info.param)) + "_error";
+                             return name;
+                         });

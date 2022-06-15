@@ -42,20 +42,24 @@ void build_from_files(build_arguments const & arguments)
         {
             // How long must the suffix be such that 4^suffix_length >= arguments.parts
             size_t suffix_length{0};
-            for (; 0b100 << (2 * suffix_length) < arguments.parts; ++suffix_length) {}
+            for (; 0b100 << (2 * suffix_length) < arguments.parts; ++suffix_length)
+            {}
             next_power_of_four = 0b100 << (2 * suffix_length);
 
             size_t const prefixes_per_part = next_power_of_four / arguments.parts;
 
             for (size_t i : std::views::iota(0u, next_power_of_four))
-                association[i/prefixes_per_part].push_back(i);
+                association[i / prefixes_per_part].push_back(i);
         }
 
         for (size_t part : std::views::iota(0u, arguments.parts))
         {
             size_t const mask{next_power_of_four - 1};
-            auto filter_view = std::views::filter([&] (auto && hash)
-                { return std::ranges::find(association[part], hash & mask) != association[part].end(); });
+            auto filter_view = std::views::filter(
+                [&](auto && hash)
+                {
+                    return std::ranges::find(association[part], hash & mask) != association[part].end();
+                });
 
             auto index = generator(std::move(filter_view));
             std::filesystem::path out_path{arguments.out_path};

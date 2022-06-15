@@ -17,17 +17,16 @@
 namespace raptor::hibf
 {
 
-
 // automatically does naive splitting if number_of_bins > 1
 void insert_into_ibf(robin_hood::unordered_flat_set<size_t> & parent_kmers,
-                            robin_hood::unordered_flat_set<size_t> const & kmers,
-                            size_t const number_of_bins,
-                            size_t const bin_index,
-                            seqan3::interleaved_bloom_filter<> & ibf,
-                            bool is_root);
+                     robin_hood::unordered_flat_set<size_t> const & kmers,
+                     size_t const number_of_bins,
+                     size_t const bin_index,
+                     seqan3::interleaved_bloom_filter<> & ibf,
+                     bool is_root);
 
 void insert_into_ibf(build_arguments const & arguments,
-                            chopper_pack_record const & record,
-                            seqan3::interleaved_bloom_filter<> & ibf);
+                     chopper_pack_record const & record,
+                     seqan3::interleaved_bloom_filter<> & ibf);
 
 } // namespace raptor::hibf

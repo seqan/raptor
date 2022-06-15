@@ -24,7 +24,7 @@ struct cmd_arguments
     // uint8_t min_errors{2u};
     uint8_t max_errors{2u};
     uint32_t read_length{100u};
-    uint32_t number_of_reads{1ULL<<20};
+    uint32_t number_of_reads{1ULL << 20};
     uint16_t number_of_haplotypes{16u};
 };
 
@@ -49,12 +49,12 @@ void run_program(cmd_arguments const & arguments)
 
         // Immediately invoked initialising lambda expession (IIILE).
         std::filesystem::path const out_file = [&]
-                                               {
-                                                   std::filesystem::path out_file = arguments.out_path;
-                                                   out_file /= bin_file.stem();
-                                                   out_file += ".fastq";
-                                                   return out_file;
-                                               }();
+        {
+            std::filesystem::path out_file = arguments.out_path;
+            out_file /= bin_file.stem();
+            out_file += ".fastq";
+            return out_file;
+        }();
 
         seqan3::sequence_file_input<my_traits, seqan3::fields<seqan3::field::seq>> fin{bin_file};
         seqan3::sequence_file_output fout{out_file};
@@ -66,7 +66,8 @@ void run_program(cmd_arguments const & arguments)
         {
             uint64_t const reference_length = std::ranges::size(seq);
             std::uniform_int_distribution<uint64_t> read_start_dis(0, reference_length - arguments.read_length);
-            for (uint32_t current_read_number = 0; current_read_number < reads_per_haplotype; ++current_read_number, ++read_counter)
+            for (uint32_t current_read_number = 0; current_read_number < reads_per_haplotype;
+                 ++current_read_number, ++read_counter)
             {
                 uint64_t const read_start_pos = read_start_dis(rng);
                 auto read_slice = seq | seqan3::views::slice(read_start_pos, read_start_pos + arguments.read_length);
@@ -88,7 +89,8 @@ void run_program(cmd_arguments const & arguments)
         }
 
         if (haplotype_counter != arguments.number_of_haplotypes)
-            std::cerr << "[WARNING] There are not enough / too many haplotypes in the file " << bin_file.string() << '\n'
+            std::cerr << "[WARNING] There are not enough / too many haplotypes in the file " << bin_file.string()
+                      << '\n'
                       << "[WARNING] Your total read count will be incorrect.\n"
                       << "[WARNING] Haplotypes in file: " << haplotype_counter << '\n'
                       << "[WARNING] Haplotypes expected: " << arguments.number_of_haplotypes << '\n';
@@ -115,22 +117,10 @@ void initialise_argument_parser(seqan3::argument_parser & parser, cmd_arguments 
     //                   '\0',
     //                   "min_errors",
     //                   "The minimum number of errors.");
-    parser.add_option(arguments.max_errors,
-                      '\0',
-                      "max_errors",
-                      "The maximum number of errors.");
-    parser.add_option(arguments.read_length,
-                      '\0',
-                      "read_length",
-                      "The read length.");
-    parser.add_option(arguments.number_of_reads,
-                      '\0',
-                      "number_of_reads",
-                      "The number of reads.");
-    parser.add_option(arguments.number_of_haplotypes,
-                      '\0',
-                      "number_of_haplotypes",
-                      "The number of haplotypes.");
+    parser.add_option(arguments.max_errors, '\0', "max_errors", "The maximum number of errors.");
+    parser.add_option(arguments.read_length, '\0', "read_length", "The read length.");
+    parser.add_option(arguments.number_of_reads, '\0', "number_of_reads", "The number of reads.");
+    parser.add_option(arguments.number_of_haplotypes, '\0', "number_of_haplotypes", "The number of haplotypes.");
 }
 
 int main(int argc, char ** argv)
@@ -140,7 +130,7 @@ int main(int argc, char ** argv)
     initialise_argument_parser(myparser, arguments);
     try
     {
-         myparser.parse();
+        myparser.parse();
     }
     catch (seqan3::argument_parser_error const & ext)
     {

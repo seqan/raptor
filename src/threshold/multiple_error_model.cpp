@@ -7,8 +7,8 @@
 
 #include <algorithm>
 
-#include <raptor/threshold/multiple_error_model.hpp>
 #include <raptor/threshold/logspace.hpp>
+#include <raptor/threshold/multiple_error_model.hpp>
 
 namespace raptor::threshold
 {

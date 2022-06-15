@@ -16,4 +16,3 @@ TEST(issue, 142)
     std::vector<double> const destroyed_by_error =
         raptor::threshold::one_indirect_error_model(15u, 6u, seqan3::ungapped{4u});
 }
-

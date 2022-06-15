@@ -82,12 +82,10 @@ void read_chopper_pack_file(build_data<data_layout_mode> & data, std::string con
     data.resize();
 }
 
-template
-void read_chopper_pack_file<seqan3::data_layout::uncompressed>(build_data<seqan3::data_layout::uncompressed> &,
-                                                               std::string const &);
+template void read_chopper_pack_file<seqan3::data_layout::uncompressed>(build_data<seqan3::data_layout::uncompressed> &,
+                                                                        std::string const &);
 
-template
-void read_chopper_pack_file<seqan3::data_layout::compressed>(build_data<seqan3::data_layout::compressed> &,
-                                                             std::string const &);
+template void read_chopper_pack_file<seqan3::data_layout::compressed>(build_data<seqan3::data_layout::compressed> &,
+                                                                      std::string const &);
 
 } // namespace raptor::hibf

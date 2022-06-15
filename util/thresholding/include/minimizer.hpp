@@ -13,12 +13,11 @@
 #pragma once
 
 #include <deque>
+#include <strong_types.hpp>
 
 #include <seqan3/alphabet/nucleotide/dna4.hpp>
 #include <seqan3/alphabet/views/complement.hpp>
 #include <seqan3/search/views/kmer_hash.hpp>
-
-#include <strong_types.hpp>
 
 struct minimizer
 {
@@ -40,9 +39,7 @@ private:
     //!\brief Stores the k-mer hashes of the reverse complement strand.
     std::vector<uint64_t> reverse_hashes;
 
-
 public:
-
     //!\brief Stores the hashes of the minimizers.
     std::vector<uint64_t> minimizer_hash;
     //!\brief Stores the begin positions of the minimizers.
@@ -50,20 +47,19 @@ public:
     //!\brief Stores the end positions of the minimizers.
     std::vector<uint64_t> minimizer_end;
 
-    minimizer() = default;                                        //!< Defaulted
-    minimizer(minimizer const &) = default;                       //!< Defaulted
-    minimizer(minimizer &&) = default;                            //!< Defaulted
-    minimizer & operator=(minimizer const &) = default;           //!< Defaulted
-    minimizer & operator=(minimizer &&) = default;                //!< Defaulted
-    ~minimizer() = default;                                       //!< Defaulted
+    minimizer() = default;                              //!< Defaulted
+    minimizer(minimizer const &) = default;             //!< Defaulted
+    minimizer(minimizer &&) = default;                  //!< Defaulted
+    minimizer & operator=(minimizer const &) = default; //!< Defaulted
+    minimizer & operator=(minimizer &&) = default;      //!< Defaulted
+    ~minimizer() = default;                             //!< Defaulted
 
     /*!\brief Constructs a minimizer from given k-mer, window size and a seed.
      * \param[in] w_    The window size.
      * \param[in] k_    The k-mer size.
      * \param[in] seed_ The seed to use. Default: 0x8F3F73B5CF1C9ADE.
      */
-    minimizer(window const w_, kmer const k_, uint64_t const seed_ = 0x8F3F73B5CF1C9ADE) :
-        w{w_.v}, k{k_.v}, seed{seed_}
+    minimizer(window const w_, kmer const k_, uint64_t const seed_ = 0x8F3F73B5CF1C9ADE) : w{w_.v}, k{k_.v}, seed{seed_}
     {}
 
     /*!\brief Resize the minimizer.
@@ -108,9 +104,8 @@ public:
         assert(w >= k);
         uint64_t kmers_per_window = w - k + 1u;
 
-
         // Helper lambda for xor'ing values depending on `do_xor`.
-        auto apply_xor = [this] (uint64_t const val)
+        auto apply_xor = [this](uint64_t const val)
         {
             return val ^ seed;
         };
@@ -143,7 +138,6 @@ public:
         minimizer_hash.push_back(std::get<0>(*min));
         minimizer_begin.push_back(std::get<1>(*min));
         minimizer_end.push_back(std::get<2>(*min));
-
 
         // For the following windows, we remove the first window k-mer (is now not in window) and add the new k-mer
         // that results from the window shifting
@@ -204,9 +198,8 @@ public:
         assert(w >= k);
         uint64_t kmers_per_window = w - k + 1u;
 
-
         // Helper lambda for xor'ing values depending on `do_xor`.
-        auto apply_xor = [this] (uint64_t const val)
+        auto apply_xor = [this](uint64_t const val)
         {
             return val ^ seed;
         };
@@ -267,5 +260,4 @@ public:
         }
         return;
     }
-
 };

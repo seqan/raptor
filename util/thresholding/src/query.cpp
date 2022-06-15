@@ -13,8 +13,10 @@
 #include <chrono>
 #include <filesystem>
 #include <numeric>
-#include <unordered_set>
 #include <set>
+#include <unordered_set>
+
+#include <cereal/types/vector.hpp>
 
 #include <seqan3/argument_parser/all.hpp>
 #include <seqan3/core/concept/cereal.hpp>
@@ -22,11 +24,11 @@
 #include <seqan3/io/sequence_file/input.hpp>
 #include <seqan3/io/views/async_input_buffer.hpp>
 
-#include <cereal/types/vector.hpp>
-
+// clang-format off
 #include <heuristic_threshold.hpp>
 #include <lemma_threshold.hpp>
 #include <minimizer_model.hpp>
+// clang-format on
 
 struct my_traits : seqan3::sequence_file_input_default_traits_dna
 {
@@ -58,11 +60,10 @@ struct threshold_result
 
 void do_cerealisation_out(std::vector<size_t> const & vec, cmd_arguments const & args, threshold_result const & result)
 {
-    std::filesystem::path filename = args.output_directory / ("binary_" + result.method +
-                                                              "_w" + std::to_string(args.window_size) +
-                                                              "_k" + std::to_string(args.kmer_size) +
-                                                              "_e" + std::to_string(args.errors) +
-                                                              "_tau" + std::to_string(args.tau));
+    std::filesystem::path filename =
+        args.output_directory
+        / ("binary_" + result.method + "_w" + std::to_string(args.window_size) + "_k" + std::to_string(args.kmer_size)
+           + "_e" + std::to_string(args.errors) + "_tau" + std::to_string(args.tau));
     std::ofstream os{filename, std::ios::binary};
     cereal::BinaryOutputArchive oarchive{os};
     oarchive(vec);
@@ -70,11 +71,10 @@ void do_cerealisation_out(std::vector<size_t> const & vec, cmd_arguments const &
 
 void do_cerealisation_in(std::vector<size_t> & vec, cmd_arguments const & args, threshold_result const & result)
 {
-    std::filesystem::path filename = args.output_directory / ("binary_" + result.method +
-                                                              "_w" + std::to_string(args.window_size) +
-                                                              "_k" + std::to_string(args.kmer_size) +
-                                                              "_e" + std::to_string(args.errors) +
-                                                              "_tau" + std::to_string(args.tau));
+    std::filesystem::path filename =
+        args.output_directory
+        / ("binary_" + result.method + "_w" + std::to_string(args.window_size) + "_k" + std::to_string(args.kmer_size)
+           + "_e" + std::to_string(args.errors) + "_tau" + std::to_string(args.tau));
     std::ifstream is{filename, std::ios::binary};
     cereal::BinaryInputArchive iarchive{is};
     iarchive(vec);
@@ -106,9 +106,10 @@ void print_results(threshold_result const & result)
                              << '\n';
         seqan3::debug_stream << "Average threshold: "
                              << static_cast<double>(std::accumulate(result.threshold_per_read.begin(),
-                                                                    result.threshold_per_read.end(), 0))
-                                / result.threshold_per_read.size()
-                            << '\n';
+                                                                    result.threshold_per_read.end(),
+                                                                    0))
+                                    / result.threshold_per_read.size()
+                             << '\n';
     }
     seqan3::debug_stream << "Hits: " << result.number_of_hits << '\n';
     seqan3::debug_stream << "Precompute time: " << result.precompute_time.count() << '\n';
@@ -116,15 +117,12 @@ void print_results(threshold_result const & result)
     // seqan3::debug_stream << '\n';
 }
 
-void write_results(cmd_arguments const & args,
-                   threshold_result const & result)
+void write_results(cmd_arguments const & args, threshold_result const & result)
 {
-    std::filesystem::path out_file = args.output_directory / ("result_" + result.method +
-                                                              "_w" + std::to_string(args.window_size) +
-                                                              "_k" + std::to_string(args.kmer_size) +
-                                                              "_e" + std::to_string(args.errors) +
-                                                              "_tau" + std::to_string(args.tau) +
-                                                              ".csv");
+    std::filesystem::path out_file =
+        args.output_directory
+        / ("result_" + result.method + "_w" + std::to_string(args.window_size) + "_k" + std::to_string(args.kmer_size)
+           + "_e" + std::to_string(args.errors) + "_tau" + std::to_string(args.tau) + ".csv");
 
     std::ofstream out{out_file};
     if (!out.is_open())
@@ -141,11 +139,10 @@ void write_results(cmd_arguments const & args,
     }
     else
     {
-        out << *std::min_element(result.threshold_per_read.begin(), result.threshold_per_read.end())
-            << ','
-            << (static_cast<double>(std::accumulate(result.threshold_per_read.begin(),
-                                    result.threshold_per_read.end(), 0))
-               / result.threshold_per_read.size())
+        out << *std::min_element(result.threshold_per_read.begin(), result.threshold_per_read.end()) << ','
+            << (static_cast<double>(
+                    std::accumulate(result.threshold_per_read.begin(), result.threshold_per_read.end(), 0))
+                / result.threshold_per_read.size())
             << ',';
     }
 
@@ -218,17 +215,13 @@ void compute_lemma_threshold(cmd_arguments const & args)
     write_results(args, result);
 }
 
-void compute_simple_model(cmd_arguments const & args,
-                          bool const indirect,
-                          bool const overlapping)
+void compute_simple_model(cmd_arguments const & args, bool const indirect, bool const overlapping)
 {
     minimizer mini{window{args.window_size}, kmer{args.kmer_size}};
     std::unordered_set<uint64_t> reference_hashes = hash_reference(mini, args.reference_file);
     threshold_result result;
-    result.method = (indirect && overlapping ? "indirect_overlapping" :
-                    (indirect ? "indirect" :
-                    (overlapping ? "overlapping" :
-                    "simple")));
+    result.method = (indirect && overlapping ? "indirect_overlapping"
+                                             : (indirect ? "indirect" : (overlapping ? "overlapping" : "simple")));
 
     std::vector<uint64_t> threshold_per_count(args.pattern_size, 0);
     size_t kmers_per_window = args.window_size - args.kmer_size + 1;
@@ -271,8 +264,9 @@ void compute_simple_model(cmd_arguments const & args,
         uint64_t count = mini.minimizer_hash.size();
 
         auto start = std::chrono::high_resolution_clock::now();
-        size_t index = std::min(mini.minimizer_hash.size() < minimal_number_of_minimizers ? 0 :
-                                    mini.minimizer_hash.size() - minimal_number_of_minimizers,
+        size_t index = std::min(mini.minimizer_hash.size() < minimal_number_of_minimizers
+                                    ? 0
+                                    : mini.minimizer_hash.size() - minimal_number_of_minimizers,
                                 maximal_number_of_minimizers - minimal_number_of_minimizers);
         auto threshold = precomp_thresholds[index];
         auto end = std::chrono::high_resolution_clock::now();
@@ -294,27 +288,67 @@ void initialize_argument_parser(seqan3::argument_parser & parser, cmd_arguments 
     parser.info.short_description = "This programs computes minimizer thresholds using different approaches.";
     parser.info.version = "1.0.0";
 
-    parser.add_option(args.reference_file, 'r', "reference", "Provide a reference file.", seqan3::option_spec::required,
+    parser.add_option(args.reference_file,
+                      'r',
+                      "reference",
+                      "Provide a reference file.",
+                      seqan3::option_spec::required,
                       seqan3::input_file_validator<seqan3::sequence_file_input<>>{});
-    parser.add_option(args.query_file, 'q', "query", "Provide a query file.", seqan3::option_spec::required,
+    parser.add_option(args.query_file,
+                      'q',
+                      "query",
+                      "Provide a query file.",
+                      seqan3::option_spec::required,
                       seqan3::input_file_validator<seqan3::sequence_file_input<>>{});
-    parser.add_option(args.output_directory, 'o', "out", "", seqan3::option_spec::required,
+    parser.add_option(args.output_directory,
+                      'o',
+                      "out",
+                      "",
+                      seqan3::option_spec::required,
                       seqan3::output_directory_validator{});
-    parser.add_option(args.window_size, 'w', "window", "Choose the window size.", seqan3::option_spec::standard,
+    parser.add_option(args.window_size,
+                      'w',
+                      "window",
+                      "Choose the window size.",
+                      seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{1, 1000});
-    parser.add_option(args.kmer_size, 'k', "kmer", "Choose the kmer size.", seqan3::option_spec::standard,
+    parser.add_option(args.kmer_size,
+                      'k',
+                      "kmer",
+                      "Choose the kmer size.",
+                      seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{1, 32});
-    parser.add_option(args.errors, 'e', "error", "Choose the number of errors.", seqan3::option_spec::standard,
+    parser.add_option(args.errors,
+                      'e',
+                      "error",
+                      "Choose the number of errors.",
+                      seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{0, 5});
-    parser.add_option(args.tau, 't', "tau", "Threshold for probabilistic models.", seqan3::option_spec::standard,
+    parser.add_option(args.tau,
+                      't',
+                      "tau",
+                      "Threshold for probabilistic models.",
+                      seqan3::option_spec::standard,
                       seqan3::arithmetic_range_validator{0, 1});
-    parser.add_option(args.pattern_size, 'p', "pattern", "Choose the pattern size. Only needed for methods other than "
+    parser.add_option(args.pattern_size,
+                      'p',
+                      "pattern",
+                      "Choose the pattern size. Only needed for methods other than "
                       "heuristic or lemma. Default: Use median of sequence lengths in query file.");
-    parser.add_option(args.method, 'm', "method", "Choose the methods to compute the trheshold.",
-                      seqan3::option_spec::required, seqan3::value_list_validator{"heuristic", "lemma", "simple",
-                      "indirect", "overlap", "indirect-overlap", "all"});
-    parser.add_flag(args.from_file, 'f', "from_file", "Load precomputed threshold from disk. Program must have "
-                      "been run without this flag before.");
+    // clang-format off
+    parser.add_option(args.method,
+                      'm',
+                      "method",
+                      "Choose the methods to compute the trheshold.",
+                      seqan3::option_spec::required,
+                      seqan3::value_list_validator{"heuristic", "lemma", "simple", "indirect", "overlap",
+                                                   "indirect-overlap", "all"});
+    // clang-format on
+    parser.add_flag(args.from_file,
+                    'f',
+                    "from_file",
+                    "Load precomputed threshold from disk. Program must have "
+                    "been run without this flag before.");
 }
 
 int main(int argc, char ** argv)
@@ -326,7 +360,7 @@ int main(int argc, char ** argv)
 
     try
     {
-         myparser.parse();
+        myparser.parse();
     }
     catch (seqan3::argument_parser_error const & ext)
     {
@@ -343,7 +377,7 @@ int main(int argc, char ** argv)
             sequence_lengths.push_back(std::ranges::size(seq));
         }
         std::sort(sequence_lengths.begin(), sequence_lengths.end());
-        args.pattern_size = sequence_lengths[sequence_lengths.size()/2];
+        args.pattern_size = sequence_lengths[sequence_lengths.size() / 2];
     }
 
     bool all = std::find(args.method.begin(), args.method.end(), "all") != args.method.end();

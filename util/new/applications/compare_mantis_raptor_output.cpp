@@ -7,11 +7,11 @@
 
 #include <cassert>
 #include <charconv>
-#include <iostream>
 #include <fstream>
-#include <unordered_map>
+#include <iostream>
 #include <ranges>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <seqan3/argument_parser/argument_parser.hpp>
@@ -101,7 +101,7 @@ void compare_results(config const & cfg)
 
 #if 1
     std::string query_name_buffer{};
-    auto parse_original_bin = [&query_name_buffer, &ub_name_to_id] (std::string_view const & line)
+    auto parse_original_bin = [&query_name_buffer, &ub_name_to_id](std::string_view const & line)
     {
         // E.g., "GCF_000005825.2_ASM582v2_genomic106". 106 is the read number.
         // find() returns an iterator to the 'g' of "genomic". `+7` moves the iterator to '1', which is the end
@@ -113,7 +113,8 @@ void compare_results(config const & cfg)
     std::array<char, 24> read_id_buffer;
     std::string query_name_buffer{};
     constexpr std::string_view bin_prefix{"bin_"};
-    auto parse_original_bin = [&read_id_buffer, &query_name_buffer, &ub_name_to_id, &bin_prefix] (std::string_view const & line)
+    auto parse_original_bin =
+        [&read_id_buffer, &query_name_buffer, &ub_name_to_id, &bin_prefix](std::string_view const & line)
     {
         // E.g., "GCF_000005825.2_ASM582v2_genomic106". 106 is the read number.
         // find() returns an iterator to the 'g' of "genomic". `+7` moves the iterator to '1', which is the end
@@ -123,7 +124,7 @@ void compare_results(config const & cfg)
         result &= 0b1111'1111'1111'1111'1111;
         result >>= 4u;
         auto [ptr, ec] = std::to_chars(read_id_buffer.data(), read_id_buffer.data() + read_id_buffer.size(), result);
-        (void) ec;
+        (void)ec;
         query_name_buffer.assign(bin_prefix);
         std::string_view const read_id{read_id_buffer.data(), ptr};
         query_name_buffer.append(std::string(5u - read_id.size(), '0'));
@@ -131,7 +132,7 @@ void compare_results(config const & cfg)
         return ub_name_to_id.at(query_name_buffer);
     };
 #endif
-    auto parse_query_name = [&mantis_line, &raptor_line] (auto const & mantis_tab_it, auto const & raptor_tab_it)
+    auto parse_query_name = [&mantis_line, &raptor_line](auto const & mantis_tab_it, auto const & raptor_tab_it)
     {
         std::string_view const mantis_query_name{mantis_line.begin(), mantis_tab_it};
         std::string_view const raptor_query_name{raptor_line.begin(), raptor_tab_it};
@@ -188,10 +189,10 @@ void compare_results(config const & cfg)
             }
             else
             {
-                 ++mantis_hit_count;
-                 ++raptor_hit_count;
-                 ++mantis_it;
-                 ++raptor_it;
+                ++mantis_hit_count;
+                ++raptor_hit_count;
+                ++mantis_it;
+                ++raptor_it;
             }
         }
 
@@ -221,16 +222,16 @@ void compare_results(config const & cfg)
         {
             ++mantis_miss;
             missing_ground_truths_file << "Line " << line_no << ": "
-                                       << "Could not find query " << query_name << ' '
-                                       << '(' << query_name_buffer << ':' << original_bin << ") "
+                                       << "Could not find query " << query_name << ' ' << '(' << query_name_buffer
+                                       << ':' << original_bin << ") "
                                        << "in its respective genome in mantis.\n";
         }
         if (!raptor_found_correct_bin)
         {
             ++raptor_miss;
             missing_ground_truths_file << "Line " << line_no << ": "
-                                       << "Could not find query " << query_name << ' '
-                                       << '(' << query_name_buffer << ':' << original_bin << ") "
+                                       << "Could not find query " << query_name << ' ' << '(' << query_name_buffer
+                                       << ':' << original_bin << ") "
                                        << "in its respective genome in raptor.\n";
         }
 
@@ -256,26 +257,18 @@ void compare_results(config const & cfg)
     stats_file << "Raptor FN:   \t" << false_negatives << '\n';
 
     if (missing_lines)
-        std::cout << "[WARNING] Somes lines were missing. See "
-                  << (cfg.output_directory / "missing_lines.warn")
+        std::cout << "[WARNING] Somes lines were missing. See " << (cfg.output_directory / "missing_lines.warn")
                   << '\n';
 
     if (mantis_miss || raptor_miss)
         std::cout << "[Info] Missing ground truths are listed in "
-                  << (cfg.output_directory / "missing_ground_truth.warn")
-                  << '\n';
+                  << (cfg.output_directory / "missing_ground_truth.warn") << '\n';
 
-    std::cout << "[Info] False positives: "
-              << (cfg.output_directory / "raptor.fps")
-              << '\n';
+    std::cout << "[Info] False positives: " << (cfg.output_directory / "raptor.fps") << '\n';
 
-    std::cout << "[Info] False negatives: "
-              << (cfg.output_directory / "raptor.fns")
-              << '\n';
+    std::cout << "[Info] False negatives: " << (cfg.output_directory / "raptor.fns") << '\n';
 
-    std::cout << "[Info] Statistics: "
-              << (cfg.output_directory / "stats.tsv")
-              << '\n';
+    std::cout << "[Info] Statistics: " << (cfg.output_directory / "stats.tsv") << '\n';
 
     std::cout << "[Info] Content of stats.tsv:\n"
               << "       Mantis total:\t" << mantis_hit_count << '\n'

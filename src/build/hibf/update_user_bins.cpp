@@ -39,5 +39,4 @@ template void update_user_bins<seqan3::data_layout::compressed>(build_data<seqan
                                                                 std::vector<int64_t> &,
                                                                 chopper_pack_record const &);
 
-
 } // namespace raptor::hibf

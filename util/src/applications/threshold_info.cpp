@@ -17,9 +17,9 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 #include <seqan3/utility/views/chunk.hpp>
 
+#include <raptor/adjust_seed.hpp>
 #include <raptor/argument_parsing/search_arguments.hpp>
 #include <raptor/argument_parsing/validators.hpp>
-#include <raptor/adjust_seed.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/search/do_parallel.hpp>
 #include <raptor/threshold/precompute_correction.hpp>
@@ -46,7 +46,7 @@ void threshold_info(raptor::search_arguments const & arguments, std::string cons
     std::vector<size_t> minimiser_frequencies(maximal_number_of_minimizers + 1);
     std::mutex min_freq_mutex;
 
-    auto worker = [&] (size_t const start, size_t const end)
+    auto worker = [&](size_t const start, size_t const end)
     {
         auto hash_adaptor = seqan3::views::minimiser_hash(seqan3::ungapped{kmer_size},
                                                           seqan3::window_size{arguments.window_size},
@@ -63,7 +63,7 @@ void threshold_info(raptor::search_arguments const & arguments, std::string cons
         }
     };
 
-    for (auto && record_batch : fin | seqan3::views::chunk((1ULL<<20)))
+    for (auto && record_batch : fin | seqan3::views::chunk((1ULL << 20)))
     {
         records.clear();
         std::ranges::move(record_batch, std::back_inserter(records));
@@ -73,6 +73,7 @@ void threshold_info(raptor::search_arguments const & arguments, std::string cons
 
     std::ofstream out{arguments.out_file};
 
+    // clang-format off
     out << "#query: " << arguments.query_file << '\n'
         << "#output: " << arguments.out_file << '\n'
         << "#kmer: " << std::to_string(kmer_size) << '\n'
@@ -96,6 +97,7 @@ void threshold_info(raptor::search_arguments const & arguments, std::string cons
         << "t(x)" << ','
         << "t_p(x)" << ','
         << "t_c(x)" << '\n';
+    // clang-format on
 
     if (minimiser_frequencies.empty())
         return;
@@ -111,11 +113,13 @@ void threshold_info(raptor::search_arguments const & arguments, std::string cons
         if (!minimiser_count)
             continue;
         size_t const index{i - minimal_number_of_minimizers};
+        // clang-format off
         out << i << ','
             << minimiser_count << ','
             << precomp_thresholds[index] + precomp_correction[index] << ','
             << precomp_thresholds[index] << ','
             << precomp_correction[index] << '\n';
+        // clang-format on
     }
 }
 
@@ -219,10 +223,7 @@ int main(int argc, char ** argv)
 
         uint64_t tmp{};
 
-        std::from_chars(shape_string.data(),
-                        shape_string.data() + shape_string.size(),
-                        tmp,
-                        2);
+        std::from_chars(shape_string.data(), shape_string.data() + shape_string.size(), tmp, 2);
 
         arguments.shape = seqan3::shape{seqan3::bin_literal{tmp}};
     }
@@ -237,10 +238,8 @@ int main(int argc, char ** argv)
     std::filesystem::create_directories(output_directory, ec);
 
     if (!output_directory.empty() && ec)
-        throw seqan3::argument_parser_error{seqan3::detail::to_string("Failed to create directory\"",
-                                                                      output_directory.c_str(),
-                                                                      "\": ",
-                                                                      ec.message())};
+        throw seqan3::argument_parser_error{
+            seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
 
     if (!arguments.pattern_size)
     {
@@ -251,7 +250,7 @@ int main(int argc, char ** argv)
             sequence_lengths.push_back(std::ranges::size(seq));
         }
         std::sort(sequence_lengths.begin(), sequence_lengths.end());
-        arguments.pattern_size = sequence_lengths[sequence_lengths.size()/2];
+        arguments.pattern_size = sequence_lengths[sequence_lengths.size() / 2];
     }
 
     threshold_info(arguments, shape_string);

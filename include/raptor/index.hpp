@@ -19,15 +19,14 @@ namespace raptor
 namespace index_structure
 {
 
-    using ibf = seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed>;
-    using ibf_compressed = seqan3::interleaved_bloom_filter<seqan3::data_layout::compressed>;
-    using hibf = hierarchical_interleaved_bloom_filter<seqan3::data_layout::uncompressed>;
-    using hibf_compressed = hierarchical_interleaved_bloom_filter<seqan3::data_layout::compressed>;
+using ibf = seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed>;
+using ibf_compressed = seqan3::interleaved_bloom_filter<seqan3::data_layout::compressed>;
+using hibf = hierarchical_interleaved_bloom_filter<seqan3::data_layout::uncompressed>;
+using hibf_compressed = hierarchical_interleaved_bloom_filter<seqan3::data_layout::compressed>;
 
-    template <typename return_t, typename input_t>
-    concept compressible_from =
-        (std::same_as<return_t, ibf_compressed> && std::same_as<input_t, ibf>) ||
-        (std::same_as<return_t, hibf_compressed> && std::same_as<input_t, hibf>);
+template <typename return_t, typename input_t>
+concept compressible_from = (std::same_as<return_t, ibf_compressed> && std::same_as<input_t, ibf>)
+                         || (std::same_as<return_t, hibf_compressed> && std::same_as<input_t, hibf>);
 
 } // namespace index_structure
 
@@ -61,8 +60,7 @@ public:
                           uint8_t const parts,
                           bool const compressed,
                           std::vector<std::vector<std::string>> const & bin_path,
-                          data_t && ibf)
-    :
+                          data_t && ibf) :
         window_size_{window_size.v},
         shape_{shape},
         parts_{parts},
@@ -163,8 +161,8 @@ public:
                 archive(shape_);
                 archive(parts_);
                 archive(compressed_);
-                if ((data_layout_mode == seqan3::data_layout::compressed && !compressed_) ||
-                    (data_layout_mode == seqan3::data_layout::uncompressed && compressed_))
+                if ((data_layout_mode == seqan3::data_layout::compressed && !compressed_)
+                    || (data_layout_mode == seqan3::data_layout::uncompressed && compressed_))
                 {
                     throw seqan3::argument_parser_error{"Data layouts of serialised and specified index differ."};
                 }
@@ -204,12 +202,12 @@ public:
                 archive(compressed_);
                 archive(bin_path_);
             }
-// GCOVR_EXCL_START
+            // GCOVR_EXCL_START
             catch (std::exception const & e)
             {
                 throw seqan3::argument_parser_error{"Cannot read index: " + std::string{e.what()}};
             }
-// GCOVR_EXCL_STOP
+            // GCOVR_EXCL_STOP
         }
         else
         {
@@ -217,7 +215,6 @@ public:
         }
     }
     //!\endcond
-
 };
 
 } // namespace raptor

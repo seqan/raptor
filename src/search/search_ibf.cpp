@@ -19,10 +19,8 @@ void search_ibf(search_arguments const & arguments)
     search_single(arguments, std::move(index));
 }
 
-template
-void search_ibf<false>(search_arguments const & arguments);
+template void search_ibf<false>(search_arguments const & arguments);
 
-template
-void search_ibf<true>(search_arguments const & arguments);
+template void search_ibf<true>(search_arguments const & arguments);
 
 } // namespace raptor

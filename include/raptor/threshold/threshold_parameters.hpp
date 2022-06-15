@@ -22,11 +22,11 @@ struct threshold_parameters
     uint64_t pattern_size{};
 
     // Threshold.
-    uint8_t errors{}; // threshold_kinds::(probabilistic|lemma)
+    uint8_t errors{};                                            // threshold_kinds::(probabilistic|lemma)
     double percentage{std::numeric_limits<double>::quiet_NaN()}; // threshold_kinds::percentage
-    double p_max{}; // threshold_kinds::probabilistic
-    double fpr{}; // threshold_kinds::probabilistic
-    double tau{}; // threshold_kinds::probabilistic
+    double p_max{};                                              // threshold_kinds::probabilistic
+    double fpr{};                                                // threshold_kinds::probabilistic
+    double tau{};                                                // threshold_kinds::probabilistic
 
     // Cache results.
     bool cache_thresholds{};

@@ -26,14 +26,14 @@ struct node_data // rename:ibf_data? or ibf_node_data
 
     bool operator==(node_data const & rhs) const
     {
-        bool res = std::tie(parent_bin_index, max_bin_index, number_of_technical_bins, favourite_child) ==
-                   std::tie(rhs.parent_bin_index, rhs.max_bin_index, rhs.number_of_technical_bins, rhs.favourite_child);
+        bool res = std::tie(parent_bin_index, max_bin_index, number_of_technical_bins, favourite_child)
+                == std::tie(rhs.parent_bin_index, rhs.max_bin_index, rhs.number_of_technical_bins, rhs.favourite_child);
 
         if (remaining_records.size() != rhs.remaining_records.size())
-          return false;
+            return false;
 
         for (size_t i = 0; i < remaining_records.size(); ++i)
-          res &= (remaining_records[i] == rhs.remaining_records[i]);
+            res &= (remaining_records[i] == rhs.remaining_records[i]);
 
         return res;
     }

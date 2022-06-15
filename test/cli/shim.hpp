@@ -9,7 +9,7 @@
 
 #ifndef __cpp_lib_ranges
 
-#include <range/v3/algorithm/replace.hpp>
+#    include <range/v3/algorithm/replace.hpp>
 
 namespace std::ranges
 {

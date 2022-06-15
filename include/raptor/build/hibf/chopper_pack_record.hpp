@@ -23,16 +23,15 @@ struct chopper_pack_record
 
     bool operator==(chopper_pack_record const & other) const
     {
-        return std::tie(filenames, bin_indices, number_of_bins, estimated_sizes) ==
-               std::tie(other.filenames, other.bin_indices, other.number_of_bins, other.estimated_sizes);
+        return std::tie(filenames, bin_indices, number_of_bins, estimated_sizes)
+            == std::tie(other.filenames, other.bin_indices, other.number_of_bins, other.estimated_sizes);
     }
 
     bool operator!=(chopper_pack_record const & other) const
     {
-        return std::tie(filenames, bin_indices, number_of_bins, estimated_sizes) !=
-               std::tie(other.filenames, other.bin_indices, other.number_of_bins, other.estimated_sizes);
+        return std::tie(filenames, bin_indices, number_of_bins, estimated_sizes)
+            != std::tie(other.filenames, other.bin_indices, other.number_of_bins, other.estimated_sizes);
     }
 };
 
 } // namespace raptor::hibf
-

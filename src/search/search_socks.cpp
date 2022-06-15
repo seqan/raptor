@@ -27,7 +27,7 @@ void search_socks(search_arguments const & arguments)
     double reads_io_time{0.0};
     double compute_time{0.0};
 
-    auto cereal_worker = [&] ()
+    auto cereal_worker = [&]()
     {
         load_index(index, arguments, index_io_time);
     };
@@ -39,7 +39,7 @@ void search_socks(search_arguments const & arguments)
 
     sync_out synced_out{arguments.out_file};
 
-    auto worker = [&] (size_t const start, size_t const end)
+    auto worker = [&](size_t const start, size_t const end)
     {
         auto & ibf = index.ibf();
         auto counter = ibf.template counting_agent<uint8_t>();
@@ -74,7 +74,7 @@ void search_socks(search_arguments const & arguments)
         size_t entries{};
 
         auto start = std::chrono::high_resolution_clock::now();
-        while (entries < (1ULL<<20)*10 && std::getline(fin, line))
+        while (entries < (1ULL << 20) * 10 && std::getline(fin, line))
         {
             auto v = line | seqan3::views::char_to<seqan3::dna4>;
             records.emplace_back(v.begin(), v.end());
@@ -88,26 +88,21 @@ void search_socks(search_arguments const & arguments)
         do_parallel(worker, records.size(), arguments.threads, compute_time);
     }
 
-// GCOVR_EXCL_START
+    // GCOVR_EXCL_START
     if (arguments.write_time)
     {
         std::filesystem::path file_path{arguments.out_file};
         file_path += ".time";
         std::ofstream file_handle{file_path};
         file_handle << "Index I/O\tReads I/O\tCompute\n";
-        file_handle << std::fixed
-                    << std::setprecision(2)
-                    << index_io_time << '\t'
-                    << reads_io_time << '\t'
+        file_handle << std::fixed << std::setprecision(2) << index_io_time << '\t' << reads_io_time << '\t'
                     << compute_time;
     }
-// GCOVR_EXCL_STOP
+    // GCOVR_EXCL_STOP
 }
 
-template
-void search_socks<false>(search_arguments const & arguments);
+template void search_socks<false>(search_arguments const & arguments);
 
-template
-void search_socks<true>(search_arguments const & arguments);
+template void search_socks<true>(search_arguments const & arguments);
 
 } // namespace raptor

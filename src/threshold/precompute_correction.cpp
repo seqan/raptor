@@ -24,18 +24,8 @@ namespace raptor::threshold
 [[nodiscard]] std::string const correction_filename(threshold_parameters const & arguments)
 {
     std::stringstream stream{};
-    stream << "correction_"
-           << std::hex
-           << arguments.pattern_size
-           << '_'
-           << arguments.window_size
-           << '_'
-           << arguments.shape.to_ulong()
-           << '_'
-           << arguments.p_max
-           << '_'
-           << arguments.fpr
-           << ".bin";
+    stream << "correction_" << std::hex << arguments.pattern_size << '_' << arguments.window_size << '_'
+           << arguments.shape.to_ulong() << '_' << arguments.p_max << '_' << arguments.fpr << ".bin";
     std::string result = stream.str();
     if (auto it = result.find("0."); it != std::string::npos)
         result.replace(it, 2, "");
@@ -71,7 +61,7 @@ bool read_correction(std::vector<size_t> & vec, threshold_parameters const & arg
 {
     uint8_t const kmer_size{arguments.shape.size()};
     assert(arguments.window_size != kmer_size); // Use k-mer lemma.
-    assert(std::isnan(arguments.percentage)); // Use percentage.
+    assert(std::isnan(arguments.percentage));   // Use percentage.
 
     std::vector<size_t> correction;
 
@@ -88,13 +78,11 @@ bool read_correction(std::vector<size_t> & vec, threshold_parameters const & arg
 
     correction.reserve(maximal_number_of_minimisers - minimal_number_of_minimisers + 1);
 
-    auto binom = [&fpr, &inv_fpr] (std::vector<double> const & binom_coeff,
-                                   size_t const number_of_minimisers,
-                                   size_t const number_of_fp)
+    auto binom = [&fpr, &inv_fpr](std::vector<double> const & binom_coeff,
+                                  size_t const number_of_minimisers,
+                                  size_t const number_of_fp)
     {
-        return binom_coeff[number_of_fp] +
-               number_of_fp * fpr +
-               (number_of_minimisers - number_of_fp) * inv_fpr;
+        return binom_coeff[number_of_fp] + number_of_fp * fpr + (number_of_minimisers - number_of_fp) * inv_fpr;
     };
 
     // Iterate over the possible number of minimisers.

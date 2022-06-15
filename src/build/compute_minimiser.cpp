@@ -21,19 +21,20 @@ namespace raptor
 bool check_for_fasta_format(std::vector<std::string> const & valid_extensions, std::string const & file_path)
 {
 
-    auto case_insensitive_string_ends_with = [&] (std::string_view str, std::string_view suffix)
+    auto case_insensitive_string_ends_with = [&](std::string_view str, std::string_view suffix)
     {
         size_t const suffix_length{suffix.size()};
         size_t const str_length{str.size()};
-        return suffix_length > str_length ?
-               false :
-               std::ranges::equal(str.substr(str_length - suffix_length), suffix, [] (char const chr1, char const chr2)
-               {
-                   return std::tolower(chr1) == std::tolower(chr2);
-               });
+        return suffix_length > str_length ? false
+                                          : std::ranges::equal(str.substr(str_length - suffix_length),
+                                                               suffix,
+                                                               [](char const chr1, char const chr2)
+                                                               {
+                                                                   return std::tolower(chr1) == std::tolower(chr2);
+                                                               });
     };
 
-    auto case_insensitive_ends_with = [&] (std::string const & ext)
+    auto case_insensitive_ends_with = [&](std::string const & ext)
     {
         return case_insensitive_string_ends_with(file_path, ext);
     };
@@ -55,7 +56,7 @@ void compute_minimiser(build_arguments const & arguments)
     std::array<uint16_t, 4> const cutoffs{1, 3, 10, 20};
     std::array<uint64_t, 4> const cutoff_bounds{314'572'800, 524'288'000, 1'073'741'824, 3'221'225'472};
 
-    auto worker = [&] (auto && zipped_view, auto &&)
+    auto worker = [&](auto && zipped_view, auto &&)
     {
         robin_hood::unordered_map<uint64_t, uint8_t> minimiser_table{};
         uint64_t count{0};
@@ -70,22 +71,26 @@ void compute_minimiser(build_arguments const & arguments)
                 for (auto & [seq] : fin)
                     for (auto && hash : seq | minimiser_view)
                         minimiser_table[hash] = std::min<uint8_t>(254u, minimiser_table[hash] + 1);
-                        // The hash table stores how often a minimiser appears. It does not matter whether a minimiser appears
-                        // 50 times or 2000 times, it is stored regardless because the biggest cutoff value is 50. Hence,
-                        // the hash table stores only values up to 254 to save memory.
+                // The hash table stores how often a minimiser appears. It does not matter whether a minimiser appears
+                // 50 times or 2000 times, it is stored regardless because the biggest cutoff value is 50. Hence,
+                // the hash table stores only values up to 254 to save memory.
             }
 
             std::filesystem::path const file_name{file_names[0]};
-            bool const is_compressed = file_name.extension() == ".gz" || file_name.extension() == ".bgzf" || file_name.extension() == ".bz2";
+            bool const is_compressed =
+                file_name.extension() == ".gz" || file_name.extension() == ".bgzf" || file_name.extension() == ".bz2";
 
             if (!arguments.disable_cutoffs)
             {
                 // Since the curoffs are based on the filesize of a gzipped fastq file, we try account for the other cases:
                 // We multiply by two if we have fasta input.
                 // We divide by 3 if the input is not compressed.
-                bool const is_fasta = is_compressed ? check_for_fasta_format(seqan3::format_fasta::file_extensions, file_name.stem())
-                                                    : check_for_fasta_format(seqan3::format_fasta::file_extensions, file_name.extension());
-                size_t const filesize = std::filesystem::file_size(file_name) * (is_fasta ? 2 : 1) / (is_compressed ? 1 : 3);
+                bool const is_fasta =
+                    is_compressed
+                        ? check_for_fasta_format(seqan3::format_fasta::file_extensions, file_name.stem())
+                        : check_for_fasta_format(seqan3::format_fasta::file_extensions, file_name.extension());
+                size_t const filesize =
+                    std::filesystem::file_size(file_name) * (is_fasta ? 2 : 1) / (is_compressed ? 1 : 3);
 
                 cutoff = default_cutoff;
                 for (size_t k = 0; k < cutoff_bounds.size(); ++k)
@@ -107,7 +112,7 @@ void compute_minimiser(build_arguments const & arguments)
             {
                 if (hash.second >= cutoff)
                 {
-                    outfile.write(reinterpret_cast<const char*>(&hash.first), sizeof(hash.first));
+                    outfile.write(reinterpret_cast<const char *>(&hash.first), sizeof(hash.first));
                     ++count;
                 }
             }
@@ -117,10 +122,8 @@ void compute_minimiser(build_arguments const & arguments)
             output_path /= is_compressed ? file_name.stem().stem() : file_name.stem();
             output_path += ".header";
             std::ofstream headerfile{output_path};
-            headerfile << arguments.shape.to_string() << '\t'
-                        << arguments.window_size << '\t'
-                        << cutoff << '\t'
-                        << count << '\n';
+            headerfile << arguments.shape.to_string() << '\t' << arguments.window_size << '\t' << cutoff << '\t'
+                       << count << '\n';
 
             count = 0;
             minimiser_table.clear();

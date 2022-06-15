@@ -9,8 +9,8 @@
 #include <numeric>
 
 #include <raptor/threshold/logspace.hpp>
-#include <raptor/threshold/pascal_row.hpp>
 #include <raptor/threshold/one_error_model.hpp>
+#include <raptor/threshold/pascal_row.hpp>
 
 namespace raptor::threshold
 {
@@ -38,21 +38,18 @@ namespace raptor::threshold
         // indirect and direct errors occur independently
         // The for loops will enumerate all combinations of i and j for achieving 0 to w many affected minimiser.
         for (size_t j = 0; i + j <= window_size; ++j)
-            probabilities[i + j] = logspace::add(probabilities[i + j],
-                                                 p_direct + affected_by_one_error_indirectly_prob[j]);
+            probabilities[i + j] =
+                logspace::add(probabilities[i + j], p_direct + affected_by_one_error_indirectly_prob[j]);
     }
 
     // Normalise probabilities.
-    double const p_sum = std::accumulate(probabilities.begin(),
-                                         probabilities.end(),
-                                         logspace::negative_inf,
-                                         logspace::add_fn{});
+    double const p_sum =
+        std::accumulate(probabilities.begin(), probabilities.end(), logspace::negative_inf, logspace::add_fn{});
 
     for (double & x : probabilities)
         x -= p_sum;
 
     return probabilities;
 }
-
 
 } // namespace raptor::threshold

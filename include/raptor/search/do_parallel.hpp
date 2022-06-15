@@ -24,7 +24,7 @@ void do_parallel(algorithm_t && worker, size_t const num_records, size_t const t
     for (size_t i = 0; i < threads; ++i)
     {
         size_t const start = records_per_thread * i;
-        size_t const end = i == (threads-1) ? num_records: records_per_thread * (i+1);
+        size_t const end = i == (threads - 1) ? num_records : records_per_thread * (i + 1);
         tasks.emplace_back(std::async(std::launch::async, worker, start, end));
     }
 

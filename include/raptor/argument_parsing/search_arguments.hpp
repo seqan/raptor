@@ -57,19 +57,16 @@ struct search_arguments
 
     raptor::threshold::threshold_parameters make_threshold_parameters() const noexcept
     {
-        return
-        {
-            .window_size{window_size},
-            .shape{shape},
-            .pattern_size{pattern_size},
-            .errors{errors},
-            .percentage{threshold},
-            .p_max{p_max},
-            .fpr{fpr},
-            .tau{tau},
-            .cache_thresholds{cache_thresholds},
-            .output_directory{index_file.parent_path()}
-        };
+        return {.window_size{window_size},
+                .shape{shape},
+                .pattern_size{pattern_size},
+                .errors{errors},
+                .percentage{threshold},
+                .p_max{p_max},
+                .fpr{fpr},
+                .tau{tau},
+                .cache_thresholds{cache_thresholds},
+                .output_directory{index_file.parent_path()}};
     }
 };
 

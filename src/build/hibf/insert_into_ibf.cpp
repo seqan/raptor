@@ -52,7 +52,7 @@ void insert_into_ibf(build_arguments const & arguments,
         {
             std::ifstream infile{filename, std::ios::binary};
 
-            while(infile.read(reinterpret_cast<char*>(&minimiser_value), sizeof(minimiser_value)))
+            while (infile.read(reinterpret_cast<char *>(&minimiser_value), sizeof(minimiser_value)))
                 ibf.emplace(minimiser_value, bin_index);
         }
     }

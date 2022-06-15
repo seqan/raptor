@@ -18,9 +18,8 @@ namespace raptor
 {
 
 template <typename data_t, typename arguments_t>
-static inline void store_index(std::filesystem::path const & path,
-                               raptor_index<data_t> const & index,
-                               arguments_t const &)
+static inline void
+store_index(std::filesystem::path const & path, raptor_index<data_t> const & index, arguments_t const &)
 {
     std::ofstream os{path, std::ios::binary};
     cereal::BinaryOutputArchive oarchive{os};
@@ -45,4 +44,3 @@ static inline void store_index(std::filesystem::path const & path,
 }
 
 } // namespace raptor
-

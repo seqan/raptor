@@ -29,13 +29,15 @@ std::istream & operator>>(std::istream & s, window & window_)
 void init_build_parser(seqan3::argument_parser & parser, build_arguments & arguments)
 {
     init_shared_meta(parser);
-    parser.info.examples = {"raptor build --kmer 19 --window 23 --size 8m --output raptor.index all_bin_paths.txt",
-                            "raptor build --kmer 19 --window 23 --compute-minimiser --output precomputed_minimisers all_bin_paths.txt",
-                            "raptor build --size 8m --output minimiser_raptor.index all_minimiser_paths.txt"};
-    parser.add_positional_option(arguments.bin_file,
-                                 (arguments.is_socks ? "File containing color and file names. " :
-                                                       "File containing file names. ") + bin_validator{}.get_help_page_message(),
-                                 seqan3::input_file_validator{});
+    parser.info.examples = {
+        "raptor build --kmer 19 --window 23 --size 8m --output raptor.index all_bin_paths.txt",
+        "raptor build --kmer 19 --window 23 --compute-minimiser --output precomputed_minimisers all_bin_paths.txt",
+        "raptor build --size 8m --output minimiser_raptor.index all_minimiser_paths.txt"};
+    parser.add_positional_option(
+        arguments.bin_file,
+        (arguments.is_socks ? "File containing color and file names. " : "File containing file names. ")
+            + bin_validator{}.get_help_page_message(),
+        seqan3::input_file_validator{});
     parser.add_option(arguments.parts,
                       '\0',
                       "parts",
@@ -63,8 +65,9 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
     parser.add_option(arguments.out_path,
                       '\0',
                       "output",
-                      arguments.is_socks ? "Provide an output filepath." :
-                                           "Provide an output filepath or an output directory if --compute-minimiser is used.",
+                      arguments.is_socks
+                          ? "Provide an output filepath."
+                          : "Provide an output filepath or an output directory if --compute-minimiser is used.",
                       seqan3::option_spec::required);
     parser.add_option(arguments.size,
                       '\0',
@@ -90,10 +93,12 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
                       "False positive rate of the HIBF.",
                       seqan3::option_spec::advanced,
                       seqan3::arithmetic_range_validator{0.0, 1.0});
+    // clang-format off
     parser.add_flag(arguments.compressed,
                     '\0',
                     "compressed",
                     "Build a compressed index.");
+    // clang-format on
     parser.add_flag(arguments.compute_minimiser,
                     '\0',
                     "compute-minimiser",
@@ -109,11 +114,13 @@ void init_build_parser(seqan3::argument_parser & parser, build_arguments & argum
                     "disable-cutoffs",
                     "Do not apply cutoffs when using --compute-minimiser.",
                     arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
+    // clang-format off
     parser.add_flag(arguments.is_hibf,
                     '\0',
                     "hibf",
                     "Index is an HIBF.",
                     seqan3::option_spec::advanced);
+    // clang-format on
 }
 
 void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
@@ -156,23 +163,21 @@ void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
         arguments.window_size = arguments.shape.size();
     }
 
-    bool const is_compute_minimiser_set{parser.is_option_set("compute-minimiser") ||
-                                        parser.is_option_set("compute-minimizer")};
+    bool const is_compute_minimiser_set{parser.is_option_set("compute-minimiser")
+                                        || parser.is_option_set("compute-minimizer")};
 
     arguments.compute_minimiser = is_compute_minimiser_set;
 
-    std::filesystem::path output_directory = is_compute_minimiser_set ? arguments.out_path :
-                                                                        arguments.out_path.parent_path();
+    std::filesystem::path output_directory =
+        is_compute_minimiser_set ? arguments.out_path : arguments.out_path.parent_path();
     std::error_code ec{};
     std::filesystem::create_directories(output_directory, ec);
 
-// GCOVR_EXCL_START
+    // GCOVR_EXCL_START
     if (!output_directory.empty() && ec)
-        throw seqan3::argument_parser_error{seqan3::detail::to_string("Failed to create directory\"",
-                                                                      output_directory.c_str(),
-                                                                      "\": ",
-                                                                      ec.message())};
-// GCOVR_EXCL_STOP
+        throw seqan3::argument_parser_error{
+            seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
+    // GCOVR_EXCL_STOP
 
     if (!is_compute_minimiser_set)
     {
@@ -200,24 +205,24 @@ void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
 
         switch (std::tolower(arguments.size.back()))
         {
-    // GCOVR_EXCL_START
-            case 't':
-                multiplier = 8ull * 1024ull * 1024ull * 1024ull * 1024ull;
-                break;
-            case 'g':
-                multiplier = 8ull * 1024ull * 1024ull * 1024ull;
-                break;
-            case 'm':
-                multiplier = 8ull * 1024ull * 1024ull;
-                break;
-    // GCOVR_EXCL_STOP
-            case 'k':
-                multiplier = 8ull * 1024ull;
-                break;
-    // GCOVR_EXCL_START
-            default:
-                throw seqan3::argument_parser_error{"Use {k, m, g, t} to pass size. E.g., --size 8g."};
-    // GCOVR_EXCL_STOP
+            // GCOVR_EXCL_START
+        case 't':
+            multiplier = 8ull * 1024ull * 1024ull * 1024ull * 1024ull;
+            break;
+        case 'g':
+            multiplier = 8ull * 1024ull * 1024ull * 1024ull;
+            break;
+        case 'm':
+            multiplier = 8ull * 1024ull * 1024ull;
+            break;
+            // GCOVR_EXCL_STOP
+        case 'k':
+            multiplier = 8ull * 1024ull;
+            break;
+            // GCOVR_EXCL_START
+        default:
+            throw seqan3::argument_parser_error{"Use {k, m, g, t} to pass size. E.g., --size 8g."};
+            // GCOVR_EXCL_STOP
         }
 
         size_t size{};
@@ -237,10 +242,7 @@ void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
         file_stream >> shape_string >> arguments.window_size;
 
         uint64_t tmp{};
-        std::from_chars(shape_string.data(),
-                        shape_string.data() + shape_string.size(),
-                        tmp,
-                        2);
+        std::from_chars(shape_string.data(), shape_string.data() + shape_string.size(), tmp, 2);
 
         arguments.shape = seqan3::shape{seqan3::bin_literal{tmp}};
         arguments.is_minimiser = true;

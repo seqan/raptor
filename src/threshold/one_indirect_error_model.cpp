@@ -7,15 +7,14 @@
 
 #include <random>
 
-#include <raptor/threshold/one_indirect_error_model.hpp>
 #include <raptor/threshold/forward_strand_minimiser.hpp>
+#include <raptor/threshold/one_indirect_error_model.hpp>
 
 namespace raptor::threshold
 {
 
-[[nodiscard]] std::vector<double> one_indirect_error_model(size_t const pattern_size,
-                                                           size_t const window_size,
-                                                           seqan3::shape const shape)
+[[nodiscard]] std::vector<double>
+one_indirect_error_model(size_t const pattern_size, size_t const window_size, seqan3::shape const shape)
 {
     uint8_t const kmer_size{shape.size()};
     size_t const max_number_of_minimiser{pattern_size - window_size + 1};
@@ -24,7 +23,7 @@ namespace raptor::threshold
     std::mt19937_64 gen{0x1D2B8284D988C4D0};
     std::uniform_int_distribution<size_t> random_error_position{0u, pattern_size - 1u};
     std::uniform_int_distribution<uint8_t> random_dna4_rank{0u, 3u};
-    auto random_dna = [&random_dna4_rank, &gen] ()
+    auto random_dna = [&random_dna4_rank, &gen]()
     {
         return seqan3::assign_rank_to(random_dna4_rank(gen), seqan3::dna4{});
     };
