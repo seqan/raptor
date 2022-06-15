@@ -55,7 +55,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: raptor
           fetch-depth: 2
@@ -84,7 +84,7 @@ jobs:
           pip install gcovr==5.0
 
       - name: Load ccache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .ccache
           key: ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.ref }}-${{ github.run_number }}
@@ -107,7 +107,7 @@ jobs:
           mkdir build
           cd build
           cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                          -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
+                          -DCMAKE_CXX_FLAGS="-Werror ${{ matrix.cxx_flags }} -Wno-interference-size" \
                           -DRAPTOR_NATIVE_BUILD=OFF
 
       - name: Build tests
