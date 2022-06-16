@@ -18,6 +18,25 @@ if (NOT CMAKE_BUILD_TYPE)
     )
 endif ()
 
+include (CheckCXXCompilerFlag)
+
+set (RAPTOR_NATIVE_BUILD
+     ON
+     CACHE BOOL "Optimize build for current architecture."
+)
+if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug" OR "${CMAKE_BUILD_TYPE}" MATCHES "Coverage")
+    message (STATUS "${FontBold}Native build disabled due to Debug/Coverage build.${FontReset}")
+elseif (RAPTOR_NATIVE_BUILD)
+    message (STATUS "${FontBold}Native build enabled. Built binaries will be optimized for this system.${FontReset}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+else ()
+    message (STATUS "${FontBold}Native build disabled. Detecting popcnt support.${FontReset}")
+    check_cxx_compiler_flag ("-mpopcnt" RAPTOR_HAS_POPCNT)
+    if (RAPTOR_HAS_POPCNT)
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
+    endif ()
+endif ()
+
 get_filename_component (RAPTOR_ROOT_DIR "../.." ABSOLUTE)
 
 # Specify the directories where to store the built archives, libraries and executables
@@ -41,19 +60,19 @@ list (APPEND CMAKE_MODULE_PATH "${RAPTOR_ROOT_DIR}/cmake/")
 include (raptor_require_ccache)
 raptor_require_ccache ()
 
-add_library (common INTERFACE)
-target_link_libraries ("common" INTERFACE seqan3::seqan3)
-target_include_directories ("common" INTERFACE ${RAPTOR_ROOT_DIR}/include)
-target_include_directories ("common" INTERFACE ${RAPTOR_ROOT_DIR}/lib/robin-hood-hashing/src/include)
-target_compile_options ("common" INTERFACE "-pedantic" "-Wall" "-Wextra")
+add_library (new_common INTERFACE)
+target_link_libraries ("new_common" INTERFACE seqan3::seqan3)
+target_include_directories ("new_common" INTERFACE ${RAPTOR_ROOT_DIR}/include)
+target_include_directories ("new_common" INTERFACE ${RAPTOR_ROOT_DIR}/lib/robin-hood-hashing/src/include)
+target_compile_options ("new_common" INTERFACE "-pedantic" "-Wall" "-Wextra")
 
 add_executable ("normalise_mantis_output" applications/normalise_mantis_output.cpp)
-target_link_libraries ("normalise_mantis_output" "common")
+target_link_libraries ("normalise_mantis_output" "new_common")
 
 add_executable ("compare_mantis_raptor_output" applications/compare_mantis_raptor_output.cpp)
-target_link_libraries ("compare_mantis_raptor_output" "common")
+target_link_libraries ("compare_mantis_raptor_output" "new_common")
 
 add_executable ("normalise_raptor_output" applications/normalise_raptor_output.cpp)
-target_link_libraries ("normalise_raptor_output" "common")
+target_link_libraries ("normalise_raptor_output" "new_common")
 
 message (STATUS "${FontBold}You can run `make install` to build the application.${FontReset}")

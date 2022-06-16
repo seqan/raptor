@@ -18,6 +18,25 @@ if (NOT CMAKE_BUILD_TYPE)
     )
 endif ()
 
+include (CheckCXXCompilerFlag)
+
+set (RAPTOR_NATIVE_BUILD
+     ON
+     CACHE BOOL "Optimize build for current architecture."
+)
+if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug" OR "${CMAKE_BUILD_TYPE}" MATCHES "Coverage")
+    message (STATUS "${FontBold}Native build disabled due to Debug/Coverage build.${FontReset}")
+elseif (RAPTOR_NATIVE_BUILD)
+    message (STATUS "${FontBold}Native build enabled. Built binaries will be optimized for this system.${FontReset}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+else ()
+    message (STATUS "${FontBold}Native build disabled. Detecting popcnt support.${FontReset}")
+    check_cxx_compiler_flag ("-mpopcnt" RAPTOR_HAS_POPCNT)
+    if (RAPTOR_HAS_POPCNT)
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
+    endif ()
+endif ()
+
 # Specify the directories where to store the built archives, libraries and executables
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
@@ -35,21 +54,21 @@ find_package (SeqAn3 QUIET REQUIRED HINTS ../lib/seqan3/build_system)
 # Allow to include CMake scripts from seqan3.
 list (APPEND CMAKE_MODULE_PATH "${SEQAN3_CLONE_DIR}/test/cmake/")
 
+# Use ccache.
+include (../cmake/raptor_require_ccache.cmake)
+raptor_require_ccache ()
+
 # Define cmake configuration flags to configure and build external projects with the same flags as specified for
 # this project.
 set (SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "")
 list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "--no-warn-unused-cli")
 list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
-list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}")
+list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS} -w")
 list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
-list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
+list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -w")
 list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}")
 list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}")
-
-# Use ccache.
-include (../cmake/raptor_require_ccache.cmake)
-raptor_require_ccache ()
 
 # Optionally build mason and DREAM-Yara.
 option (RAPTOR_UTILITY_BUILD_MASON "Build mason. Needed to generate artificial data set." OFF)
