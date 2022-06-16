@@ -39,6 +39,15 @@ jobs:
     steps:
       - name: "Cancel Misc"
         run: echo "Cancelling Misc"
+  cancel_util:
+    name: Cancel Util
+    concurrency:
+      group: util-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "Cancel Util"
+        run: echo "Cancelling Util"
   lint:
     name: clang-format
     concurrency:
