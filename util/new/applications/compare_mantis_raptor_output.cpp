@@ -151,8 +151,8 @@ void compare_results(config const & cfg)
         bool mantis_found_correct_bin{false};
         bool raptor_found_correct_bin{false};
 
-        std::ranges::split_view const mantis_fields_view{std::string_view{mantis_tab_it + 1, mantis_line.end()}, ','};
-        std::ranges::split_view const raptor_fields_view{std::string_view{raptor_tab_it + 1, raptor_line.end()}, ','};
+        std::ranges::split_view mantis_fields_view{std::string_view{mantis_tab_it + 1, mantis_line.end()}, ','};
+        std::ranges::split_view raptor_fields_view{std::string_view{raptor_tab_it + 1, raptor_line.end()}, ','};
         auto mantis_it{mantis_fields_view.begin()};
         auto raptor_it{raptor_fields_view.begin()};
 
