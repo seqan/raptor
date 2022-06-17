@@ -11,7 +11,7 @@ on:
 
 concurrency:
   group: linux-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name != 'push' }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 env:
   CMAKE_VERSION: 3.15.4
@@ -32,13 +32,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "Coverage gcc12"
-            cxx: "g++-12"
-            cc: "gcc-12"
-            build: coverage
-            build_type: Coverage
-            cxx_flags: "-std=c++23"
-
           - name: "gcc12"
             cxx: "g++-12"
             cc: "gcc-12"
@@ -79,14 +72,6 @@ jobs:
       - name: Install compiler ${{ matrix.cxx }}
         run: sudo apt-get install --yes ${{ matrix.cxx }}
 
-      - name: Install gcovr
-        if: matrix.build == 'coverage'
-        env:
-          CC: ${{ matrix.cc }}
-        run: |
-          sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/${CC/gcc/gcov} 100
-          pip install gcovr==5.0
-
       - name: Load ccache
         uses: actions/cache@v3
         with:
@@ -120,7 +105,7 @@ jobs:
           CCACHE_DIR: ${{ github.workspace }}/.ccache
           CCACHE_COMPRESS: true
           CCACHE_COMPRESSLEVEL: 12
-          CCACHE_MAXSIZE: ${{ matrix.build == 'coverage' && '125M' || '50M' }}
+          CCACHE_MAXSIZE: 50M
           CCACHE_IGNOREOPTIONS: "-fprofile-abs-path"
         run: |
           ccache -z
@@ -133,26 +118,3 @@ jobs:
           cd build
           ctest . -j2 --output-on-failure
 
-      - name: Generate coverage report
-        if: matrix.build == 'coverage'
-        run: |
-          gcovr --gcov-executable ${{ github.workspace }}/raptor/lib/seqan3/.github/workflows/scripts/gcov.sh \
-                --root ${{ github.workspace }}/raptor/test/coverage \
-                ${{ github.workspace }}/build \
-                --filter ${{ github.workspace }}/raptor/include \
-                --filter ${{ github.workspace }}/raptor/src \
-                --exclude-lines-by-pattern '^\s*$' \
-                --exclude-lines-by-pattern '^\s*};$' \
-                --exclude-lines-by-pattern '^.*GCOVR_EXCL_LINE.*$' \
-                --exclude-unreachable-branches \
-                --exclude-throw-branches \
-                -j 2 \
-                --xml \
-                --output ${{ github.workspace }}/build/coverage_report.xml
-
-      - name: Submit coverage report
-        if: matrix.build == 'coverage'
-        uses: codecov/codecov-action@v2
-        with:
-          files: ${{ github.workspace }}/build/coverage_report.xml
-          root_dir: ${{ github.workspace }}/raptor

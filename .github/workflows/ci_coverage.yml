@@ -1,4 +1,4 @@
-name: CI on macOS
+name: CI on Linux
 
 on:
   push:
@@ -10,8 +10,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: macos-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'push' }}
+  group: coverage-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
 
 env:
   CMAKE_VERSION: 3.15.4
@@ -25,32 +25,25 @@ defaults:
 jobs:
   build:
     name: ${{ matrix.name }}
-    runs-on: macos-10.15
+    runs-on: ubuntu-22.04
     timeout-minutes: 120
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'clang-format'
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
-          - name: "gcc12"
+          - name: "Coverage gcc12"
             cxx: "g++-12"
             cc: "gcc-12"
-            build_type: Release
+            build_type: Coverage
             cxx_flags: "-std=c++23"
-
-          - name: "gcc11"
-            cxx: "g++-11"
-            cc: "gcc-11"
-            build_type: Release
-            cxx_flags: "-std=c++23"
-
-          - name: "gcc10"
-            cxx: "g++-10"
-            cc: "gcc-10"
-            build_type: Release
-            cxx_flags: "-std=c++20"
 
     steps:
+      # How many commits do we need to fetch to also fetch the branch point?
+      - name: Get fetch depth
+        id: fetch_depth
+        run: echo "::set-output name=depth::$(( ${{ github.event.pull_request.commits }} + 1 ))"
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -58,17 +51,26 @@ jobs:
           fetch-depth: 2
           submodules: true
 
-      - name: Configure Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
+      - name: Add package source
+        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/configure_apt.sh
 
       - name: Install CMake
         run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_cmake.sh
 
       - name: Install ccache
-        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_via_brew.sh ccache
+        run: |
+          conda install --yes --override-channels --channel conda-forge ccache
+          sudo ln -s $CONDA/bin/ccache /usr/bin/ccache
 
       - name: Install compiler ${{ matrix.cxx }}
-        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_via_brew.sh gcc $(echo "${{ matrix.cxx }}" | sed "s/g++-//g")
+        run: sudo apt-get install --yes ${{ matrix.cxx }}
+
+      - name: Install gcovr
+        env:
+          CC: ${{ matrix.cc }}
+        run: |
+          sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/${CC/gcc/gcov} 100
+          pip install gcovr==5.0
 
       - name: Load ccache
         uses: actions/cache@v3
@@ -103,15 +105,37 @@ jobs:
           CCACHE_DIR: ${{ github.workspace }}/.ccache
           CCACHE_COMPRESS: true
           CCACHE_COMPRESSLEVEL: 12
-          CCACHE_MAXSIZE: 50M
+          CCACHE_MAXSIZE: 125M
           CCACHE_IGNOREOPTIONS: "-fprofile-abs-path"
         run: |
           ccache -z
           cd build
-          make -k -j3 api_test cli_test
+          make -k -j2 api_test cli_test
           ccache -sv
 
       - name: Run tests
         run: |
           cd build
-          ctest . -j3 --output-on-failure
+          ctest . -j2 --output-on-failure
+
+      - name: Generate coverage report
+        run: |
+          gcovr --gcov-executable ${{ github.workspace }}/raptor/lib/seqan3/.github/workflows/scripts/gcov.sh \
+                --root ${{ github.workspace }}/raptor/test/coverage \
+                ${{ github.workspace }}/build \
+                --filter ${{ github.workspace }}/raptor/include \
+                --filter ${{ github.workspace }}/raptor/src \
+                --exclude-lines-by-pattern '^\s*$' \
+                --exclude-lines-by-pattern '^\s*};$' \
+                --exclude-lines-by-pattern '^.*GCOVR_EXCL_LINE.*$' \
+                --exclude-unreachable-branches \
+                --exclude-throw-branches \
+                -j 2 \
+                --xml \
+                --output ${{ github.workspace }}/build/coverage_report.xml
+
+      - name: Submit coverage report
+        uses: codecov/codecov-action@v2
+        with:
+          files: ${{ github.workspace }}/build/coverage_report.xml
+          root_dir: ${{ github.workspace }}/raptor

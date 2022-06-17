@@ -11,7 +11,7 @@ on:
 
 concurrency:
   group: misc-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name != 'push' }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 env:
   SEQAN3_NO_VERSION_CHECK: 1
@@ -155,6 +155,7 @@ jobs:
           CCACHE_COMPRESS: true
           CCACHE_COMPRESSLEVEL: 12
           CCACHE_MAXSIZE: 50M
+          CCACHE_IGNOREOPTIONS: "-fprofile-abs-path"
           CMAKE_BUILD_PARALLEL_LEVEL: ${{ matrix.build_threads }}
         run: |
           ccache -z || true
