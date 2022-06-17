@@ -11,7 +11,7 @@ on:
 
 concurrency:
   group: util-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name != 'push' }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 env:
   CMAKE_VERSION: 3.15.4
@@ -107,7 +107,8 @@ jobs:
           CCACHE_DIR: ${{ github.workspace }}/.ccache
           CCACHE_COMPRESS: true
           CCACHE_COMPRESSLEVEL: 12
-          CCACHE_MAXSIZE: ${{ '50M' }}
+          CCACHE_MAXSIZE: 50M
+          CCACHE_IGNOREOPTIONS: "-fprofile-abs-path"
         run: |
           ccache -z
           cd build
