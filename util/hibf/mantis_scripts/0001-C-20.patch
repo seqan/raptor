@@ -1,0 +1,52 @@
+From 5e430be2c206da1302d5bdfd48a3aa49324903f3 Mon Sep 17 00:00:00 2001
+From: Enrico Seiler <enrico.seiler@hotmail.de>
+Date: Thu, 23 Jun 2022 19:18:23 +0200
+Subject: [PATCH] C++20
+
+---
+ include/canonicalKmer.h | 2 ++
+ src/stat.cc             | 3 ++-
+ src/validateMST.cc      | 3 ++-
+ 3 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/include/canonicalKmer.h b/include/canonicalKmer.h
+index 00d5079..b1c34ab 100644
+--- a/include/canonicalKmer.h
++++ b/include/canonicalKmer.h
+@@ -5,7 +5,9 @@
+ #ifndef MANTIS_CANONICALKMER_H
+ #define MANTIS_CANONICALKMER_H
+ 
++#include <cstdint>
+ #include <map>
++#include <string>
+ 
+ namespace dna {
+ 
+diff --git a/src/stat.cc b/src/stat.cc
+index d31a52a..9f01aeb 100644
+--- a/src/stat.cc
++++ b/src/stat.cc
+@@ -293,4 +293,5 @@ int stats_main(StatsOpts &sopt) {
+         logger->info("total confused kmers: {}", kmerMap.size());
+         logger->info("total non-confusing jmers: {}", jmerMap.size());
+     }
+-}
+\ No newline at end of file
++    return 0;
++}
+diff --git a/src/validateMST.cc b/src/validateMST.cc
+index 1640da6..18eaee3 100644
+--- a/src/validateMST.cc
++++ b/src/validateMST.cc
+@@ -108,4 +108,5 @@ int validate_mst_main(MSTValidateOpts &opt) {
+         }
+     }
+     logger->info("\nWOOOOW! Validation passed\n");
+-}
+\ No newline at end of file
++    return 0;
++}
+-- 
+2.36.0
+
