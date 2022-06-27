@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <seqan3/argument_parser/argument_parser.hpp>
+#include <sharg/parser.hpp>
 
 namespace raptor
 {
 
-void build_parsing(seqan3::argument_parser & parser, bool const is_socks);
+void build_parsing(sharg::parser & parser, bool const is_socks);
 
 } // namespace raptor

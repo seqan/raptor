@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include <seqan3/argument_parser/argument_parser.hpp>
+#include <sharg/parser.hpp>
+
 #include <seqan3/io/sequence_file/input.hpp>
 
 #include <raptor/strong_types.hpp>
@@ -22,7 +23,7 @@ struct power_of_two_validator
     void operator()(option_value_type const & val) const
     {
         if (!std::has_single_bit(val))
-            throw seqan3::validation_error{"The value must be a power of two."};
+            throw sharg::validation_error{"The value must be a power of two."};
     }
 
     static std::string get_help_page_message()
@@ -54,7 +55,7 @@ public:
     void operator()(option_value_type const & val) const
     {
         if (!is_zero_positive && !val)
-            throw seqan3::validation_error{"The value must be a positive integer."};
+            throw sharg::validation_error{"The value must be a positive integer."};
     }
 
     std::string get_help_page_message() const
@@ -87,7 +88,7 @@ public:
     void operator()(option_value_type const & cmp) const
     {
         if (!std::regex_match(cmp, expression))
-            throw seqan3::validation_error{
+            throw sharg::validation_error{
                 seqan3::detail::to_string("Value ",
                                           cmp,
                                           " must be an integer followed by [k,m,g,t] (case insensitive).")};
@@ -129,7 +130,7 @@ public:
     void operator()(option_value_type const & values) const
     {
         if (values.empty())
-            throw seqan3::validation_error{"The list of input files cannot be empty."};
+            throw sharg::validation_error{"The list of input files cannot be empty."};
 
         bool const is_minimiser_input = std::filesystem::path{values[0][0]}.extension() == ".minimiser";
 
@@ -140,9 +141,9 @@ public:
                 std::filesystem::path const file_path{value};
 
                 if (is_minimiser_input && (file_path.extension() != ".minimiser"))
-                    throw seqan3::validation_error{"You cannot mix sequence and minimiser files as input."};
+                    throw sharg::validation_error{"You cannot mix sequence and minimiser files as input."};
                 if (std::filesystem::file_size(file_path) == 0u)
-                    throw seqan3::validation_error{"The file " + value + " is empty."};
+                    throw sharg::validation_error{"The file " + value + " is empty."};
 
                 if (is_minimiser_input)
                     minimiser_file_validator(file_path);
@@ -196,10 +197,10 @@ private:
             }
             return result;
         }()};
-    seqan3::input_file_validator<> minimiser_file_validator{{"minimiser"}};
+    sharg::input_file_validator minimiser_file_validator{{"minimiser"}};
 
 public:
-    seqan3::input_file_validator<> sequence_file_validator{{combined_extensions}};
+    sharg::input_file_validator sequence_file_validator{{combined_extensions}};
 };
 
 } // namespace raptor
