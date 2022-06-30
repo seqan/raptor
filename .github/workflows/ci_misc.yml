@@ -15,6 +15,7 @@ concurrency:
 
 env:
   SEQAN3_NO_VERSION_CHECK: 1
+  SHARG_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
 
 defaults:

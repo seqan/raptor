@@ -65,7 +65,7 @@ TEST_F(argparse_main, no_subparser)
     cli_test_result const result = execute_app("raptor", "foo");
     std::string const expected{
         "[Error] You either forgot or misspelled the subcommand! Please specify which sub-program you want to use: one "
-        "of [build,search,socks,upgrade]. Use -h/--help for more information.\n"};
+        "of [build, search, socks, upgrade]. Use -h/--help for more information.\n"};
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, expected);
     RAPTOR_ASSERT_FAIL_EXIT(result);
@@ -76,7 +76,7 @@ TEST_F(argparse_main, unknown_option)
     cli_test_result const result = execute_app("raptor", "-v");
     std::string const expected{
         "[Error] You either forgot or misspelled the subcommand! Please specify which sub-program you want to use: one "
-        "of [build,search,socks,upgrade]. Use -h/--help for more information.\n"};
+        "of [build, search, socks, upgrade]. Use -h/--help for more information.\n"};
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, expected);
     RAPTOR_ASSERT_FAIL_EXIT(result);
