@@ -15,11 +15,11 @@ int main(int argc, char ** argv)
 {
     try
     {
-        seqan3::argument_parser top_level_parser{"raptor",
-                                                 argc,
-                                                 argv,
-                                                 seqan3::update_notifications::on,
-                                                 {"build", "search", "socks", "upgrade"}};
+        sharg::parser top_level_parser{"raptor",
+                                       argc,
+                                       argv,
+                                       sharg::update_notifications::on,
+                                       {"build", "search", "socks", "upgrade"}};
         raptor::init_shared_meta(top_level_parser);
         top_level_parser.info.description.emplace_back(
             "Raptor is a system for approximately searching many queries such as "
@@ -32,20 +32,20 @@ int main(int argc, char ** argv)
 
         top_level_parser.parse();
 
-        seqan3::argument_parser & sub_parser = top_level_parser.get_sub_parser();
+        sharg::parser & sub_parser = top_level_parser.get_sub_parser();
         if (sub_parser.info.app_name == std::string_view{"raptor-build"})
             raptor::build_parsing(sub_parser, false);
         if (sub_parser.info.app_name == std::string_view{"raptor-search"})
             raptor::search_parsing(sub_parser, false);
         if (sub_parser.info.app_name == std::string_view{"raptor-socks"})
         {
-            seqan3::argument_parser socks_parser{"socks",
-                                                 argc - 1,
-                                                 argv + 1,
-                                                 seqan3::update_notifications::off,
-                                                 {"build", "lookup-kmer"}};
+            sharg::parser socks_parser{"socks",
+                                       argc - 1,
+                                       argv + 1,
+                                       sharg::update_notifications::off,
+                                       {"build", "lookup-kmer"}};
             socks_parser.parse();
-            seqan3::argument_parser & socks_sub_parser = socks_parser.get_sub_parser();
+            sharg::parser & socks_sub_parser = socks_parser.get_sub_parser();
             if (socks_sub_parser.info.app_name == std::string_view{"socks-build"})
                 raptor::build_parsing(socks_sub_parser, true);
             if (socks_sub_parser.info.app_name == std::string_view{"socks-lookup-kmer"})
@@ -54,7 +54,7 @@ int main(int argc, char ** argv)
         if (sub_parser.info.app_name == std::string_view{"raptor-upgrade"})
             raptor::upgrade_parsing(sub_parser);
     }
-    catch (seqan3::argument_parser_error const & ext)
+    catch (sharg::parser_error const & ext)
     {
         std::cerr << "[Error] " << ext.what() << '\n';
         std::exit(-1);
