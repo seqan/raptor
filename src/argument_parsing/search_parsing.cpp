@@ -29,92 +29,94 @@ std::istream & operator>>(std::istream & s, pattern_size & pattern_size_)
     return s >> pattern_size_.v;
 }
 
-void init_search_parser(seqan3::argument_parser & parser, search_arguments & arguments)
+void init_search_parser(sharg::parser & parser, search_arguments & arguments)
 {
     init_shared_meta(parser);
     parser.info.examples = {
         "raptor search --error 2 --index raptor.index --query queries.fastq --output search.output"};
+
     parser.add_option(arguments.index_file,
-                      '\0',
-                      "index",
-                      arguments.is_socks ? "Provide a valid path to an index."
-                                         : "Provide a valid path to an index. Parts: Without suffix _0",
-                      seqan3::option_spec::required);
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "index",
+                                    .description = arguments.is_socks
+                                                     ? "Provide a valid path to an index."
+                                                     : "Provide a valid path to an index. Parts: Without suffix _0",
+                                    .required = true});
     parser.add_option(arguments.query_file,
-                      '\0',
-                      "query",
-                      "Provide a path to the query file.",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "query",
+                                    .description = "Provide a path to the query file.",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{}});
     parser.add_option(arguments.out_file,
-                      '\0',
-                      "output",
-                      "Provide a path to the output.",
-                      seqan3::option_spec::required);
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "output",
+                                    .description = "Provide a path to the output.",
+                                    .required = true});
     parser.add_option(arguments.errors,
-                      '\0',
-                      "error",
-                      "The number of errors",
-                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
-                      positive_integer_validator{true});
-    parser.add_option(arguments.tau,
-                      '\0',
-                      "tau",
-                      "Used in the dynamic thresholding. The higher tau, the lower the threshold.",
-                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{0, 1});
-    parser.add_option(arguments.threshold,
-                      '\0',
-                      "threshold",
-                      "If set, this threshold is used instead of the probabilistic models.",
-                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{0, 1});
-    parser.add_option(arguments.p_max,
-                      '\0',
-                      "p_max",
-                      "Used in the dynamic thresholding. The higher p_max, the lower the threshold.",
-                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{0, 1});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "error",
+                                    .description = "The number of errors",
+                                    .hidden = arguments.is_socks,
+                                    .validator = positive_integer_validator{true}});
+    parser.add_option(
+        arguments.tau,
+        sharg::config{.short_id = '\0',
+                      .long_id = "tau",
+                      .description = "Used in the dynamic thresholding. The higher tau, the lower the threshold.",
+                      .hidden = arguments.is_socks,
+                      .validator = sharg::arithmetic_range_validator{0, 1}});
+    parser.add_option(
+        arguments.threshold,
+        sharg::config{.short_id = '\0',
+                      .long_id = "threshold",
+                      .description = "If set, this threshold is used instead of the probabilistic models.",
+                      .hidden = arguments.is_socks,
+                      .validator = sharg::arithmetic_range_validator{0, 1}});
+    parser.add_option(
+        arguments.p_max,
+        sharg::config{.short_id = '\0',
+                      .long_id = "p_max",
+                      .description = "Used in the dynamic thresholding. The higher p_max, the lower the threshold.",
+                      .hidden = arguments.is_socks,
+                      .validator = sharg::arithmetic_range_validator{0, 1}});
     parser.add_option(arguments.fpr,
-                      '\0',
-                      "fpr",
-                      "The false positive rate used for building the index.",
-                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{0, 1});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "fpr",
+                                    .description = "The false positive rate used for building the index.",
+                                    .hidden = arguments.is_socks,
+                                    .validator = sharg::arithmetic_range_validator{0, 1}});
     parser.add_option(arguments.pattern_size_strong,
-                      '\0',
-                      "pattern",
-                      "The pattern size.",
-                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "pattern",
+                                    .description = "The pattern size.",
+                                    .hidden = arguments.is_socks});
     parser.add_option(arguments.threads,
-                      '\0',
-                      "threads",
-                      "The numer of threads to use.",
-                      seqan3::option_spec::standard,
-                      positive_integer_validator{});
-    parser.add_flag(arguments.cache_thresholds,
-                    '\0',
-                    "cache-thresholds",
-                    "Stores the computed thresholds with an unique name next to the index. In the next search call "
-                    "using this option, the stored thresholds are re-used.\n"
-                    "Two files are stored:\n"
-                    "\\fBthreshold_*.bin\\fP: Depends on pattern, window, kmer/shape, errors, and tau.\n"
-                    "\\fBcorrection_*.bin\\fP: Depends on pattern, window, kmer/shape, p_max, and fpr.");
-    // clang-format off
-    parser.add_flag(arguments.is_hibf,
-                    '\0',
-                    "hibf",
-                    "Index is an HIBF.",
-                    seqan3::option_spec::advanced);
-    parser.add_flag(arguments.write_time,
-                    '\0',
-                    "time",
-                    "Write timing file.",
-                    seqan3::option_spec::advanced);
-    // clang-format on
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "threads",
+                                    .description = "The numer of threads to use.",
+                                    .validator = positive_integer_validator{}});
+
+    parser.add_flag(
+        arguments.cache_thresholds,
+        sharg::config{
+            .short_id = '\0',
+            .long_id = "cache-thresholds",
+            .description =
+                "Stores the computed thresholds with an unique name next to the index. In the next search call "
+                "using this option, the stored thresholds are re-used.\n"
+                "Two files are stored:\n"
+                "\\fBthreshold_*.bin\\fP: Depends on pattern, window, kmer/shape, errors, and tau.\n"
+                "\\fBcorrection_*.bin\\fP: Depends on pattern, window, kmer/shape, p_max, and fpr."});
+    parser.add_flag(
+        arguments.is_hibf,
+        sharg::config{.short_id = '\0', .long_id = "hibf", .description = "Index is an HIBF.", .advanced = true});
+    parser.add_flag(
+        arguments.write_time,
+        sharg::config{.short_id = '\0', .long_id = "time", .description = "Write timing file.", .advanced = true});
 }
 
-void search_parsing(seqan3::argument_parser & parser, bool const is_socks)
+void search_parsing(sharg::parser & parser, bool const is_socks)
 {
     search_arguments arguments{};
     arguments.is_socks = is_socks;
@@ -131,24 +133,24 @@ void search_parsing(seqan3::argument_parser & parser, bool const is_socks)
 
     // GCOVR_EXCL_START
     if (!output_directory.empty() && ec)
-        throw seqan3::argument_parser_error{
+        throw sharg::parser_error{
             seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
     // GCOVR_EXCL_STOP
 
     if (!arguments.is_socks)
     {
-        seqan3::input_file_validator<seqan3::sequence_file_input<>>{}(arguments.query_file);
+        sharg::input_file_validator{raptor::detail::combined_extensions}(arguments.query_file);
     }
 
     bool partitioned{false};
-    seqan3::input_file_validator validator{};
+    sharg::input_file_validator validator{};
 
     try
     {
         validator(arguments.index_file.string() + std::string{"_0"});
         partitioned = true;
     }
-    catch (seqan3::validation_error const & e)
+    catch (sharg::validation_error const & e)
     {
         validator(arguments.index_file);
     }
