@@ -92,14 +92,16 @@ IncludeCategories:
     Priority:        4
   - Regex:           '<sdsl/'
     Priority:        5
-  - Regex:           '<seqan3/'
+  - Regex:           '<sharg/'
     Priority:        7
-  - Regex:           '<chopper/'
+  - Regex:           '<seqan3/'
     Priority:        8
-  - Regex:           '<raptor/'
+  - Regex:           '<chopper/'
     Priority:        9
-  - Regex:           '.*'
+  - Regex:           '<raptor/'
     Priority:        10
+  - Regex:           '.*'
+    Priority:        11
 IncludeIsMainRegex: '(Test)?$'
 IncludeIsMainSourceRegex: ''
 IndentAccessModifiers: false
