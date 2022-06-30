@@ -26,104 +26,101 @@ std::istream & operator>>(std::istream & s, window & window_)
     return s >> window_.v;
 }
 
-void init_build_parser(seqan3::argument_parser & parser, build_arguments & arguments)
+void init_build_parser(sharg::parser & parser, build_arguments & arguments)
 {
     init_shared_meta(parser);
     parser.info.examples = {
         "raptor build --kmer 19 --window 23 --size 8m --output raptor.index all_bin_paths.txt",
         "raptor build --kmer 19 --window 23 --compute-minimiser --output precomputed_minimisers all_bin_paths.txt",
         "raptor build --size 8m --output minimiser_raptor.index all_minimiser_paths.txt"};
+
     parser.add_positional_option(
         arguments.bin_file,
-        (arguments.is_socks ? "File containing color and file names. " : "File containing file names. ")
-            + bin_validator{}.get_help_page_message(),
-        seqan3::input_file_validator{});
+        sharg::config{.description = (arguments.is_socks ? "File containing color and file names. "
+                                                         : "File containing file names. ")
+                                   + bin_validator{}.get_help_page_message(),
+                      .validator = sharg::input_file_validator{}});
+
     parser.add_option(arguments.parts,
-                      '\0',
-                      "parts",
-                      "Splits the index in this many parts.",
-                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
-                      power_of_two_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "parts",
+                                    .description = "Splits the index in this many parts.",
+                                    .hidden = arguments.is_socks,
+                                    .validator = power_of_two_validator{}});
     parser.add_option(arguments.kmer_size,
-                      '\0',
-                      "kmer",
-                      "The k-mer size.", // Mutually exclusive with --shape.
-                      seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{1, 32});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "kmer",
+                                    .description = "The k-mer size.",
+                                    .validator = sharg::arithmetic_range_validator{1, 32}});
     parser.add_option(arguments.window_size_strong,
-                      '\0',
-                      "window",
-                      "The window size.",
-                      arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard,
-                      positive_integer_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "window",
+                                    .description = "The window size.",
+                                    .hidden = arguments.is_socks,
+                                    .validator = positive_integer_validator{}});
     parser.add_option(arguments.shape_string,
-                      '\0',
-                      "shape",
-                      "The shape to use for k-mers. Mutually exclusive with --kmer.",
-                      seqan3::option_spec::advanced, // Add help in kmer_size
-                      seqan3::regex_validator{"[01]+"});
-    parser.add_option(arguments.out_path,
-                      '\0',
-                      "output",
-                      arguments.is_socks
-                          ? "Provide an output filepath."
-                          : "Provide an output filepath or an output directory if --compute-minimiser is used.",
-                      seqan3::option_spec::required);
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "shape",
+                                    .description = "The shape to use for k-mers. Mutually exclusive with --kmer.",
+                                    .advanced = true,
+                                    .validator = sharg::regex_validator{"[01]+"}});
+    parser.add_option(
+        arguments.out_path,
+        sharg::config{.short_id = '\0',
+                      .long_id = "output",
+                      .description =
+                          arguments.is_socks
+                              ? "Provide an output filepath."
+                              : "Provide an output filepath or an output directory if --compute-minimiser is used.",
+                      .required = true});
     parser.add_option(arguments.size,
-                      '\0',
-                      "size",
-                      "The size in bytes of the resulting index.",
-                      seqan3::option_spec::standard,
-                      size_validator{"\\d+\\s{0,1}[k,m,g,t,K,M,G,T]"});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "size",
+                                    .description = "The size in bytes of the resulting index.",
+                                    .validator = size_validator{"\\d+\\s{0,1}[k,m,g,t,K,M,G,T]"}});
     parser.add_option(arguments.hash,
-                      '\0',
-                      "hash",
-                      "The number of hash functions to use.",
-                      seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{1, 5});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "hash",
+                                    .description = "The number of hash functions to use.",
+                                    .validator = sharg::arithmetic_range_validator{1, 5}});
     parser.add_option(arguments.threads,
-                      '\0',
-                      "threads",
-                      "The numer of threads to use.",
-                      seqan3::option_spec::standard,
-                      positive_integer_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "threads",
+                                    .description = "The numer of threads to use.",
+                                    .validator = positive_integer_validator{}});
     parser.add_option(arguments.fpr,
-                      '\0',
-                      "fpr",
-                      "False positive rate of the HIBF.",
-                      seqan3::option_spec::advanced,
-                      seqan3::arithmetic_range_validator{0.0, 1.0});
-    // clang-format off
-    parser.add_flag(arguments.compressed,
-                    '\0',
-                    "compressed",
-                    "Build a compressed index.");
-    // clang-format on
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "fpr",
+                                    .description = "False positive rate of the HIBF.",
+                                    .advanced = true,
+                                    .validator = sharg::arithmetic_range_validator{0.0, 1.0}});
+
+    parser.add_flag(
+        arguments.compressed,
+        sharg::config{.short_id = '\0', .long_id = "compressed", .description = "Build a compressed index."});
+    parser.add_flag(
+        arguments.compute_minimiser,
+        sharg::config{.short_id = '\0',
+                      .long_id = "compute-minimiser",
+                      .description =
+                          "Computes minimisers using cutoffs from Mantis (Pandey et al.). Does not create the index.",
+                      .hidden = arguments.is_socks});
     parser.add_flag(arguments.compute_minimiser,
-                    '\0',
-                    "compute-minimiser",
-                    "Computes minimisers using cutoffs from Mantis (Pandey et al.). Does not create the index.",
-                    arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
-    parser.add_flag(arguments.compute_minimiser,
-                    '\0',
-                    "compute-minimizer",
-                    "Hidden flag, alias of --compute-minimiser.",
-                    seqan3::option_spec::hidden);
+                    sharg::config{.short_id = '\0',
+                                  .long_id = "compute-minimizer",
+                                  .description = "Hidden flag, alias of --compute-minimiser.",
+                                  .hidden = true});
     parser.add_flag(arguments.disable_cutoffs,
-                    '\0',
-                    "disable-cutoffs",
-                    "Do not apply cutoffs when using --compute-minimiser.",
-                    arguments.is_socks ? seqan3::option_spec::hidden : seqan3::option_spec::standard);
-    // clang-format off
-    parser.add_flag(arguments.is_hibf,
-                    '\0',
-                    "hibf",
-                    "Index is an HIBF.",
-                    seqan3::option_spec::advanced);
-    // clang-format on
+                    sharg::config{.short_id = '\0',
+                                  .long_id = "disable-cutoffs",
+                                  .description = "Do not apply cutoffs when using --compute-minimiser.",
+                                  .hidden = arguments.is_socks});
+    parser.add_flag(
+        arguments.is_hibf,
+        sharg::config{.short_id = '\0', .long_id = "hibf", .description = "Index is an HIBF.", .advanced = true});
 }
 
-void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
+void build_parsing(sharg::parser & parser, bool const is_socks)
 {
     build_arguments arguments{};
     arguments.is_socks = is_socks;
@@ -136,7 +133,7 @@ void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
     if (parser.is_option_set("shape"))
     {
         if (parser.is_option_set("kmer"))
-            throw seqan3::argument_parser_error{"You cannot set both shape and k-mer arguments."};
+            throw sharg::parser_error{"You cannot set both shape and k-mer arguments."};
 
         uint64_t tmp{};
 
@@ -156,7 +153,7 @@ void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
     {
         arguments.window_size = arguments.window_size_strong.v;
         if (arguments.shape.size() > arguments.window_size)
-            throw seqan3::argument_parser_error{"The k-mer size cannot be bigger than the window size."};
+            throw sharg::parser_error{"The k-mer size cannot be bigger than the window size."};
     }
     else
     {
@@ -175,17 +172,17 @@ void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
 
     // GCOVR_EXCL_START
     if (!output_directory.empty() && ec)
-        throw seqan3::argument_parser_error{
+        throw sharg::parser_error{
             seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
     // GCOVR_EXCL_STOP
 
     if (!is_compute_minimiser_set)
     {
-        seqan3::output_file_validator{}(arguments.out_path);
+        sharg::output_file_validator{}(arguments.out_path);
 
         if (!parser.is_option_set("size") && !parser.is_option_set("hibf"))
         {
-            throw seqan3::argument_parser_error{"Option --size is required but not set."};
+            throw sharg::parser_error{"Option --size is required but not set."};
         }
     }
 
@@ -221,7 +218,7 @@ void build_parsing(seqan3::argument_parser & parser, bool const is_socks)
             break;
             // GCOVR_EXCL_START
         default:
-            throw seqan3::argument_parser_error{"Use {k, m, g, t} to pass size. E.g., --size 8g."};
+            throw sharg::parser_error{"Use {k, m, g, t} to pass size. E.g., --size 8g."};
             // GCOVR_EXCL_STOP
         }
 

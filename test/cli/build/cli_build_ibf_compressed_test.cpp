@@ -136,5 +136,5 @@ TEST_F(build_ibf_compressed, wrong_compression)
 
     std::ifstream is{data("1bins19window.index"), std::ios::binary};
     cereal::BinaryInputArchive iarchive{is};
-    EXPECT_THROW(iarchive(index), seqan3::argument_parser_error);
+    EXPECT_THROW(iarchive(index), sharg::parser_error);
 }

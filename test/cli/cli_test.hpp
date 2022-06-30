@@ -51,7 +51,7 @@ protected:
         result.command = [&command_items...]()
         {
             std::ostringstream command{};
-            command << "SEQAN3_NO_VERSION_CHECK=1 " << BINDIR;
+            command << "SEQAN3_NO_VERSION_CHECK=1 SHARG_NO_VERSION_CHECK=1 " << BINDIR;
             int a[] = {0, ((void)(command << command_items << ' '), 0)...};
             (void)a;
             return command.str();

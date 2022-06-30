@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <seqan3/argument_parser/argument_parser.hpp>
+#include <sharg/parser.hpp>
 
 namespace raptor
 {
 
-void init_shared_meta(seqan3::argument_parser & parser);
+void init_shared_meta(sharg::parser & parser);
 
 } // namespace raptor

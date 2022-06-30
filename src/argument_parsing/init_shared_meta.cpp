@@ -10,7 +10,7 @@
 namespace raptor
 {
 
-void init_shared_meta(seqan3::argument_parser & parser)
+void init_shared_meta(sharg::parser & parser)
 {
     parser.info.app_name = "Raptor";
     parser.info.author = "Enrico Seiler";

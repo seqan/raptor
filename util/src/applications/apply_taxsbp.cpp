@@ -7,7 +7,8 @@
 
 #include <filesystem>
 
-#include <seqan3/argument_parser/all.hpp>
+#include <sharg/all.hpp>
+
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
 #include <seqan3/core/debug_stream.hpp>
 #include <seqan3/io/sequence_file/input.hpp>
@@ -39,7 +40,7 @@ public:
     {
         if (!is_zero_positive && !val)
         {
-            throw seqan3::validation_error{"The value must be a positive integer."};
+            throw sharg::validation_error{"The value must be a positive integer."};
         }
     }
 
@@ -247,7 +248,7 @@ inline void apply_taxsbp(config const & cfg)
 
 int main(int argc, char ** argv)
 {
-    seqan3::argument_parser parser{"apply_taxsbp", argc, argv, seqan3::update_notifications::off};
+    sharg::parser parser{"apply_taxsbp", argc, argv, sharg::update_notifications::off};
     parser.info.author = "Enrico Seiler";
     parser.info.author = "enrico.seiler@fu-berlin.de";
     parser.info.short_description = "Split RefSeq according to taxsbp";
@@ -256,54 +257,56 @@ int main(int argc, char ** argv)
     config cfg{};
 
     parser.add_option(cfg.input_directory,
-                      '\0',
-                      "input",
-                      "Provide the path to directory containing the RefSeq files.",
-                      seqan3::option_spec::required,
-                      seqan3::input_directory_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "input",
+                                    .description = "Provide the path to directory containing the RefSeq files.",
+                                    .required = true,
+                                    .validator = sharg::input_directory_validator{}});
 
     parser.add_option(cfg.output_directory,
-                      '\0',
-                      "output",
-                      "Provide an output directory.",
-                      seqan3::option_spec::required,
-                      seqan3::output_directory_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "output",
+                                    .description = "Provide an output directory.",
+                                    .required = true,
+                                    .validator = sharg::output_directory_validator{}});
 
     parser.add_option(cfg.taxsbp_binning_path,
-                      '\0',
-                      "taxsbp",
-                      "Provide the taxsbp binning file.",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "taxsbp",
+                                    .description = "Provide the taxsbp binning file.",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{}});
 
     parser.add_option(cfg.genome_updater_accession_path,
-                      '\0',
-                      "genome_update",
-                      "Provide the genome_updater's updated_sequence_accession.txt file.",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "genome_update",
+                                    .description = "Provide the genome_updater's updated_sequence_accession.txt file.",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{}});
 
     parser.add_option(cfg.assembly_summary_path,
-                      '\0',
-                      "assembly_summary",
-                      "Provide the assembly_summary file.",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "assembly_summary",
+                                    .description = "Provide the assembly_summary file.",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{}});
 
-    parser.add_flag(cfg.skip_gzip, '\0', "skip_gzip", "Whether to skip gzipping the output files.");
+    parser.add_flag(cfg.skip_gzip,
+                    sharg::config{.short_id = '\0',
+                                  .long_id = "skip_gzip",
+                                  .description = "Whether to skip gzipping the output files."});
 
     parser.add_option(cfg.threads,
-                      '\0',
-                      "threads",
-                      "Number of threads to use.",
-                      seqan3::option_spec::standard,
-                      positive_integer_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "threads",
+                                    .description = "Number of threads to use.",
+                                    .validator = positive_integer_validator{}});
 
     try
     {
         parser.parse();
     }
-    catch (seqan3::argument_parser_error const & ext)
+    catch (sharg::parser_error const & ext)
     {
         std::cerr << "[Error] " << ext.what() << '\n';
         std::exit(-1);

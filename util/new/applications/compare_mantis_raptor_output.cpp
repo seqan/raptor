@@ -14,7 +14,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <seqan3/argument_parser/argument_parser.hpp>
+#include <sharg/parser.hpp>
 
 #include "check_output_file.hpp"
 #include "parse_user_bin_ids.hpp"
@@ -279,36 +279,36 @@ void compare_results(config const & cfg)
               << "       Raptor FN:   \t" << false_negatives << '\n';
 }
 
-void init_parser(seqan3::argument_parser & parser, config & cfg)
+void init_parser(sharg::parser & parser, config & cfg)
 {
     parser.add_option(cfg.mantis_result_file,
-                      '\0',
-                      "mantis_results",
-                      "The mantis result file produced by normalise_mantis_output.",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "mantis_results",
+                                    .description = "The mantis result file produced by normalise_mantis_output.",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{}});
     parser.add_option(cfg.raptor_result_file,
-                      '\0',
-                      "raptor_results",
-                      "The raptor result file, e.g., \"raptor.results\".",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "raptor_results",
+                                    .description = "The raptor result file, e.g., \"raptor.results\".",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{}});
     parser.add_option(cfg.user_bin_ids_file,
-                      '\0',
-                      "user_bin_ids",
-                      "The file containing user bin ids, e.g., \"user_bin.ids\".",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "user_bin_ids",
+                                    .description = "The file containing user bin ids, e.g., \"user_bin.ids\".",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{}});
     parser.add_option(cfg.output_directory,
-                      '\0',
-                      "output_directory",
-                      "Provide a path to the output.",
-                      seqan3::option_spec::required);
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "output_directory",
+                                    .description = "Provide a path to the output.",
+                                    .required = true});
 }
 
 int main(int argc, char ** argv)
 {
-    seqan3::argument_parser parser{"compare_mantis_raptor_output", argc, argv, seqan3::update_notifications::off};
+    sharg::parser parser{"compare_mantis_raptor_output", argc, argv, sharg::update_notifications::off};
     parser.info.author = "Svenja Mehringer, Enrico Seiler";
     parser.info.email = "enrico.seiler@fu-berlin.de";
     parser.info.short_description = "Compares mantis and raptor results.";
@@ -323,7 +323,7 @@ int main(int argc, char ** argv)
         cfg.output_directory = std::filesystem::absolute(cfg.output_directory);
         check_output_file(cfg.output_directory / "stats.txt");
     }
-    catch (seqan3::argument_parser_error const & ext)
+    catch (sharg::parser_error const & ext)
     {
         std::cerr << "[Error] " << ext.what() << '\n';
         std::exit(-1);

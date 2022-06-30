@@ -40,3 +40,6 @@
 	branch = master
 	shallow = true
 	fetchRecurseSubmodules = false
+[submodule "lib/submodules/sharg-parser"]
+	path = lib/submodules/sharg-parser
+	url = https://github.com/seqan/sharg-parser

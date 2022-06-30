@@ -7,10 +7,47 @@
 
 #pragma once
 
-#include <seqan3/argument_parser/argument_parser.hpp>
+#include <sharg/parser.hpp>
+
 #include <seqan3/io/sequence_file/input.hpp>
 
 #include <raptor/strong_types.hpp>
+
+namespace raptor::detail
+{
+
+static inline std::vector<std::string> sequence_extensions{
+    seqan3::detail::valid_file_extensions<typename seqan3::sequence_file_input<>::valid_formats>()};
+
+static inline std::vector<std::string> compression_extensions{[]()
+                                                              {
+                                                                  std::vector<std::string> result;
+#ifdef SEQAN3_HAS_BZIP2
+                                                                  result.push_back("bz2");
+#endif
+#ifdef SEQAN3_HAS_ZLIB
+                                                                  result.push_back("gz");
+                                                                  result.push_back("bgzf");
+#endif
+                                                                  return result;
+                                                              }()}; // GCOVR_EXCL_LINE
+
+static inline std::vector<std::string> combined_extensions{
+    []()
+    {
+        if (compression_extensions.empty())
+            return sequence_extensions; // GCOVR_EXCL_LINE
+        std::vector<std::string> result;
+        for (auto && sequence_extension : sequence_extensions)
+        {
+            result.push_back(sequence_extension);
+            for (auto && compression_extension : compression_extensions)
+                result.push_back(sequence_extension + std::string{'.'} + compression_extension);
+        }
+        return result;
+    }()};
+
+} // namespace raptor::detail
 
 namespace raptor
 {
@@ -22,7 +59,7 @@ struct power_of_two_validator
     void operator()(option_value_type const & val) const
     {
         if (!std::has_single_bit(val))
-            throw seqan3::validation_error{"The value must be a power of two."};
+            throw sharg::validation_error{"The value must be a power of two."};
     }
 
     static std::string get_help_page_message()
@@ -54,7 +91,7 @@ public:
     void operator()(option_value_type const & val) const
     {
         if (!is_zero_positive && !val)
-            throw seqan3::validation_error{"The value must be a positive integer."};
+            throw sharg::validation_error{"The value must be a positive integer."};
     }
 
     std::string get_help_page_message() const
@@ -87,7 +124,7 @@ public:
     void operator()(option_value_type const & cmp) const
     {
         if (!std::regex_match(cmp, expression))
-            throw seqan3::validation_error{
+            throw sharg::validation_error{
                 seqan3::detail::to_string("Value ",
                                           cmp,
                                           " must be an integer followed by [k,m,g,t] (case insensitive).")};
@@ -129,7 +166,7 @@ public:
     void operator()(option_value_type const & values) const
     {
         if (values.empty())
-            throw seqan3::validation_error{"The list of input files cannot be empty."};
+            throw sharg::validation_error{"The list of input files cannot be empty."};
 
         bool const is_minimiser_input = std::filesystem::path{values[0][0]}.extension() == ".minimiser";
 
@@ -140,9 +177,9 @@ public:
                 std::filesystem::path const file_path{value};
 
                 if (is_minimiser_input && (file_path.extension() != ".minimiser"))
-                    throw seqan3::validation_error{"You cannot mix sequence and minimiser files as input."};
+                    throw sharg::validation_error{"You cannot mix sequence and minimiser files as input."};
                 if (std::filesystem::file_size(file_path) == 0u)
-                    throw seqan3::validation_error{"The file " + value + " is empty."};
+                    throw sharg::validation_error{"The file " + value + " is empty."};
 
                 if (is_minimiser_input)
                     minimiser_file_validator(file_path);
@@ -159,47 +196,19 @@ public:
                                          "being separated by a whitespace. Each line in the file corresponds to one "
                                          "bin. Valid extensions for the paths in the file are [minimiser] when "
                                          " preprocessing, and ",
-                                         sequence_extensions,
+                                         raptor::detail::sequence_extensions,
 #if defined(SEQAN3_HAS_BZIP2) || defined(SEQAN3_HAS_ZLIB)
                                          ", possibly followed by ",
-                                         compression_extensions,
+                                         raptor::detail::compression_extensions,
 #endif
                                          " otherwise. ");
     }
 
 private:
-    std::vector<std::string> sequence_extensions{
-        seqan3::detail::valid_file_extensions<typename seqan3::sequence_file_input<>::valid_formats>()};
-    std::vector<std::string> compression_extensions{[&]()
-                                                    {
-                                                        std::vector<std::string> result;
-#ifdef SEQAN3_HAS_BZIP2
-                                                        result.push_back("bz2");
-#endif
-#ifdef SEQAN3_HAS_ZLIB
-                                                        result.push_back("gz");
-                                                        result.push_back("bgzf");
-#endif
-                                                        return result;
-                                                    }()}; // GCOVR_EXCL_LINE
-    std::vector<std::string> combined_extensions{
-        [&]()
-        {
-            if (compression_extensions.empty())
-                return sequence_extensions; // GCOVR_EXCL_LINE
-            std::vector<std::string> result;
-            for (auto && sequence_extension : sequence_extensions)
-            {
-                result.push_back(sequence_extension);
-                for (auto && compression_extension : compression_extensions)
-                    result.push_back(sequence_extension + std::string{'.'} + compression_extension);
-            }
-            return result;
-        }()};
-    seqan3::input_file_validator<> minimiser_file_validator{{"minimiser"}};
+    sharg::input_file_validator minimiser_file_validator{{"minimiser"}};
 
 public:
-    seqan3::input_file_validator<> sequence_file_validator{{combined_extensions}};
+    sharg::input_file_validator sequence_file_validator{raptor::detail::combined_extensions};
 };
 
 } // namespace raptor

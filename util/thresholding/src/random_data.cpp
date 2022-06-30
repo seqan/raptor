@@ -13,7 +13,8 @@
 #include <filesystem>
 #include <random>
 
-#include <seqan3/argument_parser/all.hpp>
+#include <sharg/all.hpp>
+
 #include <seqan3/core/debug_stream.hpp>
 #include <seqan3/io/sequence_file/output.hpp>
 
@@ -106,44 +107,47 @@ struct cmd_arguments
     size_t seed{0x7E82B6F280D4706B};
 };
 
-void initialize_argument_parser(seqan3::argument_parser & parser, cmd_arguments & args)
+void initialize_argument_parser(sharg::parser & parser, cmd_arguments & args)
 {
     parser.info.author = "Enrico Seiler";
     parser.info.short_description = "This programs creates random data for testing purposes.";
     parser.info.version = "1.0.0";
 
     parser.add_option(args.output_file,
-                      '\0',
-                      "out",
-                      "The output directory where the files will be located.",
-                      seqan3::option_spec::required,
-                      seqan3::output_directory_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "out",
+                                    .description = "The output directory where the files will be located.",
+                                    .required = true,
+                                    .validator = sharg::output_directory_validator{}});
     parser.add_option(args.reference_length,
-                      '\0',
-                      "reference-size",
-                      "The length of the reference.",
-                      seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{1, 1'000'000'000});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "reference-size",
+                                    .description = "The length of the reference.",
+                                    .validator = sharg::arithmetic_range_validator{1, 1'000'000'000}});
     parser.add_option(args.number_of_queries,
-                      '\0',
-                      "number-of-queries",
-                      "The number of queries.",
-                      seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{1, 1'000'000'000});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "number-of-queries",
+                                    .description = "The number of queries.",
+                                    .validator = sharg::arithmetic_range_validator{1, 1'000'000'000}});
     parser.add_option(args.query_length,
-                      '\0',
-                      "query_length",
-                      "The length of the queries.",
-                      seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{1, 1'000'000});
-    parser.add_option(args.min_error, '\0', "min_error", "The minimal number of errors.");
-    parser.add_option(args.max_error, '\0', "max_error", "The maximal number of errors.");
-    parser.add_option(args.seed, '\0', "seed", "The seed to use.", seqan3::option_spec::advanced);
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "query_length",
+                                    .description = "The length of the queries.",
+                                    .validator = sharg::arithmetic_range_validator{1, 1'000'000}});
+    parser.add_option(
+        args.min_error,
+        sharg::config{.short_id = '\0', .long_id = "min_error", .description = "The minimal number of errors."});
+    parser.add_option(
+        args.max_error,
+        sharg::config{.short_id = '\0', .long_id = "max_error", .description = "The maximal number of errors."});
+    parser.add_option(
+        args.seed,
+        sharg::config{.short_id = '\0', .long_id = "seed", .description = "The seed to use.", .advanced = true});
 }
 
 int main(int argc, char ** argv)
 {
-    seqan3::argument_parser myparser{"Minimizers", argc, argv, seqan3::update_notifications::off};
+    sharg::parser myparser{"Minimizers", argc, argv, sharg::update_notifications::off};
     cmd_arguments args{};
 
     initialize_argument_parser(myparser, args);
@@ -152,9 +156,9 @@ int main(int argc, char ** argv)
     {
         myparser.parse();
         if (args.min_error > args.max_error)
-            throw seqan3::parser_invalid_argument{"The minimum number of errors cannot be greater than the maximum."};
+            throw sharg::user_input_error{"The minimum number of errors cannot be greater than the maximum."};
     }
-    catch (seqan3::argument_parser_error const & ext)
+    catch (sharg::parser_error const & ext)
     {
         std::cerr << "[Error] " << ext.what() << "\n";
         return -1;

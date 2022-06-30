@@ -1,4 +1,5 @@
-#include <seqan3/argument_parser/all.hpp>
+#include <sharg/all.hpp>
+
 #include <seqan3/io/sequence_file/all.hpp>
 
 struct dna4_traits : seqan3::sequence_file_input_default_traits_dna
@@ -11,9 +12,13 @@ int main(int argc, char ** argv)
     std::filesystem::path input_file{};
     std::filesystem::path output_file{};
 
-    seqan3::argument_parser parser{"fasta_to_fastq", argc, argv, seqan3::update_notifications::off};
-    parser.add_option(input_file, '\0', "input", "Input FASTA file.", seqan3::option_spec::required);
-    parser.add_option(output_file, '\0', "output", "OUTPUT FASTQ file.", seqan3::option_spec::required);
+    sharg::parser parser{"fasta_to_fastq", argc, argv, sharg::update_notifications::off};
+    parser.add_option(
+        input_file,
+        sharg::config{.short_id = '\0', .long_id = "input", .description = "Input FASTA file.", .required = true});
+    parser.add_option(
+        output_file,
+        sharg::config{.short_id = '\0', .long_id = "output", .description = "OUTPUT FASTQ file.", .required = true});
     parser.parse();
 
     seqan3::sequence_file_input<dna4_traits> fin{input_file};

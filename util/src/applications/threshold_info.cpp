@@ -11,7 +11,8 @@
 
 #include <robin_hood.h>
 
-#include <seqan3/argument_parser/all.hpp>
+#include <sharg/all.hpp>
+
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
 #include <seqan3/io/views/async_input_buffer.hpp>
 #include <seqan3/search/views/minimiser_hash.hpp>
@@ -123,80 +124,80 @@ void threshold_info(raptor::search_arguments const & arguments, std::string cons
     }
 }
 
-void init_search_parser(seqan3::argument_parser & parser,
-                        raptor::search_arguments & arguments,
-                        std::string & shape_string)
+void init_search_parser(sharg::parser & parser, raptor::search_arguments & arguments, std::string & shape_string)
 {
     arguments.cache_thresholds = false;
+
     parser.add_option(arguments.query_file,
-                      '\0',
-                      "query",
-                      "Provide a path to the query file.",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "query",
+                                    .description = "Provide a path to the query file.",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{}});
     parser.add_option(arguments.out_file,
-                      '\0',
-                      "output",
-                      "Provide a path to the output.",
-                      seqan3::option_spec::required);
-    parser.add_option(arguments.shape_size,
-                      '\0',
-                      "kmer",
-                      "The k-mer size. Mutually exclusive with --shape.",
-                      seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{1, 32});
-    parser.add_option(shape_string,
-                      '\0',
-                      "shape",
-                      "The shape to use for k-mers. Mutually exclusive with --kmer.",
-                      seqan3::option_spec::standard,
-                      seqan3::regex_validator{"[01]+"});
-    parser.add_option(arguments.window_size,
-                      '\0',
-                      "window",
-                      "The window size.",
-                      seqan3::option_spec::standard,
-                      raptor::positive_integer_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "output",
+                                    .description = "Provide a path to the output.",
+                                    .required = true});
     parser.add_option(arguments.errors,
-                      '\0',
-                      "error",
-                      "The number of errors",
-                      seqan3::option_spec::standard,
-                      raptor::positive_integer_validator{true});
-    parser.add_option(arguments.tau,
-                      '\0',
-                      "tau",
-                      "Threshold for probabilistic models.",
-                      seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{0, 1});
-    parser.add_option(arguments.p_max,
-                      '\0',
-                      "p_max",
-                      "Correction.",
-                      seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{0, 1});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "error",
+                                    .description = "The number of errors",
+                                    .validator = raptor::positive_integer_validator{true}});
+    parser.add_option(arguments.shape_size,
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "kmer",
+                                    .description = "The k-mer size. Mutually exclusive with --shape.",
+                                    .validator = sharg::arithmetic_range_validator{1, 32}});
+    parser.add_option(arguments.window_size,
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "window",
+                                    .description = "The window size.",
+                                    .validator = raptor::positive_integer_validator{}});
+    parser.add_option(shape_string,
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "shape",
+                                    .description = "The shape to use for k-mers. Mutually exclusive with --kmer.",
+                                    .validator = sharg::regex_validator{"[01]+"}});
+    parser.add_option(
+        arguments.tau,
+        sharg::config{.short_id = '\0',
+                      .long_id = "tau",
+                      .description = "Used in the dynamic thresholding. The higher tau, the lower the threshold.",
+                      .validator = sharg::arithmetic_range_validator{0, 1}});
+    parser.add_option(
+        arguments.threshold,
+        sharg::config{.short_id = '\0',
+                      .long_id = "threshold",
+                      .description = "If set, this threshold is used instead of the probabilistic models.",
+                      .validator = sharg::arithmetic_range_validator{0, 1}});
+    parser.add_option(
+        arguments.p_max,
+        sharg::config{.short_id = '\0',
+                      .long_id = "p_max",
+                      .description = "Used in the dynamic thresholding. The higher p_max, the lower the threshold.",
+                      .validator = sharg::arithmetic_range_validator{0, 1}});
     parser.add_option(arguments.fpr,
-                      '\0',
-                      "fpr",
-                      "fpr.",
-                      seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{0, 1});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "fpr",
+                                    .description = "The false positive rate used for building the index.",
+                                    .validator = sharg::arithmetic_range_validator{0, 1}});
     parser.add_option(arguments.pattern_size,
-                      '\0',
-                      "pattern",
-                      "The pattern size. Default: Use median of sequence lengths in query file.",
-                      seqan3::option_spec::standard);
+                      sharg::config{
+                          .short_id = '\0',
+                          .long_id = "pattern",
+                          .description = "The pattern size. Default: Use median of sequence lengths in query file.",
+                      });
     parser.add_option(arguments.threads,
-                      '\0',
-                      "threads",
-                      "The numer of threads to use.",
-                      seqan3::option_spec::standard,
-                      raptor::positive_integer_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "threads",
+                                    .description = "The numer of threads to use.",
+                                    .validator = raptor::positive_integer_validator{}});
 }
 
 int main(int argc, char ** argv)
 {
-    seqan3::argument_parser parser{"threshold_info", argc, argv, seqan3::update_notifications::off};
+    sharg::parser parser{"threshold_info", argc, argv, sharg::update_notifications::off};
     parser.info.author = "Enrico Seiler";
     parser.info.author = "enrico.seiler@fu-berlin.de";
     parser.info.short_description = "Print thresholds.";
@@ -210,7 +211,7 @@ int main(int argc, char ** argv)
     {
         parser.parse();
     }
-    catch (seqan3::argument_parser_error const & ext)
+    catch (sharg::parser_error const & ext)
     {
         std::cerr << "[Error] " << ext.what() << '\n';
         std::exit(-1);
@@ -219,7 +220,7 @@ int main(int argc, char ** argv)
     if (parser.is_option_set("shape"))
     {
         if (parser.is_option_set("kmer"))
-            throw seqan3::argument_parser_error{"You cannot set both shape and k-mer arguments."};
+            throw sharg::parser_error{"You cannot set both shape and k-mer arguments."};
 
         uint64_t tmp{};
 
@@ -238,7 +239,7 @@ int main(int argc, char ** argv)
     std::filesystem::create_directories(output_directory, ec);
 
     if (!output_directory.empty() && ec)
-        throw seqan3::argument_parser_error{
+        throw sharg::parser_error{
             seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
 
     if (!arguments.pattern_size)

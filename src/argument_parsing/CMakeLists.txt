@@ -4,7 +4,6 @@ add_library ("raptor_argument_parsing" STATIC
              ../build/hibf/parse_chopper_pack_line.cpp
              build_parsing.cpp
              init_shared_meta.cpp
-             init_shared_meta.cpp
              parse_bin_path.cpp
              search_parsing.cpp
              upgrade_parsing.cpp
