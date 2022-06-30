@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <seqan3/argument_parser/exceptions.hpp>
+#include <sharg/exceptions.hpp>
 
 #include <raptor/argument_parsing/build_arguments.hpp>
 #include <raptor/hierarchical_interleaved_bloom_filter.hpp>
@@ -164,19 +164,19 @@ public:
                 if ((data_layout_mode == seqan3::data_layout::compressed && !compressed_)
                     || (data_layout_mode == seqan3::data_layout::uncompressed && compressed_))
                 {
-                    throw seqan3::argument_parser_error{"Data layouts of serialised and specified index differ."};
+                    throw sharg::parser_error{"Data layouts of serialised and specified index differ."};
                 }
                 archive(bin_path_);
                 archive(ibf_);
             }
             catch (std::exception const & e)
             {
-                throw seqan3::argument_parser_error{"Cannot read index: " + std::string{e.what()}};
+                throw sharg::parser_error{"Cannot read index: " + std::string{e.what()}};
             }
         }
         else
         {
-            throw seqan3::argument_parser_error{"Unsupported index version. Check raptor upgrade."}; // GCOVR_EXCL_LINE
+            throw sharg::parser_error{"Unsupported index version. Check raptor upgrade."}; // GCOVR_EXCL_LINE
         }
     }
 
@@ -205,13 +205,13 @@ public:
             // GCOVR_EXCL_START
             catch (std::exception const & e)
             {
-                throw seqan3::argument_parser_error{"Cannot read index: " + std::string{e.what()}};
+                throw sharg::parser_error{"Cannot read index: " + std::string{e.what()}};
             }
             // GCOVR_EXCL_STOP
         }
         else
         {
-            throw seqan3::argument_parser_error{"Unsupported index version. Check raptor upgrade."}; // GCOVR_EXCL_LINE
+            throw sharg::parser_error{"Unsupported index version. Check raptor upgrade."}; // GCOVR_EXCL_LINE
         }
     }
     //!\endcond
