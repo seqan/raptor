@@ -24,14 +24,15 @@ set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # Dependency: SeqAn3.
+set (SEQAN3_SUBMODULES_DIR "../../lib")
 find_package (SeqAn3 QUIET REQUIRED HINTS ../../lib/seqan3/build_system)
 
-add_library (common INTERFACE)
-target_link_libraries ("common" INTERFACE seqan3::seqan3)
-target_include_directories ("common" INTERFACE include)
+add_library (common_thresholding INTERFACE)
+target_link_libraries ("common_thresholding" INTERFACE seqan3::seqan3)
+target_include_directories ("common_thresholding" INTERFACE include)
 
 add_executable (query src/query.cpp)
-target_link_libraries ("query" "common")
+target_link_libraries ("query" "common_thresholding")
 
 add_executable (random_data src/random_data.cpp)
-target_link_libraries ("random_data" "common")
+target_link_libraries ("random_data" "common_thresholding")

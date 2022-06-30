@@ -18,7 +18,8 @@
 
 #include <cereal/types/vector.hpp>
 
-#include <seqan3/argument_parser/all.hpp>
+#include <sharg/all.hpp>
+
 #include <seqan3/core/concept/cereal.hpp>
 #include <seqan3/core/debug_stream.hpp>
 #include <seqan3/io/sequence_file/input.hpp>
@@ -29,6 +30,37 @@
 #include <lemma_threshold.hpp>
 #include <minimizer_model.hpp>
 // clang-format on
+
+static inline std::vector<std::string> sequence_extensions{
+    seqan3::detail::valid_file_extensions<typename seqan3::sequence_file_input<>::valid_formats>()};
+
+static inline std::vector<std::string> compression_extensions{[]()
+                                                              {
+                                                                  std::vector<std::string> result;
+#ifdef SEQAN3_HAS_BZIP2
+                                                                  result.push_back("bz2");
+#endif
+#ifdef SEQAN3_HAS_ZLIB
+                                                                  result.push_back("gz");
+                                                                  result.push_back("bgzf");
+#endif
+                                                                  return result;
+                                                              }()}; // GCOVR_EXCL_LINE
+
+static inline std::vector<std::string> combined_extensions{
+    []()
+    {
+        if (compression_extensions.empty())
+            return sequence_extensions; // GCOVR_EXCL_LINE
+        std::vector<std::string> result;
+        for (auto && sequence_extension : sequence_extensions)
+        {
+            result.push_back(sequence_extension);
+            for (auto && compression_extension : compression_extensions)
+                result.push_back(sequence_extension + std::string{'.'} + compression_extension);
+        }
+        return result;
+    }()};
 
 struct my_traits : seqan3::sequence_file_input_default_traits_dna
 {
@@ -282,78 +314,78 @@ void compute_simple_model(cmd_arguments const & args, bool const indirect, bool 
     seqan3::debug_stream << '\n';
 }
 
-void initialize_argument_parser(seqan3::argument_parser & parser, cmd_arguments & args)
+void initialize_argument_parser(sharg::parser & parser, cmd_arguments & args)
 {
     parser.info.author = "Enrico Seiler";
     parser.info.short_description = "This programs computes minimizer thresholds using different approaches.";
     parser.info.version = "1.0.0";
 
     parser.add_option(args.reference_file,
-                      'r',
-                      "reference",
-                      "Provide a reference file.",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator<seqan3::sequence_file_input<>>{});
+                      sharg::config{.short_id = 'r',
+                                    .long_id = "reference",
+                                    .description = "Provide a reference file.",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{combined_extensions}});
     parser.add_option(args.query_file,
-                      'q',
-                      "query",
-                      "Provide a query file.",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator<seqan3::sequence_file_input<>>{});
+                      sharg::config{.short_id = 'q',
+                                    .long_id = "query",
+                                    .description = "Provide a query file.",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{combined_extensions}});
     parser.add_option(args.output_directory,
-                      'o',
-                      "out",
-                      "",
-                      seqan3::option_spec::required,
-                      seqan3::output_directory_validator{});
+                      sharg::config{.short_id = 'o',
+                                    .long_id = "out",
+                                    .description = "",
+                                    .required = true,
+                                    .validator = sharg::output_directory_validator{}});
     parser.add_option(args.window_size,
-                      'w',
-                      "window",
-                      "Choose the window size.",
-                      seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{1, 1000});
+                      sharg::config{.short_id = 'w',
+                                    .long_id = "window",
+                                    .description = "Choose the window size.",
+                                    .validator = sharg::arithmetic_range_validator{1, 1000}});
     parser.add_option(args.kmer_size,
-                      'k',
-                      "kmer",
-                      "Choose the kmer size.",
-                      seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{1, 32});
+                      sharg::config{.short_id = 'k',
+                                    .long_id = "kmer",
+                                    .description = "Choose the kmer size.",
+                                    .validator = sharg::arithmetic_range_validator{1, 32}});
     parser.add_option(args.errors,
-                      'e',
-                      "error",
-                      "Choose the number of errors.",
-                      seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{0, 5});
+                      sharg::config{.short_id = 'e',
+                                    .long_id = "error",
+                                    .description = "Choose the number of errors.",
+                                    .validator = sharg::arithmetic_range_validator{0, 5}});
     parser.add_option(args.tau,
-                      't',
-                      "tau",
-                      "Threshold for probabilistic models.",
-                      seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{0, 1});
+                      sharg::config{.short_id = 't',
+                                    .long_id = "tau",
+                                    .description = "Threshold for probabilistic models.",
+                                    .validator = sharg::arithmetic_range_validator{0, 1}});
     parser.add_option(args.pattern_size,
-                      'p',
-                      "pattern",
-                      "Choose the pattern size. Only needed for methods other than "
-                      "heuristic or lemma. Default: Use median of sequence lengths in query file.");
-    // clang-format off
+                      sharg::config{.short_id = 'p',
+                                    .long_id = "pattern",
+                                    .description =
+                                        "Choose the pattern size. Only needed for methods other than "
+                                        "heuristic or lemma. Default: Use median of sequence lengths in query file."});
     parser.add_option(args.method,
-                      'm',
-                      "method",
-                      "Choose the methods to compute the trheshold.",
-                      seqan3::option_spec::required,
-                      seqan3::value_list_validator{"heuristic", "lemma", "simple", "indirect", "overlap",
-                                                   "indirect-overlap", "all"});
-    // clang-format on
+                      sharg::config{.short_id = 'm',
+                                    .long_id = "method",
+                                    .description = "Choose the methods to compute the trheshold.",
+                                    .required = true,
+                                    .validator = sharg::value_list_validator{"heuristic",
+                                                                             "lemma",
+                                                                             "simple",
+                                                                             "indirect",
+                                                                             "overlap",
+                                                                             "indirect-overlap",
+                                                                             "all"}});
     parser.add_flag(args.from_file,
-                    'f',
-                    "from_file",
-                    "Load precomputed threshold from disk. Program must have "
-                    "been run without this flag before.");
+                    sharg::config{.short_id = 'f',
+                                  .long_id = "from_file",
+                                  .description = "Load precomputed threshold from disk. Program must have "
+                                                 "been run without this flag before."});
 }
 
 int main(int argc, char ** argv)
 {
-    seqan3::argument_parser myparser{"Minimizers", argc, argv, seqan3::update_notifications::off};
+    sharg::parser myparser{"Minimizers", argc, argv, sharg::update_notifications::off};
     cmd_arguments args{};
 
     initialize_argument_parser(myparser, args);
@@ -362,7 +394,7 @@ int main(int argc, char ** argv)
     {
         myparser.parse();
     }
-    catch (seqan3::argument_parser_error const & ext)
+    catch (sharg::parser_error const & ext)
     {
         std::cerr << "[Error] " << ext.what() << "\n";
         return -1;

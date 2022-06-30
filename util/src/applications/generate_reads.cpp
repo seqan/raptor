@@ -7,7 +7,8 @@
 
 #include <random>
 
-#include <seqan3/argument_parser/all.hpp>
+#include <sharg/all.hpp>
+
 #include <seqan3/io/sequence_file/input.hpp>
 #include <seqan3/io/sequence_file/output.hpp>
 
@@ -97,42 +98,46 @@ void run_program(cmd_arguments const & arguments)
     }
 }
 
-void initialise_argument_parser(seqan3::argument_parser & parser, cmd_arguments & arguments)
+void initialise_argument_parser(sharg::parser & parser, cmd_arguments & arguments)
 {
     parser.info.author = "Enrico Seiler";
     parser.info.author = "enrico.seiler@fu-berlin.de";
     parser.info.short_description = "Generate reads from bins.";
     parser.info.version = "0.0.1";
     parser.info.examples = {"./generate_reads --output ./reads_e2 all_bins.txt"};
-    parser.add_positional_option(arguments.bin_file_path,
-                                 "Provide a path to a file containing one path to a bin per line.",
-                                 seqan3::input_file_validator{});
+    parser.add_positional_option(
+        arguments.bin_file_path,
+        sharg::config{.description = "Provide a path to a file containing one path to a bin per line.",
+                      .validator = sharg::input_file_validator{}});
     parser.add_option(arguments.out_path,
-                      '\0',
-                      "output",
-                      "Provide the base dir where the reads should be written to.",
-                      seqan3::option_spec::required,
-                      seqan3::output_directory_validator{});
-    // parser.add_option(arguments.min_errors,
-    //                   '\0',
-    //                   "min_errors",
-    //                   "The minimum number of errors.");
-    parser.add_option(arguments.max_errors, '\0', "max_errors", "The maximum number of errors.");
-    parser.add_option(arguments.read_length, '\0', "read_length", "The read length.");
-    parser.add_option(arguments.number_of_reads, '\0', "number_of_reads", "The number of reads.");
-    parser.add_option(arguments.number_of_haplotypes, '\0', "number_of_haplotypes", "The number of haplotypes.");
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "output",
+                                    .description = "Provide the base dir where the reads should be written to.",
+                                    .required = true,
+                                    .validator = sharg::output_directory_validator{}});
+    parser.add_option(
+        arguments.max_errors,
+        sharg::config{.short_id = '\0', .long_id = "max_errors", .description = "The maximum number of errors."});
+    parser.add_option(arguments.read_length,
+                      sharg::config{.short_id = '\0', .long_id = "read_length", .description = "The read length."});
+    parser.add_option(
+        arguments.number_of_reads,
+        sharg::config{.short_id = '\0', .long_id = "number_of_reads", .description = "The number of reads."});
+    parser.add_option(
+        arguments.number_of_haplotypes,
+        sharg::config{.short_id = '\0', .long_id = "number_of_haplotypes", .description = "The number of haplotypes."});
 }
 
 int main(int argc, char ** argv)
 {
-    seqan3::argument_parser myparser{"build_ibf", argc, argv, seqan3::update_notifications::off};
+    sharg::parser myparser{"build_ibf", argc, argv, sharg::update_notifications::off};
     cmd_arguments arguments{};
     initialise_argument_parser(myparser, arguments);
     try
     {
         myparser.parse();
     }
-    catch (seqan3::argument_parser_error const & ext)
+    catch (sharg::parser_error const & ext)
     {
         std::cout << "[Error] " << ext.what() << "\n";
         return -1;
@@ -140,7 +145,7 @@ int main(int argc, char ** argv)
 
     std::ifstream istrm{arguments.bin_file_path};
     std::string line;
-    seqan3::input_file_validator validator{};
+    sharg::input_file_validator validator{};
 
     while (std::getline(istrm, line))
     {
@@ -153,21 +158,21 @@ int main(int argc, char ** argv)
     }
 
     // if (arguments.min_errors > arguments.max_errors)
-    //     throw seqan3::argument_parser_error{"Minimum number of errors must be at most the maximum number of errors."};
+    //     throw sharg::parser_error{"Minimum number of errors must be at most the maximum number of errors."};
 
     size_t const number_of_bins{arguments.bin_path.size()};
 
     if (arguments.max_errors > arguments.read_length)
-        throw seqan3::argument_parser_error{"Cannot have more errors than the read is long."};
+        throw sharg::parser_error{"Cannot have more errors than the read is long."};
 
     if (number_of_bins > arguments.number_of_reads)
-        throw seqan3::argument_parser_error{"Must simulate at least one read per bin."};
+        throw sharg::parser_error{"Must simulate at least one read per bin."};
 
     if (arguments.number_of_reads % number_of_bins)
-        throw seqan3::argument_parser_error{"The number of reads must distribute evenly over the bins."};
+        throw sharg::parser_error{"The number of reads must distribute evenly over the bins."};
 
     if ((arguments.number_of_reads / number_of_bins) % arguments.number_of_haplotypes)
-        throw seqan3::argument_parser_error{"The number of reads per bin must evenly distribute over the haplotypes."};
+        throw sharg::parser_error{"The number of reads per bin must evenly distribute over the haplotypes."};
 
     run_program(arguments);
 

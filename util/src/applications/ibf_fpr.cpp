@@ -16,38 +16,33 @@ struct config
     double fpr{0.05};
 };
 
-void init_parser(seqan3::argument_parser & parser, config & cfg)
+void init_parser(sharg::parser & parser, config & cfg)
 {
     parser.add_option(cfg.kmer_size,
-                      '\0',
-                      "kmer",
-                      "The k-mer size.",
-                      seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{1, 32});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "kmer",
+                                    .description = "The k-mer size.",
+                                    .validator = sharg::arithmetic_range_validator{1, 32}});
     parser.add_option(cfg.elements,
-                      '\0',
-                      "elements",
-                      "Number of elements to insert.",
-                      seqan3::option_spec::standard,
-                      raptor::positive_integer_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "elements",
+                                    .description = "Number of elements to insert.",
+                                    .validator = raptor::positive_integer_validator{}});
     parser.add_option(cfg.splits,
-                      '\0',
-                      "splits",
-                      "Number of bins to split into.",
-                      seqan3::option_spec::standard,
-                      raptor::positive_integer_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "splits",
+                                    .description = "Number of bins to split into.",
+                                    .validator = raptor::positive_integer_validator{}});
     parser.add_option(cfg.hash,
-                      '\0',
-                      "hash",
-                      "The number of hash functions to use.",
-                      seqan3::option_spec::standard,
-                      seqan3::arithmetic_range_validator{1, 5});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "hash",
+                                    .description = "The number of hash functions to use.",
+                                    .validator = sharg::arithmetic_range_validator{1, 5}});
     parser.add_option(cfg.fpr,
-                      '\0',
-                      "fpr",
-                      "The desired false positive rate.",
-                      seqan3::option_spec::advanced,
-                      seqan3::arithmetic_range_validator{0.0, 1.0});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "fpr",
+                                    .description = "The desired false positive rate.",
+                                    .validator = sharg::arithmetic_range_validator{0.0, 1.0}});
 }
 
 size_t bin_size_in_bits(config const & cfg, size_t const elements)
@@ -169,7 +164,7 @@ void multiple_tb(config const & cfg, size_t const bin_size)
 
 int main(int argc, char ** argv)
 {
-    seqan3::argument_parser parser{"ibf_fpr", argc, argv, seqan3::update_notifications::off};
+    sharg::parser parser{"ibf_fpr", argc, argv, sharg::update_notifications::off};
     config cfg{};
     init_parser(parser, cfg);
     parser.parse();

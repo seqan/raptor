@@ -201,60 +201,62 @@ void normalise_output(config const & cfg)
     std::cerr << "Done" << std::endl;
 }
 
-void init_parser(seqan3::argument_parser & parser, config & cfg)
+void init_parser(sharg::parser & parser, config & cfg)
 {
     parser.add_option(cfg.query_names_file,
-                      '\0',
-                      "query_names",
-                      "The file containing query names, e.g., \"query.names\".",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "query_names",
+                                    .description = "The file containing query names, e.g., \"query.names\".",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{}});
     parser.add_option(cfg.user_bin_ids_file,
-                      '\0',
-                      "user_bin_ids",
-                      "The file containing user bin ids, e.g., \"user_bin.ids\".",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "user_bin_ids",
+                                    .description = "The file containing user bin ids, e.g., \"user_bin.ids\".",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{}});
     parser.add_option(cfg.mantis_result_file,
-                      '\0',
-                      "mantis_results",
-                      "The mantis result file, e.g., \"mantis.results\".",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "mantis_results",
+                                    .description = "The mantis result file, e.g., \"mantis.results\".",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{}});
     parser.add_option(cfg.output_file,
-                      '\0',
-                      "output_file",
-                      "Provide a path to the output.",
-                      seqan3::option_spec::required);
-    parser.add_option(cfg.percentage,
-                      '\0',
-                      "percentage",
-                      "Percentage of kmers in a query that need to be found to qualify as a hit.",
-                      seqan3::option_spec::required,
-                      seqan3::arithmetic_range_validator{0, 1});
-    // parser.add_option(cfg.kmer_size,
-    //                   '\0',
-    //                   "kmer_size",
-    //                   "The k-mer size.",
-    //                   seqan3::option_spec::required,
-    //                   seqan3::arithmetic_range_validator{1, 32});
-    // parser.add_option(cfg.number_of_errors,
-    //                   '\0',
-    //                   "errors",
-    //                   "The number of errors.",
-    //                   seqan3::option_spec::required,
-    //                   raptor::positive_integer_validator{true});
-    // parser.add_option(cfg.threshold_grace,
-    //                   '\0',
-    //                   "threshold_grace",
-    //                   "Reduce kmer threshold by this much.",
-    //                   seqan3::option_spec::required,
-    //                   raptor::positive_integer_validator{true});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "output_file",
+                                    .description = "Provide a path to the output.",
+                                    .required = true});
+    parser.add_option(
+        cfg.percentage,
+        sharg::config{.short_id = '\0',
+                      .long_id = "percentage",
+                      .description = "Percentage of kmers in a query that need to be found to qualify as a hit.",
+                      .required = true,
+                      .validator = sharg::arithmetic_range_validator{0, 1}});
+
+    // parser.add_option(cfg.kmer_size, sharg::config{
+    //                   .short_id='\0',
+    //                   .long_id="kmer_size",
+    //                   .description="The k-mer size.",
+    //                   .required=true,
+    //                   .validator=sharg::arithmetic_range_validator{1, 32}});
+    // parser.add_option(cfg.number_of_errors, sharg::config{
+    //                   .short_id='\0',
+    //                   .long_id="errors",
+    //                   .description="The number of errors.",
+    //                   .required=true,
+    //                   .validator=raptor::positive_integer_validator{true}});
+    // parser.add_option(cfg.threshold_grace, sharg::config{
+    //                   .short_id='\0',
+    //                   .long_id="threshold_grace",
+    //                   .description="Reduce kmer threshold by this much.",
+    //                   .required=true,
+    //                   .validator=raptor::positive_integer_validator{true}});
 }
 
 int main(int argc, char ** argv)
 {
-    seqan3::argument_parser parser{"normalise_mantis_output", argc, argv, seqan3::update_notifications::off};
+    sharg::parser parser{"normalise_mantis_output", argc, argv, sharg::update_notifications::off};
     parser.info.author = "Svenja Mehringer, Enrico Seiler";
     parser.info.email = "enrico.seiler@fu-berlin.de";
     parser.info.short_description = "Converts mantis results into raptor-like results.";
@@ -268,7 +270,7 @@ int main(int argc, char ** argv)
         parser.parse();
         check_output_file(cfg.output_file);
     }
-    catch (seqan3::argument_parser_error const & ext)
+    catch (sharg::parser_error const & ext)
     {
         std::cerr << "[Error] " << ext.what() << '\n';
         std::exit(-1);

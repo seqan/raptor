@@ -103,30 +103,32 @@ void normalise_output(config const & cfg)
     std::cerr << "Done" << std::endl;
 }
 
-void init_parser(seqan3::argument_parser & parser, config & cfg)
+void init_parser(sharg::parser & parser, config & cfg)
 {
-    parser.add_option(cfg.truth_user_bin_ids_file,
-                      '\0',
-                      "user_bin_ids",
-                      "The file containing user bin ids from the 'truth'-raptor file, e.g., \"user_bin.ids\".",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator{});
+    parser.add_option(
+        cfg.truth_user_bin_ids_file,
+        sharg::config{.short_id = '\0',
+                      .long_id = "user_bin_ids",
+                      .description =
+                          "The file containing user bin ids from the 'truth'-raptor file, e.g., \"user_bin.ids\".",
+                      .required = true,
+                      .validator = sharg::input_file_validator{}});
     parser.add_option(cfg.raptor_result_file,
-                      '\0',
-                      "raptor_results",
-                      "The raptor result file, e.g., \"raptor.results\".",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "raptor_results",
+                                    .description = "The raptor result file, e.g., \"raptor.results\".",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{}});
     parser.add_option(cfg.output_file,
-                      '\0',
-                      "output_file",
-                      "Provide a path to the output.",
-                      seqan3::option_spec::required);
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "output_file",
+                                    .description = "Provide a path to the output.",
+                                    .required = true});
 }
 
 int main(int argc, char ** argv)
 {
-    seqan3::argument_parser parser{"normalise_mantis_output", argc, argv, seqan3::update_notifications::off};
+    sharg::parser parser{"normalise_mantis_output", argc, argv, sharg::update_notifications::off};
     parser.info.author = "Svenja Mehringer, Enrico Seiler";
     parser.info.email = "enrico.seiler@fu-berlin.de";
     parser.info.short_description = "Unifies raptor results by replacing user bin ids from one raptor file with those "
@@ -141,7 +143,7 @@ int main(int argc, char ** argv)
         parser.parse();
         check_output_file(cfg.output_file);
     }
-    catch (seqan3::argument_parser_error const & ext)
+    catch (sharg::parser_error const & ext)
     {
         std::cerr << "[Error] " << ext.what() << '\n';
         std::exit(-1);

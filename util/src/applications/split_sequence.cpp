@@ -7,11 +7,43 @@
 
 #include <filesystem>
 
+#include <sharg/all.hpp>
+
 #include <seqan3/alphabet/nucleotide/dna4.hpp>
-#include <seqan3/argument_parser/all.hpp>
 #include <seqan3/io/sequence_file/input.hpp>
 #include <seqan3/io/sequence_file/output.hpp>
 #include <seqan3/utility/views/chunk.hpp>
+
+static inline std::vector<std::string> sequence_extensions{
+    seqan3::detail::valid_file_extensions<typename seqan3::sequence_file_input<>::valid_formats>()};
+
+static inline std::vector<std::string> compression_extensions{[]()
+                                                              {
+                                                                  std::vector<std::string> result;
+#ifdef SEQAN3_HAS_BZIP2
+                                                                  result.push_back("bz2");
+#endif
+#ifdef SEQAN3_HAS_ZLIB
+                                                                  result.push_back("gz");
+                                                                  result.push_back("bgzf");
+#endif
+                                                                  return result;
+                                                              }()}; // GCOVR_EXCL_LINE
+
+static inline std::vector<std::string> combined_extensions{
+    []()
+    {
+        if (compression_extensions.empty())
+            return sequence_extensions; // GCOVR_EXCL_LINE
+        std::vector<std::string> result;
+        for (auto && sequence_extension : sequence_extensions)
+        {
+            result.push_back(sequence_extension);
+            for (auto && compression_extension : compression_extensions)
+                result.push_back(sequence_extension + std::string{'.'} + compression_extension);
+        }
+        return result;
+    }()};
 
 struct dna4_traits : seqan3::sequence_file_input_default_traits_dna
 {
@@ -41,7 +73,7 @@ public:
     {
         if (!is_zero_positive && !val)
         {
-            throw seqan3::validation_error{"The value must be a positive integer."};
+            throw sharg::validation_error{"The value must be a positive integer."};
         }
     }
 
@@ -86,7 +118,7 @@ inline void split_sequence(config const & cfg)
 
 int main(int argc, char ** argv)
 {
-    seqan3::argument_parser parser{"split_sequence", argc, argv, seqan3::update_notifications::off};
+    sharg::parser parser{"split_sequence", argc, argv, sharg::update_notifications::off};
     parser.info.author = "Enrico Seiler";
     parser.info.author = "enrico.seiler@fu-berlin.de";
     parser.info.short_description = "Split a fasta into parts.";
@@ -95,37 +127,33 @@ int main(int argc, char ** argv)
     config cfg{};
 
     parser.add_option(cfg.input_path,
-                      '\0',
-                      "input",
-                      "Provide the path to a sequence to be split.",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator<seqan3::sequence_file_input<>>{});
-
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "input",
+                                    .description = "Provide the path to a sequence to be split.",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{combined_extensions}});
     parser.add_option(cfg.output_path,
-                      '\0',
-                      "output",
-                      "Provide an output filepath. Default: directory of input.",
-                      seqan3::option_spec::standard);
-
-    parser.add_option(cfg.parts,
-                      '\0',
-                      "parts",
-                      "The number of parts to split the sequence into. Mutually exclusive with --length.",
-                      seqan3::option_spec::standard,
-                      positive_integer_validator{});
-
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "output",
+                                    .description = "Provide an output filepath. Default: directory of input."});
+    parser.add_option(
+        cfg.parts,
+        sharg::config{.short_id = '\0',
+                      .long_id = "parts",
+                      .description =
+                          "The number of parts to split the sequence into. Mutually exclusive with --length.",
+                      .validator = positive_integer_validator{}});
     parser.add_option(cfg.length,
-                      '\0',
-                      "length",
-                      "The length of one part. Mutually exclusive with --parts.",
-                      seqan3::option_spec::standard,
-                      positive_integer_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "length",
+                                    .description = "The length of one part. Mutually exclusive with --parts.",
+                                    .validator = positive_integer_validator{}});
 
     try
     {
         parser.parse();
     }
-    catch (seqan3::argument_parser_error const & ext)
+    catch (sharg::parser_error const & ext)
     {
         std::cerr << "[Error] " << ext.what() << '\n';
         std::exit(-1);
@@ -133,16 +161,16 @@ int main(int argc, char ** argv)
 
     if (!parser.is_option_set("length") && !parser.is_option_set("parts"))
     {
-        throw seqan3::validation_error{"Set --length or --parts"};
+        throw sharg::validation_error{"Set --length or --parts"};
     }
 
     // {
     //     seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>> input_sequence{cfg.input_path};
     //     auto sequence_count = std::ranges::distance(input_sequence);
     //     if (sequence_count == 0)
-    //         throw seqan3::validation_error{"Empty input sequence."};
+    //         throw sharg::validation_error{"Empty input sequence."};
     //     if (sequence_count > 1)
-    //         throw seqan3::validation_error{"Only one sequence per input sequence allowed."};
+    //         throw sharg::validation_error{"Only one sequence per input sequence allowed."};
     // }
 
     if (!parser.is_option_set("length"))
@@ -166,7 +194,7 @@ int main(int argc, char ** argv)
             cfg.output_path = ".";
     }
 
-    seqan3::output_directory_validator{}(cfg.output_path);
+    sharg::output_directory_validator{}(cfg.output_path);
 
     split_sequence(cfg);
 }

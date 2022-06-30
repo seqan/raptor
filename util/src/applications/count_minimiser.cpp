@@ -11,7 +11,8 @@
 
 #include <robin_hood.h>
 
-#include <seqan3/argument_parser/all.hpp>
+#include <sharg/all.hpp>
+
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
 #include <seqan3/search/views/minimiser_hash.hpp>
 #include <seqan3/utility/views/chunk.hpp>
@@ -86,7 +87,7 @@ void compute_minimisers(config const & cfg)
 
 int main(int argc, char ** argv)
 {
-    seqan3::argument_parser parser{"count_minimiser", argc, argv, seqan3::update_notifications::off};
+    sharg::parser parser{"count_minimiser", argc, argv, sharg::update_notifications::off};
     parser.info.author = "Enrico Seiler";
     parser.info.author = "enrico.seiler@fu-berlin.de";
     parser.info.short_description = "Count minimiser.";
@@ -94,45 +95,40 @@ int main(int argc, char ** argv)
 
     config cfg{};
 
-    // clang-format off
-    parser.add_positional_option(cfg.bin_file,
-                                 "File containing file names.",
-                                 seqan3::input_file_validator{});
-    // clang-format on
+    parser.add_positional_option(
+        cfg.bin_file,
+        sharg::config{.description = "File containing file names.", .validator = sharg::input_file_validator{}});
 
-    parser.add_option(cfg.out_path,
-                      '\0',
-                      "output",
-                      "Provide an output filepath.",
-                      seqan3::option_spec::required,
-                      seqan3::output_file_validator{seqan3::output_file_open_options::create_new});
-
+    parser.add_option(
+        cfg.out_path,
+        sharg::config{.short_id = '\0',
+                      .long_id = "output",
+                      .description = "Provide an output filepath.",
+                      .required = true,
+                      .validator = sharg::output_file_validator{sharg::output_file_open_options::create_new}});
     parser.add_option(cfg.window_size,
-                      '\0',
-                      "window",
-                      "Choose the window size.",
-                      seqan3::option_spec::required,
-                      raptor::positive_integer_validator{});
-
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "window",
+                                    .description = "Choose the window size.",
+                                    .required = true,
+                                    .validator = raptor::positive_integer_validator{}});
     parser.add_option(cfg.kmer_size,
-                      '\0',
-                      "kmer",
-                      "Choose the kmer size.",
-                      seqan3::option_spec::required,
-                      seqan3::arithmetic_range_validator{1, 32});
-
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "kmer",
+                                    .description = "Choose the kmer size.",
+                                    .required = true,
+                                    .validator = sharg::arithmetic_range_validator{1, 32}});
     parser.add_option(cfg.threads,
-                      '\0',
-                      "threads",
-                      "Choose the number of threads.",
-                      seqan3::option_spec::standard,
-                      raptor::positive_integer_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "threads",
+                                    .description = "Choose the number of threads.",
+                                    .validator = raptor::positive_integer_validator{}});
 
     try
     {
         parser.parse();
     }
-    catch (seqan3::argument_parser_error const & ext)
+    catch (sharg::parser_error const & ext)
     {
         std::cerr << "[Error] " << ext.what() << '\n';
         std::exit(-1);
