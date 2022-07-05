@@ -1,8 +1,8 @@
 # Raptor [![build status][1]][2] [![codecov][3]][4] [![install with bioconda][5]][6] [![install with brew][7]][8]
 
-[1]: https://img.shields.io/github/workflow/status/seqan/raptor/CI%20on%20Linux/master?style=flat&logo=github&label=Raptor%20CI
-[2]: https://github.com/seqan/raptor/actions?query=branch%3Amaster
-[3]: https://codecov.io/gh/seqan/raptor/branch/master/graph/badge.svg?token=SJVMYRUKW2
+[1]: https://img.shields.io/github/workflow/status/seqan/raptor/CI%20on%20Linux/main?style=flat&logo=github&label=Raptor%20CI
+[2]: https://github.com/seqan/raptor/actions?query=branch%3Amain
+[3]: https://codecov.io/gh/seqan/raptor/branch/main/graph/badge.svg?token=SJVMYRUKW2
 [4]: https://codecov.io/gh/seqan/raptor
 [5]: https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat
 [6]: #install-with-bioconda-linux
@@ -37,7 +37,7 @@ Refer to the [Seqan3 Setup Tutorial](https://docs.seqan.de/seqan/3-master-user/s
 information.
 </details>
 
-<details><summary>Download current master branch (click to expand)</summary>
+<details><summary>Download current main branch (click to expand)</summary>
 
 ```bash
 git clone https://github.com/seqan/raptor
@@ -227,4 +227,4 @@ The subdirectory `util` contains applications and scripts related to the paper.
 
 ### License
 Raptor is open source software. However, certain conditions apply when you (re-)distribute and/or modify Raptor,
-please see the [license](https://github.com/seqan/raptor/blob/master/LICENSE.md).
+please see the [license](https://github.com/seqan/raptor/blob/main/LICENSE.md).
