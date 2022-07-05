@@ -3,7 +3,7 @@ name: CI on macOS
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
   pull_request:
     types:
       - unlabeled
