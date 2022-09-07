@@ -184,7 +184,13 @@ message (STATUS "${FontBold}You can run `make` to build the application.${FontRe
 
 ## DOCUMENTATION
 
-add_subdirectory (doc EXCLUDE_FROM_ALL)
+set (RAPTOR_BUILD_DOC
+     ON
+     CACHE BOOL "Build documentation"
+)
+if (RAPTOR_BUILD_DOC)
+    add_subdirectory (doc EXCLUDE_FROM_ALL)
+endif ()
 
 ## TEST
 
@@ -193,5 +199,11 @@ set (RAPTOR_ENABLE_BENCHMARK
      CACHE BOOL "Compile benchmarks as cli tests."
 )
 
-enable_testing ()
-add_subdirectory (test EXCLUDE_FROM_ALL)
+set (RAPTOR_BUILD_TEST
+     ON
+     CACHE BOOL "Build test"
+)
+if (RAPTOR_BUILD_TEST)
+    enable_testing ()
+    add_subdirectory (test EXCLUDE_FROM_ALL)
+endif ()

@@ -21,20 +21,19 @@ void load_index(index_t & index, search_arguments const & arguments, size_t cons
     std::filesystem::path index_file{arguments.index_file};
     index_file += "_" + std::to_string(part);
 
-    std::ifstream is{index_file, std::ios::binary};
-    cereal::BinaryInputArchive iarchive{is};
-
-    auto start = std::chrono::high_resolution_clock::now();
-    iarchive(index);
-    auto end = std::chrono::high_resolution_clock::now();
-
-    index_io_time += std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
+    load_index(index, index_file, index_io_time);
 }
 
 template <typename index_t>
 void load_index(index_t & index, search_arguments const & arguments, double & index_io_time)
 {
-    std::ifstream is{arguments.index_file, std::ios::binary};
+    load_index(index, arguments.index_file, index_io_time);
+}
+
+template <typename index_t>
+void load_index(index_t & index, std::filesystem::path const & path, double & index_io_time)
+{
+    std::ifstream is{path, std::ios::binary};
     cereal::BinaryInputArchive iarchive{is};
 
     auto start = std::chrono::high_resolution_clock::now();
