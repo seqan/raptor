@@ -144,7 +144,7 @@ set (RAPTOR_CHOPPER_PATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libchopper_count_lib
 list (APPEND RAPTOR_CHOPPER_PATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libchopper_layout_lib.a")
 
 if (EXISTS "${RAPTOR_CHOPPER_PATH}")
-    add_custom_target (chopper_lib)
+    add_custom_target (chopper_project)
 else ()
     set (RAPTOR_CHOPPER_ARGS "${SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS}")
     list (APPEND RAPTOR_CHOPPER_ARGS "-DCHOPPER_SUBMODULES_DIR=${RAPTOR_SUBMODULES_DIR}")
@@ -153,8 +153,8 @@ else ()
     list (APPEND RAPTOR_CHOPPER_ARGS "-DCMAKE_INSTALL_BINDIR=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
     include (ExternalProject)
-    ExternalProject_Add (chopper_lib
-                         PREFIX chopper_lib
+    ExternalProject_Add (chopper_project
+                         PREFIX chopper_project
                          SOURCE_DIR "${RAPTOR_SUBMODULES_DIR}/chopper"
                          DOWNLOAD_COMMAND ""
                          CMAKE_ARGS "${RAPTOR_CHOPPER_ARGS}"
@@ -164,19 +164,24 @@ else ()
 endif ()
 
 add_library (chopper_count STATIC IMPORTED)
-add_dependencies (chopper_count chopper_lib)
+add_dependencies (chopper_count chopper_project)
 set_target_properties (chopper_count PROPERTIES IMPORTED_LOCATION
                                                 "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libchopper_count_lib.a"
 )
 
 add_library (chopper_layout STATIC IMPORTED)
-add_dependencies (chopper_layout chopper_lib)
+add_dependencies (chopper_layout chopper_project)
 set_target_properties (chopper_layout PROPERTIES IMPORTED_LOCATION
                                                  "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libchopper_layout_lib.a"
 )
 
-add_library (chopper INTERFACE IMPORTED)
-set_property (TARGET chopper PROPERTY INTERFACE_LINK_LIBRARIES chopper_count chopper_layout ZLIB::ZLIB BZip2::BZip2)
+add_library (chopper_lib INTERFACE IMPORTED)
+set_property (TARGET chopper_lib PROPERTY INTERFACE_LINK_LIBRARIES chopper_count chopper_layout ZLIB::ZLIB BZip2::BZip2)
+
+add_executable (chopper IMPORTED)
+set_target_properties (chopper PROPERTIES IMPORTED_LOCATION
+                                          "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/chopper"
+)
 
 # Add the application.
 add_subdirectory (src)

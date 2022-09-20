@@ -1,0 +1,115 @@
+name: CI Nextflow
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    types:
+      - unlabeled
+  workflow_dispatch:
+
+concurrency:
+  group: nextflow-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
+env:
+  CMAKE_VERSION: 3.15.4
+  SEQAN3_NO_VERSION_CHECK: 1
+  SHARG_NO_VERSION_CHECK: 1
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -ex {0}
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'clang-format'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "Nextflow"
+            cxx: "g++-12"
+            cc: "gcc-12"
+            build_type: Release
+            cxx_flags: "-std=c++23"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: raptor
+          fetch-depth: 2
+          submodules: true
+
+      - name: Add package source
+        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/configure_apt.sh
+
+      - name: Install CMake
+        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_cmake.sh
+
+      - name: Install ccache
+        run: |
+          conda install --yes --override-channels --channel conda-forge ccache
+          sudo ln -s $CONDA/bin/ccache /usr/bin/ccache
+
+      - name: Install compiler ${{ matrix.cxx }}
+        run: sudo apt-get install --yes ${{ matrix.cxx }}
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: latest-stable
+
+      - name: Load ccache
+        uses: actions/cache@v3
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.ref }}-${{ github.run_number }}
+          # Restoring: From current branch, otherwise from base branch, otherwise from any branch.
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.ref }}
+            ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.base_ref }}
+            ${{ runner.os }}-${{ matrix.name }}-ccache-
+
+      - name: Tool versions
+        run: |
+          env cmake --version
+          env ${{ matrix.cxx }} --version
+          env nextflow -version
+
+      - name: Configure Raptor
+        env:
+          CXX: ${{ matrix.cxx }}
+          CC: ${{ matrix.cc }}
+        run: |
+          mkdir build
+          cd build
+          cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                          -DCMAKE_CXX_FLAGS="-Werror ${{ matrix.cxx_flags }} -Wno-interference-size" \
+                          -DRAPTOR_NATIVE_BUILD=OFF
+
+      - name: Build Raptor
+        env:
+          CCACHE_BASEDIR: ${{ github.workspace }}
+          CCACHE_DIR: ${{ github.workspace }}/.ccache
+          CCACHE_COMPRESS: true
+          CCACHE_COMPRESSLEVEL: 12
+          CCACHE_MAXSIZE: 50M
+          CCACHE_IGNOREOPTIONS: "-fprofile-abs-path"
+        run: |
+          ccache -z
+          cd build
+          sudo make -k -j2 install
+          ccache -sv
+
+      - name: Run Nextflow
+        run: |
+          cd raptor/workflow/nextflow
+          nextflow hibf.nf
+
