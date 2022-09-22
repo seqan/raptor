@@ -7,7 +7,7 @@ nextflow.enable.dsl=2
  */
 
 params.reads = "data/queries.fq"
-params.data = "data/small_genomes.tar.gz"
+params.data = "https://ftp.imp.fu-berlin.de/pub/seiler/raptor/small_genomes.tar.gz"
 params.tmax = 192 /* Is best chosen as the square root of the number of bins/files/sequences to index. */
 params.kmer_size = 20
 params.number_of_hash_functions = 2 /* [2,3,4] has worked well in practice */
@@ -20,14 +20,30 @@ println "\nResult files will be written to $params.outdir\n"
 
 workflow {
     def query_ch = Channel.fromPath(params.reads)
-    def data_ch = Channel.fromPath(params.data)
 
-    UNTAR(data_ch)
+    DOWNLOAD(params.data)
+    UNTAR(DOWNLOAD.out)
 
     DATA_PREP(UNTAR.out)
     LAYOUT(DATA_PREP.out, params.kmer_size, params.fpr, params.tmax)
     INDEX(LAYOUT.out, params.kmer_size, params.fpr, params.number_of_hash_functions)
     SEARCH(INDEX.out, query_ch, params.fpr, params.errors)
+}
+
+process DOWNLOAD {
+    tag "Only needed for the small_genomes.tar.gz example on Github"
+
+    input:
+    val data
+
+    output:
+    path "small_genomes.tar.gz"
+
+    script:
+    """
+    set -x
+    wget $data
+    """
 }
 
 process UNTAR {
@@ -41,7 +57,7 @@ process UNTAR {
 
     script:
     """
-    set -x 
+    set -x
     tar zxf $data
     """
 }

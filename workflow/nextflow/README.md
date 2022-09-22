@@ -10,7 +10,7 @@ We will work on docker images meanwhile.
 
 Given the above tool requirements, the workflow is running on two inputs
 
-1. The database `data/small_genomes/`
+1. The database available [here](https://ftp.imp.fu-berlin.de/pub/seiler/raptor/small_genomes.tar.gz)
 2. The query file `data/queries.fq`
 
 You can swap these input data with anything that fits your needs, but be aware of the following:
