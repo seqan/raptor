@@ -189,14 +189,6 @@ message (STATUS "${FontBold}You can run `make` to build the application.${FontRe
 
 ## DOCUMENTATION
 
-set (RAPTOR_BUILD_DOC
-     ON
-     CACHE BOOL "Build documentation"
-)
-if (RAPTOR_BUILD_DOC)
-    add_subdirectory (doc EXCLUDE_FROM_ALL)
-endif ()
-
 ## TEST
 
 set (RAPTOR_ENABLE_BENCHMARK
