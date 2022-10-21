@@ -6,7 +6,7 @@ SOURCE_DIR=`pwd`
 CACHE_DIR="${SOURCE_DIR}/node_modules"
 
 # Install dependencies.
-yum --assumeyes --quiet install wget cmake3 flex bison xz graphviz
+yum --assumeyes --quiet install wget cmake3 flex bison xz graphviz &>/dev/null
 
 # Download doxygen.
 mkdir -p ${CACHE_DIR}/doxygen-download
@@ -16,7 +16,7 @@ tar -C ${CACHE_DIR}/doxygen-download -zxf ${CACHE_DIR}/doxygen-download/doxygen-
 # Configure doxygen.
 cd ${CACHE_DIR}/doxygen-download/doxygen-${DOXYGEN_VERSION}
 mkdir -p build && cd build
-if ! cmake3 -G "Unix Makefiles" .. 1>/dev/null; then
+if ! cmake3 -G "Unix Makefiles" -DCMAKE_CXX_FLAGS="-w" .. 1>/dev/null; then
     rm -rf *
     cmake3 -G "Unix Makefiles" .. 1>/dev/null
 fi
