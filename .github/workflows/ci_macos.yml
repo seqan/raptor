@@ -25,7 +25,7 @@ defaults:
 jobs:
   build:
     name: ${{ matrix.name }}
-    runs-on: macos-10.15
+    runs-on: macos-12
     timeout-minutes: 120
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'clang-format'
     strategy:
@@ -35,18 +35,21 @@ jobs:
           - name: "gcc12"
             cxx: "g++-12"
             cc: "gcc-12"
+            build: unit
             build_type: Release
             cxx_flags: "-std=c++23"
 
           - name: "gcc11"
             cxx: "g++-11"
             cc: "gcc-11"
+            build: unit
             build_type: Release
             cxx_flags: "-std=c++23"
 
           - name: "gcc10"
             cxx: "g++-10"
             cc: "gcc-10"
+            build: unit
             build_type: Release
             cxx_flags: "-std=c++20"
 
@@ -85,6 +88,7 @@ jobs:
         run: |
           env cmake --version
           env ${{ matrix.cxx }} --version
+          sudo xcode-select -s '/Applications/Xcode_13.4.1.app/Contents/Developer' # https://github.com/actions/runner-images/issues/6350
 
       - name: Configure tests
         env:
@@ -93,9 +97,9 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                          -DCMAKE_CXX_FLAGS="-Werror ${{ matrix.cxx_flags }} -Wno-interference-size" \
-                          -DRAPTOR_NATIVE_BUILD=OFF
+          cmake ../raptor/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                                                   -DCMAKE_CXX_FLAGS="-Werror ${{ matrix.cxx_flags }} -Wno-interference-size" \
+                                                   -DRAPTOR_NATIVE_BUILD=OFF
 
       - name: Build tests
         env:
@@ -108,7 +112,7 @@ jobs:
         run: |
           ccache -z
           cd build
-          make -k -j3 api_test cli_test
+          make -k -j3
           ccache -sv
 
       - name: Run tests

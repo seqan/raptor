@@ -55,7 +55,7 @@ find_package (SeqAn3 QUIET REQUIRED HINTS ../lib/seqan3/build_system)
 list (APPEND CMAKE_MODULE_PATH "${SEQAN3_CLONE_DIR}/test/cmake/")
 
 # Use ccache.
-include (../cmake/raptor_require_ccache.cmake)
+include (../test/cmake/raptor_require_ccache.cmake)
 raptor_require_ccache ()
 
 # Define cmake configuration flags to configure and build external projects with the same flags as specified for

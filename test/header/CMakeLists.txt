@@ -5,16 +5,27 @@
 # shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 # --------------------------------------------------------------------------------------------------
 
-cmake_minimum_required (VERSION 3.15)
+cmake_minimum_required (VERSION 3.10)
+
+project (raptor_test_header CXX)
+
+include (../raptor-test.cmake)
+include (GoogleTest OPTIONAL)
+
+raptor_require_benchmark ()
+raptor_require_ccache ()
+raptor_require_test ()
+
+find_path (SEQAN3_TEST_CMAKE_MODULE_DIR
+           NAMES seqan3_test_files.cmake
+           HINTS "${RAPTOR_SUBMODULES_DIR}/seqan3/test/cmake/")
+list (APPEND CMAKE_MODULE_PATH "${SEQAN3_TEST_CMAKE_MODULE_DIR}")
 
 include (seqan3_test_files)
 include (seqan3_test_component)
 
 add_library ("raptor_header_test_lib" INTERFACE)
-target_link_libraries ("raptor_header_test_lib" INTERFACE "${PROJECT_NAME}_interface" gtest gtest_main)
-target_include_directories ("raptor_header_test_lib" SYSTEM INTERFACE "${SEQAN3_TEST_CLONE_DIR}/googletest/include/")
-# SeqAn3 script adds an include for <bechmark/benchmark.h>, which we do not use in Raptor
-target_include_directories ("raptor_header_test_lib" SYSTEM INTERFACE ./dummy_include)
+target_link_libraries ("raptor_header_test_lib" INTERFACE raptor::test::header)
 set (target "header_test")
 
 set (header_base_path "${CMAKE_CURRENT_LIST_DIR}/../../include/")
