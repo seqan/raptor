@@ -15,7 +15,6 @@ concurrency:
 
 env:
   CMAKE_VERSION: 3.15.4
-  SEQAN3_NO_VERSION_CHECK: 1
   SHARG_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
 
