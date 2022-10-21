@@ -54,7 +54,7 @@ set (SEQAN3_SUBMODULES_DIR "${RAPTOR_ROOT_DIR}/lib")
 find_package (SeqAn3 QUIET REQUIRED HINTS ${RAPTOR_ROOT_DIR}/lib/seqan3/build_system)
 
 # Allow to include CMake scripts from raptor.
-list (APPEND CMAKE_MODULE_PATH "${RAPTOR_ROOT_DIR}/cmake/")
+list (APPEND CMAKE_MODULE_PATH "${RAPTOR_ROOT_DIR}/test/cmake/")
 
 # Use ccache.
 include (raptor_require_ccache)

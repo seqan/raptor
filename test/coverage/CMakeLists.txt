@@ -6,6 +6,12 @@
 # --------------------------------------------------------------------------------------------------
 
 cmake_minimum_required (VERSION 3.15)
+cmake_minimum_required (VERSION 3.10)
+
+project (raptor_test_coverage CXX)
+
+include (../cmake/raptor_require_ccache.cmake)
+raptor_require_ccache ()
 
 # Add a custom build type: Coverage
 
@@ -29,3 +35,7 @@ set (CMAKE_SHARED_LINKER_FLAGS_COVERAGE
 mark_as_advanced (CMAKE_CXX_FLAGS_COVERAGE CMAKE_C_FLAGS_COVERAGE CMAKE_EXE_LINKER_FLAGS_COVERAGE
                   CMAKE_SHARED_LINKER_FLAGS_COVERAGE
 )
+
+enable_testing ()
+add_subdirectory ("../unit" "${CMAKE_CURRENT_BINARY_DIR}/unit")
+

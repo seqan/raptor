@@ -35,6 +35,7 @@ jobs:
           - name: "Coverage gcc12"
             cxx: "g++-12"
             cc: "gcc-12"
+            build: coverage
             build_type: Coverage
             cxx_flags: "-std=c++23"
 
@@ -95,9 +96,9 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                          -DCMAKE_CXX_FLAGS="-Werror ${{ matrix.cxx_flags }} -Wno-interference-size" \
-                          -DRAPTOR_NATIVE_BUILD=OFF
+          cmake ../raptor/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                                                   -DCMAKE_CXX_FLAGS="-Werror ${{ matrix.cxx_flags }} -Wno-interference-size" \
+                                                   -DRAPTOR_NATIVE_BUILD=OFF
 
       - name: Build tests
         env:
@@ -105,12 +106,12 @@ jobs:
           CCACHE_DIR: ${{ github.workspace }}/.ccache
           CCACHE_COMPRESS: true
           CCACHE_COMPRESSLEVEL: 12
-          CCACHE_MAXSIZE: 125M
+          CCACHE_MAXSIZE: 525M
           CCACHE_IGNOREOPTIONS: "-fprofile-abs-path"
         run: |
           ccache -z
           cd build
-          make -k -j2 api_test cli_test
+          make -k -j2
           ccache -sv
 
       - name: Run tests

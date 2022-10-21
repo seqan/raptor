@@ -35,18 +35,21 @@ jobs:
           - name: "gcc12"
             cxx: "g++-12"
             cc: "gcc-12"
+            build: unit
             build_type: Release
             cxx_flags: "-std=c++23"
 
           - name: "gcc11"
             cxx: "g++-11"
             cc: "gcc-11"
+            build: unit
             build_type: Release
             cxx_flags: "-std=c++23"
 
           - name: "gcc10"
             cxx: "g++-10"
             cc: "gcc-10"
+            build: unit
             build_type: Release
             cxx_flags: "-std=c++20"
 
@@ -95,9 +98,9 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                          -DCMAKE_CXX_FLAGS="-Werror ${{ matrix.cxx_flags }} -Wno-interference-size" \
-                          -DRAPTOR_NATIVE_BUILD=OFF
+          cmake ../raptor/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                                                   -DCMAKE_CXX_FLAGS="-Werror ${{ matrix.cxx_flags }} -Wno-interference-size" \
+                                                   -DRAPTOR_NATIVE_BUILD=OFF
 
       - name: Build tests
         env:
@@ -110,7 +113,7 @@ jobs:
         run: |
           ccache -z
           cd build
-          make -k -j2 api_test cli_test
+          make -k -j2
           ccache -sv
 
       - name: Run tests

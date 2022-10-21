@@ -7,200 +7,30 @@
 
 cmake_minimum_required (VERSION 3.15)
 
-# Define the application name and version.
-project (raptor VERSION 2.0.1)
+find_path (RAPTOR_MODULE_PATH "raptor-config.cmake" HINTS "${CMAKE_CURRENT_LIST_DIR}/build_system/")
+list (APPEND CMAKE_MODULE_PATH "${RAPTOR_MODULE_PATH}")
 
-# Messages
-string (ASCII 27 Esc)
-set (FontBold "${Esc}[1m")
-set (FontReset "${Esc}[m")
+include (raptor-config-version)
 
-# Fallback to these values if there is no git or no git repository
-set (RAPTOR_COMMIT_DATE
-     "2021-08-20--no-git"
-     CACHE STRING
-           "Set to provide a commit date if git is not available or the source directory is not a git repository."
-)
-set (RAPTOR_COMMIT_HASH
-     "74f815358db47037e93a56b826a9df3692e55680--no-git"
-     CACHE STRING
-           "Set to provide a commit hash if git is not available or the source directory is not a git repository."
+project (raptor
+            LANGUAGES CXX
+            VERSION "${RAPTOR_PROJECT_VERSION}"
+            DESCRIPTION "Raptor -- A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences"
+            HOMEPAGE_URL "https://github.com/seqan/raptor"
 )
 
-# Extract git commit hash and date
-find_package (Git QUIET)
+find_package (Raptor REQUIRED HINTS ${RAPTOR_MODULE_PATH})
 
-if (GIT_FOUND)
-    execute_process (COMMAND "${GIT_EXECUTABLE}" -C "${CMAKE_SOURCE_DIR}" rev-parse
-                     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-                     RESULT_VARIABLE is_no_git_repository
-                     ERROR_QUIET
-    )
+option (BUILD_RAPTOR "Enable building of Raptor." ON)
 
-    if (NOT is_no_git_repository)
-        execute_process (COMMAND "${GIT_EXECUTABLE}" describe --always --abbrev=40 --dirty
-                         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-                         OUTPUT_VARIABLE RAPTOR_COMMIT_HASH
-                         ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-
-        execute_process (COMMAND "${GIT_EXECUTABLE}" log -1 --format=%ad --date=short
-                         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-                         OUTPUT_VARIABLE RAPTOR_COMMIT_DATE
-                         ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-    endif ()
+if (BUILD_RAPTOR)
+    add_subdirectory (src)
 endif ()
 
-## BUILD
+option (INSTALL_RAPTOR_HEADERS "Enable installation of Raptor headers." OFF)
 
-# Make Release default build type
-if (NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE
-         Release
-         CACHE STRING "Choose the type of build, options are: Debug Release Coverage RelWithDebInfo MinSizeRel." FORCE
-    )
+if (INSTALL_RAPTOR_HEADERS)
+    include (raptor-install)
+    include (raptor-package)
 endif ()
 
-set (RAPTOR_SUBMODULES_DIR
-     "${CMAKE_CURRENT_LIST_DIR}/lib"
-     CACHE STRING "Directory containing submodules."
-)
-
-include (CheckCXXCompilerFlag)
-
-set (RAPTOR_NATIVE_BUILD
-     ON
-     CACHE BOOL "Optimize build for current architecture."
-)
-if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug" OR "${CMAKE_BUILD_TYPE}" MATCHES "Coverage")
-    message (STATUS "${FontBold}Native build disabled due to Debug/Coverage build.${FontReset}")
-elseif (RAPTOR_NATIVE_BUILD)
-    message (STATUS "${FontBold}Native build enabled. Built binaries will be optimized for this system.${FontReset}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-else ()
-    message (STATUS "${FontBold}Native build disabled. Detecting popcnt support.${FontReset}")
-    check_cxx_compiler_flag ("-mpopcnt" RAPTOR_HAS_POPCNT)
-    if (RAPTOR_HAS_POPCNT)
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mpopcnt")
-    endif ()
-endif ()
-
-check_cxx_compiler_flag ("-fopenmp" RAPTOR_HAS_OPENMP)
-if (RAPTOR_HAS_OPENMP)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-endif ()
-
-check_cxx_compiler_flag ("-fopenmp-simd" RAPTOR_HAS_OPENMP_SIMD)
-if (RAPTOR_HAS_OPENMP_SIMD)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp-simd -DSIMDE_ENABLE_OPENMP")
-endif ()
-
-check_cxx_compiler_flag ("-fopenmp-simd" RAPTOR_SUPPRESS_GCC4_ABI)
-if (RAPTOR_SUPPRESS_GCC4_ABI)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
-endif ()
-
-# Specify the directories where to store the built archives, libraries and executables
-set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-
-# Require compression libs.
-find_package (ZLIB QUIET REQUIRED)
-find_package (BZip2 QUIET REQUIRED)
-
-# Dependency: SeqAn3.
-set (SEQAN3_CEREAL
-     ON
-     CACHE BOOL "Require cereal to be present."
-)
-set (SEQAN3_SUBMODULES_DIR "${RAPTOR_SUBMODULES_DIR}")
-find_package (SeqAn3 QUIET REQUIRED HINTS ${RAPTOR_SUBMODULES_DIR}/seqan3/build_system)
-
-# Allow to include CMake scripts from seqan3.
-list (APPEND CMAKE_MODULE_PATH "${SEQAN3_CLONE_DIR}/test/cmake/")
-# Allow to include CMake scripts from raptor.
-list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/")
-
-# Define cmake configuration flags to configure and build external projects with the same flags as specified for
-# this project.
-set (SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "")
-list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "--no-warn-unused-cli")
-list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
-list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}")
-list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
-list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -w")
-list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
-list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}")
-list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}")
-
-# Use ccache.
-include (raptor_require_ccache)
-raptor_require_ccache ()
-
-# Dependency: chopper
-set (RAPTOR_CHOPPER_PATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libchopper_count_lib.a")
-list (APPEND RAPTOR_CHOPPER_PATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libchopper_layout_lib.a")
-
-if (EXISTS "${RAPTOR_CHOPPER_PATH}")
-    add_custom_target (chopper_project)
-else ()
-    set (RAPTOR_CHOPPER_ARGS "${SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS}")
-    list (APPEND RAPTOR_CHOPPER_ARGS "-DCHOPPER_SUBMODULES_DIR=${RAPTOR_SUBMODULES_DIR}")
-    list (APPEND RAPTOR_CHOPPER_ARGS "-DSEQAN3_SUBMODULES_DIR=${RAPTOR_SUBMODULES_DIR}")
-    list (APPEND RAPTOR_CHOPPER_ARGS "-DCMAKE_INSTALL_LIBDIR=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
-    list (APPEND RAPTOR_CHOPPER_ARGS "-DCMAKE_INSTALL_BINDIR=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-
-    include (ExternalProject)
-    ExternalProject_Add (chopper_project
-                         PREFIX chopper_project
-                         SOURCE_DIR "${RAPTOR_SUBMODULES_DIR}/chopper"
-                         DOWNLOAD_COMMAND ""
-                         CMAKE_ARGS "${RAPTOR_CHOPPER_ARGS}"
-                         BUILD_BYPRODUCTS "${RAPTOR_CHOPPER_PATH}"
-                         UPDATE_DISCONNECTED 1
-    )
-endif ()
-
-add_library (chopper_count STATIC IMPORTED)
-add_dependencies (chopper_count chopper_project)
-set_target_properties (chopper_count PROPERTIES IMPORTED_LOCATION
-                                                "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libchopper_count_lib.a"
-)
-
-add_library (chopper_layout STATIC IMPORTED)
-add_dependencies (chopper_layout chopper_project)
-set_target_properties (chopper_layout PROPERTIES IMPORTED_LOCATION
-                                                 "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libchopper_layout_lib.a"
-)
-
-add_library (chopper_lib INTERFACE IMPORTED)
-set_property (TARGET chopper_lib PROPERTY INTERFACE_LINK_LIBRARIES chopper_count chopper_layout ZLIB::ZLIB BZip2::BZip2)
-
-add_executable (chopper IMPORTED)
-set_target_properties (chopper PROPERTIES IMPORTED_LOCATION
-                                          "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/chopper"
-)
-
-# Add the application.
-add_subdirectory (src)
-message (STATUS "${FontBold}You can run `make` to build the application.${FontReset}")
-
-## DOCUMENTATION
-
-## TEST
-
-set (RAPTOR_ENABLE_BENCHMARK
-     OFF
-     CACHE BOOL "Compile benchmarks as cli tests."
-)
-
-set (RAPTOR_BUILD_TEST
-     ON
-     CACHE BOOL "Build test"
-)
-if (RAPTOR_BUILD_TEST)
-    enable_testing ()
-    add_subdirectory (test EXCLUDE_FROM_ALL)
-endif ()

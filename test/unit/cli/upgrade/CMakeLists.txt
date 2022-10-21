@@ -5,17 +5,6 @@
 # shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 # --------------------------------------------------------------------------------------------------
 
-cmake_minimum_required (VERSION 3.10)
+cmake_minimum_required (VERSION 3.15)
 
-project (raptor_test_benchmark CXX)
-
-set (RAPTOR_ENABLE_BENCHMARK TRUE)
-include (../raptor-test.cmake)
-
-raptor_require_benchmark ()
-raptor_require_ccache ()
-raptor_require_test ()
-
-add_custom_target (cli_test)
-
-add_cli_test (bin_influence_benchmark.cpp)
+add_unit_test (upgrade_test.cpp)

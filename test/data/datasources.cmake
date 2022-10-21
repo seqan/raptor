@@ -1,7 +1,5 @@
 cmake_minimum_required (VERSION 3.15)
 
-include (cmake/app_internal_datasources.cmake)
-
 declare_internal_datasource (FILE bin1.fa
                              URL ${CMAKE_CURRENT_LIST_DIR}/bin1.fa
                              URL_HASH SHA256=03ac546c2dfa34f2a75283d43dd2293aa702ed2b7dd877dfbb4f966d258201f0
