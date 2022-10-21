@@ -87,13 +87,13 @@ jobs:
         id: fetch_depth
         env:
           GITHUB_TOKEN: ${{ secrets.SEQAN_ACTIONS_PAT }}
-          COMMIT_RANGE: ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}
+          COMMIT_RANGE: ${{ github.event.pull_request.base.ref }}...${{ github.event.pull_request.base.sha }}
         run: |
           QUERY="/repos/${{ github.repository }}/compare/${COMMIT_RANGE}"
           ANSWER=$(gh api -H "Accept: application/vnd.github.v3+json" ${QUERY})
           NBEHIND=$(jq '.behind_by' <<< "${ANSWER}")
-          echo "::set-output name=depth::$(( ${NBEHIND} + 1 ))"
-          echo "::set-output name=pr_depth::$(( ${{ github.event.pull_request.commits }} + 1 ))"
+          echo "depth=$(( ${NBEHIND} + 1 ))" >> $GITHUB_OUTPUT
+          echo "pr_depth=$(( ${{ github.event.pull_request.commits }} + 2 ))" >> $GITHUB_OUTPUT
 
       - name: Checkout Raptor
         uses: actions/checkout@v3
@@ -141,13 +141,14 @@ jobs:
           LIST=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} | \
           { grep -v -E "(lib/)" || test $? = 1; } | \
           { grep -E "(.cpp|.hpp)" || test $? = 1; } | xargs)
-          echo "::set-output name=list::$LIST"
+          echo "list=$LIST" >> $GITHUB_OUTPUT
 
       - name: Install clang-format
         if: ${{ steps.changed_files.outputs.list }}
         run: |
           echo 'APT::Acquire::Retries "5";' | sudo tee -a /etc/apt/apt.conf.d/80-retries > /dev/null
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo apt-add-repository --no-update --yes "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"
           sudo apt-add-repository --no-update --yes "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy main"
           sudo apt-get update
           sudo apt-get install --yes clang-format-15

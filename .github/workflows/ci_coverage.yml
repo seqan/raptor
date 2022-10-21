@@ -42,13 +42,13 @@ jobs:
       # How many commits do we need to fetch to also fetch the branch point?
       - name: Get fetch depth
         id: fetch_depth
-        run: echo "::set-output name=depth::$(( ${{ github.event.pull_request.commits }} + 1 ))"
+        run: echo "depth=$(( ${{ github.event.pull_request.commits }} + 2 ))" >> $GITHUB_OUTPUT
 
       - name: Checkout
         uses: actions/checkout@v3
         with:
           path: raptor
-          fetch-depth: 2
+          fetch-depth: ${{ steps.fetch_depth.outputs.depth }}
           submodules: true
 
       - name: Add package source
