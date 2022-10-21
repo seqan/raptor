@@ -47,6 +47,15 @@ inputs:
     inputBinding:
       prefix: --output
 
+hints:
+  SoftwareRequirement:
+    packages:
+      raptor:
+        specs: [ https://bio.tools/raptor ]
+        version: [ "2.0.0"]
+  DockerRequirement:
+    dockerPull: quay.io/biocontainers/raptor:2.0.0--h19e8d03_1
+
 requirements:
   EnvVarRequirement:
     envDef:

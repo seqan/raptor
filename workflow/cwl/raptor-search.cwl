@@ -2,8 +2,6 @@
 cwlVersion: v1.2
 class: CommandLineTool
 
-# non-preprocessing version
-
 label: search reads
 
 baseCommand: [ raptor, search ]
@@ -48,6 +46,15 @@ inputs:
       the range [0,1]
     inputBinding:
       prefix: --p_max
+
+hints:
+  SoftwareRequirement:
+    packages:
+      raptor:
+        specs: [ https://bio.tools/raptor ]
+        version: [ "2.0.0"]
+  DockerRequirement:
+    dockerPull: quay.io/biocontainers/raptor:2.0.0--h19e8d03_1
 
 requirements:
   EnvVarRequirement:
