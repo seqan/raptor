@@ -228,3 +228,13 @@ The subdirectory `util` contains applications and scripts related to the paper.
 ### License
 Raptor is open source software. However, certain conditions apply when you (re-)distribute and/or modify Raptor,
 please see the [license](https://github.com/seqan/raptor/blob/main/LICENSE.md).
+
+## Sponsorships
+
+[![Vercel][vercel_badge]][vercel_website]
+
+[vercel_badge]: https://raw.githubusercontent.com/seqan/raptor/main/test/documentation/.vercel/powered-by-vercel.svg "Powered by Vercel"
+[vercel_website]: https://vercel.com/?utm_source=seqan&utm_campaign=oss
+
+Vercel is kind enough to build and host our documentation and even provide preview-builds within our pull requests.
+Check them out!

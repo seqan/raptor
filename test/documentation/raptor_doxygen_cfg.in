@@ -1,14 +1,15 @@
-# Doxyfile 1.9.4
+# Doxyfile 1.9.5
 
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = fastq_to_fasta
-PROJECT_NUMBER         =
-PROJECT_BRIEF          = "A template for creation of SeqAn3 apps, with a FASTQ to FASTA example app."
+PROJECT_NAME           = Raptor
+PROJECT_NUMBER         = ${PROJECT_VERSION}
+PROJECT_BRIEF          = "A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences"
 PROJECT_LOGO           =
-OUTPUT_DIRECTORY       = ${APP_TEMPLATE_DOXYGEN_OUTPUT_DIR}
+## PATHS
+OUTPUT_DIRECTORY       = ${RAPTOR_DOXYGEN_OUTPUT_DIR}
 CREATE_SUBDIRS         = NO
 CREATE_SUBDIRS_LEVEL   = 8
 ALLOW_UNICODE_NAMES    = NO
@@ -28,9 +29,9 @@ ABBREVIATE_BRIEF       = "The $name class" \
                          the
 ALWAYS_DETAILED_SEC    = NO
 INLINE_INHERITED_MEMB  = NO
-FULL_PATH_NAMES        = YES
-STRIP_FROM_PATH        = ${CMAKE_SOURCE_DIR}
-STRIP_FROM_INC_PATH    = ${CMAKE_SOURCE_DIR}/include
+FULL_PATH_NAMES        = NO
+STRIP_FROM_PATH        = ${RAPTOR_DOXYGEN_SOURCE_DIR}/include
+STRIP_FROM_INC_PATH    = ${RAPTOR_DOXYGEN_SOURCE_DIR}/include
 SHORT_NAMES            = NO
 JAVADOC_AUTOBRIEF      = NO
 JAVADOC_BANNER         = NO
@@ -40,15 +41,17 @@ PYTHON_DOCSTRING       = YES
 INHERIT_DOCS           = YES
 SEPARATE_MEMBER_PAGES  = NO
 TAB_SIZE               = 4
+## Custom doxygen commands
 ALIASES                =
 OPTIMIZE_OUTPUT_FOR_C  = NO
 OPTIMIZE_OUTPUT_JAVA   = NO
 OPTIMIZE_FOR_FORTRAN   = NO
 OPTIMIZE_OUTPUT_VHDL   = NO
 OPTIMIZE_OUTPUT_SLICE  = NO
-EXTENSION_MAPPING      =
+## detect headers without extensions (in std module)
+EXTENSION_MAPPING      = .no_extension=C++
 MARKDOWN_SUPPORT       = YES
-TOC_INCLUDE_HEADINGS   = 5
+TOC_INCLUDE_HEADINGS   = 2
 AUTOLINK_SUPPORT       = YES
 BUILTIN_STL_SUPPORT    = NO
 CPP_CLI_SUPPORT        = NO
@@ -65,8 +68,9 @@ NUM_PROC_THREADS       = 1
 #---------------------------------------------------------------------------
 # Build related configuration options
 #---------------------------------------------------------------------------
-EXTRACT_ALL            = YES
-EXTRACT_PRIVATE        = NO
+EXTRACT_ALL            = NO
+## Developer VS user mode
+EXTRACT_PRIVATE        = ${RAPTOR_DOXYGEN_EXTRACT_PRIVATE}
 EXTRACT_PRIV_VIRTUAL   = NO
 EXTRACT_PACKAGE        = NO
 EXTRACT_STATIC         = NO
@@ -79,7 +83,7 @@ HIDE_UNDOC_CLASSES     = NO
 HIDE_FRIEND_COMPOUNDS  = NO
 HIDE_IN_BODY_DOCS      = NO
 INTERNAL_DOCS          = NO
-CASE_SENSE_NAMES       = NO
+CASE_SENSE_NAMES       = SYSTEM
 HIDE_SCOPE_NAMES       = NO
 HIDE_COMPOUND_REFERENCE= NO
 SHOW_HEADERFILE        = YES
@@ -88,7 +92,7 @@ SHOW_GROUPED_MEMB_INC  = NO
 FORCE_LOCAL_INCLUDES   = NO
 INLINE_INFO            = YES
 SORT_MEMBER_DOCS       = YES
-SORT_BRIEF_DOCS        = NO
+SORT_BRIEF_DOCS        = YES
 SORT_MEMBERS_CTORS_1ST = NO
 SORT_GROUP_NAMES       = NO
 SORT_BY_SCOPE_NAME     = NO
@@ -97,13 +101,13 @@ GENERATE_TODOLIST      = YES
 GENERATE_TESTLIST      = YES
 GENERATE_BUGLIST       = YES
 GENERATE_DEPRECATEDLIST= YES
-ENABLED_SECTIONS       =
+ENABLED_SECTIONS       = ${RAPTOR_DOXYGEN_ENABLED_SECTIONS}
 MAX_INITIALIZER_LINES  = 30
 SHOW_USED_FILES        = YES
 SHOW_FILES             = YES
 SHOW_NAMESPACES        = YES
 FILE_VERSION_FILTER    =
-LAYOUT_FILE            =
+LAYOUT_FILE            = ${RAPTOR_DOXYGEN_OUTPUT_DIR}/DoxygenLayout.xml
 CITE_BIB_FILES         =
 #---------------------------------------------------------------------------
 # Configuration options related to warning and progress messages
@@ -121,71 +125,29 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = ${CMAKE_SOURCE_DIR}/include \
-                         ${CMAKE_SOURCE_DIR}/src \
-                         ${CMAKE_SOURCE_DIR}/LICENSE.md
+INPUT                  = ${RAPTOR_DOXYGEN_SOURCE_DIR}/include \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/LICENSE.md \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/CHANGELOG.md \
 INPUT_ENCODING         = UTF-8
-FILE_PATTERNS          = *.c \
-                         *.cc \
-                         *.cxx \
-                         *.cpp \
-                         *.c++ \
-                         *.java \
-                         *.ii \
-                         *.ixx \
-                         *.ipp \
-                         *.i++ \
-                         *.inl \
-                         *.idl \
-                         *.ddl \
-                         *.odl \
-                         *.h \
-                         *.hh \
-                         *.hxx \
-                         *.hpp \
-                         *.h++ \
-                         *.cs \
-                         *.d \
-                         *.php \
-                         *.php4 \
-                         *.php5 \
-                         *.phtml \
-                         *.inc \
-                         *.m \
-                         *.markdown \
-                         *.md \
-                         *.mm \
-                         *.dox \
-                         *.doc \
-                         *.txt \
-                         *.py \
-                         *.pyw \
-                         *.f90 \
-                         *.f95 \
-                         *.f03 \
-                         *.f08 \
-                         *.f \
-                         *.for \
-                         *.tcl \
-                         *.vhd \
-                         *.vhdl \
-                         *.ucf \
-                         *.qsf \
-                         *.ice
+INPUT_FILE_ENCODING    =
+FILE_PATTERNS          = *
 RECURSIVE              = YES
 EXCLUDE                =
 EXCLUDE_SYMLINKS       = NO
-EXCLUDE_PATTERNS       =
-EXCLUDE_SYMBOLS        =
-EXAMPLE_PATH           =
+EXCLUDE_PATTERNS       = */doc/*.cpp
+EXCLUDE_SYMBOLS        = ${RAPTOR_DOXYGEN_EXCLUDE_SYMBOLS}
+EXAMPLE_PATH           = ${RAPTOR_DOXYGEN_SOURCE_DIR}
 EXAMPLE_PATTERNS       = *
 EXAMPLE_RECURSIVE      = NO
-IMAGE_PATH             = ${CMAKE_SOURCE_DIR}/doc
+IMAGE_PATH             = ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation
 INPUT_FILTER           =
 FILTER_PATTERNS        =
 FILTER_SOURCE_FILES    = NO
 FILTER_SOURCE_PATTERNS =
 USE_MDFILE_AS_MAINPAGE =
+FORTRAN_COMMENT_AFTER  = 72
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
 #---------------------------------------------------------------------------
@@ -210,16 +172,19 @@ GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 HTML_FILE_EXTENSION    = .html
 HTML_HEADER            =
-HTML_FOOTER            =
+HTML_FOOTER            = ${RAPTOR_DOXYGEN_OUTPUT_DIR}/raptor_footer.html
 HTML_STYLESHEET        =
-HTML_EXTRA_STYLESHEET  =
+HTML_EXTRA_STYLESHEET  = ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/raptor.css \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/raptor_dark.css
+### Extra files that we can link to
 HTML_EXTRA_FILES       =
+HTML_COLORSTYLE        = AUTO_LIGHT
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 100
 HTML_COLORSTYLE_GAMMA  = 80
-HTML_TIMESTAMP         = NO
+HTML_TIMESTAMP         = YES
 HTML_DYNAMIC_MENUS     = YES
-HTML_DYNAMIC_SECTIONS  = NO
+HTML_DYNAMIC_SECTIONS  = YES
 HTML_INDEX_NUM_ENTRIES = 100
 GENERATE_DOCSET        = NO
 DOCSET_FEEDNAME        = "Doxygen generated docs"
@@ -244,21 +209,20 @@ QHP_SECT_FILTER_ATTRS  =
 QHG_LOCATION           =
 GENERATE_ECLIPSEHELP   = NO
 ECLIPSE_DOC_ID         = org.doxygen.Project
-DISABLE_INDEX          = NO
-GENERATE_TREEVIEW      = NO
+DISABLE_INDEX          = YES
+GENERATE_TREEVIEW      = YES
 FULL_SIDEBAR           = NO
 ENUM_VALUES_PER_LINE   = 4
 TREEVIEW_WIDTH         = 250
-EXT_LINKS_IN_WINDOW    = NO
+EXT_LINKS_IN_WINDOW    = YES
 OBFUSCATE_EMAILS       = YES
 HTML_FORMULA_FORMAT    = png
-FORMULA_FONTSIZE       = 10
-FORMULA_TRANSPARENT    = YES
+FORMULA_FONTSIZE       = 14
 FORMULA_MACROFILE      =
-USE_MATHJAX            = NO
+USE_MATHJAX            = ${RAPTOR_DOXYGEN_USE_MATHJAX}
 MATHJAX_VERSION        = MathJax_2
 MATHJAX_FORMAT         = HTML-CSS
-MATHJAX_RELPATH        = https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/
+MATHJAX_RELPATH        =
 MATHJAX_EXTENSIONS     =
 MATHJAX_CODEFILE       =
 SEARCHENGINE           = YES
@@ -271,14 +235,15 @@ EXTRA_SEARCH_MAPPINGS  =
 #---------------------------------------------------------------------------
 # Configuration options related to the LaTeX output
 #---------------------------------------------------------------------------
-GENERATE_LATEX         = YES
+## MISC OPTIONS
+GENERATE_LATEX         = NO
 LATEX_OUTPUT           = latex
 LATEX_CMD_NAME         =
 MAKEINDEX_CMD_NAME     = makeindex
 LATEX_MAKEINDEX_CMD    = makeindex
 COMPACT_LATEX          = NO
 PAPER_TYPE             = a4
-EXTRA_PACKAGES         =
+EXTRA_PACKAGES         = {amsfonts}
 LATEX_HEADER           =
 LATEX_FOOTER           =
 LATEX_EXTRA_STYLESHEET =
@@ -334,18 +299,24 @@ PERLMOD_MAKEVAR_PREFIX =
 # Configuration options related to the preprocessor
 #---------------------------------------------------------------------------
 ENABLE_PREPROCESSING   = YES
-MACRO_EXPANSION        = NO
-EXPAND_ONLY_PREDEF     = NO
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
 SEARCH_INCLUDES        = YES
-INCLUDE_PATH           = ${CMAKE_SOURCE_DIR}/include
+INCLUDE_PATH           = ${RAPTOR_DOXYGEN_SOURCE_DIR}/include
 INCLUDE_FILE_PATTERNS  =
-PREDEFINED             =
+PREDEFINED             = "CEREAL_SERIALIZE_FUNCTION_NAME=serialize" \
+                         "CEREAL_LOAD_FUNCTION_NAME=load" \
+                         "CEREAL_SAVE_FUNCTION_NAME=save" \
+                         "CEREAL_LOAD_MINIMAL_FUNCTION_NAME=load_minimal" \
+                         "CEREAL_SAVE_MINIMAL_FUNCTION_NAME=save_minimal" \
+                         "RAPTOR_DOXYGEN_ONLY(x)= x" \
+                         "${RAPTOR_DOXYGEN_PREDEFINED_NDEBUG}"
 EXPAND_AS_DEFINED      =
-SKIP_FUNCTION_MACROS   = YES
+SKIP_FUNCTION_MACROS   = NO
 #---------------------------------------------------------------------------
 # Configuration options related to external references
 #---------------------------------------------------------------------------
-TAGFILES               =
+TAGFILES               = "${RAPTOR_DOXYGEN_STD_TAGFILE}=https://en.cppreference.com/w/"
 GENERATE_TAGFILE       =
 ALLEXTERNALS           = NO
 EXTERNAL_GROUPS        = YES
@@ -355,19 +326,21 @@ EXTERNAL_PAGES         = YES
 #---------------------------------------------------------------------------
 DIA_PATH               =
 HIDE_UNDOC_RELATIONS   = YES
-HAVE_DOT               = NO
-DOT_NUM_THREADS        = 0
-DOT_FONTNAME           = Helvetica
-DOT_FONTSIZE           = 10
+## DOT SUPPORT
+HAVE_DOT               = ${RAPTOR_DOXYGEN_HAVE_DOT}
+DOT_NUM_THREADS        = ${RAPTOR_DOXYGEN_DOT_NUM_THREADS}
+DOT_COMMON_ATTR        = "fontname=Helvetica,fontsize=10"
+DOT_EDGE_ATTR          = "labelfontname=Helvetica,labelfontsize=10"
+DOT_NODE_ATTR          = "shape=box,height=0.2,width=0.4"
 DOT_FONTPATH           =
 CLASS_GRAPH            = YES
-COLLABORATION_GRAPH    = YES
+COLLABORATION_GRAPH    = NO
 GROUP_GRAPHS           = YES
 UML_LOOK               = NO
 UML_LIMIT_NUM_FIELDS   = 10
 DOT_UML_DETAILS        = NO
 DOT_WRAP_THRESHOLD     = 17
-TEMPLATE_RELATIONS     = NO
+TEMPLATE_RELATIONS     = YES
 INCLUDE_GRAPH          = YES
 INCLUDED_BY_GRAPH      = YES
 CALL_GRAPH             = NO
@@ -375,8 +348,8 @@ CALLER_GRAPH           = NO
 GRAPHICAL_HIERARCHY    = YES
 DIRECTORY_GRAPH        = YES
 DIR_GRAPH_MAX_DEPTH    = 1
-DOT_IMAGE_FORMAT       = png
-INTERACTIVE_SVG        = NO
+DOT_IMAGE_FORMAT       = svg
+INTERACTIVE_SVG        = ${RAPTOR_DOXYGEN_HAVE_DOT}
 DOT_PATH               =
 DOTFILE_DIRS           =
 MSCFILE_DIRS           =
@@ -384,9 +357,12 @@ DIAFILE_DIRS           =
 PLANTUML_JAR_PATH      =
 PLANTUML_CFG_FILE      =
 PLANTUML_INCLUDE_PATH  =
-DOT_GRAPH_MAX_NODES    = 50
+DOT_GRAPH_MAX_NODES    = 500
 MAX_DOT_GRAPH_DEPTH    = 0
-DOT_TRANSPARENT        = NO
 DOT_MULTI_TARGETS      = NO
 GENERATE_LEGEND        = YES
 DOT_CLEANUP            = YES
+#---------------------------------------------------------------------------
+# Configuration options related to the deployment by Vercel
+#---------------------------------------------------------------------------
+${RAPTOR_DOXYFILE_OPTION_POWERED_BY_VERCEL}
