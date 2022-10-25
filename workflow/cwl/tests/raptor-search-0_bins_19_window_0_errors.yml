@@ -1,0 +1,11 @@
+index:
+ class: File
+ path: ../../../test/data/1bins19window.index
+false_positive_rate: 0.05
+output_name: search.out
+error_tolerance: 0
+p_max: 0.4 
+queries:
+  class: File
+  path: ../../../test/data/query.fq
+  format: http://edamontology.org/format_1930

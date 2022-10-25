@@ -1,0 +1,5 @@
+index_size: 64k
+kmer_size: 19
+window_size: 19
+output_name: 0_bins_window_19.index
+sequences: [ [  {class: File, path: ../../../test/data/bin1.fa } ] ]
