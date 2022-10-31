@@ -114,7 +114,7 @@ CITE_BIB_FILES         =
 #---------------------------------------------------------------------------
 QUIET                  = NO
 WARNINGS               = YES
-WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_UNDOCUMENTED   = NO
 WARN_IF_DOC_ERROR      = YES
 WARN_IF_INCOMPLETE_DOC = YES
 WARN_NO_PARAMDOC       = NO
@@ -128,7 +128,7 @@ WARN_LOGFILE           =
 INPUT                  = ${RAPTOR_DOXYGEN_SOURCE_DIR}/include \
                          ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc \
                          ${RAPTOR_DOXYGEN_SOURCE_DIR}/LICENSE.md \
-                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/CHANGELOG.md \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/CHANGELOG.md
 INPUT_ENCODING         = UTF-8
 INPUT_FILE_ENCODING    =
 FILE_PATTERNS          = *

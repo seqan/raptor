@@ -39,8 +39,8 @@ jobs:
             doxygen: 1.9.5
             requires_toolchain: false
             requires_ccache: false
-            skip_build_tests: false # todo: swap once no warnings
-            skip_run_tests: true # todo: swap once no warnings
+            skip_build_tests: true
+            skip_run_tests: false
 
           - name: "Header gcc12"
             cxx: "g++-12"
@@ -145,6 +145,10 @@ jobs:
           cmake ../raptor/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                                    -DCMAKE_CXX_FLAGS="-Werror ${{ matrix.cxx_flags }} -Wno-interference-size" \
                                                    -DRAPTOR_NATIVE_BUILD=OFF
+          case "${{ matrix.build }}" in
+            header) make -j${{ matrix.build_threads }} gtest_build gbenchmark_build;;
+            documentation) make -j${{ matrix.build_threads }} download-cppreference-doxygen-web-tag;;
+          esac
 
       - name: Build tests
         if: ${{!matrix.skip_build_tests}}
