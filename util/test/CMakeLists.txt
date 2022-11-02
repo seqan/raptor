@@ -9,7 +9,7 @@ cmake_minimum_required (VERSION 3.15)
 
 project (raptor_utility_test)
 
-get_filename_component(RAPTOR_UTIL_ROOT "${CMAKE_CURRENT_LIST_DIR}/../dummy" DIRECTORY)
+get_filename_component (RAPTOR_UTIL_ROOT "${CMAKE_CURRENT_LIST_DIR}/../dummy" DIRECTORY)
 
 message (STATUS "Adding util...")
 add_subdirectory ("${RAPTOR_UTIL_ROOT}" "${CMAKE_CURRENT_BINARY_DIR}/util")

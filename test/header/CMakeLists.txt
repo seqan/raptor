@@ -18,7 +18,8 @@ raptor_require_test ()
 
 find_path (SEQAN3_TEST_CMAKE_MODULE_DIR
            NAMES seqan3_test_files.cmake
-           HINTS "${RAPTOR_SUBMODULES_DIR}/seqan3/test/cmake/")
+           HINTS "${RAPTOR_SUBMODULES_DIR}/seqan3/test/cmake/"
+)
 list (APPEND CMAKE_MODULE_PATH "${SEQAN3_TEST_CMAKE_MODULE_DIR}")
 
 include (seqan3_test_files)

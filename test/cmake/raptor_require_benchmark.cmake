@@ -16,10 +16,10 @@ macro (raptor_require_benchmark)
     message (STATUS "Fetching Google Benchmark ${gbenchmark_git_tag}:")
 
     include (FetchContent)
-    FetchContent_Declare (
-        gbenchmark_fetch_content
-        GIT_REPOSITORY "https://github.com/google/benchmark.git"
-        GIT_TAG "${gbenchmark_git_tag}")
+    FetchContent_Declare (gbenchmark_fetch_content
+                          GIT_REPOSITORY "https://github.com/google/benchmark.git"
+                          GIT_TAG "${gbenchmark_git_tag}"
+    )
     option (BENCHMARK_ENABLE_TESTING "" OFF)
     option (BENCHMARK_ENABLE_WERROR "" OFF) # Does not apply to Debug builds.
     option (BENCHMARK_ENABLE_INSTALL "" OFF)

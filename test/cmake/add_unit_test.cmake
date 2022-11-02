@@ -6,7 +6,7 @@
 # --------------------------------------------------------------------------------------------------
 
 # A macro that adds an api or cli test.
-macro (add_unit_test test_filename )
+macro (add_unit_test test_filename)
     # Extract the test target name.
     file (RELATIVE_PATH source_file "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_LIST_DIR}/${test_filename}")
     get_filename_component (target "${source_file}" NAME_WE)

@@ -38,4 +38,3 @@ mark_as_advanced (CMAKE_CXX_FLAGS_COVERAGE CMAKE_C_FLAGS_COVERAGE CMAKE_EXE_LINK
 
 enable_testing ()
 add_subdirectory ("../unit" "${CMAKE_CURRENT_BINARY_DIR}/unit")
-

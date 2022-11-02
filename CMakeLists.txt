@@ -13,10 +13,10 @@ list (APPEND CMAKE_MODULE_PATH "${RAPTOR_MODULE_PATH}")
 include (raptor-config-version)
 
 project (raptor
-            LANGUAGES CXX
-            VERSION "${RAPTOR_PROJECT_VERSION}"
-            DESCRIPTION "Raptor -- A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences"
-            HOMEPAGE_URL "https://github.com/seqan/raptor"
+         LANGUAGES CXX
+         VERSION "${RAPTOR_PROJECT_VERSION}"
+         DESCRIPTION "Raptor -- A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences"
+         HOMEPAGE_URL "https://github.com/seqan/raptor"
 )
 
 find_package (Raptor REQUIRED HINTS ${RAPTOR_MODULE_PATH})
@@ -33,4 +33,3 @@ if (INSTALL_RAPTOR_HEADERS)
     include (raptor-install)
     include (raptor-package)
 endif ()
-
