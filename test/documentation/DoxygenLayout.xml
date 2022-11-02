@@ -28,6 +28,9 @@
       <tab type="user" visible="yes" title="Update Notifications" url="\ref about_update_notifications" intro=""/>
     </tab> -->
     <!-- Custom ^^^ -->
+    <!-- Tutorials are added in raptor-doxygen-layout.cmake automatically for each doc/tutorial/*/index.md file -->
+    <tab type="usergroup" visible="yes" title="Tutorial" intro="">
+    </tab>
     <tab type="modules" visible="yes" title="API Reference" intro=""/>
     <tab type="usergroup" visible="yes" title="API Reference (details)" intro="">
       <tab type="namespaces" visible="no" title="">

@@ -33,7 +33,7 @@ set (RAPTOR_DOXYGEN_DOT_NUM_THREADS "0")
 set (RAPTOR_DOXYGEN_SOURCE_DIR "${RAPTOR_CLONE_DIR}")
 set (RAPTOR_DOXYFILE_IN ${RAPTOR_DOXYGEN_INPUT_DIR}/raptor_doxygen_cfg.in)
 set (RAPTOR_FOOTER_HTML_IN ${RAPTOR_DOXYGEN_INPUT_DIR}/raptor_footer.html.in)
-set (RAPTOR_LAYOUT_IN ${RAPTOR_DOXYGEN_INPUT_DIR}/DoxygenLayout.xml.in)
+set (RAPTOR_LAYOUT_IN ${RAPTOR_DOXYGEN_INPUT_DIR}/DoxygenLayout.xml)
 
 option(RAPTOR_VERCEL_PREVIEW_DOC "Is this a preview build by vercel.com?" OFF)
 

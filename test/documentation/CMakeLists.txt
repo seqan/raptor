@@ -28,7 +28,7 @@ set (RAPTOR_DOXYGEN_EXTRACT_PRIVATE "YES")
 
 configure_file (${RAPTOR_DOXYFILE_IN} ${RAPTOR_DOXYGEN_OUTPUT_DIR}/Doxyfile)
 configure_file (${RAPTOR_FOOTER_HTML_IN} ${RAPTOR_DOXYGEN_OUTPUT_DIR}/raptor_footer.html)
-configure_file (${RAPTOR_LAYOUT_IN} ${RAPTOR_DOXYGEN_OUTPUT_DIR}/DoxygenLayout.xml)
+include (raptor-doxygen-layout.cmake)
 
 add_custom_target(doc ALL
                   COMMAND ${DOXYGEN_EXECUTABLE}

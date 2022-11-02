@@ -42,7 +42,7 @@ INHERIT_DOCS           = YES
 SEPARATE_MEMBER_PAGES  = NO
 TAB_SIZE               = 4
 ## Custom doxygen commands
-ALIASES                =
+ALIASES                = tutorial_head{4}="<table><tr><th>Difficulty</th><td>\1</td></tr><tr><th>Duration</th><td>\2</td></tr><tr><th>Prerequisite tutorials</th><td>\3</td></tr><tr><th>Recommended reading</th><td>\4</td></tr></table>"
 OPTIMIZE_OUTPUT_FOR_C  = NO
 OPTIMIZE_OUTPUT_JAVA   = NO
 OPTIMIZE_FOR_FORTRAN   = NO
