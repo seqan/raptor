@@ -36,6 +36,8 @@ file (GLOB_RECURSE header_files
       "${header_base_path}/*.hpp"
 )
 
+list (FILTER header_files EXCLUDE REGEX "raptor/version.hpp")
+
 file (WRITE "${PROJECT_BINARY_DIR}/${target}.cpp" "")
 add_executable (${target} ${PROJECT_BINARY_DIR}/${target}.cpp)
 target_link_libraries (${target} raptor_header_test_lib)

@@ -99,7 +99,7 @@ jobs:
           mkdir build
           cd build
           cmake ../raptor/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                                   -DCMAKE_CXX_FLAGS="-Werror ${{ matrix.cxx_flags }} -Wno-interference-size" \
+                                                   -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size" \
                                                    -DRAPTOR_NATIVE_BUILD=OFF
 
       - name: Build tests
