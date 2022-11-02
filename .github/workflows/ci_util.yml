@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - 'main'
-  pull_request:
-    types:
-      - unlabeled
+  # pull_request:
+  #   types:
+  #     - unlabeled
   workflow_dispatch:
 
 concurrency:
