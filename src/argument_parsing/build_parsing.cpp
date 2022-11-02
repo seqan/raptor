@@ -29,6 +29,7 @@ std::istream & operator>>(std::istream & s, window & window_)
 void init_build_parser(sharg::parser & parser, build_arguments & arguments)
 {
     init_shared_meta(parser);
+    parser.info.description.emplace_back("Constructs a Raptor index of large collections of nucleotide sequences.");
     parser.info.examples = {
         "raptor build --kmer 19 --window 23 --size 8m --output raptor.index all_bin_paths.txt",
         "raptor build --kmer 19 --window 23 --compute-minimiser --output precomputed_minimisers all_bin_paths.txt",
