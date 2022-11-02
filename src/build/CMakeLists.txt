@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.15)
+cmake_minimum_required (VERSION 3.16)
 
 if (NOT TARGET raptor_build)
     add_library ("raptor_build" STATIC build_from_minimiser.cpp compute_minimiser.cpp raptor_build.cpp)

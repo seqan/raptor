@@ -29,7 +29,7 @@ brew install brewsci/bio/raptor
 ### Compile from source
 <details><summary>Prerequisites (click to expand)</summary>
 
-* CMake >= 3.8
+* CMake >= 3.16
 * GCC 10, 11 or 12 (most recent minor version)
 * git
 
