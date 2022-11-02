@@ -14,13 +14,14 @@ include (GNUInstallDirs)
 # install documentation files in /share/doc
 install (FILES "${RAPTOR_CLONE_DIR}/CHANGELOG.md" #
                "${RAPTOR_CLONE_DIR}/LICENSE.md" #
-               "${RAPTOR_CLONE_DIR}/README.md"
-         TYPE DOC)
+               "${RAPTOR_CLONE_DIR}/README.md" TYPE DOC
+)
 
 # install cmake files in /share/cmake
 install (FILES "${RAPTOR_CLONE_DIR}/build_system/raptor-config.cmake"
                "${RAPTOR_CLONE_DIR}/build_system/raptor-config-version.cmake"
-         DESTINATION "${CMAKE_INSTALL_DATADIR}/cmake/raptor")
+         DESTINATION "${CMAKE_INSTALL_DATADIR}/cmake/raptor"
+)
 
 # install raptor header files in /include/raptor
 install (DIRECTORY "${RAPTOR_INCLUDE_DIR}/raptor" TYPE INCLUDE)

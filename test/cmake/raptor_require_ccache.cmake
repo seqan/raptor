@@ -15,7 +15,10 @@ include (FindPackageMessage)
 # * https://ccache.dev/
 # * https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_LAUNCHER.html
 macro (raptor_require_ccache)
-    set (RAPTOR_USE_CCACHE ON CACHE BOOL "Use ccache if available.")
+    set (RAPTOR_USE_CCACHE
+         ON
+         CACHE BOOL "Use ccache if available."
+    )
     set (RAPTOR_FPROFILE_ABS_PATH "-fprofile-abs-path")
     if (RAPTOR_USE_CCACHE)
         find_program (CCACHE_PROGRAM ccache)

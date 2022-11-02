@@ -67,8 +67,8 @@ cmake_minimum_required (VERSION 3.4...3.12)
 # ----------------------------------------------------------------------------
 
 # make output globally quiet if required by find_package, this effects cmake functions like `check_*`
-set(CMAKE_REQUIRED_QUIET_SAVE ${CMAKE_REQUIRED_QUIET})
-set(CMAKE_REQUIRED_QUIET ${${CMAKE_FIND_PACKAGE_NAME}_FIND_QUIETLY})
+set (CMAKE_REQUIRED_QUIET_SAVE ${CMAKE_REQUIRED_QUIET})
+set (CMAKE_REQUIRED_QUIET ${${CMAKE_FIND_PACKAGE_NAME}_FIND_QUIETLY})
 
 # ----------------------------------------------------------------------------
 # Greeter
@@ -119,7 +119,10 @@ endmacro ()
 # Note that raptor-config.cmake can be standalone and thus RAPTOR_CLONE_DIR might be empty.
 # * `RAPTOR_CLONE_DIR` was already found in raptor-config-version.cmake
 # * `RAPTOR_INCLUDE_DIR` was already found in raptor-config-version.cmake
-find_path (RAPTOR_SUBMODULES_DIR NAMES seqan3 HINTS "${RAPTOR_CLONE_DIR}/lib" "${RAPTOR_INCLUDE_DIR}/raptor")
+find_path (RAPTOR_SUBMODULES_DIR
+           NAMES seqan3
+           HINTS "${RAPTOR_CLONE_DIR}/lib" "${RAPTOR_INCLUDE_DIR}/raptor"
+)
 
 if (RAPTOR_INCLUDE_DIR)
     raptor_config_print ("RAPTOR include dir found:   ${RAPTOR_INCLUDE_DIR}")
@@ -136,7 +139,14 @@ if (RAPTOR_CLONE_DIR)
 endif ()
 
 if (RAPTOR_SUBMODULES_DIR)
-    file (GLOB submodules ${RAPTOR_SUBMODULES_DIR}/*/include ${RAPTOR_SUBMODULES_DIR}/*/test/include ${RAPTOR_SUBMODULES_DIR}/submodules/*/include ${RAPTOR_SUBMODULES_DIR}/*/src/include ${RAPTOR_SUBMODULES_DIR}/simde/simde)
+    file (GLOB
+          submodules
+          ${RAPTOR_SUBMODULES_DIR}/*/include
+          ${RAPTOR_SUBMODULES_DIR}/*/test/include
+          ${RAPTOR_SUBMODULES_DIR}/submodules/*/include
+          ${RAPTOR_SUBMODULES_DIR}/*/src/include
+          ${RAPTOR_SUBMODULES_DIR}/simde/simde
+    )
     foreach (submodule ${submodules})
         if (IS_DIRECTORY ${submodule})
             raptor_config_print ("  …adding submodule include:  ${submodule}")
@@ -150,10 +160,10 @@ endif ()
 # ----------------------------------------------------------------------------
 
 # deactivate messages in check_*
-set (CMAKE_REQUIRED_QUIET       1)
+set (CMAKE_REQUIRED_QUIET 1)
 # use global variables in Check* calls
-set (CMAKE_REQUIRED_INCLUDES    ${CMAKE_INCLUDE_PATH} ${RAPTOR_INCLUDE_DIR} ${RAPTOR_DEPENDENCY_INCLUDE_DIRS})
-set (CMAKE_REQUIRED_FLAGS       ${CMAKE_CXX_FLAGS})
+set (CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH} ${RAPTOR_INCLUDE_DIR} ${RAPTOR_DEPENDENCY_INCLUDE_DIRS})
+set (CMAKE_REQUIRED_FLAGS ${CMAKE_CXX_FLAGS})
 
 # ----------------------------------------------------------------------------
 # Force-deactivate optional dependencies
@@ -161,7 +171,7 @@ set (CMAKE_REQUIRED_FLAGS       ${CMAKE_CXX_FLAGS})
 
 # These two are "opt-in", because detected by CMake
 # If you want to force-require these, just do find_package (zlib REQUIRED) before find_package (raptor)
-option (RAPTOR_NO_ZLIB  "Don't use ZLIB, even if present." OFF)
+option (RAPTOR_NO_ZLIB "Don't use ZLIB, even if present." OFF)
 option (RAPTOR_NO_BZIP2 "Don't use BZip2, even if present." OFF)
 
 # ----------------------------------------------------------------------------
@@ -171,10 +181,11 @@ option (RAPTOR_NO_BZIP2 "Don't use BZip2, even if present." OFF)
 set (CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
 
 set (CXXSTD_TEST_SOURCE
-    "#if !defined (__cplusplus) || (__cplusplus < 201709L)
+     "#if !defined (__cplusplus) || (__cplusplus < 201709L)
     #error NOCXX20
     #endif
-    int main() {}")
+    int main() {}"
+)
 
 check_cxx_source_compiles ("${CXXSTD_TEST_SOURCE}" CXX20_BUILTIN)
 
@@ -211,7 +222,7 @@ if (RAPTOR_HAS_OPENMP_SIMD)
     set (RAPTOR_CXX_FLAGS "${RAPTOR_CXX_FLAGS} -fopenmp-simd -DSIMDE_ENABLE_OPENMP")
     raptor_config_print ("SIMD-OpenMP Support:        via -fopenmp-simd")
 else ()
-        raptor_config_print ("SIMD-OpenMP Support:        not found")
+    raptor_config_print ("SIMD-OpenMP Support:        not found")
 endif ()
 
 check_cxx_compiler_flag ("-Wno-psabi" RAPTOR_SUPPRESS_GCC4_ABI)
@@ -266,9 +277,9 @@ if (NOT RAPTOR_NO_ZLIB)
 endif ()
 
 if (ZLIB_FOUND)
-    set (RAPTOR_LIBRARIES         ${RAPTOR_LIBRARIES}         ${ZLIB_LIBRARIES})
-    set (RAPTOR_DEPENDENCY_INCLUDE_DIRS      ${RAPTOR_DEPENDENCY_INCLUDE_DIRS}      ${ZLIB_INCLUDE_DIRS})
-    set (RAPTOR_DEFINITIONS       ${RAPTOR_DEFINITIONS}       "-DSEQAN3_HAS_ZLIB=1")
+    set (RAPTOR_LIBRARIES ${RAPTOR_LIBRARIES} ${ZLIB_LIBRARIES})
+    set (RAPTOR_DEPENDENCY_INCLUDE_DIRS ${RAPTOR_DEPENDENCY_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS})
+    set (RAPTOR_DEFINITIONS ${RAPTOR_DEFINITIONS} "-DSEQAN3_HAS_ZLIB=1")
     raptor_config_print ("Optional dependency:        ZLIB-${ZLIB_VERSION_STRING} found")
 else ()
     raptor_config_print ("Optional dependency:        ZLIB not found")
@@ -286,14 +297,15 @@ if (NOT ZLIB_FOUND AND BZIP2_FOUND)
     # NOTE (marehr): iostream_bzip2 uses the type `uInt`, which is defined by
     # `zlib`. Therefore, `bzip2` will cause a ton of errors without `zlib`.
     message (AUTHOR_WARNING "Disabling BZip2 [which was successfully found], "
-                            "because ZLIB was not found BZip2 depends on ZLIB.")
+                            "because ZLIB was not found BZip2 depends on ZLIB."
+    )
     unset (BZIP2_FOUND)
 endif ()
 
 if (BZIP2_FOUND)
-    set (RAPTOR_LIBRARIES         ${RAPTOR_LIBRARIES}         ${BZIP2_LIBRARIES})
-    set (RAPTOR_DEPENDENCY_INCLUDE_DIRS      ${RAPTOR_DEPENDENCY_INCLUDE_DIRS}      ${BZIP2_INCLUDE_DIRS})
-    set (RAPTOR_DEFINITIONS       ${RAPTOR_DEFINITIONS}       "-DSEQAN3_HAS_BZIP2=1")
+    set (RAPTOR_LIBRARIES ${RAPTOR_LIBRARIES} ${BZIP2_LIBRARIES})
+    set (RAPTOR_DEPENDENCY_INCLUDE_DIRS ${RAPTOR_DEPENDENCY_INCLUDE_DIRS} ${BZIP2_INCLUDE_DIRS})
+    set (RAPTOR_DEFINITIONS ${RAPTOR_DEFINITIONS} "-DSEQAN3_HAS_BZIP2=1")
     raptor_config_print ("Optional dependency:        BZip2-${BZIP2_VERSION_STRING} found")
 else ()
     raptor_config_print ("Optional dependency:        BZip2 not found")
@@ -304,9 +316,10 @@ endif ()
 # ----------------------------------------------------------------------------
 
 # librt
-if ((${CMAKE_SYSTEM_NAME} STREQUAL "Linux") OR
-    (${CMAKE_SYSTEM_NAME} STREQUAL "kFreeBSD") OR
-    (${CMAKE_SYSTEM_NAME} STREQUAL "GNU"))
+if ((${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+    OR (${CMAKE_SYSTEM_NAME} STREQUAL "kFreeBSD")
+    OR (${CMAKE_SYSTEM_NAME} STREQUAL "GNU")
+)
     set (RAPTOR_LIBRARIES ${RAPTOR_LIBRARIES} rt)
 endif ()
 
@@ -358,7 +371,18 @@ find_package_handle_standard_args (${CMAKE_FIND_PACKAGE_NAME} REQUIRED_VARS RAPT
 # Set RAPTOR_* variables with the content of ${CMAKE_FIND_PACKAGE_NAME}_(FOUND|...|VERSION)
 # This needs to be done, because `find_package(RAPTOR)` might be called in any case-sensitive way and we want to
 # guarantee that RAPTOR_* are always set.
-foreach (package_var FOUND DIR ROOT CONFIG VERSION VERSION_MAJOR VERSION_MINOR VERSION_PATCH VERSION_TWEAK VERSION_COUNT)
+foreach (package_var
+         FOUND
+         DIR
+         ROOT
+         CONFIG
+         VERSION
+         VERSION_MAJOR
+         VERSION_MINOR
+         VERSION_PATCH
+         VERSION_TWEAK
+         VERSION_COUNT
+)
     set (RAPTOR_${package_var} "${${CMAKE_FIND_PACKAGE_NAME}_${package_var}}")
 endforeach ()
 
@@ -388,24 +412,24 @@ endif ()
 set (CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_SAVE})
 
 if (RAPTOR_FIND_DEBUG)
-  message ("Result for ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt")
-  message ("")
-  message ("  CMAKE_BUILD_TYPE            ${CMAKE_BUILD_TYPE}")
-  message ("  CMAKE_SOURCE_DIR            ${CMAKE_SOURCE_DIR}")
-  message ("  CMAKE_INCLUDE_PATH          ${CMAKE_INCLUDE_PATH}")
-  message ("  RAPTOR_INCLUDE_DIR          ${RAPTOR_INCLUDE_DIR}")
-  message ("")
-  message ("  ${CMAKE_FIND_PACKAGE_NAME}_FOUND                ${${CMAKE_FIND_PACKAGE_NAME}_FOUND}")
-  message ("  RAPTOR_HAS_ZLIB             ${ZLIB_FOUND}")
-  message ("  RAPTOR_HAS_BZIP2            ${BZIP2_FOUND}")
-  message ("")
-  message ("  RAPTOR_INCLUDE_DIRS         ${RAPTOR_INCLUDE_DIRS}")
-  message ("  RAPTOR_LIBRARIES            ${RAPTOR_LIBRARIES}")
-  message ("  RAPTOR_DEFINITIONS          ${RAPTOR_DEFINITIONS}")
-  message ("  RAPTOR_CXX_FLAGS            ${RAPTOR_CXX_FLAGS}")
-  message ("")
-  message ("  RAPTOR_VERSION              ${RAPTOR_VERSION}")
-  message ("  RAPTOR_VERSION_MAJOR        ${RAPTOR_VERSION_MAJOR}")
-  message ("  RAPTOR_VERSION_MINOR        ${RAPTOR_VERSION_MINOR}")
-  message ("  RAPTOR_VERSION_PATCH        ${RAPTOR_VERSION_PATCH}")
+    message ("Result for ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt")
+    message ("")
+    message ("  CMAKE_BUILD_TYPE            ${CMAKE_BUILD_TYPE}")
+    message ("  CMAKE_SOURCE_DIR            ${CMAKE_SOURCE_DIR}")
+    message ("  CMAKE_INCLUDE_PATH          ${CMAKE_INCLUDE_PATH}")
+    message ("  RAPTOR_INCLUDE_DIR          ${RAPTOR_INCLUDE_DIR}")
+    message ("")
+    message ("  ${CMAKE_FIND_PACKAGE_NAME}_FOUND                ${${CMAKE_FIND_PACKAGE_NAME}_FOUND}")
+    message ("  RAPTOR_HAS_ZLIB             ${ZLIB_FOUND}")
+    message ("  RAPTOR_HAS_BZIP2            ${BZIP2_FOUND}")
+    message ("")
+    message ("  RAPTOR_INCLUDE_DIRS         ${RAPTOR_INCLUDE_DIRS}")
+    message ("  RAPTOR_LIBRARIES            ${RAPTOR_LIBRARIES}")
+    message ("  RAPTOR_DEFINITIONS          ${RAPTOR_DEFINITIONS}")
+    message ("  RAPTOR_CXX_FLAGS            ${RAPTOR_CXX_FLAGS}")
+    message ("")
+    message ("  RAPTOR_VERSION              ${RAPTOR_VERSION}")
+    message ("  RAPTOR_VERSION_MAJOR        ${RAPTOR_VERSION_MAJOR}")
+    message ("  RAPTOR_VERSION_MINOR        ${RAPTOR_VERSION_MINOR}")
+    message ("  RAPTOR_VERSION_PATCH        ${RAPTOR_VERSION_PATCH}")
 endif ()

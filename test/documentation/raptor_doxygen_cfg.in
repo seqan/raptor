@@ -42,7 +42,7 @@ INHERIT_DOCS           = YES
 SEPARATE_MEMBER_PAGES  = NO
 TAB_SIZE               = 4
 ## Custom doxygen commands
-ALIASES                =
+ALIASES                = tutorial_head{4}="<table><tr><th>Difficulty</th><td>\1</td></tr><tr><th>Duration</th><td>\2</td></tr><tr><th>Prerequisite tutorials</th><td>\3</td></tr><tr><th>Recommended reading</th><td>\4</td></tr></table>"
 OPTIMIZE_OUTPUT_FOR_C  = NO
 OPTIMIZE_OUTPUT_JAVA   = NO
 OPTIMIZE_FOR_FORTRAN   = NO
@@ -220,9 +220,9 @@ HTML_FORMULA_FORMAT    = png
 FORMULA_FONTSIZE       = 14
 FORMULA_MACROFILE      =
 USE_MATHJAX            = ${RAPTOR_DOXYGEN_USE_MATHJAX}
-MATHJAX_VERSION        = MathJax_2
+MATHJAX_VERSION        = MathJax_3
 MATHJAX_FORMAT         = HTML-CSS
-MATHJAX_RELPATH        =
+MATHJAX_RELPATH        = https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/
 MATHJAX_EXTENSIONS     =
 MATHJAX_CODEFILE       =
 SEARCHENGINE           = YES

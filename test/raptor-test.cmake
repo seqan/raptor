@@ -26,7 +26,8 @@ option (RAPTOR_TEST_BUILD_OFFLINE "Skip the update step of external projects." O
 
 find_path (RAPTOR_TEST_CMAKE_MODULE_DIR
            NAMES raptor_require_ccache.cmake
-           HINTS "${CMAKE_CURRENT_LIST_DIR}/cmake/")
+           HINTS "${CMAKE_CURRENT_LIST_DIR}/cmake/"
+)
 list (APPEND CMAKE_MODULE_PATH "${RAPTOR_TEST_CMAKE_MODULE_DIR}")
 
 # ----------------------------------------------------------------------------

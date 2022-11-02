@@ -13,16 +13,25 @@ raptor_require_ccache ()
 # Dependency: Chopper
 include (FetchContent)
 
-FetchContent_Declare (
-    chopper_project
-    URL "${RAPTOR_SUBMODULES_DIR}/chopper"
-)
+FetchContent_Declare (chopper_project URL "${RAPTOR_SUBMODULES_DIR}/chopper")
 
 set (SEQAN3_SUBMODULES_DIR "${RAPTOR_SUBMODULES_DIR}")
-set (CHOPPER_SUBMODULES_DIR "${RAPTOR_SUBMODULES_DIR}" CACHE STRING "Directory containing submodules.")
-set (CHOPPER_USE_CCACHE OFF CACHE BOOL "Use ccache if available.")
-set (CHOPPER_BUILD_DOC OFF CACHE BOOL "Build chopper documentation.")
-set (CHOPPER_BUILD_TEST OFF CACHE BOOL "Build chopper tests.")
+set (CHOPPER_SUBMODULES_DIR
+     "${RAPTOR_SUBMODULES_DIR}"
+     CACHE STRING "Directory containing submodules."
+)
+set (CHOPPER_USE_CCACHE
+     OFF
+     CACHE BOOL "Use ccache if available."
+)
+set (CHOPPER_BUILD_DOC
+     OFF
+     CACHE BOOL "Build chopper documentation."
+)
+set (CHOPPER_BUILD_TEST
+     OFF
+     CACHE BOOL "Build chopper tests."
+)
 set (CMAKE_DISABLE_FIND_PACKAGE_Doxygen TRUE) # For chopper
 
 FetchContent_MakeAvailable (chopper_project)
@@ -38,7 +47,7 @@ endif ()
 if (NOT TARGET raptor_lib)
     add_library ("raptor_lib" INTERFACE)
     target_link_libraries ("raptor_lib" INTERFACE "raptor_argument_parsing" "raptor_build" "raptor_build_hibf"
-                                                "raptor_search" "raptor_threshold" "raptor_upgrade"
+                                                  "raptor_search" "raptor_threshold" "raptor_upgrade"
     )
 endif ()
 

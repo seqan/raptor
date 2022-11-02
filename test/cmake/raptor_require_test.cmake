@@ -16,10 +16,10 @@ macro (raptor_require_test)
     message (STATUS "Fetching Google Test ${gtest_git_tag}:")
 
     include (FetchContent)
-    FetchContent_Declare (
-        gtest_fetch_content
-        GIT_REPOSITORY "https://github.com/google/googletest.git"
-        GIT_TAG "${gtest_git_tag}")
+    FetchContent_Declare (gtest_fetch_content
+                          GIT_REPOSITORY "https://github.com/google/googletest.git"
+                          GIT_TAG "${gtest_git_tag}"
+    )
     option (BUILD_GMOCK "" OFF)
     option (INSTALL_GTEST "" OFF)
     FetchContent_MakeAvailable (gtest_fetch_content)
