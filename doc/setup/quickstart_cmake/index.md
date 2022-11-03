@@ -11,13 +11,13 @@ works.
 # Download and Installation
 There may be performance benefits when compiling from source as the build can be optimized for the host system.
 
-## Install with [conda](https://conda.io) and [bioconda](https://bioconda.github.io/recipes/raptor/README.html) (Linux)
+## Install with conda and bioconda (Linux)
 
 ```bash
 conda install -c bioconda -c conda-forge raptor
 ```
 
-## Install with [Homebrew](https://brew.sh/) (Linux, macOS)
+## Install with Homebrew (Linux, macOS)
 
 ```bash
 brew install brewsci/bio/raptor
@@ -45,7 +45,7 @@ git submodule update --init
 
 \endcollapsible
 
-<details><summary>Download specific version (click to expand)</summary>
+\startcollapsible{Download specific version (click to expand)}
 
 E.g., for version `1.1.0`:
 ```bash
