@@ -28,6 +28,9 @@
       <tab type="user" visible="yes" title="Update Notifications" url="\ref about_update_notifications" intro=""/>
     </tab> -->
     <!-- Custom ^^^ -->
+    <!-- Setup pages are added in seqan3-doxygen-layout.cmake automatically for each doc/setup/*/index.md file -->
+    <tab type="usergroup" visible="yes" title="Setup" intro="">
+    </tab>
     <!-- Tutorials are added in raptor-doxygen-layout.cmake automatically for each doc/tutorial/*/index.md file -->
     <tab type="usergroup" visible="yes" title="Tutorial" intro="">
     </tab>
