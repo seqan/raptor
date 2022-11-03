@@ -1,8 +1,7 @@
 # Quick Setup {#setup}
 
 <b>Learning Objective:</b><br>
-In this short guide you will learn how to set up Raptor and how to compile a small example to test whether everything
-works.
+In this short guide you will learn how to set up Raptor or how to compile a specific version.
 
 \tutorial_head{Easy, 30 Minutes, No prerequisites, }
 
