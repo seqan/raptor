@@ -56,7 +56,7 @@ endif ()
 # needed for performance test cases in raptor/test/performance
 if (NOT TARGET raptor::test::performance)
     add_library (raptor_test_performance INTERFACE)
-    target_link_libraries (raptor_test_performance INTERFACE "raptor::test" "gbenchmark")
+    target_link_libraries (raptor_test_performance INTERFACE "raptor::test" "benchmark_main" "benchmark")
 
     add_library (raptor::test::performance ALIAS raptor_test_performance)
 endif ()

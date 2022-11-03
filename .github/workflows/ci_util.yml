@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'push' }}
 
 env:
-  CMAKE_VERSION: 3.15.4
+  CMAKE_VERSION: 3.16.9
   SHARG_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
 
@@ -96,7 +96,7 @@ jobs:
           mkdir build
           cd build
           cmake ../raptor/util/test -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                    -DCMAKE_CXX_FLAGS="-Werror ${{ matrix.cxx_flags }} -Wno-interference-size" \
+                                    -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size" \
                                     -DRAPTOR_NATIVE_BUILD=OFF \
                                     -DRAPTOR_UTILITY_BUILD_MASON=1 \
                                     -DRAPTOR_UTILITY_BUILD_DREAM_YARA=1
