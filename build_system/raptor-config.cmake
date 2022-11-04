@@ -153,6 +153,7 @@ if (RAPTOR_SUBMODULES_DIR)
             set (RAPTOR_DEPENDENCY_INCLUDE_DIRS ${submodule} ${RAPTOR_DEPENDENCY_INCLUDE_DIRS})
         endif ()
     endforeach ()
+    set (SHARG_HINT_TDL "${RAPTOR_SUBMODULES_DIR}/tool_description_lib")
 endif ()
 
 # ----------------------------------------------------------------------------
@@ -204,6 +205,11 @@ else ()
 
     set (RAPTOR_CXX_FLAGS "${RAPTOR_CXX_FLAGS} -std=c++20")
 endif ()
+
+# ----------------------------------------------------------------------------
+# Required: Sharg (with TDL for CWL/CTD support)
+# ----------------------------------------------------------------------------
+find_package (Sharg QUIET REQUIRED HINTS ${RAPTOR_SUBMODULES_DIR}/sharg-parser/build_system)
 
 # ----------------------------------------------------------------------------
 # Optional: OpenMP
@@ -457,7 +463,7 @@ if (RAPTOR_FOUND AND NOT TARGET raptor::raptor)
     target_compile_definitions (raptor_raptor INTERFACE ${RAPTOR_DEFINITIONS})
     target_compile_options (raptor_raptor INTERFACE ${RAPTOR_CXX_FLAGS_LIST})
     target_link_options (raptor_raptor INTERFACE ${RAPTOR_CXX_FLAGS_LIST})
-    target_link_libraries (raptor_raptor INTERFACE "${RAPTOR_LIBRARIES}")
+    target_link_libraries (raptor_raptor INTERFACE "${RAPTOR_LIBRARIES}" sharg::sharg)
     # include raptor/include/ as -I, because raptor should never produce warnings.
     target_include_directories (raptor_raptor INTERFACE "${RAPTOR_INCLUDE_DIR}")
     # include everything except raptor/include/ as -isystem, i.e.
