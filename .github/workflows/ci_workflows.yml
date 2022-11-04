@@ -38,6 +38,11 @@ jobs:
             build_type: Release
             cxx_flags: "-std=c++23"
 
+          - name: "CWL"
+            cxx: "g++-12"
+            cc: "gcc-12"
+            build_type: Release
+            cxx_flags: "-std=c++23"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -59,9 +64,16 @@ jobs:
         run: sudo apt-get install --yes ${{ matrix.cxx }}
 
       - name: Install Nextflow
+        if: matrix.name == 'Nextflow'
         uses: nf-core/setup-nextflow@v1
         with:
           version: latest-stable
+
+      - name: Install cwltool
+        if: matrix.name == 'CWL'
+        run: |
+          sudo apt-get install --yes pipx
+          pipx install cwltool
 
       - name: Load ccache
         uses: actions/cache@v3
@@ -78,7 +90,8 @@ jobs:
         run: |
           env cmake --version
           env ${{ matrix.cxx }} --version
-          env nextflow -version
+          env nextflow -version || true
+          env cwltool --version || true
 
       - name: Configure Raptor
         env:
@@ -106,7 +119,17 @@ jobs:
           ccache -sv
 
       - name: Run Nextflow
+        if: matrix.name == 'Nextflow'
         run: |
           cd raptor/workflow/nextflow
           nextflow hibf.nf
+
+      - name: Run cwltool
+        if: matrix.name == 'CWL'
+        run: |
+          export PATH=${PATH}:${{ github.workspace }}/build/bin
+          raptor build --export-help cwl > raptor.cwl
+          cwltool --validate raptor.cwl
+          cwltool raptor.cwl raptor/workflow/cwl/tests/raptor-build-0_bins_window_19.yml | grep 098169f476fb949b0d08f2d1e05881049819b811
+          cwltool raptor.cwl raptor/workflow/cwl/tests/raptor-build-16_bins_window_19.yml | grep 64a4328eb3dab99bf6ecd38f84f4ae45fd01a4dd
 

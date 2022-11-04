@@ -63,6 +63,7 @@ requirements:
   InlineJavascriptRequirement: {}
   InitialWorkDirRequirement:
     listing:
+      - $(inputs.sequences.flat())
       - entryname: input_bins_filepaths.txt
         entry: |
           ${
@@ -70,7 +71,7 @@ requirements:
              for (var i = 0; i < inputs.sequences.length; i++) {
                 var currentBin = inputs.sequences[i];
                 for (var j = 0; j < currentBin.length; j++) {
-                  bins += currentBin[j].path + " ";
+                  bins += currentBin[j].basename + " ";
                 }
                 bins += "\n";
              }
@@ -80,6 +81,7 @@ requirements:
 arguments:
   - prefix: --threads
     valueFrom: $(runtime.cores)
+  - --input
   - input_bins_filepaths.txt
 
 outputs:
