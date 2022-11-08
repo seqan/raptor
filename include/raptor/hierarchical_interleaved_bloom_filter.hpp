@@ -50,7 +50,7 @@ namespace raptor
  *
  * In this example, user bin 1 was split into two technical bins. Bins 3, 4, and 5 were merged into a single technical
  * bin, and another IBF was added for the merged bin.
- * \image html hibf.svg
+ * \image html hibf.svg width=90%
  *
  * The individual IBFs may have a different number of technical bins and differ in their sizes, allowing an efficient
  * distribution of the user bins.
