@@ -95,7 +95,7 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
     parser.add_option(arguments.threads,
                       sharg::config{.short_id = '\0',
                                     .long_id = "threads",
-                                    .description = "The numer of threads to use.",
+                                    .description = "The number of threads to use.",
                                     .validator = positive_integer_validator{}});
 
     parser.add_flag(
