@@ -26,7 +26,7 @@
     ]]></command>
     <inputs>
         <param name="inputs" label="Files representing a bin each" type="data" format="fasta" multiple="true" />
-        <param name="threads" label="Threads" type="integer" value="1" min="1" help="The numer of threads to use. Default: 1. Value must be a positive integer. " />
+        <param name="threads" label="Threads" type="integer" value="1" min="1" help="The number of threads to use. Default: 1. Value must be a positive integer. " />
         <param name="parts" label="Parts" type="integer" value="1" min="1" help="Splits the index in this many parts. Default: 1. Value must be a power of two." />
         <param name="window" label="Window size" type="integer" optional="true" min="1" help="The window size. Default: kmer size. Value must be a positive integer." />
         <param name="kmer" label ="Kmer size" type="integer" value="20" min="1" max="32" help="The k-mer size. Default: 20. Value must be in range [1,32]." />
@@ -70,7 +70,7 @@ OPTIONS
 
   Basic options:
     --threads (unsigned 8 bit integer)
-          The numer of threads to use. Default: 1. Value must be a positive
+          The number of threads to use. Default: 1. Value must be a positive
           integer.
     --parts (unsigned 8 bit integer)
           Splits the index in this many parts. Default: 1. Value must be a

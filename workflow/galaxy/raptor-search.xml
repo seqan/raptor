@@ -16,7 +16,7 @@
             #if $pattern#   --pattern ${pattern} #end if#
     ]]></command>
     <inputs>
-        <param name="threads" label="Threads" type="integer" value="1" min="1" help="The numer of threads to use. Default: 1. Value must be a positive integer." />
+        <param name="threads" label="Threads" type="integer" value="1" min="1" help="The number of threads to use. Default: 1. Value must be a positive integer." />
         <param name="index" label="Index" type="data" format="binary" help="Provide a valid path to an index. Parts: Without suffix _0 " />
         <param name="query" label="Query" type="data" format="fasta" help="Provide a path to the query file. The input file must exist and read permissions must be granted." />
         <param name="error" label="Allowed errors" type="integer" value="0" min="0" help="The number of errors Default: 0. Value must be a positive integer or 0." />
@@ -41,7 +41,7 @@ OPTIONS
 
   Basic options:
     --threads (unsigned 8 bit integer)
-          The numer of threads to use. Default: 1. Value must be a positive integer.
+          The number of threads to use. Default: 1. Value must be a positive integer.
     --index (std::filesystem::path)
           Provide a valid path to an index. Parts: Without suffix _0
     --query (std::filesystem::path)
