@@ -12,7 +12,6 @@ namespace raptor
 
 void init_shared_meta(sharg::parser & parser)
 {
-    parser.info.app_name = "Raptor";
     parser.info.author = "Enrico Seiler";
     parser.info.citation = "Raptor: A fast and space-efficient pre-filter for querying very large collections of "
                            "nucleotide sequences; Enrico Seiler, Svenja Mehringer, Mitra Darvish, Etienne Turc, "
