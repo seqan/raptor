@@ -1,0 +1,7 @@
+{
+    "functions": {
+      "api/doxysearch.sh": {
+        "runtime": "vercel-bash@4.1.0"
+      }
+    }
+  }
