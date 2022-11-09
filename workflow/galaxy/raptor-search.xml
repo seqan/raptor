@@ -34,8 +34,8 @@
             <output name="results" file="expected_query_results.txt" />
         </test>
     </tests>
-    <help><![CDATA[Raptor - A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences.
-===========================================================================================================
+    <help><![CDATA[Raptor-search - A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences.
+==================================================================================================================
 
 OPTIONS
 

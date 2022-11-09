@@ -39,10 +39,11 @@ TEST_F(argparse_main, no_options)
 TEST_F(argparse_build, no_options)
 {
     cli_test_result const result = execute_app("raptor", "build");
-    std::string const expected{
-        "Raptor - A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences.\n"
-        "===========================================================================================================\n"
-        "    Try -h or --help for more information.\n"};
+    std::string const expected{"Raptor-build - A fast and space-efficient pre-filter for querying very large "
+                               "collections of nucleotide sequences.\n"
+                               "======================================================================================="
+                               "==========================\n"
+                               "    Try -h or --help for more information.\n"};
     EXPECT_EQ(result.out, expected);
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
@@ -51,10 +52,11 @@ TEST_F(argparse_build, no_options)
 TEST_F(argparse_search, no_options)
 {
     cli_test_result const result = execute_app("raptor", "search");
-    std::string const expected{
-        "Raptor - A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences.\n"
-        "===========================================================================================================\n"
-        "    Try -h or --help for more information.\n"};
+    std::string const expected{"Raptor-search - A fast and space-efficient pre-filter for querying very large "
+                               "collections of nucleotide sequences.\n"
+                               "======================================================================================="
+                               "===========================\n"
+                               "    Try -h or --help for more information.\n"};
     EXPECT_EQ(result.out, expected);
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);

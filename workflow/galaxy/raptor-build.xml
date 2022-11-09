@@ -53,8 +53,8 @@
         </test>
     </tests>
 
-    <help><![CDATA[Raptor - A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences.
-===========================================================================================================
+    <help><![CDATA[Raptor-build - A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences.
+=================================================================================================================
 
 POSITIONAL ARGUMENTS
     ARGUMENT-1 (std::filesystem::path)

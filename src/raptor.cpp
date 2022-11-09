@@ -15,7 +15,7 @@ int main(int argc, char ** argv)
 {
     try
     {
-        sharg::parser top_level_parser{"raptor",
+        sharg::parser top_level_parser{"Raptor",
                                        argc,
                                        argv,
                                        sharg::update_notifications::on,
@@ -33,11 +33,11 @@ int main(int argc, char ** argv)
         top_level_parser.parse();
 
         sharg::parser & sub_parser = top_level_parser.get_sub_parser();
-        if (sub_parser.info.app_name == std::string_view{"raptor-build"})
+        if (sub_parser.info.app_name == std::string_view{"Raptor-build"})
             raptor::build_parsing(sub_parser, false);
-        if (sub_parser.info.app_name == std::string_view{"raptor-search"})
+        if (sub_parser.info.app_name == std::string_view{"Raptor-search"})
             raptor::search_parsing(sub_parser, false);
-        if (sub_parser.info.app_name == std::string_view{"raptor-socks"})
+        if (sub_parser.info.app_name == std::string_view{"Raptor-socks"})
         {
             sharg::parser socks_parser{"socks",
                                        argc - 1,
@@ -51,7 +51,7 @@ int main(int argc, char ** argv)
             if (socks_sub_parser.info.app_name == std::string_view{"socks-lookup-kmer"})
                 raptor::search_parsing(socks_sub_parser, true);
         }
-        if (sub_parser.info.app_name == std::string_view{"raptor-upgrade"})
+        if (sub_parser.info.app_name == std::string_view{"Raptor-upgrade"})
             raptor::upgrade_parsing(sub_parser);
     }
     catch (sharg::parser_error const & ext)
