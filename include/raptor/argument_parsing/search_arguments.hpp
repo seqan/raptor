@@ -17,12 +17,6 @@
 namespace raptor
 {
 
-// For costum default message in argparser
-struct pattern_size
-{
-    uint64_t v{};
-};
-
 struct search_arguments
 {
     // Related to k-mers
@@ -39,7 +33,6 @@ struct search_arguments
     double p_max{0.15};
     double fpr{0.05};
     uint64_t pattern_size{};
-    raptor::pattern_size pattern_size_strong{};
     uint8_t errors{0};
 
     // Related to IBF

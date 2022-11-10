@@ -14,18 +14,6 @@
 namespace raptor
 {
 
-// Printing a custom default value for argument_parser.
-std::ostream & operator<<(std::ostream & s, window const &)
-{
-    return s << "\\fBk-mer size\\fP";
-}
-
-// Parsing input from argument_parser.
-std::istream & operator>>(std::istream & s, window & window_)
-{
-    return s >> window_.v;
-}
-
 void init_build_parser(sharg::parser & parser, build_arguments & arguments)
 {
     init_shared_meta(parser);
@@ -53,10 +41,11 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
                                     .long_id = "kmer",
                                     .description = "The k-mer size.",
                                     .validator = sharg::arithmetic_range_validator{1, 32}});
-    parser.add_option(arguments.window_size_strong,
+    parser.add_option(arguments.window_size,
                       sharg::config{.short_id = '\0',
                                     .long_id = "window",
                                     .description = "The window size.",
+                                    .default_message = "k-mer size",
                                     .hidden = arguments.is_socks,
                                     .validator = positive_integer_validator{}});
     parser.add_option(arguments.shape_string,
@@ -150,16 +139,10 @@ void build_parsing(sharg::parser & parser, bool const is_socks)
         arguments.shape = seqan3::shape{seqan3::ungapped{arguments.kmer_size}};
     }
 
-    if (parser.is_option_set("window"))
-    {
-        arguments.window_size = arguments.window_size_strong.v;
-        if (arguments.shape.size() > arguments.window_size)
-            throw sharg::parser_error{"The k-mer size cannot be bigger than the window size."};
-    }
-    else
-    {
+    if (!parser.is_option_set("window"))
         arguments.window_size = arguments.shape.size();
-    }
+    else if (arguments.shape.size() > arguments.window_size)
+        throw sharg::parser_error{"The k-mer size cannot be bigger than the window size."};
 
     bool const is_compute_minimiser_set{parser.is_option_set("compute-minimiser")
                                         || parser.is_option_set("compute-minimizer")};

@@ -22,7 +22,6 @@ struct build_arguments
     // Related to k-mers
     uint8_t kmer_size{20u};
     uint32_t window_size{kmer_size};
-    window window_size_strong{kmer_size};
     std::string shape_string{};
     seqan3::shape shape{seqan3::ungapped{kmer_size}};
     bool compute_minimiser{false};

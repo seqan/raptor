@@ -17,18 +17,6 @@
 namespace raptor
 {
 
-// Printing a custom default value for argument_parser.
-std::ostream & operator<<(std::ostream & s, pattern_size const &)
-{
-    return s << "Median of sequence lengths in query file";
-}
-
-// Parsing input from argument_parser.
-std::istream & operator>>(std::istream & s, pattern_size & pattern_size_)
-{
-    return s >> pattern_size_.v;
-}
-
 void init_search_parser(sharg::parser & parser, search_arguments & arguments)
 {
     init_shared_meta(parser);
@@ -87,10 +75,11 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                                     .description = "The false positive rate used for building the index.",
                                     .hidden = arguments.is_socks,
                                     .validator = sharg::arithmetic_range_validator{0, 1}});
-    parser.add_option(arguments.pattern_size_strong,
+    parser.add_option(arguments.pattern_size,
                       sharg::config{.short_id = '\0',
                                     .long_id = "pattern",
                                     .description = "The pattern size.",
+                                    .default_message = "Median of sequence lengths in query file",
                                     .hidden = arguments.is_socks});
     parser.add_option(arguments.threads,
                       sharg::config{.short_id = '\0',
@@ -171,10 +160,6 @@ void search_parsing(sharg::parser & parser, bool const is_socks)
             }
             std::sort(sequence_lengths.begin(), sequence_lengths.end());
             arguments.pattern_size = sequence_lengths[sequence_lengths.size() / 2];
-        }
-        else
-        {
-            arguments.pattern_size = arguments.pattern_size_strong.v;
         }
     }
 
