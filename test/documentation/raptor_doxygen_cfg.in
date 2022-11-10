@@ -45,6 +45,12 @@ TAB_SIZE               = 4
 ALIASES                = tutorial_head{4}="<table><tr><th>Difficulty</th><td>\1</td></tr><tr><th>Duration</th><td>\2</td></tr><tr><th>Prerequisite tutorials</th><td>\3</td></tr><tr><th>Recommended reading</th><td>\4</td></tr></table>"
 ALIASES                += startcollapsible{1}="\htmlonly<details class=\"seqan\"><summary class = \"seqan\">\1</summary>\endhtmlonly"
 ALIASES                += endcollapsible="\htmlonly</details>\endhtmlonly"
+ALIASES                += assignment{1}="\htmlonly <div class=\"assignment\"><h4>\1</h4><div class=\"assignment_content\">\endhtmlonly"
+ALIASES                += endassignment="\htmlonly</div></div>\endhtmlonly"
+ALIASES                += solution="\htmlonly <div class=\"solution\"> <details><summary><b>Solution</b></summary> \endhtmlonly"
+ALIASES                += endsolution="\htmlonly </details> </div> \endhtmlonly"
+ALIASES                += hint="\htmlonly <div class=\"assignment\"> <details><summary><b>Hint</b></summary> \endhtmlonly"
+ALIASES                += endhint="\htmlonly </details> </div> \endhtmlonly"
 OPTIMIZE_OUTPUT_FOR_C  = NO
 OPTIMIZE_OUTPUT_JAVA   = NO
 OPTIMIZE_FOR_FORTRAN   = NO
