@@ -69,12 +69,6 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                       .description = "Used in the dynamic thresholding. The higher p_max, the lower the threshold.",
                       .hidden = arguments.is_socks,
                       .validator = sharg::arithmetic_range_validator{0, 1}});
-    parser.add_option(arguments.fpr,
-                      sharg::config{.short_id = '\0',
-                                    .long_id = "fpr",
-                                    .description = "The false positive rate used for building the index.",
-                                    .hidden = arguments.is_socks,
-                                    .validator = sharg::arithmetic_range_validator{0, 1}});
     parser.add_option(arguments.pattern_size,
                       sharg::config{.short_id = '\0',
                                     .long_id = "pattern",
