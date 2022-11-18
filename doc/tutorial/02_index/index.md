@@ -21,7 +21,7 @@ in read mapping you might want to compare your genome to the genome of 100'000 o
 It can also be used for metagenomic classification, i.e., which microbes are in a single sample.
 
 \see Related tools:
-- Rna-seq expression analysis: [Needle](https://www.seqan.de/apps/needle.html), a tool for storing sequencing
+- RNA-seq expression analysis: [Needle](https://www.seqan.de/apps/needle.html), a tool for storing sequencing
 experiments in such a way that approximate quantification of large sequencing data sets is possible.
 - Metagenomics: [Ganon/Ganon2](https://github.com/pirovc/ganon), a tool for comparative metagenomics analysis in short
 time using the whole of the quickly growing number of assembled sequences openly available.
@@ -34,6 +34,11 @@ These sequences are typically available as
 [FASTQ](https://docs.seqan.de/seqan/3-master-user/classseqan3_1_1format__fastq.html#details) files, but can be in any
 format supported by
 [`seqan3::sequence_file_input`](https://docs.seqan.de/seqan/3-master-user/tutorial_sequence_file.html).
+
+We summarise these in a list of paths and can then create a first index using the default values of raptor:
+```bash
+raptor build --size 1k --output raptor.index all_bin_paths.txt
+```
 
 \assignment{Assignment 1: Create example files and index them}
 Copy and paste the following FASTA files to some location, e.g. the tmp directory:
@@ -54,39 +59,39 @@ mini_3.fasta:
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 ```
 and then create an all_paths.txt and run raptor build.
+
+\note
+Check the help page to read what the expected content of `all_paths.txt` looks like, which can be accessed as usual by
+typing `raptor build -h` or `raptor build --help`.
+
 \endassignment
 
 \solution
-Your all_paths.txt should look like:
+Your `all_paths.txt` might look like:
 ```txt
 mini_1.fasta
 mini_2.fasta
 mini_3.fasta
 ```
+
+/note
+Sometimes it would be better to use the absolute paths instead.
+
 And you should have run:
 ```bash
-raptor build --output raptor.index all_paths.txt
+raptor build --size 1k --output raptor.index all_paths.txt
 ```
 Your directory should look like this:
 ```bash
 tmp$ ls
 all_paths.txt   mini_1.fasta    mini_2.fasta    mini_3.fasta    raptor.index
 ```
-\endsolution
-\todo Currently there is an Error: `[Error] Option --size is required but not set.` Thus you should run raptor with the
-default size value: `--size 1k`.
 
 \note
-We will use this mini-example in the following, both with further parameters and then for `raptor search`. We therefore
+We will use this mini-example in the following, both with further parameters and then for `raptor search`. Therefore, we
 recommend not deleting the files including the built indexes.
 
-We summarise these in a list of paths and can then create a first index using the default values of raptor:
-```bash
-raptor build --output raptor.index all_bin_paths.txt
-```
-
-\note
-Raptor also has a help page, which can be accessed as usual by typing `raptor build -h` or `raptor build --help`.
+\endsolution
 
 ## General Idea & main parameters
 
