@@ -115,7 +115,7 @@ for tmax in $TECHNICAL_BINS; do
             --output $query_out \
             --threads $THREADS \
             --error $ERRORS \
-            --pattern $READ_LENGTH \
+            --query_length $READ_LENGTH \
             --tau 0.9999 \
             --fpr $FPR \
             --time
@@ -146,7 +146,7 @@ echo -n "[$(date +"%Y-%m-%d %T")] Searching index for reads of length $READ_LENG
         --output $query_out \
         --threads $THREADS \
         --error $ERRORS \
-        --pattern $READ_LENGTH \
+        --query_length $READ_LENGTH \
         --tau 0.9999 \
         --fpr $FPR \
         --time

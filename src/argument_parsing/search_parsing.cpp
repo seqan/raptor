@@ -72,8 +72,8 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                                     .validator = sharg::arithmetic_range_validator{0, 1}});
     parser.add_option(arguments.pattern_size,
                       sharg::config{.short_id = '\0',
-                                    .long_id = "pattern",
-                                    .description = "The pattern size. Only used with --error.",
+                                    .long_id = "query_length",
+                                    .description = "The query length. Only used with --error.",
                                     .default_message = "Median of sequence lengths in query file",
                                     .hidden = arguments.is_socks});
 
@@ -155,11 +155,11 @@ void search_parsing(sharg::parser & parser, bool const is_socks)
     }
 
     // ==========================================
-    // Process --pattern.
+    // Process --query_length.
     // ==========================================
     if (!arguments.is_socks)
     {
-        if (!parser.is_option_set("pattern"))
+        if (!parser.is_option_set("query_length"))
         {
             std::vector<uint64_t> sequence_lengths{};
             seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>> query_in{arguments.query_file};

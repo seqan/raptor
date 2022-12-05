@@ -348,7 +348,7 @@ TEST_F(argparse_search, temporary_warning)
                                                data("query.fq"),
                                                "--index ",
                                                data("1bins23window.index"),
-                                               "--pattern 60",
+                                               "--query_length 60",
                                                "--output search.out");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err,

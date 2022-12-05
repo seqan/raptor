@@ -360,7 +360,7 @@ void initialize_argument_parser(sharg::parser & parser, cmd_arguments & args)
                                     .validator = sharg::arithmetic_range_validator{0, 1}});
     parser.add_option(args.pattern_size,
                       sharg::config{.short_id = 'p',
-                                    .long_id = "pattern",
+                                    .long_id = "query_length",
                                     .description =
                                         "Choose the pattern size. Only needed for methods other than "
                                         "heuristic or lemma. Default: Use median of sequence lengths in query file."});

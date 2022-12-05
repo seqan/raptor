@@ -185,7 +185,7 @@ void init_search_parser(sharg::parser & parser, raptor::search_arguments & argum
     parser.add_option(arguments.pattern_size,
                       sharg::config{
                           .short_id = '\0',
-                          .long_id = "pattern",
+                          .long_id = "query_length",
                           .description = "The pattern size. Default: Use median of sequence lengths in query file.",
                       });
     parser.add_option(arguments.threads,
