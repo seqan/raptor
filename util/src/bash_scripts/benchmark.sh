@@ -87,7 +87,7 @@ for size in $SIZES; do
                                 --output $query_out \
                                 --threads $THREADS \
                                 --error $ERRORS \
-                                --pattern $READ_LENGTH \
+                                --query_length $READ_LENGTH \
                                 --tau 0.9999 \
                                 --time
 

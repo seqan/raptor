@@ -348,7 +348,7 @@ TEST_F(argparse_search, temporary_warning)
                                                data("query.fq"),
                                                "--index ",
                                                data("1bins23window.index"),
-                                               "--pattern 60",
+                                               "--query_length 60",
                                                "--output search.out");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err,
@@ -361,6 +361,22 @@ TEST_F(argparse_search, temporary_warning)
                           "          To disable this warning, explicitly pass the FPR to raptor search "
                           "(--fpr 0.05).\n"});
     RAPTOR_ASSERT_ZERO_EXIT(result);
+}
+
+TEST_F(argparse_search, error_treshold)
+{
+    cli_test_result const result = execute_app("raptor",
+                                               "search",
+                                               "--query ",
+                                               data("query.fq"),
+                                               "--index ",
+                                               data("1bins23window.index"),
+                                               "--error 0",
+                                               "--threshold 0.4",
+                                               "--output search.out");
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] You cannot set both error and threshold arguments.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
 TEST_F(argparse_upgrade, kmer_window)

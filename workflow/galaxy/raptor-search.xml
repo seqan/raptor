@@ -13,7 +13,7 @@
             --output results.txt
             #if $threshold# --threshold ${threshold} #end if#
             #if $tau#       --tau ${tau} #end if#
-            #if $pattern#   --pattern ${pattern} #end if#
+            #if $pattern#   --query_length ${pattern} #end if#
     ]]></command>
     <inputs>
         <param name="threads" label="Threads" type="integer" value="1" min="1" help="The number of threads to use. Default: 1. Value must be a positive integer." />
@@ -55,7 +55,7 @@ OPTIONS
     --threshold (double)
           If set, this threshold is used instead of the probabilistic models. Default: 0. Value must be in range
           [0,1].
-    --pattern (unsigned 64 bit integer)
+    --query_length (unsigned 64 bit integer)
           The pattern size. Default: Use median of sequence lengths in query file. Default: 0.
 
 EXAMPLES
