@@ -24,6 +24,7 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
     parser.info.examples = {
         "raptor search --error 2 --index raptor.index --query queries.fastq --output search.output"};
 
+    parser.add_subsection("General options");
     parser.add_option(arguments.index_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "index",
@@ -31,6 +32,12 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                                                      ? "Provide a valid path to an index."
                                                      : "Provide a valid path to an index. Parts: Without suffix _0",
                                     .required = true});
+    parser.add_option(arguments.fpr,
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "fpr",
+                                    .description = "The false positive rate used for building the index.",
+                                    .hidden = arguments.is_socks,
+                                    .validator = sharg::arithmetic_range_validator{0, 1}});
     parser.add_option(arguments.query_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "query",
@@ -42,51 +49,48 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                                     .long_id = "output",
                                     .description = "Provide a path to the output.",
                                     .required = true});
-    parser.add_option(arguments.errors,
-                      sharg::config{.short_id = '\0',
-                                    .long_id = "error",
-                                    .description = "The number of errors",
-                                    .hidden = arguments.is_socks,
-                                    .validator = positive_integer_validator{true}});
-    parser.add_option(
-        arguments.tau,
-        sharg::config{.short_id = '\0',
-                      .long_id = "tau",
-                      .description = "Used in the dynamic thresholding. The higher tau, the lower the threshold.",
-                      .hidden = arguments.is_socks,
-                      .validator = sharg::arithmetic_range_validator{0, 1}});
-    parser.add_option(
-        arguments.threshold,
-        sharg::config{.short_id = '\0',
-                      .long_id = "threshold",
-                      .description = "If set, this threshold is used instead of the probabilistic models.",
-                      .hidden = arguments.is_socks,
-                      .validator = sharg::arithmetic_range_validator{0, 1}});
-    parser.add_option(
-        arguments.p_max,
-        sharg::config{.short_id = '\0',
-                      .long_id = "p_max",
-                      .description = "Used in the dynamic thresholding. The higher p_max, the lower the threshold.",
-                      .hidden = arguments.is_socks,
-                      .validator = sharg::arithmetic_range_validator{0, 1}});
-    parser.add_option(arguments.fpr,
-                      sharg::config{.short_id = '\0',
-                                    .long_id = "fpr",
-                                    .description = "The false positive rate used for building the index.",
-                                    .hidden = arguments.is_socks,
-                                    .validator = sharg::arithmetic_range_validator{0, 1}});
-    parser.add_option(arguments.pattern_size,
-                      sharg::config{.short_id = '\0',
-                                    .long_id = "pattern",
-                                    .description = "The pattern size.",
-                                    .default_message = "Median of sequence lengths in query file",
-                                    .hidden = arguments.is_socks});
     parser.add_option(arguments.threads,
                       sharg::config{.short_id = '\0',
                                     .long_id = "threads",
                                     .description = "The number of threads to use.",
                                     .validator = positive_integer_validator{}});
 
+    parser.add_subsection("Threshold method options");
+    parser.add_option(arguments.errors,
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "error",
+                                    .description = "The number of errors. Mutually exclusive with --threshold.",
+                                    .hidden = arguments.is_socks,
+                                    .validator = positive_integer_validator{true}});
+    parser.add_option(arguments.threshold,
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "threshold",
+                                    .description = "Ratio of k-mers that need to be found for a hit to occur. "
+                                                   "Mutually exclusive with --error.",
+                                    .default_message = "None",
+                                    .hidden = arguments.is_socks,
+                                    .validator = sharg::arithmetic_range_validator{0, 1}});
+    parser.add_option(arguments.pattern_size,
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "pattern",
+                                    .description = "The pattern size. Only used with --error.",
+                                    .default_message = "Median of sequence lengths in query file",
+                                    .hidden = arguments.is_socks});
+
+    parser.add_subsection("Dynamic thresholding options");
+    parser.add_line("\\fBThese option only take effect when using --error.\\fP");
+    parser.add_option(arguments.tau,
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "tau",
+                                    .description = "The higher tau, the lower the threshold.",
+                                    .hidden = arguments.is_socks,
+                                    .validator = sharg::arithmetic_range_validator{0, 1}});
+    parser.add_option(arguments.p_max,
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "p_max",
+                                    .description = "The higher p_max, the lower the threshold.",
+                                    .hidden = arguments.is_socks,
+                                    .validator = sharg::arithmetic_range_validator{0, 1}});
     parser.add_flag(
         arguments.cache_thresholds,
         sharg::config{
@@ -96,8 +100,10 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                 "Stores the computed thresholds with an unique name next to the index. In the next search call "
                 "using this option, the stored thresholds are re-used.\n"
                 "Two files are stored:\n"
-                "\\fBthreshold_*.bin\\fP: Depends on pattern, window, kmer/shape, errors, and tau.\n"
-                "\\fBcorrection_*.bin\\fP: Depends on pattern, window, kmer/shape, p_max, and fpr."});
+                "\\fBthreshold_*.bin\\fP: Depends on query_length, window, kmer/shape, errors, and tau.\n"
+                "\\fBcorrection_*.bin\\fP: Depends on query_length, window, kmer/shape, p_max, and fpr."});
+
+    parser.add_subsection("Advanced options", true);
     parser.add_flag(
         arguments.is_hibf,
         sharg::config{.short_id = '\0', .long_id = "hibf", .description = "Index is an HIBF.", .advanced = true});
@@ -116,6 +122,9 @@ void search_parsing(sharg::parser & parser, bool const is_socks)
     // ==========================================
     // Various checks.
     // ==========================================
+
+    if (parser.is_option_set("error") && parser.is_option_set("threshold"))
+        throw sharg::parser_error{"You cannot set both error and threshold arguments."};
 
     std::filesystem::path output_directory = arguments.out_file.parent_path();
     std::error_code ec{};
