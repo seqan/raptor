@@ -13,7 +13,7 @@ raptor_require_ccache ()
 # Dependency: Chopper
 include (FetchContent)
 
-FetchContent_Declare (chopper_project URL "${RAPTOR_SUBMODULES_DIR}/chopper")
+FetchContent_Declare (raptor_chopper_project URL "${RAPTOR_SUBMODULES_DIR}/chopper")
 
 set (SEQAN3_SUBMODULES_DIR "${RAPTOR_SUBMODULES_DIR}")
 set (CHOPPER_SUBMODULES_DIR
@@ -32,9 +32,8 @@ set (CHOPPER_BUILD_TEST
      OFF
      CACHE BOOL "Build chopper tests."
 )
-set (CMAKE_DISABLE_FIND_PACKAGE_Doxygen TRUE) # For chopper
 
-FetchContent_MakeAvailable (chopper_project)
+FetchContent_MakeAvailable (raptor_chopper_project)
 
 # Dependency: xxHash
 FetchContent_Declare (raptor_xxhash_project URL "${RAPTOR_SUBMODULES_DIR}/xxHash" SOURCE_SUBDIR "cmake_unofficial")
@@ -67,7 +66,7 @@ if (NOT TARGET raptor)
     target_link_libraries ("raptor" PUBLIC "raptor_lib")
 endif ()
 
-install (TARGETS raptor chopper DESTINATION "${CMAKE_INSTALL_BINDIR}")
+install (TARGETS raptor DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 add_subdirectory (argument_parsing)
 add_subdirectory (build)
