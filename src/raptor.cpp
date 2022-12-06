@@ -9,6 +9,7 @@
 #include <raptor/argument_parsing/init_shared_meta.hpp>
 #include <raptor/argument_parsing/search_parsing.hpp>
 #include <raptor/argument_parsing/upgrade_parsing.hpp>
+#include <raptor/layout/raptor_layout.hpp>
 #include <raptor/raptor.hpp>
 
 int main(int argc, char ** argv)
@@ -19,7 +20,7 @@ int main(int argc, char ** argv)
                                        argc,
                                        argv,
                                        sharg::update_notifications::on,
-                                       {"build", "search", "socks", "upgrade"}};
+                                       {"build", "layout", "search", "socks", "upgrade"}};
         raptor::init_shared_meta(top_level_parser);
         top_level_parser.info.description.emplace_back(
             "Raptor is a system for approximately searching many queries such as "
@@ -35,6 +36,8 @@ int main(int argc, char ** argv)
         sharg::parser & sub_parser = top_level_parser.get_sub_parser();
         if (sub_parser.info.app_name == std::string_view{"Raptor-build"})
             raptor::build_parsing(sub_parser, false);
+        if (sub_parser.info.app_name == std::string_view{"Raptor-layout"})
+            raptor::chopper_layout(sub_parser);
         if (sub_parser.info.app_name == std::string_view{"Raptor-search"})
             raptor::search_parsing(sub_parser, false);
         if (sub_parser.info.app_name == std::string_view{"Raptor-socks"})
