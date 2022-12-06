@@ -36,6 +36,16 @@ set (CMAKE_DISABLE_FIND_PACKAGE_Doxygen TRUE) # For chopper
 
 FetchContent_MakeAvailable (chopper_project)
 
+# Dependency: xxHash
+FetchContent_Declare (raptor_xxhash_project URL "${RAPTOR_SUBMODULES_DIR}/xxHash" SOURCE_SUBDIR "cmake_unofficial")
+
+set (XXHASH_BUILD_ENABLE_INLINE_API ON)
+set (XXHASH_BUILD_XXHSUM OFF)
+set (XXHASH_BUNDLED_MODE OFF)
+set (BUILD_SHARED_LIBS OFF)
+
+FetchContent_MakeAvailable (raptor_xxhash_project)
+
 # Shared interface
 if (NOT TARGET raptor_interface)
     add_library ("raptor_interface" INTERFACE)
