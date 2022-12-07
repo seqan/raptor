@@ -34,9 +34,10 @@ raptor. So you can simply call it up with `raptor layout` without having to inst
 The figure above shows the storage of the user bins in the technical bins. The resulting tree represents the layout.
 The first step is to estimate the number of (representative) k-mers per user bin by computing
 [HyperLogLog (HLL) sketches](http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf) of the input data. These HLL
-sketches are stored in a directory and will be used in computing an HIBF layout. The HIBF layout tries to minimize the
-disk space consumption of the resulting index. The space is estimated using a k-mer count per user bin which represents
-the potential denisity in a technical bin in an interleaved Bloom filter.
+sketches are stored in a directory and will be used in computing an HIBF layout. We will go into more detail later
+\ref HLL. The HIBF layout tries to minimize the disk space consumption of the resulting index. The space is estimated
+using a k-mer count per user bin which represents the potential denisity in a technical bin in an Interleaved Bloom
+filter.
 
 Using all default values a first call will look like:
 
@@ -49,19 +50,19 @@ files.
 
 \todo Chopper braucht ein `input_data.tsv` input, wobei es momentan nur eine Spalte (mit den Pfaden) gibt, also geht auch `.txt`.
 
-The parameter `--tmax` limits the number of technical bins on each level of the HIBF. Choosing a good `tmax` is not
-trivial. The smaller `tmax`, the more levels the layout needs to represent the data. This results in a higher space
-consumption of the index. While querying each individual level is cheap, querying many levels might also lead to an
-increased runtime. A good `tmax` is usually the square root of the number of user bins rounded to the next multiple of
-`64`. Note that your `tmax` will be rounded to the next multiple of 64 anyway.
+The parameter `--tmax` limits the number of technical bins on each level of the HIBF. Choosing a good \f$t_{max}\f$ is
+not trivial. The smaller \f$t_{max}\f$, the more levels the layout needs to represent the data. This results in a higher
+space consumption of the index. While querying each individual level is cheap, querying many levels might also lead to
+an increased runtime. A good \f$t_{max}\f$ is usually the square root of the number of user bins rounded to the next
+multiple of `64`. Note that your \f$t_{max}\f$ will be rounded to the next multiple of 64 anyway.
 
 \note
-At the expense of a longer runtime, you can enable the statistic mode that determines the best `tmax` using the option
-`--determine-best-tmax`.
-When this flag is set, the program will compute multiple layouts for `tmax` in `[64 , 128, 256, ... , tmax]` as well as
-`tmax = sqrt(number of user bins)`. The layout algorithm itself only optimizes the space consumption. When determining
-the best layout, we additionally keep track of the average number of queries needed to traverse each layout. This query
-cost is taken into account when determining the best `tmax` for your data.
+At the expense of a longer runtime, you can enable the statistic mode that determines the best \f$t_{max}\f$ using the
+option `--determine-best-tmax`.
+When this flag is set, the program will compute multiple layouts for \f$t_{max}\f$ in `[64 , 128, 256, ... , tmax]` as
+well as `tmax = sqrt(number of user bins)`. The layout algorithm itself only optimizes the space consumption. When
+determining the best layout, we additionally keep track of the average number of queries needed to traverse each layout.
+This query cost is taken into account when determining the best \f$t_{max}\f$ for your data.
 Note that the option `--tmax` serves as upper bound. Once the layout quality starts dropping, the computation is
 stopped. To run all layout computations, pass the flag `--force-all-binnings`.
 The flag `--force-all-binnings` forces all layouts up to `--tmax` to be computed, regardless of the layout quality. If
@@ -91,8 +92,8 @@ By using multiple hash functions, you can sometimes further reduce the possibili
 (`--num-hash-functions`). We found a useful [Bloom Filter Calculator](https://hur.st/bloomfilter/) to get a calculation
 if it could help. As it is not ours, we do not guarantee its accuracy.
 
-Each Bloom filter has a bit vector length that, across all Bloom filters, gives the size of the Interleaved Bloom
-filter, which we can specify in the IBF case. Since the HIBF calculates the size of the index itself, it is no longer
+Each Bloom Filter has a bit vector length that, across all Bloom Filters, gives the size of the Interleaved Bloom
+Filter, which we can specify in the IBF case. Since the HIBF calculates the size of the index itself, it is no longer
 possible to specify a size here. But we can offer the option to name the desired false positive rate with
 `--false-positive-rate`.
 
@@ -100,33 +101,74 @@ possible to specify a size here. But we can offer the option to name the desired
 
 \todo This is not checked at the moment?
 
+### HyperLogLog sketch {#HLL}
 
+The first step is to estimate the number of (representative) k-mers per user bin by computing
+[HyperLogLog (HLL) sketches](http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf) of the input data. These HLL
+sketches are stored in a directory and will be used in computing an HIBF layout.
 
-Thus, for example, a call looks like this:
+We will also give a short explanation of the HLL sketches here to explain the possible parameters.
 
+\note
+Most parameters are advanced and only need to be changed if the calculation takes significantly too long or the memory
+usage is too high.
 
-Parameter Tweaking:
-- `--sketch-bits`
-      The number of bits the HyperLogLog sketch should use to distribute the values into bins. Default: 12. Value
-      must be in range [5,32].
-- `--disable-sketch-output`
-      Although the sketches will improve the layout, you might want to disable writing the sketch files to disk.
-      Doing so will save disk space. However, you cannot use either --estimate-unions or --rearrange-user-bins in
-      chopper layout without the sketches. Note that this option does not decrease run time as sketches have to be
-      computed either way.
+So the question is how many elements of our multiset are identical?
+With exact calculation, we need more storage space and runtime than with the HLL estimate.
+So, to find this out, we form (binary) 64 bit hash values of the data. These are equally distributed over all possible
+hash values. If you go through this hashed data, you can then estimate how many different elements you have seen so far
+only by reading leading zeros. (For the i'th element with `p` leading zeros, it is estimated that you have seen
+\f$2^p\f$ different elements). You then simply save the maximum of these (\f$2^{p_{max}}\f$ different elements).
 
-HyperLogLog Sketches:
-To improve the layout, you can estimate the sequence similarities using HyperLogLog sketches.
-- `--estimate-union`
-      Use sketches to estimate the sequence similarity among a set of user bins. This will improve the layout
-      computation as merging user bins that do not increase technical bin sizes will be preferred. Attention: Only
-      possible if the directory [INPUT-PREFIX]_sketches is present.
-- `--rearrange-user-bins`
-      As a preprocessing step, rearranging the order of the given user bins based on their sequence similarity may
-      lead to favourable small unions and thus a smaller index. Attention: Also enables --estimate-union and is
-      only possible if the directory [INPUT-PREFIX]_sketches is present.
+<!-- bei p (at least) leading zeros ist die wahrscheinlichkeit dieses vorkommens genau 1/(2^p) -->
 
-<- die machen das layout besser dauern aber laenger
+However, if we are unlucky and come across a hash value that consists of only `0`'s, then \f$p_{max}\f$ is of course
+maximum of all possible hash values, no matter how many different elements are actually present.
+To avoid this, we cut each hash value into `m` parts and calculate the \f$p_{max}\f$ over each of these parts. From
+these we then calculate the *harmonic mean* as the total \f$p_{max}\f$.
+
+We can influence this m with `--sketch-bits`. `m` must be a power of two so that we can divide the `64` bit evenly, so
+we use `--sketch-bits` to set a `b` with \f$m = 2^b\f$.
+
+If we choose our `b` (`m`) to be very large, then we need more memory but get higher accuracy. (Storage consumption is
+growing exponentially.) In addition, calculating the layout can take longer with a high `b` (`m`). If we have many user
+bins and observe a long runtime, then it is worth choosing a somewhat smaller `b` (`m`).
+
+\todo
+Wird bisher ein sketch über alles berechnet oder einzelne sketches die gemerged werden? Laut Felix ist das mergen ebenfalls sehr schnell. (zb 10 genome sketchen und dann mergen)
+
+#### Advanced options for HLL sketches
+
+The following options should only be touched if the calculation takes a long time.
+
+We have implemented another preprocessing that summarises the technical bins even better with regard to the similarities
+of the input data. This can be switched off with the flag `--skip-similarity-preprocessing` if it costs too much
+runtime.
+
+\todo
+Add parameter `--skip-similarity-preprocessing` instead of `--estimate-union` and `--rearrange-user-bins`. Set it as
+advanced.
+
+\todo
+`--disable-sketch-output` wahrscheinlich unsinnig, da nur der zwischenstand zwischen count und layout
+
+With `--max-rearrangement-ratio` you can further influence a part of the preprocessing (value between `0` and `1`). If
+you set this value to `1`, it is switched off. If you set it to a very small value, you will also need more runtime and
+memory. If it is close to `1`, however, just little re-arranging is done, which could be bad. In our benchmarks, however,
+we were not able to determine a too great influence, so we recommend that this value only be used for fine tuning.
+
+\todo
+Wenn r=1, dann `--rearrange-user-bins` aus, daher die flag nicht nötig.
+
+One last observation about these advanced options: If you expect hardly any similarity in the data set, then the
+similarity preprocessing makes very little difference.
+
+### Others
+
+- beeinflusst die laufzeit gar nicht, ist für DP
+- alpha ist ein schätzer für das mergen
+- alpha macht mergen teurer
+- kleines alpha macht es günstiger
 
   Parameter Tweaking:
 - `--alpha`
@@ -135,11 +177,7 @@ To improve the layout, you can estimate the sequence similarities using HyperLog
       influences the query time because a merged bin always triggers another search on a lower level. To influence
       this ratio, alpha can be used. The higher alpha, the less merged bins are chosen in the layout. This
       improves query times but leads to a bigger index. Default: 1.2.
-- `--max-rearrangement-ratio`
-      When the option --rearrange-user-bins is set, this option can influence the rearrangement algorithm. The
-      algorithm only rearranges the order of user bins in fixed intervals. The higher --max-rearrangement-ratio,
-      the larger the intervals. This potentially improves the layout, but increases the runtime of the layout
-      algorithm. Default: 0.5. Value must be in range [0,1].
+
 
 A call could then look like this:
 ```bash
