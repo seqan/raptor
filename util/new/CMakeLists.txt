@@ -52,6 +52,7 @@ set (FontReset "${Esc}[m")
 # Dependency: SeqAn3.
 set (SEQAN3_SUBMODULES_DIR "${RAPTOR_ROOT_DIR}/lib")
 find_package (SeqAn3 QUIET REQUIRED HINTS ${RAPTOR_ROOT_DIR}/lib/seqan3/build_system)
+find_package (Sharg QUIET REQUIRED HINTS ${RAPTOR_ROOT_DIR}/lib/sharg-parser/build_system)
 
 # Allow to include CMake scripts from raptor.
 list (APPEND CMAKE_MODULE_PATH "${RAPTOR_ROOT_DIR}/test/cmake/")
@@ -61,7 +62,7 @@ include (raptor_require_ccache)
 raptor_require_ccache ()
 
 add_library (new_common INTERFACE)
-target_link_libraries ("new_common" INTERFACE seqan3::seqan3)
+target_link_libraries ("new_common" INTERFACE seqan3::seqan3 sharg::sharg)
 target_include_directories ("new_common" INTERFACE ${RAPTOR_ROOT_DIR}/include)
 target_include_directories ("new_common" INTERFACE ${RAPTOR_ROOT_DIR}/lib/robin-hood-hashing/src/include)
 target_compile_options ("new_common" INTERFACE "-pedantic" "-Wall" "-Wextra")

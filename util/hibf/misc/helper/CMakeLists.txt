@@ -16,6 +16,7 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 # Dependency: SeqAn3.
 set (SEQAN3_SUBMODULES_DIR "../../../../lib")
 find_package (SeqAn3 QUIET REQUIRED HINTS ../../../../lib/seqan3/build_system)
+find_package (Sharg QUIET REQUIRED HINTS ../../../../lib/sharg-parser/build_system)
 
 include ("${SEQAN3_CLONE_DIR}/test/cmake/seqan3_require_ccache.cmake")
 seqan3_require_ccache ()
