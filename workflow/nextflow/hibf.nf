@@ -94,17 +94,14 @@ process LAYOUT {
     script:
     """
     set -x # commands are printed to stdout for logging
-    chopper count --input-file $refseq \
-                  --output-prefix input_data \
+    raptor layout --input-file $refseq \
                   --kmer-size "$kmer_size" \
-                  --threads $task.cpus
-    chopper layout --tmax $tmax \
-                   --num-hash-functions 3 \
-                   --false-positive-rate "$fpr" \
-                   --input-prefix input_data \
-                   --output-filename hibf.layout \
-                   --rearrange-user-bins \
-                   --threads $task.cpus
+                  --threads $task.cpus \
+                  --tmax $tmax \
+                  --num-hash-functions 3 \
+                  --false-positive-rate "$fpr" \
+                  --output-filename hibf.layout \
+                  --rearrange-user-bins
     """
 }
 

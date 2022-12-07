@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'push' }}
 
 env:
-  CMAKE_VERSION: 3.16.9
+  CMAKE_VERSION: 3.18.4
   SHARG_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
 
@@ -100,6 +100,7 @@ jobs:
           cmake ../raptor/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                                    -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size" \
                                                    -DRAPTOR_NATIVE_BUILD=OFF
+          make -j2 gtest_build
 
       - name: Build tests
         env:

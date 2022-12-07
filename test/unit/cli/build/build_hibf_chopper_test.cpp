@@ -13,10 +13,10 @@
 
 #include "../../../include/cli_test.hpp"
 
-struct build_hibf_chopper : public raptor_base
+struct build_hibf_layout : public raptor_base
 {};
 
-TEST_F(build_hibf_chopper, pipeline)
+TEST_F(build_hibf_layout, pipeline)
 {
     seqan3::test::tmp_directory count_dir{};
     std::filesystem::path const count_prefix = count_dir.path() / "raptor_cli_test";
@@ -37,39 +37,23 @@ TEST_F(build_hibf_chopper, pipeline)
 
     ASSERT_TRUE(std::filesystem::exists(data_filename.get_path()));
 
-    { // generate count file
-        char const * argv[] = {"./chopper-count",
-                               "--kmer-size",
-                               "19",
-                               "--disable-sketch-output",
-                               "--column-index",
-                               "2",
-                               "--threads",
-                               "1",
-                               "--input-file",
-                               data_filename.get_path().c_str(),
-                               "--output-prefix",
-                               count_prefix.c_str()};
-        int const argc = sizeof(argv) / sizeof(*argv);
-        seqan3::argument_parser parser{"chopper-count", argc, argv, seqan3::update_notifications::off};
-        chopper::count::execute(parser);
-    }
+    { // build layout
+        cli_test_result const result = execute_app("raptor",
+                                                   "layout",
+                                                   "--kmer-size 19",
+                                                   "--disable-sketch-output",
+                                                   "--column-index 2",
+                                                   "--threads 1",
+                                                   "--input-file",
+                                                   data_filename.get_path().c_str(),
+                                                   "--tmax 64",
+                                                   "--false-positive-rate 0.05",
+                                                   "--output-filename",
+                                                   layout_filename.get_path().c_str());
 
-    ASSERT_TRUE(std::filesystem::exists(count_prefix.string() + ".count"));
-
-    { // generate layout file
-        char const * argv[] = {"./chopper-layout",
-                               "--tmax",
-                               "64",
-                               "--false-positive-rate",
-                               "0.05",
-                               "--input-prefix",
-                               count_prefix.c_str(),
-                               "--output-filename",
-                               layout_filename.get_path().c_str()};
-        int const argc = sizeof(argv) / sizeof(*argv);
-        seqan3::argument_parser parser{"chopper-layout", argc, argv, seqan3::update_notifications::off};
-        chopper::layout::execute(parser);
+        EXPECT_EQ(result.out, std::string{});
+        EXPECT_EQ(result.err, std::string{});
+        RAPTOR_ASSERT_ZERO_EXIT(result);
     }
 
     ASSERT_TRUE(std::filesystem::exists(layout_filename.get_path()));

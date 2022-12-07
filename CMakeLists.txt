@@ -5,7 +5,7 @@
 # shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 # --------------------------------------------------------------------------------------------------
 
-cmake_minimum_required (VERSION 3.16)
+cmake_minimum_required (VERSION 3.18)
 
 find_path (RAPTOR_MODULE_PATH "raptor-config.cmake" HINTS "${CMAKE_CURRENT_LIST_DIR}/build_system/")
 list (APPEND CMAKE_MODULE_PATH "${RAPTOR_MODULE_PATH}")
