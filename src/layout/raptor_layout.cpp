@@ -24,11 +24,13 @@ void chopper_layout(sharg::parser & parser)
     {
         parser.parse();
     }
+    // GCOVR_EXCL_START
     catch (sharg::parser_error const & ext) // the user did something wrong
     {
         std::cerr << "[CHOPPER ERROR] " << ext.what() << '\n'; // customize your error message
         return;
     }
+    // GCOVR_EXCL_STOP
 
     config.input_prefix = config.output_prefix;
 
@@ -41,10 +43,12 @@ void chopper_layout(sharg::parser & parser)
         exit_code |= chopper::count::execute(config);
         exit_code |= chopper::layout::execute(config);
     }
+    // GCOVR_EXCL_START
     catch (sharg::parser_error const & ext)
     {
         std::cerr << "[CHOPPER ERROR] " << ext.what() << '\n';
     }
+    // GCOVR_EXCL_STOP
 }
 
 } // namespace raptor
