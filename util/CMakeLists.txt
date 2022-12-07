@@ -50,6 +50,7 @@ set (FontReset "${Esc}[m")
 # Dependency: SeqAn3.
 set (SEQAN3_SUBMODULES_DIR "../lib")
 find_package (SeqAn3 QUIET REQUIRED HINTS ../lib/seqan3/build_system)
+find_package (Sharg QUIET REQUIRED HINTS ../lib/sharg-parser/build_system)
 
 # Allow to include CMake scripts from seqan3.
 list (APPEND CMAKE_MODULE_PATH "${SEQAN3_CLONE_DIR}/test/cmake/")
@@ -93,7 +94,7 @@ else ()
 endif ()
 
 add_library (common INTERFACE)
-target_link_libraries ("common" INTERFACE seqan3::seqan3)
+target_link_libraries ("common" INTERFACE seqan3::seqan3 sharg::sharg)
 target_include_directories ("common" INTERFACE ../include)
 target_include_directories ("common" INTERFACE ../lib/robin-hood-hashing/src/include)
 target_compile_options ("common" INTERFACE "-pedantic" "-Wall" "-Wextra")
