@@ -49,6 +49,8 @@ if (NOT TARGET raptor::test)
 
     target_link_libraries (raptor_test INTERFACE "raptor_lib" "pthread" "chopper_lib")
 
+    target_include_directories (raptor_test INTERFACE "${CMAKE_CURRENT_LIST_DIR}/include")
+
     add_library (raptor::test ALIAS raptor_test)
 endif ()
 
