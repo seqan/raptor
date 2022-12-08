@@ -5,7 +5,7 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include "../../../include/cli_test.hpp"
+#include <raptor/test/cli_test.hpp>
 
 struct search_ibf_preprocessing :
     public raptor_base,

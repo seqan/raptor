@@ -15,8 +15,6 @@
 
 #include <raptor/index.hpp>
 
-#include "shim.hpp"
-
 #ifndef RAPTOR_ASSERT_ZERO_EXIT
 #    define RAPTOR_ASSERT_ZERO_EXIT(arg) ASSERT_EQ(arg.exit_code, 0) << "Command: " << arg.command
 #endif

@@ -11,7 +11,7 @@
 #include <chopper/count/execute.hpp>
 #include <chopper/layout/execute.hpp>
 
-#include "../../../include/cli_test.hpp"
+#include <raptor/test/cli_test.hpp>
 
 struct build_hibf_layout : public raptor_base
 {};

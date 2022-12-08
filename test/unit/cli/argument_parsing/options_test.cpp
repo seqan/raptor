@@ -7,7 +7,7 @@
 
 #include <seqan3/test/snippet/create_temporary_snippet_file.hpp>
 
-#include "../../../include/cli_test.hpp"
+#include <raptor/test/cli_test.hpp>
 
 struct argparse_build : public raptor_base
 {};
