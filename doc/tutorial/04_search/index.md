@@ -351,18 +351,31 @@ If no minimizers are used, our thresholding ensures that the (H)IBF gives no fal
 there are few false negatives, because the minimizer compression is not lossless.
 
 \assignment{Assignment 4: Search with hibf.}
-We want to use the `hibf.index` from the index tutorial assignment again and use ...
+We want to use the `hibf.index` from the index tutorial assignment again. <!-- and use X as X-parameter. -->
 
-Lets search now with ..., with creating a `search6.output`.
+Lets search now for the `1024/reads/mini.fastq` querries with creating a `search6.output`.
 \endassignment
 
 \solution
 You should have run
 ```bash
-raptor search --index hibf.index --query query.fasta --output search6.output
+raptor search --hibf --index hibf.index --query 1024/reads/mini.fastq --output search6.output
 ```
 Your `search6.output` should look like:
 ```text
+#0      1024/bins/bin_0712.fasta
+#1      1024/bins/bin_0406.fasta
 ...
+#1021   1024/bins/bin_0533.fasta
+#1022   1024/bins/bin_0624.fasta
+#QUERY_NAME     USER_BINS
+0
+1
+...
+1047555
+1047556
 ```
+\note
+You can also calculate the second hibf index B and you will see that they will give slightly different results
+(`diff search6.output search7.output`).
 \endsolution
