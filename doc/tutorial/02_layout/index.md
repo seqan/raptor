@@ -74,6 +74,86 @@ index. You can change this default with `--output-filename`.
 \note
 Raptor also has a help page, which can be accessed as usual by typing `raptor layout -h` or `raptor layout --help`.
 
+\assignment{Assignment 1: Create a first layout}
+Lets take the bigger example form the introduction \ref tutorial_first_steps and create a layout for it.
+```console
+$ tree -L 2 example_data
+example_data
+├── 1024
+│   ├── bins
+│   └── reads
+└── 64
+    ├── bins
+    └── reads
+```
+And use the data of the `1024` Folder.
+
+\hint
+First we need a file with all paths to the fasta files. For this use the command:
+```bash
+for i in {0001..1023}; do echo "1024/bins/bin_$i.fasta" >> all_bin_paths.txt; done
+```
+\endhint
+
+Then first determine the best tmax value and calculate a layout with default values and this tmax.
+\endassignment
+
+\solution
+Your `all_bin_paths.txt` should look like:
+```txt
+1024/bins/bin_0001.fasta
+1024/bins/bin_0002.fasta
+1024/bins/bin_0003.fasta
+...
+1024/bins/bin_1021.fasta
+1024/bins/bin_1022.fasta
+1024/bins/bin_1023.fasta
+```
+
+/note
+Sometimes it would be better to use the absolute paths instead.
+
+And you should have run:
+```bash
+raptor layout --input-file all_bin_paths.txt --determine-best-tmax --tmax 64
+```
+With the output:
+```bash
+## ### Parameters ###
+## number of user bins = 1023
+## number of hash functions = 2
+## false positive rate = 0.05
+## ### Notation ###
+## X-IBF = An IBF with X number of bins.
+## X-HIBF = An HIBF with tmax = X, e.g a maximum of X technical bins on each level.
+## ### Column Description ###
+## tmax : The maximum number of technical bin on each level
+## c_tmax : The technical extra cost of querying an tmax-IBF, compared to 64-IBF
+## l_tmax : The estimated query cost for an tmax-HIBF, compared to an 64-HIBF
+## m_tmax : The estimated memory consumption for an tmax-HIBF, compared to an 64-HIBF
+## (l*m)_tmax : Computed by l_tmax * m_tmax
+## size : The expected total size of an tmax-HIBF
+# tmax	c_tmax	l_tmax	m_tmax	(l*m)_tmax	size
+64	1.00	2.00	1.00	2.00	12.8MiB
+# Best t_max (regarding expected query runtime): 64
+```
+And afterwards:
+```bash
+raptor layout --input-file all_bin_paths.txt --tmax 64
+```
+Your directory should look like this:
+```bash
+$ ls
+1024/                    all_bin_paths.txt        chopper_sketch.count     mini/
+64/                      binning.out              chopper_sketch_sketches/
+```
+
+\note
+We will use this mini-example in the following, both with further parameters and then for `raptor index --hibf`.
+Therefore, we recommend not deleting the files including the built indexes.
+
+\endsolution
+
 ## Additional parameters
 
 To create an index and thus a layout, the individual samples of the data set are chopped up into k-mers and determine in
@@ -101,9 +181,46 @@ possible to specify a size here. But we can offer the option to name the desired
 
 \todo This is not checked at the moment?
 
+A call could then look like this:
+```bash
+raptor layout --input-file all_bin_path.txt \
+              --tmax 64 \
+              --kmer-size 17 \
+              --num-hash-functions 4 \
+              --false-positive-rate 0.25 \
+              --output-filename binning.layout
+```
+
 ### Parallelization
 
 Raptor supports parallelization. By specifying `--threads`, for example, the k-mer hashes are processed simultaneously.
+
+
+\assignment{Assignment 2: Create a more specific layout}
+Now lets run the above example with more parameters.
+
+Use the same `all_bin_paths.txt` and create a `binning2.out`. Take a kmer size of `16`, `3` hash functions, a false
+positive rate of `0.1` and use `2` threads.
+\endassignment
+
+\solution
+And you should have run:
+```bash
+raptor layout --input-file all_bin_paths.txt \
+              --tmax 64 \
+              --kmer-size 16 \
+              --num-hash-functions 3 \
+              --false-positive-rate 0.1 \
+              --threads 2 \
+              --output-filename binning2.layout
+```
+Your directory should look like this:
+```bash
+$ ls
+1024/                    all_bin_paths.txt        binning2.layout          chopper_sketch_sketches/
+64/                      binning.out              chopper_sketch.count     mini/
+```
+\endsolution
 
 ### HyperLogLog sketch {#HLL}
 
@@ -140,20 +257,6 @@ bins and observe a long runtime, then it is worth choosing a somewhat smaller `b
 
 \todo
 Wird bisher ein sketch über alles berechnet oder einzelne sketches die gemerged werden? Laut Felix ist das mergen ebenfalls sehr schnell. (zb 10 genome sketchen und dann mergen)
-
-A call could then look like this:
-```bash
-raptor layout --input-file all_bin_path.txt \
-              --tmax 64 \
-              --kmer-size 16 \
-              --sketch-bits 5 \
-              --num-hash-functions 3 \
-              --false-positive-rate 0.25 \
-              --threads 4 \
-              --output-filename binning.layout
-```
-
-An assignment follows in the index tutorial on the HIBF.
 
 #### Advanced options for HLL sketches
 
