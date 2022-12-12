@@ -41,7 +41,7 @@ raptor build --size 1k --output raptor.index all_bin_paths.txt
 ```
 
 \assignment{Assignment 1: Create example files and index them}
-Copy and paste the following FASTA files to some location, e.g. the tmp directory:
+Copy and paste the following FASTA files to some location, e.g. a tmp directory:
 
 mini_1.fasta:
 ```fasta
@@ -263,10 +263,10 @@ raptor build --hibf binning.layout \
              --output hibf.index
 ```
 
-\assignment{Assignment 4: A default HIBF}
-We want to start this time with the default parameters and then we will look at all the possibilities to improve the
-index.
+\note wichtig!!! --false-positive-rate "$fpr"  muss die selbe sein wie die von raptor Genauso die k-mer size. Hash functions auch oder?
+\warning test
 
+\assignment{Assignment 4: A default HIBF}
 Since we cannot see the advantages of the hibf with our small example. And certainly not the differences when we change
 the parameters. Let's not go back to our small example from above, but to the one from the introduction:
 
@@ -280,74 +280,43 @@ example_data
     ├── bins
     └── reads
 ```
-And use the data of the `1024` Folder.
+And use the data of the `1024` Folder and the two layouts we've created in the \ref tutorial_layout tutorial :
+`binning.out` and `binning2.layout`.
 
-Lets use the HIBF with the default parameters and call the new index `hibf.index`.
+Lets use the HIBF with the default parameters and call the new indexes `hibf.index` and `hibf2.index`.
+\note
+Your kmer size, number of hash functions and the false positive rate must be the same as in the layout.
 
-/hint
-To create the `all_bin_paths.txt` you can use:
-```
-seq -f "example_data/1024/bins/bin_%02g.fasta" 0 1 1023 > all_bin_paths.txt
-```
+\hint
+For the second layout we took a kmer size of `16`, `3` hash functions and a false positive rate of `0.1`.
 \endhint
-
-Now run `raptor layout`and `raptor build` with its default parameters and call the new index `hibf_raptor.index`.
-
 \endassignment
 
 \solution
 You should have run:
 ```bash
-raptor layout --input-file all_bin_path.txt --tmax 64
 raptor build --hibf binning.out --output hibf.index
+raptor build --hibf binning2.layout --kmer 16 --hash 3 --fpr 0.1 --output hibf2.index
 ```
-
-/hint
-Your `tmax` is the squareroot of `1024`, which is `32`. Round this to a multiple of `64`, so we take `64`.
 
 Your directory should look like this:
 ```bash
-tmp$ ls -la
-...
+$ ls -la
+... 384B 12 Dez 13:44 ./
+... 544B 12 Dez 12:14 ../
+... 128B 23 Sep  2020 1024/
+... 128B 23 Sep  2020 64/
+...  25K 12 Dez 12:52 all_bin_paths.txt
+...  37K 12 Dez 12:56 binning.out
+...  37K 12 Dez 13:26 binning2.layout
+...  55K 12 Dez 13:26 chopper_sketch.count
+...  32K 12 Dez 12:52 chopper_sketch_sketches/
+...  13M 12 Dez 13:44 hibf.index
+... 7,2M 12 Dez 13:44 hibf2.index
+...  64B  8 Dez 16:24 mini/
 ```
 \endsolution
-
-\note wichtig!!! --false-positive-rate "$fpr"  muss die selbe sein wie die von raptor Genauso die k-mer size. Hash functions auch oder?
-\warning test
 
 \note
-For a detailed explanation of the Hierarchical Interleaved Bloom Filter (HIBF), please refer to the
+For a more detailed explanation of the Hierarchical Interleaved Bloom Filter (HIBF), please refer to the
 `raptor::hierarchical_interleaved_bloom_filter` API.
-
-\assignment{Assignment 5: HIBF with usefull parameters}
-Lets use the HIBF for our small example. Thus run the example above with a false positive rate of 0.05 and call the new
-index `hibf2.index`.
-As our example is small, we will keep the kmer size of 4
-\hint
-...
-\endhint
-\endassignment
-
-\solution
-You should have run:
-```bash
-raptor layout --input-file all_bin_path.txt --output-filename binning2.out --tmax 64
-raptor build --hibf binning2.out --fpr 0.1 --output hibf2.index all_paths.txt
-
-    raptor build --kmer 4  \
-                 --window "$kmer_size"  \
-                 --hash 3  \
-                 --fpr 0.05  \
-                 --threads 4  \
-                 --output hibf2.index  \
-                 --hibf binning2.out \
-                 all_paths.txt
-```
-/todo Currently not working: `[Error] The list of input files cannot be empty.`
-
-Your directory should look like this:
-```bash
-tmp$ ls -la
-...
-```
-\endsolution
