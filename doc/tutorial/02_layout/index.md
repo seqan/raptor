@@ -101,6 +101,10 @@ possible to specify a size here. But we can offer the option to name the desired
 
 \todo This is not checked at the moment?
 
+### Parallelization
+
+Raptor supports parallelization. By specifying `--threads`, for example, the k-mer hashes are processed simultaneously.
+
 ### HyperLogLog sketch {#HLL}
 
 The first step is to estimate the number of (representative) k-mers per user bin by computing
@@ -137,6 +141,20 @@ bins and observe a long runtime, then it is worth choosing a somewhat smaller `b
 \todo
 Wird bisher ein sketch über alles berechnet oder einzelne sketches die gemerged werden? Laut Felix ist das mergen ebenfalls sehr schnell. (zb 10 genome sketchen und dann mergen)
 
+A call could then look like this:
+```bash
+raptor layout --input-file all_bin_path.txt \
+              --tmax 64 \
+              --kmer-size 16 \
+              --sketch-bits 5 \
+              --num-hash-functions 3 \
+              --false-positive-rate 0.25 \
+              --threads 4 \
+              --output-filename binning.layout
+```
+
+An assignment follows in the index tutorial on the HIBF.
+
 #### Advanced options for HLL sketches
 
 The following options should only be touched if the calculation takes a long time.
@@ -163,41 +181,15 @@ Wenn r=1, dann `--rearrange-user-bins` aus, daher die flag nicht nötig.
 One last observation about these advanced options: If you expect hardly any similarity in the data set, then the
 similarity preprocessing makes very little difference.
 
-### Others
+### Another advanced Option: alpha
 
-- beeinflusst die laufzeit gar nicht, ist für DP
-- alpha ist ein schätzer für das mergen
-- alpha macht mergen teurer
-- kleines alpha macht es günstiger
+You should only touch the parameter `--alpha` if you have understood very well how the layout works and you are
+dissatisfied with the resulting index, e.g. there is still a lot of space in RAM but the index is very slow.
 
-  Parameter Tweaking:
-- `--alpha`
-      The layout algorithm optimizes the space consumption of the resulting HIBF but currently has no means of
-      optimizing the runtime for querying such an HIBF. In general, the ratio of merged bins and split bins
-      influences the query time because a merged bin always triggers another search on a lower level. To influence
-      this ratio, alpha can be used. The higher alpha, the less merged bins are chosen in the layout. This
-      improves query times but leads to a bigger index. Default: 1.2.
+The layout algorithm optimizes the space consumption of the resulting HIBF but currently has no means of optimizing the
+runtime for querying such an HIBF. In general, the ratio of merged bins and split bins influences the query time because
+a merged bin always triggers another search on a lower level. To influence this ratio, alpha can be used.
 
-
-A call could then look like this:
-```bash
-raptor layout --input-file all_bin_path.txt \
-              --tmax 64 \
-              --kmer-size 16 \
-              --sketch-bits 5 \
-              --num-hash-functions 3 \
-              --false-positive-rate 0.25 \
-              --estimate-union \
-              --rearrange-user-bins \
-              --alpha 1.5 \
-              --max-rearrangement-ratio 0.25 \
-              --threads 4 \
-              --output-filename binning.layout
-```
-
-An assignment follows in the index tutorial on the HIBF.
-
-
-### Parallelization
-
-Raptor supports parallelization. By specifying `--threads`, for example, the k-mer hashes are processed simultaneously.
+Alpha is a parameter for weighting the storage space calculation of the lower-level IBFs. It functions as a lower-level
+penalty, i.e. if alpha is large, the DP algorithm tries to avoid lower levels, which at the same time leads to the
+top-level IBF becoming somewhat larger. This improves query times but leads to a bigger index.
