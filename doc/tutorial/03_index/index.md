@@ -166,7 +166,7 @@ with `--disable-cutoffs` to reduce the false positive rate.
 
 \assignment{Assignment 3: Minimisers}
 Lets use a minimiser for our small example. Use for this a window size of 6 and a k-mer size of 4 and call the new
-index raptor_minimiser.index with a size of 1m again.
+index minimiser.index with a size of 1m again.
 \hint
 For the all_minimiser_paths.txt you just need to add the `*.minimiser` files.
 \endhint
@@ -176,7 +176,7 @@ For the all_minimiser_paths.txt you just need to add the `*.minimiser` files.
 You should have run:
 ```bash
 raptor build --kmer 4 --window 6 --compute-minimiser --output precomputed_minimisers all_paths.txt
-raptor build --size 1m --output raptor_minimiser.index all_minimiser_paths.txt
+raptor build --size 1m --output minimiser.index all_minimiser_paths.txt
 ```
 Whereby your all_minimiser_paths.txt should look like:
 ```txt
@@ -257,7 +257,7 @@ For a detailed explanation of the Hierarchical Interleaved Bloom Filter (HIBF), 
 
 \assignment{Assignment 4: HIBF}
 Lets use the HIBF for our small example. Thus run the example above with a false positive rate of 0.05 and call the new
-index `hibf_raptor.index`.
+index `hibf.index`.
 As our example is small, we will keep the kmer size of 4
 \hint
 ...
@@ -267,7 +267,7 @@ As our example is small, we will keep the kmer size of 4
 \solution
 You should have run:
 ```bash
-raptor build --kmer 4 --hibf --fpr 0.05 --output hibf_raptor.index all_paths.txt
+raptor build --kmer 4 --hibf --fpr 0.05 --output hibf.index all_paths.txt
 ```
 /todo Currently not working: `[Error] The list of input files cannot be empty.`
 
