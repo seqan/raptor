@@ -1,6 +1,6 @@
 # Search with Raptor {#tutorial_search}
 
-You will learn how to searche a Raptor index using one or more sequences queries.
+You will learn how to search a Raptor index using one or more sequences queries.
 
 \tutorial_head{Easy, 30 min, \ref tutorial_index, }
 
@@ -10,12 +10,12 @@ You will learn how to searche a Raptor index using one or more sequences queries
 
 ## A first search
 
-Now we want to have a look at Raptors second method: `raptor search`.
+Now we want to have a look at Raptor's second method: `raptor search`.
 
 We have already learned how to build an index in the previous tutorial on the `raptor index` and now we want to learn
 how to search in it.
-But before we delve deeper into the various possibilities and parameters. We can start a first search with the indexes
-we have already created.
+But before that, we delve deeper into the various possibilities and parameters. We can start a first search with the
+indexes we have already created.
 
 For this we just need the index and a query to run
 `raptor search --index raptor.index --query query.fasta --output search.output`.
@@ -87,11 +87,25 @@ and the other `search2.output` like this:
 query1  0
 query2
 ```
-In the following section, we will also discuss these results and their differences.
+For the `search.output` Raptor will not output usefull results, as the index was build by the default kmer size `20`,
+which is smaller than the length of the queries. This should not happen in normal cases.
+For `search2.output` lets have a look again on the indexed sequences and the queries:
+```fasta
+>chr1
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACGCGTTCATTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+>query2                              ||||||||||
+                                     CGCGTTCATT
+>chr2
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACGCGTCATTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+>query2                              |||||||||
+                                     CGCGTCATT
+>chr3
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+```
+So, with no errors allowed, we would expect a match from query1 to the first sequence and from query2 to the second
+sequence. Actually, this should also appear in the output, we assume that due to the smallness of the example, the
+second match does not appear.
 \endsolution
-
-\todo
-Warum hat query2 keinen match?
 
 \note
 The Raptor search also has a help page, which can be accessed as usual by typing `raptor search -h` or
@@ -100,8 +114,6 @@ The Raptor search also has a help page, which can be accessed as usual by typing
 ## General Idea & main parameters
 
 \image html Raptor_no_title.svg width=90%
-
-\todo wollen wir die Raptor überschrift im image abschneiden?
 
 With `raptor index` we stored a representative transformation of the k-mer content of the database that is divided up
 into a number of bins, typically a few hundred to a few thousand.
@@ -176,6 +188,23 @@ and the other `search4.output` like this:
 query1  0
 query2  1
 ```
+For the `search3.output` lets have a look again on the first two sequences and the queries:
+```fasta
+>chr1
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACGCGTTCATTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+>query2                              ||||||||||
+                                     CGCGTTCATT
+>chr2                                |||| |||||
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACGCG-TCATTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+>query2                              |||| |||||
+                                     CGCG-TCATT
+>chr1                                |||| |||||
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACGCGTTCATTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+A
+```
+As you can see, the queries now also match with an error the other sequence, which means that our search result makes
+sense.
+For the `search4.output` we lose these matches again, because the threshold throws out these results.
 \endsolution
 
 #### Minimizers and thresholding
