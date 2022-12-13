@@ -48,8 +48,6 @@ raptor layout --input-file all_bin_path.txt --tmax 64
 The `input-file` looks exactly as in our previous calls of `raptor index`; it contains all the paths of our database
 files.
 
-\todo Chopper braucht ein `input_data.tsv` input, wobei es momentan nur eine Spalte (mit den Pfaden) gibt, also geht auch `.txt`.
-
 The parameter `--tmax` limits the number of technical bins on each level of the HIBF. Choosing a good \f$t_{max}\f$ is
 not trivial. The smaller \f$t_{max}\f$, the more levels the layout needs to represent the data. This results in a higher
 space consumption of the index. While querying each individual level is cheap, querying many levels might also lead to
@@ -91,7 +89,7 @@ And use the data of the `1024` Folder.
 \hint
 First we need a file with all paths to the fasta files. For this use the command:
 ```bash
-for i in {0001..1023}; do echo "1024/bins/bin_$i.fasta" >> all_bin_paths.txt; done
+seq -f "1024/bins/bin_%04g.fasta" 0 1 1023 > all_bin_paths.txt
 ```
 \endhint
 
@@ -179,8 +177,6 @@ possible to specify a size here. But we can offer the option to name the desired
 
 \note These parameters must be set identically for `raptor index`.
 
-\todo This is not checked at the moment?
-
 A call could then look like this:
 ```bash
 raptor layout --input-file all_bin_path.txt \
@@ -228,7 +224,8 @@ The first step is to estimate the number of (representative) k-mers per user bin
 [HyperLogLog (HLL) sketches](http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf) of the input data. These HLL
 sketches are stored in a directory and will be used in computing an HIBF layout.
 
-We will also give a short explanation of the HLL sketches here to explain the possible parameters.
+We will also give a short explanation of the HLL sketches here to explain the possible parameters, whereby each bin is
+sketched individually.
 
 \note
 Most parameters are advanced and only need to be changed if the calculation takes significantly too long or the memory
@@ -255,9 +252,6 @@ If we choose our `b` (`m`) to be very large, then we need more memory but get hi
 growing exponentially.) In addition, calculating the layout can take longer with a high `b` (`m`). If we have many user
 bins and observe a long runtime, then it is worth choosing a somewhat smaller `b` (`m`).
 
-\todo
-Wird bisher ein sketch über alles berechnet oder einzelne sketches die gemerged werden? Laut Felix ist das mergen ebenfalls sehr schnell. (zb 10 genome sketchen und dann mergen)
-
 #### Advanced options for HLL sketches
 
 The following options should only be touched if the calculation takes a long time.
@@ -266,20 +260,10 @@ We have implemented another preprocessing that summarises the technical bins eve
 of the input data. This can be switched off with the flag `--skip-similarity-preprocessing` if it costs too much
 runtime.
 
-\todo
-Add parameter `--skip-similarity-preprocessing` instead of `--estimate-union` and `--rearrange-user-bins`. Set it as
-advanced.
-
-\todo
-`--disable-sketch-output` wahrscheinlich unsinnig, da nur der zwischenstand zwischen count und layout
-
 With `--max-rearrangement-ratio` you can further influence a part of the preprocessing (value between `0` and `1`). If
 you set this value to `1`, it is switched off. If you set it to a very small value, you will also need more runtime and
 memory. If it is close to `1`, however, just little re-arranging is done, which could be bad. In our benchmarks, however,
 we were not able to determine a too great influence, so we recommend that this value only be used for fine tuning.
-
-\todo
-Wenn r=1, dann `--rearrange-user-bins` aus, daher die flag nicht nötig.
 
 One last observation about these advanced options: If you expect hardly any similarity in the data set, then the
 similarity preprocessing makes very little difference.

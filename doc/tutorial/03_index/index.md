@@ -263,9 +263,6 @@ raptor build --hibf binning.layout \
              --output hibf.index
 ```
 
-\note wichtig!!! --false-positive-rate "$fpr"  muss die selbe sein wie die von raptor Genauso die k-mer size. Hash functions auch oder?
-\warning test
-
 \assignment{Assignment 4: A default HIBF}
 Since we cannot see the advantages of the hibf with our small example. And certainly not the differences when we change
 the parameters. Let's not go back to our small example from above, but to the one from the introduction:

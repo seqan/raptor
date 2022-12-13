@@ -124,8 +124,6 @@ and apply a thresholding step to determine the membership of a query in a bin.
 The term representative indicates that the k-mer content could be transformed by a function which reduces its size and
 distribution, e.g. using minimizers.
 
-\todo Mehr auf das image eingehen.
-
 There are also a few parameters for the search, which we will now explain.
 
 Instead of an exact search, we can also allow errors in the query, this we achieve with a positive value of `--error`.
