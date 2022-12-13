@@ -2,7 +2,7 @@
 
 You will learn how to construct a Raptor index of large collections of nucleotide sequences.
 
-\tutorial_head{Easy, 30 min, \ref tutorial_first_steps,
+\tutorial_head{Easy, 30 min, \ref tutorial_first_steps \, for using HIBF: \ref tutorial_layout,
 [<b>Interleaved Bloom Filter (IBF)</b>](https://docs.seqan.de/seqan/3-master-user/classseqan3_1_1interleaved__bloom__filter.html#details)\,
 \ref raptor::hierarchical_interleaved_bloom_filter "Hierarchical Interleaved Bloom Filter (HIBF)"}
 
@@ -41,7 +41,7 @@ raptor build --size 1k --output raptor.index all_bin_paths.txt
 ```
 
 \assignment{Assignment 1: Create example files and index them}
-Copy and paste the following FASTA files to some location, e.g. the tmp directory:
+Copy and paste the following FASTA files to some location, e.g. a tmp directory:
 
 mini_1.fasta:
 ```fasta
@@ -192,7 +192,7 @@ tmp$ ls -la
 ... 107B 14 Nov 16:11 mini_1.fasta
 ... 107B 14 Nov 16:11 mini_2.fasta
 ... 107B 14 Nov 16:11 mini_3.fasta
-... 8,0M 14 Nov 16:21 minimiser_raptor.index
+... 8,0M 14 Nov 16:21 minimiser.index
 ... 256B 14 Nov 16:20 precomputed_minimisers/
 ...  19B 10 Nov 16:40 query.fasta
 ... 1,2K 14 Nov 16:15 raptor.index
@@ -237,43 +237,83 @@ does not need any special parameters.
 
 ## IBF vs HIBF {#hibf}
 
-/todo This is a placeholder section and needs more information including the chopper layout.
-
 Raptor works with the Interleaved Bloom Filter by default. A new feature is the Hierarchical Interleaved Bloom Filter
-(HIBF) (raptor::hierarchical_interleaved_bloom_filter), which can be used with `--hibf` can be used. This uses a more
+(HIBF) (raptor::hierarchical_interleaved_bloom_filter), which can be used with `--hibf`. This uses a more
 space-saving method of storing the bins. It distinguishes between the user bins, which reflect the individual samples as
 before, and the so-called technical bins, which throw some bins together. This is especially useful when there are
 samples of very different sizes.
+
+To use the HIBF, a layout must be created before creating an index. We have written an extra tutorial for this
+\ref tutorial_layout.
+
+### HIBF indexing with the use of the layout
+
+The layout replaces the `all_bin_path.txt` and is given instead with the HIBF parameter: `--hibf binning.out`.
+
 Since the HIBF calculates the size of the index itself, it is no longer possible to specify a size here. But we can
-offer the option to name the desired false positive rate with `--fpr`.
+offer the option to name the desired false positive rate with `--fpr`. Thus, for example, a call looks like this:
 
 ```bash
-raptor build --kmer 19 --hash 3 --hibf --fpr 0.1 --output raptor.index all_bin_paths.txt
+raptor build --hibf binning.layout \
+             --kmer 16  \
+             --window 20  \
+             --hash 3 \
+             --fpr 0.25  \
+             --threads 2 \
+             --output hibf.index
 ```
 
-\note
-For a detailed explanation of the Hierarchical Interleaved Bloom Filter (HIBF), please refer to the
-`raptor::hierarchical_interleaved_bloom_filter` API.
+\assignment{Assignment 4: A default HIBF}
+Since we cannot see the advantages of the hibf with our small example. And certainly not the differences when we change
+the parameters. Let's not go back to our small example from above, but to the one from the introduction:
 
-\assignment{Assignment 4: HIBF}
-Lets use the HIBF for our small example. Thus run the example above with a false positive rate of 0.05 and call the new
-index `hibf.index`.
-As our example is small, we will keep the kmer size of 4
+```console
+$ tree -L 2 example_data
+example_data
+├── 1024
+│   ├── bins
+│   └── reads
+└── 64
+    ├── bins
+    └── reads
+```
+And use the data of the `1024` Folder and the two layouts we've created in the \ref tutorial_layout tutorial :
+`binning.out` and `binning2.layout`.
+
+Lets use the HIBF with the default parameters and call the new indexes `hibf.index` and `hibf2.index`.
+\note
+Your kmer size, number of hash functions and the false positive rate must be the same as in the layout.
+
 \hint
-...
+For the second layout we took a kmer size of `16`, `3` hash functions and a false positive rate of `0.1`.
 \endhint
 \endassignment
 
 \solution
 You should have run:
 ```bash
-raptor build --kmer 4 --hibf --fpr 0.05 --output hibf.index all_paths.txt
+raptor build --hibf binning.out --output hibf.index
+raptor build --hibf binning2.layout --kmer 16 --hash 3 --fpr 0.1 --output hibf2.index
 ```
-/todo Currently not working: `[Error] The list of input files cannot be empty.`
 
 Your directory should look like this:
 ```bash
-tmp$ ls -la
-...
+$ ls -la
+... 384B 12 Dez 13:44 ./
+... 544B 12 Dez 12:14 ../
+... 128B 23 Sep  2020 1024/
+... 128B 23 Sep  2020 64/
+...  25K 12 Dez 12:52 all_bin_paths.txt
+...  37K 12 Dez 12:56 binning.out
+...  37K 12 Dez 13:26 binning2.layout
+...  55K 12 Dez 13:26 chopper_sketch.count
+...  32K 12 Dez 12:52 chopper_sketch_sketches/
+...  13M 12 Dez 13:44 hibf.index
+... 7,2M 12 Dez 13:44 hibf2.index
+...  64B  8 Dez 16:24 mini/
 ```
 \endsolution
+
+\note
+For a more detailed explanation of the Hierarchical Interleaved Bloom Filter (HIBF), please refer to the
+`raptor::hierarchical_interleaved_bloom_filter` API.
