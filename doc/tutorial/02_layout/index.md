@@ -15,11 +15,12 @@ You can skip this chapter if you want to use raptor with the default IBF.
 # IBF vs HIBF
 
 Raptor works with the Interleaved Bloom Filter by default. A new feature is the Hierarchical Interleaved Bloom Filter
-(HIBF) (raptor::hierarchical_interleaved_bloom_filter). This uses a more space-saving method of storing the bins. It
-distinguishes between the user bins, which reflect the individual samples as before, and the so-called technical bins,
-which throw some bins together. This is especially useful when there are samples of very different sizes.
+(HIBF) (raptor::hierarchical_interleaved_bloom_filter). This uses an almost always more space-saving method of storing
+the bins (the HIBF is only not smaller if all bins are the same size). It distinguishes between the user bins, which
+reflect the individual samples as before, and the so-called technical bins, which merges some bins together and splits
+bigger ones. This is especially useful when there are samples of very different sizes.
 
-To use the HIBF, a layout must be created
+To use the HIBF, a layout must be created.
 
 # Create a Layout of the HIBF
 
@@ -36,8 +37,12 @@ The first step is to estimate the number of (representative) k-mers per user bin
 [HyperLogLog (HLL) sketches](http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf) of the input data. These HLL
 sketches are stored in a directory and will be used in computing an HIBF layout. We will go into more detail later
 \ref HLL. The HIBF layout tries to minimize the disk space consumption of the resulting index. The space is estimated
-using a k-mer count per user bin which represents the potential denisity in a technical bin in an Interleaved Bloom
+using a k-mer count per user bin which represents the potential density in a technical bin in an Interleaved Bloom
 filter.
+
+\note
+The term representative indicates that the k-mer content could be transformed by a function which reduces its size and
+distribution, e.g. using minimizers.
 
 Using all default values a first call will look like:
 
@@ -157,6 +162,15 @@ Therefore, we recommend not deleting the files including the built indexes.
 To create an index and thus a layout, the individual samples of the data set are chopped up into k-mers and determine in
 their so-called bin the specific bit setting of the Bloom Filter by passing them through hash functions. This means that
 a k-mer from sample `i` marks in bin `i` with `j` hash functions `j` bits with a `1`.
+
+Example:
+Query ACGT with kmers ACG, CGT.
+Sample 1: AATGT, Sample 2: ACCGT, Sample 3: ACGTA
+2 Hash funktions
+-> Bins 1 to 3 for ACG could look like |0000|0000|0101|
+   Bins 1 to 3 for CGT could look like |0000|0110|1100|
+-> The query seems to match Sample 3
+
 If a query is then searched, its k-mers are thrown into the hash functions and looked at in which bins it only points
 to ones. This can also result in false positives. Thus, the result only indicates that the query is probably part of a
 sample.
@@ -242,15 +256,17 @@ only by reading leading zeros. (For the i'th element with `p` leading zeros, it 
 
 However, if we are unlucky and come across a hash value that consists of only `0`'s, then \f$p_{max}\f$ is of course
 maximum of all possible hash values, no matter how many different elements are actually present.
-To avoid this, we cut each hash value into `m` parts and calculate the \f$p_{max}\f$ over each of these parts. From
-these we then calculate the *harmonic mean* as the total \f$p_{max}\f$.
+To avoid this, we cut the stream of hash values into `m` substreams and use the first `b` bits of each hash value to
+determine into which substream it belongs. From these we then calculate the *harmonic mean* as the total \f$p_{max}\f$.
 
 We can influence this m with `--sketch-bits`. `m` must be a power of two so that we can divide the `64` bit evenly, so
 we use `--sketch-bits` to set a `b` with \f$m = 2^b\f$.
 
 If we choose our `b` (`m`) to be very large, then we need more memory but get higher accuracy. (Storage consumption is
-growing exponentially.) In addition, calculating the layout can take longer with a high `b` (`m`). If we have many user
-bins and observe a long runtime, then it is worth choosing a somewhat smaller `b` (`m`).
+growing exponentially.) In addition, calculating the layout can take longer with a high `b` (`m`).  If we have many user
+bins and observe a long runtime, then it is worth choosing a somewhat smaller `b` (`m`). Furthermore, the relative error
+of the HLL estimate increases with a decreasing `b` (`m`). Based on our benchmarks, we believe that anything above
+`m = 512` should be fine.
 
 #### Advanced options for HLL sketches
 
@@ -262,8 +278,9 @@ runtime.
 
 With `--max-rearrangement-ratio` you can further influence a part of the preprocessing (value between `0` and `1`). If
 you set this value to `1`, it is switched off. If you set it to a very small value, you will also need more runtime and
-memory. If it is close to `1`, however, just little re-arranging is done, which could be bad. In our benchmarks, however,
-we were not able to determine a too great influence, so we recommend that this value only be used for fine tuning.
+memory. If it is close to `1`, however, just little re-arranging is done,  which could result in a less memory-efficient
+layout. This parameter should only be changed if the layouting takes to much memory or time, because there it can have a
+large influence.
 
 One last observation about these advanced options: If you expect hardly any similarity in the data set, then the
 similarity preprocessing makes very little difference.
