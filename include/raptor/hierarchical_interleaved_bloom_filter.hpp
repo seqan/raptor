@@ -33,37 +33,44 @@ namespace raptor
  *
  * # Terminology
  *
- * ## Technical Bin
- * A Technical Bin represents an actual bin in the binning directory. In the IBF, it stores its kmers in a single Bloom
- * Filter (which is interleaved with all the other BFs).
- *
  * ## User Bin
  * The user may impose a structure on his sequence data in the form of logical groups (e.g. species). When querying the
- * IBF, the user is interested in an answer that differentiates between these groups.
+ * (H)IBF, the user is interested in an answer that differentiates between these groups.
+ *
+ * ## Technical Bin
+ * A Technical Bin represents an actual bin in the binning directory. In the IBF, it stores its kmers in a single Bloom
+ * Filter (which is interleaved with all the other BFs). In the HIBF each of these bins could be merged or splitted,
+ * thus it differs to the original user bins.
+ *
+ * ## Layout of the HIBF
+ * The relationship between user bins and technical bins in the HIBF, i.e. which are split or merged, how substructures
+ * of merged bins (lower-level IBFs) look like is called layout.
  *
  * # Hierarchical Interleaved Bloom Filter (HIBF)
  *
- * In constrast to the [seqan3::interleaved_bloom_filter][1], the user bins may be split across multiple technical bins
- * , or multiple user bins may be merged into one technical bin. When merging multiple user bins, the HIBF stores
- * another IBF that is built over the user bins constituting the merged bin. This lower-level IBF can then be used
- * to further distinguish between merged bins.
+ * In constrast to the [seqan3::interleaved_bloom_filter][1], the user bins may be split across multiple technical bins,
+ * or multiple user bins may be merged into one technical bin. When merging multiple user bins, the HIBF stores another
+ * IBF that is built over the user bins constituting the merged bin. This lower-level IBF can then be used to further
+ * distinguish between merged bins.
  *
- * In this example, user bin 1 was split into two technical bins. Bins 3, 4, and 5 were merged into a single technical
- * bin, and another IBF was added for the merged bin.
- * \image html hibf.svg width=90%
+ * In this example layout, user bin 1 was split into two technical bins. Bins 3, 4, and 5 were merged into a single
+ * technical bin, and another IBF was added for the merged bin.
+ * \image html hibf.svg width=40%
  *
  * The individual IBFs may have a different number of technical bins and differ in their sizes, allowing an efficient
  * distribution of the user bins.
  *
  * ## Querying
  * To query the Hierarchical Interleaved Bloom Filter for values, call
- * hibf::hierarchical_interleaved_bloom_filter::membership_agent() and use the returned
- * hibf::hierarchical_interleaved_bloom_filter::membership_agent.
+ * raptor::hierarchical_interleaved_bloom_filter::membership_agent() and use the returned
+ * raptor::hierarchical_interleaved_bloom_filter::membership_agent.
  * In contrast to the [seqan3::interleaved_bloom_filter][1], the result will consist of indices of user bins.
  *
  * To count the occurrences in each user bin of a range of values in the Hierarchical Interleaved Bloom Filter, call
- * hibf::hierarchical_interleaved_bloom_filter::counting_agent() and use
- * the returned hibf::hierarchical_interleaved_bloom_filter::counting_agent_type.
+ * raptor::hierarchical_interleaved_bloom_filter::counting_agent() and use
+ * the returned raptor::hierarchical_interleaved_bloom_filter::counting_agent_type.
+ *
+ * \todo the raptor::hierarchical_interleaved_bloom_filter::counting_agent() does not exist/link to something.
  *
  * ## Thread safety
  *
@@ -275,8 +282,8 @@ public:
     //!\endcond
 };
 
-/*!\brief Manages membership queries for the hibf::hierarchical_interleaved_bloom_filter.
- * \see hibf::hierarchical_interleaved_bloom_filter::user_bins::filename_of_user_bin
+/*!\brief Manages membership queries for the raptor::hierarchical_interleaved_bloom_filter.
+ * \see raptor::hierarchical_interleaved_bloom_filter::user_bins::filename_of_user_bin
  * \details
  * In contrast to the [seqan3::interleaved_bloom_filter][1], the result will consist of indices of user bins.
  */
@@ -358,7 +365,7 @@ public:
      * ### Thread safety
      *
      * Concurrent invocations of this function are not thread safe, please create a
-     * hibf::hierarchical_interleaved_bloom_filter::membership_agent for each thread.
+     * raptor::hierarchical_interleaved_bloom_filter::membership_agent for each thread.
      */
     template <std::ranges::forward_range value_range_t>
     [[nodiscard]] std::vector<int64_t> const & bulk_contains(value_range_t && values, size_t const threshold) & noexcept
@@ -387,7 +394,7 @@ public:
 };
 
 #if RAPTOR_HIBF_HAS_COUNT
-/*!\brief Manages counting ranges of values for the hibf::hierarchical_interleaved_bloom_filter.
+/*!\brief Manages counting ranges of values for the raptor::hierarchical_interleaved_bloom_filter.
  */
 template <seqan3::data_layout data_layout_mode>
 template <std::integral value_t>
@@ -471,7 +478,7 @@ public:
      * ### Thread safety
      *
      * Concurrent invocations of this function are not thread safe, please create a
-     * hibf::hierarchical_interleaved_bloom_filter::counting_agent_type for each thread.
+     * raptor::hierarchical_interleaved_bloom_filter::counting_agent_type for each thread.
      */
     template <std::ranges::forward_range value_range_t>
     [[nodiscard]] seqan3::counting_vector<value_t> const & bulk_count(value_range_t && values,
