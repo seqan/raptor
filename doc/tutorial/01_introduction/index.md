@@ -91,6 +91,7 @@ the corresponding bins in which they were found:
 For a list of options, see the help pages:
 ```console
 raptor --help
+raptor layout --help
 raptor build --help
 raptor search --help
 raptor upgrade --help
