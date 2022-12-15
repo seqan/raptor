@@ -16,9 +16,10 @@ You can skip this chapter if you want to use raptor with the default IBF.
 
 Raptor works with the Interleaved Bloom Filter by default. A new feature is the Hierarchical Interleaved Bloom Filter
 (HIBF) (raptor::hierarchical_interleaved_bloom_filter). This uses an almost always more space-saving method of storing
-the bins (the HIBF is only not smaller if all bins are the same size). It distinguishes between the user bins, which
-reflect the individual samples as before, and the so-called technical bins, which merges some bins together and splits
-bigger ones. This is especially useful when there are samples of very different sizes.
+the bins (except if the input samples are all of the same size). It distinguishes between the *user bins*, which reflect
+the individual input samples, and the *technical bins*, which are physical storage units within the HIBF.
+*Technical bins* may store a single user bin, a split part of a user bin or several (merged) user bins. This is
+especially useful when there are samples of very different sizes.
 
 To use the HIBF, a layout must be created.
 
@@ -264,9 +265,9 @@ we use `--sketch-bits` to set a `b` with \f$m = 2^b\f$.
 
 If we choose our `b` (`m`) to be very large, then we need more memory but get higher accuracy. (Storage consumption is
 growing exponentially.) In addition, calculating the layout can take longer with a high `b` (`m`).  If we have many user
-bins and observe a long runtime, then it is worth choosing a somewhat smaller `b` (`m`). Furthermore, the relative error
-of the HLL estimate increases with a decreasing `b` (`m`). Based on our benchmarks, we believe that anything above
-`m = 512` should be fine.
+bins and observe a long layout computation time, then it is worth choosing a somewhat smaller `b` (`m`). Furthermore,
+the relative error of the HLL estimate increases with a decreasing `b` (`m`). Based on our benchmarks, we believe that
+anything above `m = 512` should be fine.
 
 #### Advanced options for HLL sketches
 
