@@ -216,7 +216,15 @@ public:
         return ibf_bin_to_filename_position[idx];
     }
 
-    //!\brief Returns the filename of the `idx`th user bin.
+    /*!\brief Returns the filename of the `idx`th user bin.
+     * \param idx The id of the x-th user bin.
+     *
+     * \details
+     *
+     * ### Example
+     *
+     * \include test/snippet/filename_of_user_bin.cpp
+     */
     std::string & filename_of_user_bin(size_t const idx)
     {
         return user_bin_filenames[idx];
