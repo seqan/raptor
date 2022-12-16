@@ -202,7 +202,15 @@ public:
         user_bin_filenames.resize(size);
     }
 
-    //!\brief Returns a vector containing user bin indices for each bin in the `idx`th IBF.
+    /*!\brief Returns a vector containing user bin indices for each bin in the `idx`th IBF.
+     * \param idx The id of the x-th IBF.
+     *
+     * \details
+     *
+     * ### Example
+     *
+     * \include test/snippet/bin_indices_of_ibf.cpp
+     */
     std::vector<int64_t> & bin_indices_of_ibf(size_t const idx)
     {
         return ibf_bin_to_filename_position[idx];
