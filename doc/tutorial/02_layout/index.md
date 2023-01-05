@@ -18,8 +18,8 @@ Raptor works with the Interleaved Bloom Filter by default. A new feature is the 
 (HIBF) (raptor::hierarchical_interleaved_bloom_filter). This uses an almost always more space-saving method of storing
 the bins (except if the input samples are all of the same size). It distinguishes between the *user bins*, which reflect
 the individual input samples, and the *technical bins*, which are physical storage units within the HIBF.
-*Technical bins* may store a single user bin, a split part of a user bin or several (merged) user bins. This is
-especially useful when there are samples of very different sizes.
+*Technical bins* may store a single user bin, a split part of a user bin, or several (merged) user bins. This is
+especially useful when samples vary dramatically in size.
 
 To use the HIBF, a layout must be created.
 
@@ -43,7 +43,7 @@ filter.
 
 \note
 The term representative indicates that the k-mer content could be transformed by a function which reduces its size and
-distribution, e.g. using minimizers.
+distribution, e.g. by using minimizers.
 
 Using all default values a first call will look like:
 
@@ -184,6 +184,8 @@ With `--kmer-size` you can specify the length of the k-mers, which should be lon
 By using multiple hash functions, you can sometimes further reduce the possibility of false positives
 (`--num-hash-functions`). We found a useful [Bloom Filter Calculator](https://hur.st/bloomfilter/) to get a calculation
 if it could help. As it is not ours, we do not guarantee its accuracy.
+To use this calculator the number of inserted elements is the number of kmers in a single bin and you should use the
+biggest bin to be sure.
 
 Each Bloom Filter has a bit vector length that, across all Bloom Filters, gives the size of the Interleaved Bloom
 Filter, which we can specify in the IBF case. Since the HIBF calculates the size of the index itself, it is no longer
@@ -258,7 +260,7 @@ only by reading leading zeros. (For the i'th element with `p` leading zeros, it 
 However, if we are unlucky and come across a hash value that consists of only `0`'s, then \f$p_{max}\f$ is of course
 maximum of all possible hash values, no matter how many different elements are actually present.
 To avoid this, we cut the stream of hash values into `m` substreams and use the first `b` bits of each hash value to
-determine into which substream it belongs. From these we then calculate the *harmonic mean* as the total \f$p_{max}\f$.
+determine into which substream it belongs. From these, we calculate the *harmonic mean* as the total \f$p_{max}\f$.
 
 We can influence this m with `--sketch-bits`. `m` must be a power of two so that we can divide the `64` bit evenly, so
 we use `--sketch-bits` to set a `b` with \f$m = 2^b\f$.
@@ -279,7 +281,7 @@ runtime.
 
 With `--max-rearrangement-ratio` you can further influence a part of the preprocessing (value between `0` and `1`). If
 you set this value to `1`, it is switched off. If you set it to a very small value, you will also need more runtime and
-memory. If it is close to `1`, however, just little re-arranging is done,  which could result in a less memory-efficient
+memory. If it is close to `1`, however, just little re-arranging is done, which could result in a less memory-efficient
 layout. This parameter should only be changed if the layouting takes to much memory or time, because there it can have a
 large influence.
 
