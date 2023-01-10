@@ -196,6 +196,11 @@ void search_parsing(sharg::parser & parser, bool const is_socks)
             arguments.pattern_size = arguments.shape_size;
     }
 
+    if (arguments.pattern_size < arguments.window_size)
+        throw sharg::parser_error{std::string{"The query size ("} + std::to_string(arguments.pattern_size)
+                                  + ") is too short to be used with window size "
+                                  + std::to_string(arguments.window_size) + '.'};
+
     // ==========================================
     // Temporary.
     // ==========================================

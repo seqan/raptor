@@ -168,3 +168,7 @@ declare_internal_datasource (FILE empty.fq
                              URL ${CMAKE_CURRENT_LIST_DIR}/empty.fq
                              URL_HASH SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 )
+declare_internal_datasource (FILE too_short.fq
+                             URL ${CMAKE_CURRENT_LIST_DIR}/too_short.fq
+                             URL_HASH SHA256=d6e5bf240c450ae800d188cc486763345c209589b178631195e20b0831d6ab3f
+)

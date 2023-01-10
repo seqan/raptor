@@ -394,6 +394,21 @@ TEST_F(argparse_search, empty_query)
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
+TEST_F(argparse_search, queries_too_short)
+{
+    cli_test_result const result = execute_app("raptor",
+                                               "search",
+                                               "--fpr 0.05",
+                                               "--query ",
+                                               data("too_short.fq"),
+                                               "--index ",
+                                               data("1bins23window.index"),
+                                               "--output search.out");
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] The query size (21) is too short to be used with window size 23.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
 TEST_F(argparse_upgrade, kmer_window)
 {
     cli_test_result const result = execute_app("raptor",
