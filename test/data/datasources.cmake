@@ -163,3 +163,8 @@ declare_internal_datasource (FILE three_levels.pack
                              URL_HASH SHA256=f4d0061995ba803265396e195154eca1629cdce331354f7a44f1ef1c0a075079
                              CONFIGURE true
 )
+
+declare_internal_datasource (FILE empty.fq
+                             URL ${CMAKE_CURRENT_LIST_DIR}/empty.fq
+                             URL_HASH SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+)

@@ -379,6 +379,21 @@ TEST_F(argparse_search, error_treshold)
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
+TEST_F(argparse_search, empty_query)
+{
+    cli_test_result const result = execute_app("raptor",
+                                               "search",
+                                               "--fpr 0.05",
+                                               "--query ",
+                                               data("empty.fq"),
+                                               "--index ",
+                                               data("1bins23window.index"),
+                                               "--output search.out");
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] The query file is empty.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
 TEST_F(argparse_upgrade, kmer_window)
 {
     cli_test_result const result = execute_app("raptor",
