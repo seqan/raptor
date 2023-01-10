@@ -141,6 +141,9 @@ void search_parsing(sharg::parser & parser, bool const is_socks)
         sharg::input_file_validator{raptor::detail::combined_extensions}(arguments.query_file);
     }
 
+    if (std::filesystem::is_empty(arguments.query_file))
+        throw sharg::parser_error{"The query file is empty."};
+
     bool partitioned{false};
     sharg::input_file_validator validator{};
 
