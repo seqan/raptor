@@ -240,7 +240,7 @@ int main(int argc, char ** argv)
         throw sharg::parser_error{"Must simulate at least one read per bin."};
 
     if (number_of_bins != arguments.number_of_reads_per_bin.size())
-        throw seqan3::argument_parser_error{"Something went wrong here."};
+        throw seqan3::argument_parser_error{"number_of_bins (" + std::to_string(number_of_bins) + " != arguments.number_of_reads_per_bin.size()" + std::to_string(arguments.number_of_reads_per_bin.size()) + ")"};
 
     for (size_t & weight : arguments.number_of_reads_per_bin) // was initialised with the weights of the bins
         weight = std::ceil((static_cast<double>(weight) / sum_of_weights) * arguments.number_of_reads);

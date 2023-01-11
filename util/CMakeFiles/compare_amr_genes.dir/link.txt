@@ -1,0 +1,1 @@
+/usr/local/package/bin/g++11  -O3 -DNDEBUG   CMakeFiles/compare_amr_genes.dir/hibf/misc/helper/src/compare_amr_genes.cpp.o  -o bin/compare_amr_genes  -pthread /usr/lib/libz.so /usr/lib/libbz2.so -lrt 

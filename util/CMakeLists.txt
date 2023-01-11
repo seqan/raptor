@@ -142,6 +142,27 @@ add_executable ("create_comparable_output" hibf/misc/helper/src/create_comparabl
 target_link_libraries ("create_comparable_output" "common")
 install (TARGETS "create_comparable_output" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
+add_executable ("normalise_bifrost_output" hibf/misc/helper/src/normalise_bifrost_output.cpp)
+target_link_libraries ("normalise_bifrost_output" "common")
+install (TARGETS "normalise_bifrost_output" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+add_executable ("normalise_raptor_output" hibf/misc/helper/src/normalise_raptor_output.cpp)
+target_link_libraries ("normalise_raptor_output" "common")
+install (TARGETS "normalise_raptor_output" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+add_executable ("normalise_yara_truth_file" hibf/misc/helper/src/normalise_yara_truth_file.cpp)
+target_link_libraries ("normalise_yara_truth_file" "common")
+install (TARGETS "normalise_yara_truth_file" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+add_executable ("compare_mantis_raptor_output" hibf/misc/helper/src/compare_mantis_raptor_output.cpp)
+target_link_libraries ("compare_mantis_raptor_output" "common")
+install (TARGETS "compare_mantis_raptor_output" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+# formerly create_truth_file
+add_executable ("to_be_deleted" hibf/misc/helper/src/to_be_deleted.cpp)
+target_link_libraries ("to_be_deleted" "common")
+install (TARGETS "to_be_deleted" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
 add_executable ("compare_output" hibf/misc/helper/src/compare_output.cpp)
 target_link_libraries ("compare_output" "common")
 install (TARGETS "compare_output" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
