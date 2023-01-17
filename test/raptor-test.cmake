@@ -13,6 +13,7 @@ cmake_minimum_required (VERSION 3.10)
 
 # require Raptor package
 find_package (Raptor REQUIRED HINTS ${CMAKE_CURRENT_LIST_DIR}/../build_system)
+include (${CMAKE_CURRENT_LIST_DIR}/../build_system/raptor-config-version.cmake)
 
 include (CheckCXXSourceCompiles)
 include (FindPackageHandleStandardArgs)
