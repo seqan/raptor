@@ -32,32 +32,6 @@ TEST_P(search_ibf, with_error)
     compare_search(number_of_repeated_bins, number_of_errors, "search.out");
 }
 
-TEST_P(search_ibf, socks)
-{
-    auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
-
-    if (window_size == 23 || number_of_errors != 0)
-        GTEST_SKIP() << "SOCKS only supports (k,k)-minimizers";
-
-    cli_test_result const result = execute_app("raptor",
-                                               "socks",
-                                               "lookup-kmer",
-                                               "--output search.out",
-                                               "--index ",
-                                               ibf_path(number_of_repeated_bins, window_size),
-                                               "--query ",
-                                               data("query_socks.fq"));
-    EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{});
-    RAPTOR_ASSERT_ZERO_EXIT(result);
-
-    std::string const expected =
-        string_from_file(search_result_path(number_of_repeated_bins, window_size, number_of_errors), std::ios::binary);
-    std::string const actual = string_from_file("search.out");
-
-    EXPECT_EQ(expected, actual);
-}
-
 TEST_P(search_ibf, threshold)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();

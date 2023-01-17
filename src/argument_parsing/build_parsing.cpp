@@ -25,16 +25,13 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
 
     parser.add_positional_option(
         arguments.bin_file,
-        sharg::config{.description = (arguments.is_socks ? "File containing color and file names. "
-                                                         : "File containing file names. ")
-                                   + bin_validator{}.get_help_page_message(),
+        sharg::config{.description = "File containing file names. " + bin_validator{}.get_help_page_message(),
                       .validator = sharg::input_file_validator{}});
 
     parser.add_option(arguments.parts,
                       sharg::config{.short_id = '\0',
                                     .long_id = "parts",
                                     .description = "Splits the index in this many parts.",
-                                    .hidden = arguments.is_socks,
                                     .validator = power_of_two_validator{}});
     parser.add_option(arguments.kmer_size,
                       sharg::config{.short_id = '\0',
@@ -46,7 +43,6 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
                                     .long_id = "window",
                                     .description = "The window size.",
                                     .default_message = "k-mer size",
-                                    .hidden = arguments.is_socks,
                                     .validator = positive_integer_validator{}});
     parser.add_option(arguments.shape_string,
                       sharg::config{.short_id = '\0',
@@ -59,9 +55,7 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
         sharg::config{.short_id = '\0',
                       .long_id = "output",
                       .description =
-                          arguments.is_socks
-                              ? "Provide an output filepath."
-                              : "Provide an output filepath or an output directory if --compute-minimiser is used.",
+                          "Provide an output filepath or an output directory if --compute-minimiser is used.",
                       .required = true});
     parser.add_option(arguments.size,
                       sharg::config{.short_id = '\0',
@@ -93,8 +87,7 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
         sharg::config{.short_id = '\0',
                       .long_id = "compute-minimiser",
                       .description =
-                          "Computes minimisers using cutoffs from Mantis (Pandey et al.). Does not create the index.",
-                      .hidden = arguments.is_socks});
+                          "Computes minimisers using cutoffs from Mantis (Pandey et al.). Does not create the index."});
     parser.add_flag(arguments.compute_minimiser,
                     sharg::config{.short_id = '\0',
                                   .long_id = "compute-minimizer",
@@ -103,17 +96,15 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
     parser.add_flag(arguments.disable_cutoffs,
                     sharg::config{.short_id = '\0',
                                   .long_id = "disable-cutoffs",
-                                  .description = "Do not apply cutoffs when using --compute-minimiser.",
-                                  .hidden = arguments.is_socks});
+                                  .description = "Do not apply cutoffs when using --compute-minimiser."});
     parser.add_flag(
         arguments.is_hibf,
         sharg::config{.short_id = '\0', .long_id = "hibf", .description = "Index is an HIBF.", .advanced = true});
 }
 
-void build_parsing(sharg::parser & parser, bool const is_socks)
+void build_parsing(sharg::parser & parser)
 {
     build_arguments arguments{};
-    arguments.is_socks = is_socks;
     init_build_parser(parser, arguments);
     parser.parse();
 

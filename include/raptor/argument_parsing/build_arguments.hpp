@@ -41,7 +41,6 @@ struct build_arguments
     std::vector<std::vector<std::string>> bin_path{};
     std::filesystem::path bin_file{};
     uint8_t threads{1u};
-    bool is_socks{false};
     bool is_hibf{false};
     bool is_minimiser{false};
 };

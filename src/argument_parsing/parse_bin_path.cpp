@@ -17,12 +17,10 @@ namespace detail
 
 void parse_bin_path(std::filesystem::path const & bin_file,
                     std::vector<std::vector<std::string>> & bin_path,
-                    bool const is_socks,
                     bool const is_hibf)
 {
     std::ifstream istrm{bin_file};
     std::string line{};
-    std::string color_name{};
     std::string file_name{};
     std::vector<std::string> tmp{};
 
@@ -42,14 +40,11 @@ void parse_bin_path(std::filesystem::path const & bin_file,
                 tmp.clear();
                 std::stringstream sstream{line};
 
-                if (is_socks)
-                    sstream >> color_name;
-
                 while (std::getline(sstream, file_name, ' '))
                     if (!file_name.empty())
-                        tmp.emplace_back(file_name);
+                        tmp.emplace_back(std::move(file_name));
 
-                bin_path.emplace_back(tmp);
+                bin_path.emplace_back(std::move(tmp));
             }
         }
     }
@@ -61,12 +56,12 @@ void parse_bin_path(std::filesystem::path const & bin_file,
 
 void parse_bin_path(build_arguments & arguments)
 {
-    raptor::detail::parse_bin_path(arguments.bin_file, arguments.bin_path, arguments.is_socks, arguments.is_hibf);
+    raptor::detail::parse_bin_path(arguments.bin_file, arguments.bin_path, arguments.is_hibf);
 }
 
 void parse_bin_path(upgrade_arguments & arguments)
 {
-    raptor::detail::parse_bin_path(arguments.bin_file, arguments.bin_path, false, false);
+    raptor::detail::parse_bin_path(arguments.bin_file, arguments.bin_path, false);
 }
 
 } // namespace raptor

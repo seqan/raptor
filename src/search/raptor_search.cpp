@@ -8,7 +8,6 @@
 #include <raptor/search/search_hibf.hpp>
 #include <raptor/search/search_ibf.hpp>
 #include <raptor/search/search_multiple.hpp>
-#include <raptor/search/search_socks.hpp>
 
 namespace raptor
 {
@@ -24,20 +23,10 @@ void raptor_search(search_arguments const & arguments)
     }
     else if (arguments.parts == 1)
     {
-        if (arguments.is_socks)
-        {
-            if (arguments.compressed)
-                search_socks<true>(arguments);
-            else
-                search_socks<false>(arguments);
-        }
+        if (arguments.compressed)
+            search_ibf<true>(arguments);
         else
-        {
-            if (arguments.compressed)
-                search_ibf<true>(arguments);
-            else
-                search_ibf<false>(arguments);
-        }
+            search_ibf<false>(arguments);
     }
     else
     {
