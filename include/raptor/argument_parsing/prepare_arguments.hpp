@@ -12,24 +12,24 @@
 
 #include <seqan3/search/kmer_index/shape.hpp>
 
+#include <raptor/strong_types.hpp>
+
 namespace raptor
 {
 
-struct upgrade_arguments
+struct prepare_arguments
 {
-    uint32_t window_size{};
-    uint8_t kmer_size{};
-    seqan3::shape shape{};
-    uint8_t parts{1u};
-    bool compressed{false};
-    double fpr{0.05};
-    bool is_hibf{false};
+    uint8_t kmer_size{20u};
+    uint32_t window_size{kmer_size};
+    std::string shape_string{};
+    seqan3::shape shape{seqan3::ungapped{kmer_size}};
+    bool enable_cutoffs{false};
 
-    std::filesystem::path bin_file{};
-    std::filesystem::path in_file{};
-    std::filesystem::path out_file{};
+    std::filesystem::path out_dir{"./"};
 
     std::vector<std::vector<std::string>> bin_path{};
+    std::filesystem::path bin_file{};
+    uint8_t threads{1u};
 };
 
 } // namespace raptor

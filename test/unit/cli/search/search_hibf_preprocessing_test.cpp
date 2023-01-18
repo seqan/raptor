@@ -43,12 +43,10 @@ TEST_P(search_hibf_preprocessing, pipeline)
     }
 
     cli_test_result const result1 = execute_app("raptor",
-                                                "build",
+                                                "prepare",
                                                 "--kmer 19",
                                                 "--window ",
                                                 std::to_string(window_size),
-                                                "--compute-minimiser",
-                                                "--disable-cutoffs",
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output precomputed_minimisers",
@@ -75,12 +73,9 @@ TEST_P(search_hibf_preprocessing, pipeline)
 
     cli_test_result const result3 = execute_app("raptor",
                                                 "search",
-                                                "--fpr 0.05",
-                                                "--hibf",
                                                 "--output search.out",
                                                 "--error ",
                                                 std::to_string(number_of_errors),
-                                                "--p_max 0.4",
                                                 "--index ",
                                                 "raptor.index",
                                                 "--query ",
@@ -123,12 +118,10 @@ TEST_P(search_hibf_preprocessing, pipeline_compressed_index)
     }
 
     cli_test_result const result1 = execute_app("raptor",
-                                                "build",
+                                                "prepare",
                                                 "--kmer 19",
                                                 "--window ",
                                                 std::to_string(window_size),
-                                                "--compute-minimiser",
-                                                "--disable-cutoffs",
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output precomputed_minimisers",
@@ -151,12 +144,9 @@ TEST_P(search_hibf_preprocessing, pipeline_compressed_index)
 
     cli_test_result const result3 = execute_app("raptor",
                                                 "search",
-                                                "--fpr 0.05",
-                                                "--hibf",
                                                 "--output search.out",
                                                 "--error ",
                                                 std::to_string(number_of_errors),
-                                                "--p_max 0.4",
                                                 "--index ",
                                                 "raptor.index",
                                                 "--query ",

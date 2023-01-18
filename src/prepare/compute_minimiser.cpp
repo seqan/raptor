@@ -11,9 +11,9 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <raptor/adjust_seed.hpp>
-#include <raptor/build/call_parallel_on_bins.hpp>
-#include <raptor/build/compute_minimiser.hpp>
+#include <raptor/call_parallel_on_bins.hpp>
 #include <raptor/dna4_traits.hpp>
+#include <raptor/prepare/compute_minimiser.hpp>
 
 namespace raptor
 {
@@ -42,7 +42,7 @@ bool check_for_fasta_format(std::vector<std::string> const & valid_extensions, s
     return std::ranges::find_if(valid_extensions, case_insensitive_ends_with) != valid_extensions.end();
 }
 
-void compute_minimiser(build_arguments const & arguments)
+void compute_minimiser(prepare_arguments const & arguments)
 {
     auto minimiser_view = seqan3::views::minimiser_hash(arguments.shape,
                                                         seqan3::window_size{arguments.window_size},
@@ -80,7 +80,7 @@ void compute_minimiser(build_arguments const & arguments)
             bool const is_compressed =
                 file_name.extension() == ".gz" || file_name.extension() == ".bgzf" || file_name.extension() == ".bz2";
 
-            if (!arguments.disable_cutoffs)
+            if (arguments.enable_cutoffs)
             {
                 // Since the curoffs are based on the filesize of a gzipped fastq file, we try account for the other cases:
                 // We multiply by two if we have fasta input.
@@ -104,7 +104,7 @@ void compute_minimiser(build_arguments const & arguments)
             }
 
             // Store binary file
-            std::filesystem::path output_path{arguments.out_path};
+            std::filesystem::path output_path{arguments.out_dir};
             output_path /= is_compressed ? file_name.stem().stem() : file_name.stem();
             output_path += ".minimiser";
             std::ofstream outfile{output_path, std::ios::binary};
@@ -118,7 +118,7 @@ void compute_minimiser(build_arguments const & arguments)
             }
 
             // Store header file
-            output_path = arguments.out_path;
+            output_path = arguments.out_dir;
             output_path /= is_compressed ? file_name.stem().stem() : file_name.stem();
             output_path += ".header";
             std::ofstream headerfile{output_path};
@@ -130,7 +130,7 @@ void compute_minimiser(build_arguments const & arguments)
         }
     };
 
-    call_parallel_on_bins(worker, arguments);
+    call_parallel_on_bins(worker, arguments.bin_path, arguments.threads);
 }
 
 } // namespace raptor

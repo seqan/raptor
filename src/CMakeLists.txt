@@ -55,7 +55,7 @@ endif ()
 # Raptor library
 if (NOT TARGET raptor_lib)
     add_library ("raptor_lib" INTERFACE)
-    target_link_libraries ("raptor_lib" INTERFACE "raptor_argument_parsing" "raptor_build" "raptor_build_hibf"
+    target_link_libraries ("raptor_lib" INTERFACE "raptor_argument_parsing" "raptor_build" "raptor_build_hibf" "raptor_prepare"
                                                   "raptor_search" "raptor_threshold" "raptor_upgrade" "raptor_layout"
     )
 endif ()
@@ -72,5 +72,6 @@ add_subdirectory (argument_parsing)
 add_subdirectory (build)
 add_subdirectory (layout)
 add_subdirectory (search)
+add_subdirectory (prepare)
 add_subdirectory (threshold)
 add_subdirectory (upgrade)

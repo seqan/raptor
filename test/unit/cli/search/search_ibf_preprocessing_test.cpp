@@ -36,12 +36,10 @@ TEST_P(search_ibf_preprocessing, pipeline)
     }
 
     cli_test_result const result1 = execute_app("raptor",
-                                                "build",
+                                                "prepare",
                                                 "--kmer 19",
                                                 "--window ",
                                                 std::to_string(window_size),
-                                                "--compute-minimiser",
-                                                "--disable-cutoffs",
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output precomputed_minimisers",
@@ -52,7 +50,6 @@ TEST_P(search_ibf_preprocessing, pipeline)
 
     cli_test_result const result2 = execute_app("raptor",
                                                 "build",
-                                                "--size 64k",
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output raptor.index",
@@ -65,7 +62,6 @@ TEST_P(search_ibf_preprocessing, pipeline)
 
     cli_test_result const result3 = execute_app("raptor",
                                                 "search",
-                                                "--fpr 0.05",
                                                 "--output search.out",
                                                 "--error ",
                                                 std::to_string(number_of_errors),
@@ -105,11 +101,10 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
     }
 
     cli_test_result const result1 = execute_app("raptor",
-                                                "build",
+                                                "prepare",
                                                 "--kmer 19",
                                                 "--window ",
                                                 std::to_string(window_size),
-                                                "--compute-minimiser",
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output precomputed_minimisers",
@@ -120,7 +115,6 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
 
     cli_test_result const result2 = execute_app("raptor",
                                                 "build",
-                                                "--size 64k",
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output raptor.index",
@@ -133,11 +127,10 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
 
     cli_test_result const result3 = execute_app("raptor",
                                                 "search",
-                                                "--fpr 0.05",
                                                 "--output search.out",
                                                 "--error ",
                                                 std::to_string(number_of_errors),
-                                                "--p_max 0.4",
+                                                // "--p_max 0.4",
                                                 "--index ",
                                                 "raptor.index",
                                                 "--query ",
@@ -165,23 +158,17 @@ TEST_F(search_ibf_preprocessing, pipeline_compressed_index)
     }
 
     cli_test_result const result1 = execute_app("raptor",
-                                                "build",
+                                                "prepare",
                                                 "--kmer 19",
                                                 "--window 23",
-                                                "--compute-minimiser",
-                                                "--disable-cutoffs",
                                                 "--output precomputed_minimisers",
                                                 "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result1);
 
-    cli_test_result const result2 = execute_app("raptor",
-                                                "build",
-                                                "--size 64k",
-                                                "--output raptor.index",
-                                                "--compressed",
-                                                "raptor_cli_test.minimiser");
+    cli_test_result const result2 =
+        execute_app("raptor", "build", "--output raptor.index", "--compressed", "raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result2);

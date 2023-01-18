@@ -62,9 +62,9 @@ static std::vector<std::vector<seqan3::dna4>> const reads{
 
 using ibf_t = seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed>;
 
-static constexpr uint64_t adjust_seed(uint8_t const kmer_size, uint64_t const seed = 0x8F3F73B5CF1C9ADEULL) noexcept
+static constexpr uint64_t adjust_seed(uint8_t const kmer_size) noexcept
 {
-    return seed >> (64u - 2u * kmer_size);
+    return 0x8F3F73B5CF1C9ADEULL >> (64u - 2u * kmer_size);
 }
 
 static constexpr size_t compute_bin_size(size_t const max_bin_size, double const fpr)

@@ -186,17 +186,16 @@ public:
 
     std::string get_help_page_message() const
     {
-        // Update
         return seqan3::detail::to_string("The file must contain at least one file path per line, with multiple paths "
                                          "being separated by a whitespace. Each line in the file corresponds to one "
                                          "bin. Valid extensions for the paths in the file are [minimiser] when "
-                                         " preprocessing, and ",
+                                         " using preprocessed input in raptor build, and ",
                                          raptor::detail::sequence_extensions,
 #if defined(SEQAN3_HAS_BZIP2) || defined(SEQAN3_HAS_ZLIB)
                                          ", possibly followed by ",
                                          raptor::detail::compression_extensions,
 #endif
-                                         " otherwise. ");
+                                         ". ");
     }
 
 private:
@@ -204,6 +203,101 @@ private:
 
 public:
     sharg::input_file_validator sequence_file_validator{raptor::detail::combined_extensions};
+};
+
+class output_directory_validator
+{
+public:
+    using option_value_type = std::string;
+
+    output_directory_validator() = default;
+    output_directory_validator(output_directory_validator const &) = default;
+    output_directory_validator & operator=(output_directory_validator const &) = default;
+    output_directory_validator(output_directory_validator &&) = default;
+    output_directory_validator & operator=(output_directory_validator &&) = default;
+    ~output_directory_validator() = default;
+
+    void operator()(option_value_type const & value) const
+    {
+        std::filesystem::path const out_dir{value};
+        std::error_code ec{};
+        std::filesystem::create_directories(out_dir, ec);
+        if (ec)
+            throw sharg::validation_error{
+                sharg::detail::to_string("Failed to create directory\"", out_dir.c_str(), "\": ", ec.message())};
+
+        if (!std::filesystem::is_empty(out_dir))
+            throw sharg::validation_error{
+                sharg::detail::to_string("The output directory \"", out_dir.c_str(), "\" is not empty.")};
+
+        validator(out_dir);
+    }
+
+    std::string get_help_page_message() const
+    {
+        return "A valid path for the output directory. The directory must be empty.";
+    }
+
+private:
+    sharg::output_directory_validator validator{};
+};
+
+class output_file_validator
+{
+public:
+    using option_value_type = std::string;
+
+    output_file_validator() = default;
+    output_file_validator(output_file_validator const &) = default;
+    output_file_validator & operator=(output_file_validator const &) = default;
+    output_file_validator(output_file_validator &&) = default;
+    output_file_validator & operator=(output_file_validator &&) = default;
+    ~output_file_validator() = default;
+
+    void operator()(option_value_type const & value) const
+    {
+        std::filesystem::path const out_path{value};
+        std::filesystem::path const out_dir{out_path.parent_path()};
+        if (!out_dir.empty())
+        {
+            std::error_code ec{};
+            std::filesystem::create_directories(out_dir, ec);
+            if (ec)
+                throw sharg::validation_error{
+                    sharg::detail::to_string("Failed to create directory \"", out_dir.c_str(), "\": ", ec.message())};
+        }
+
+        validator(out_path);
+    }
+
+    std::string get_help_page_message() const
+    {
+        return "A valid path for the output file. Write permissions must be granted.";
+    }
+
+private:
+    sharg::output_file_validator validator{sharg::output_file_open_options::open_or_create};
+};
+
+class sequence_file_validator : public sharg::input_file_validator
+{
+private:
+    using base_t = sharg::input_file_validator;
+
+public:
+    using base_t::base_t;
+
+    std::string get_help_page_message() const
+    {
+        return seqan3::detail::to_string(
+            "The input file must exist and read permissions must be granted. Valid file extensions are ",
+            raptor::detail::sequence_extensions,
+#if defined(SEQAN3_HAS_BZIP2) || defined(SEQAN3_HAS_ZLIB)
+            ", possibly followed by ",
+            raptor::detail::compression_extensions,
+#endif
+            ". ");
+    }
 };
 
 } // namespace raptor

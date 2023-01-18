@@ -34,8 +34,8 @@ TEST_P(build_ibf_partitioned, pipeline)
                                                 "--kmer 19",
                                                 "--window ",
                                                 std::to_string(window_size),
-                                                "--size 64k",
                                                 "--output raptor.index",
+                                                "--fpr 0.02",
                                                 compressed ? "--compressed" : "--threads 1",
                                                 "--parts ",
                                                 std::to_string(parts),
@@ -46,7 +46,6 @@ TEST_P(build_ibf_partitioned, pipeline)
 
     cli_test_result const result2 = execute_app("raptor",
                                                 "search",
-                                                "--fpr 0.05",
                                                 "--output search.out",
                                                 "--error ",
                                                 std::to_string(number_of_errors),
@@ -81,7 +80,7 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
                                                 "build",
                                                 "--kmer 19",
                                                 "--window 23",
-                                                "--size 64k",
+                                                "--fpr 0.02",
                                                 "--output raptor.index",
                                                 "--parts 4",
                                                 "raptor_cli_test.txt");
@@ -91,7 +90,6 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
 
     cli_test_result const result2 = execute_app("raptor",
                                                 "search",
-                                                "--fpr 0.05",
                                                 "--output search.out",
                                                 "--threshold 0.5",
                                                 "--index ",
@@ -106,7 +104,6 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
 
     cli_test_result const result3 = execute_app("raptor",
                                                 "search",
-                                                "--fpr 0.05",
                                                 "--output search2.out",
                                                 "--error 1",
                                                 "--index ",

@@ -45,27 +45,27 @@ declare_internal_datasource (FILE query_empty.fq
 
 declare_internal_datasource (FILE 1bins19window.index
                              URL ${CMAKE_CURRENT_LIST_DIR}/1bins19window.index
-                             URL_HASH SHA256=c25c3d0679c0cda7fa71841765c6aa3371227a63fd12401039627abf8680698c
+                             URL_HASH SHA256=ddf786e06302fba9f24b0725b00f039c606b59993894f05ccea1cb4ecd1645a5
 )
 declare_internal_datasource (FILE 1bins23window.index
                              URL ${CMAKE_CURRENT_LIST_DIR}/1bins23window.index
-                             URL_HASH SHA256=28bc4d11c0badbbd577919836d76dafd748f2642013b840eee4808e76f956081
+                             URL_HASH SHA256=da2b106b3f92c4006b1664206200a48909d22ea0012122273f5c1ee58e317150
 )
 declare_internal_datasource (FILE 64bins19window.index
                              URL ${CMAKE_CURRENT_LIST_DIR}/64bins19window.index
-                             URL_HASH SHA256=9c3f56c8907d96ab5f2439fcbbc7ca369f1c01aaa08e2f7a354687c6565c1c84
+                             URL_HASH SHA256=faf3f7ac2bb0651313247231a57b7835ff29371fc49546dac18ae38489472a1b
 )
 declare_internal_datasource (FILE 64bins23window.index
                              URL ${CMAKE_CURRENT_LIST_DIR}/64bins23window.index
-                             URL_HASH SHA256=87ac0febfd3b16ad67c8eab11beb52180cd545a7ec2a781f0d02f6df832a2e7b
+                             URL_HASH SHA256=28bf2a0e465a197dd6f4c3bbe84e492f589870b6425bcdbad6d060171c7002e0
 )
 declare_internal_datasource (FILE 128bins19window.index
                              URL ${CMAKE_CURRENT_LIST_DIR}/128bins19window.index
-                             URL_HASH SHA256=4890292fe5379227306774bf59bfb49acde789889296da83edf59001ada7677c
+                             URL_HASH SHA256=a5fee0afc79f64a4a9c7f0d257b5f076f84753824892bd1ddca0d9abd577b879
 )
 declare_internal_datasource (FILE 128bins23window.index
                              URL ${CMAKE_CURRENT_LIST_DIR}/128bins23window.index
-                             URL_HASH SHA256=558351b046f236877e94f31972933f0e9526ff2a6510215091fe4bfb1ae72157
+                             URL_HASH SHA256=500afa4fc9ac0acca90c108b4e9ad664bad1717c92a4bb3d39ce4e1869f684e0
 )
 declare_internal_datasource (FILE 1_1.index
                              URL ${CMAKE_CURRENT_LIST_DIR}/1_1.index
@@ -94,36 +94,36 @@ declare_internal_datasource (FILE 1_1c.index
 )
 declare_internal_datasource (FILE 64bins23windowc.index
                              URL ${CMAKE_CURRENT_LIST_DIR}/64bins23windowc.index
-                             URL_HASH SHA256=fa0cd03253dc8fd9620190a95f8db021c3ffb4db3a5b99ea754b5793879f3cd6
+                             URL_HASH SHA256=a52aa73bb64f98341b9473b651149d130cd2c1f9a889ffd8a7d65a1c134d4eb7
 )
 
 declare_internal_datasource (FILE 1bins19window.hibf
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/1bins19window.hibf
-                             URL_HASH SHA256=3573d1026b6d49159db552d99e0f8c5555c8f435364a23a55c499d2147a3f0a3
-)
-declare_internal_datasource (FILE 64bins19window.hibf
-                             URL ${CMAKE_CURRENT_LIST_DIR}/hibf/64bins19window.hibf
-                             URL_HASH SHA256=4604008953ded1b79236bb637a5ba1c29ebe464a874c438c9f2c78c08d5f1083
-)
-declare_internal_datasource (FILE 128bins19window.hibf
-                             URL ${CMAKE_CURRENT_LIST_DIR}/hibf/128bins19window.hibf
-                             URL_HASH SHA256=ca1d07f4d78c3ca82b4d59723d11b836155fae9554ccd573f7e650cf1566a363
+                             URL_HASH SHA256=621817cea53051553d1f3bee99f6ba856f88e7ff8c08bb1a39e6185a9309aa1c
 )
 declare_internal_datasource (FILE 1bins23window.hibf
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/1bins23window.hibf
-                             URL_HASH SHA256=d5d3fe65b832c2466c4378c7a231fc7311c1d2f0d780980533fbcd2739024588
+                             URL_HASH SHA256=ad3a927d4e1eea6617f20114b914b77fe5c0cd40b710e24a28cc150b9cf5f2b1
+)
+declare_internal_datasource (FILE 64bins19window.hibf
+                             URL ${CMAKE_CURRENT_LIST_DIR}/hibf/64bins19window.hibf
+                             URL_HASH SHA256=c3a292d9883055c1dea202e43d8a63e3a279e46f17cf9a8e78b3f6f228b9d920
 )
 declare_internal_datasource (FILE 64bins23window.hibf
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/64bins23window.hibf
-                             URL_HASH SHA256=ce106cf0f93f05584f1ff07663b0a3eec8717f0ca76068233b0edef02a6b459d
+                             URL_HASH SHA256=c11b4381f8bdf086ffd1fb8d37ce361c12adb3475a8eedf103b09e20d4f2401d
+)
+declare_internal_datasource (FILE 128bins19window.hibf
+                             URL ${CMAKE_CURRENT_LIST_DIR}/hibf/128bins19window.hibf
+                             URL_HASH SHA256=f6618f22feeff358d880fd727ce6d82da74d24e30f72ba7b1d954836a84e1115
 )
 declare_internal_datasource (FILE 128bins23window.hibf
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/128bins23window.hibf
-                             URL_HASH SHA256=b6e2d237182c196cff25ec8928c77aecc2d361f76cb86756c62b1afb222a9677
+                             URL_HASH SHA256=8b12e56bf0cb732ed96b896ca7ee7c0cb4f8a5a8079755077e6adf585666ae2a
 )
 declare_internal_datasource (FILE three_levels.hibf
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/three_levels.hibf
-                             URL_HASH SHA256=060af28fd7fa175a52848a969acaf8796140a7fec26a622c85768c188b0d4d22
+                             URL_HASH SHA256=963f4cad2539ee33d3ed0fec585b04279ebd104733387ca2a03399a654689b3f
 )
 
 declare_internal_datasource (FILE 1bins.pack
@@ -155,3 +155,6 @@ declare_internal_datasource (FILE too_short.fq
                              URL ${CMAKE_CURRENT_LIST_DIR}/too_short.fq
                              URL_HASH SHA256=d6e5bf240c450ae800d188cc486763345c209589b178631195e20b0831d6ab3f
 )
+
+# for bins in 1 64 128; do for window in 19 23; do sha256sum /home/infri/develop/raptor/build/unit/GCC-12.2.0-Debug/output/build_hibf_suite/build_hibf.with_file/${bins}_bins_${window}_window_serial/raptor.index; done; done
+# for bins in 1 64 128; do for window in 19 23; do cp /home/infri/develop/raptor/build/unit/GCC-12.2.0-Debug/output/build_hibf_suite/build_hibf.with_file/${bins}_bins_${window}_window_serial/raptor.index /home/infri/develop/raptor/test/data/hibf/${bins}bins${window}window.hibf; done; done

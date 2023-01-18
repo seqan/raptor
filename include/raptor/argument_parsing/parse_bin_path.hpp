@@ -8,6 +8,7 @@
 #pragma once
 
 #include <raptor/argument_parsing/build_arguments.hpp>
+#include <raptor/argument_parsing/prepare_arguments.hpp>
 #include <raptor/argument_parsing/upgrade_arguments.hpp>
 
 namespace raptor
@@ -23,6 +24,7 @@ void parse_bin_path(std::filesystem::path const & bin_file,
 } // namespace detail
 
 void parse_bin_path(build_arguments & arguments);
+void parse_bin_path(prepare_arguments & arguments);
 void parse_bin_path(upgrade_arguments & arguments);
 
 } // namespace raptor

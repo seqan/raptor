@@ -35,8 +35,8 @@ if (NOT TARGET raptor_argument_parsing)
     endif ()
 
     add_library ("raptor_argument_parsing" STATIC
-                 ../build/hibf/parse_chopper_pack_line.cpp build_parsing.cpp init_shared_meta.cpp parse_bin_path.cpp
-                 search_parsing.cpp upgrade_parsing.cpp
+                 ../build/hibf/parse_chopper_pack_line.cpp build_parsing.cpp compute_bin_size.cpp init_shared_meta.cpp
+                 parse_bin_path.cpp search_parsing.cpp prepare_parsing.cpp upgrade_parsing.cpp
     )
 
     target_compile_definitions ("raptor_argument_parsing"

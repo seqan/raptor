@@ -14,7 +14,6 @@ namespace raptor
 
 /*\brief Adjust the default seed such that it does not interfere with the IBF's hashing.
  *\param kmer_size The used k-mer size. For gapped shapes, this corresponds to the number of set bits (count()).
- *\param seed The seed.
  *\details
  *
  * The hashing used with the IBF assumes that the input values are uniformly distributed.
@@ -30,10 +29,9 @@ namespace raptor
  *
  * `seed XOR kmer` will then always have 4 leading ones.
  */
-static inline constexpr uint64_t adjust_seed(uint8_t const kmer_size,
-                                             uint64_t const seed = 0x8F3F73B5CF1C9ADEULL) noexcept
+static inline constexpr uint64_t adjust_seed(uint8_t const kmer_size) noexcept
 {
-    return seed >> (64u - 2u * kmer_size);
+    return 0x8F3F73B5CF1C9ADEULL >> (64u - 2u * kmer_size);
 }
 
 } // namespace raptor
