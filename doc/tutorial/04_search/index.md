@@ -302,8 +302,8 @@ Two files are stored:
 - `correction_*.bin`: Depends on pattern, window, kmer/shape, p_max, and false positive rate.
 
 \assignment{Assignment 3: Search with minimizers.}
-We want to use the `minimiser.index` from the index tutorial assignment again and use the same queries `CGCGTTCATT` and
-`CGCGTCATT` to search in it.
+We want to use the `minimiser.index` from the index tutorial assignment (\ref tutorial_index ) again and use the same
+queries `CGCGTTCATT` and `CGCGTCATT` to search in it.
 
 Lets search now with a tau of `0.9` and a pmax of `0.9`, with creating a `search5.output`.
 \endassignment

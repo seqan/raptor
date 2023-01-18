@@ -118,6 +118,8 @@ With `--kmer` you can specify the length of the k-mers, which should be long eno
 By using multiple hash functions, you can sometimes further reduce the possibility of false positives (`--hash`). We
 found a useful [Bloom Filter Calculator](https://hur.st/bloomfilter/) to get a calculation if it could help. As it is
 not ours, we do not guarantee its accuracy.
+To use this calculator the number of inserted elements is the number of kmers in a single bin and you should use the
+biggest bin to be sure.
 
 Each Bloom Filter has a bit vector length, which over all Bloom Filters gives the size of the Interleaved Bloom Filter,
 which we specify with `--size`. We can therefore specify how much space the bins take up in total, whereby the following
