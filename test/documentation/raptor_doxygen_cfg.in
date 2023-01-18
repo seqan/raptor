@@ -318,6 +318,7 @@ PREDEFINED             = "CEREAL_SERIALIZE_FUNCTION_NAME=serialize" \
                          "CEREAL_LOAD_MINIMAL_FUNCTION_NAME=load_minimal" \
                          "CEREAL_SAVE_MINIMAL_FUNCTION_NAME=save_minimal" \
                          "RAPTOR_DOXYGEN_ONLY(x)= x" \
+                         "RAPTOR_HIBF_HAS_COUNT=1" \
                          "${RAPTOR_DOXYGEN_PREDEFINED_NDEBUG}"
 EXPAND_AS_DEFINED      =
 SKIP_FUNCTION_MACROS   = NO

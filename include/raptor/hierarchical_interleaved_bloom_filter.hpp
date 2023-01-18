@@ -70,8 +70,6 @@ namespace raptor
  * raptor::hierarchical_interleaved_bloom_filter::counting_agent() and use
  * the returned raptor::hierarchical_interleaved_bloom_filter::counting_agent_type.
  *
- * \todo the raptor::hierarchical_interleaved_bloom_filter::counting_agent() does not exist/link to something.
- *
  * ## Thread safety
  *
  * The Interleaved Bloom Filter promises the basic thread-safety by the STL that all
