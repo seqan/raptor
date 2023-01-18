@@ -12,6 +12,6 @@
 namespace raptor
 {
 
-void search_parsing(sharg::parser & parser, bool const is_socks);
+void search_parsing(sharg::parser & parser);
 
 } // namespace raptor

@@ -136,11 +136,3 @@ time. `raptor search` will automatically detect the parts, and does not need any
 ## Upgrading the index (v1.1.0 to v2.0.0)
 An old index can be upgraded by running `raptor upgrade` and providing some information about how the index was
 constructed.
-
-## SOCKS interface
-We implement the core interface of [SOCKS](https://gitlab.ub.uni-bielefeld.de/gi/socks).
-For a list of options, see the help pages:
-```console
-raptor socks build --help
-raptor socks lookup-kmer --help
-```

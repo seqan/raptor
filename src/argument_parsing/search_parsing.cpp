@@ -28,15 +28,12 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
     parser.add_option(arguments.index_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "index",
-                                    .description = arguments.is_socks
-                                                     ? "Provide a valid path to an index."
-                                                     : "Provide a valid path to an index. Parts: Without suffix _0",
+                                    .description = "Provide a valid path to an index. Parts: Without suffix _0",
                                     .required = true});
     parser.add_option(arguments.fpr,
                       sharg::config{.short_id = '\0',
                                     .long_id = "fpr",
                                     .description = "The false positive rate used for building the index.",
-                                    .hidden = arguments.is_socks,
                                     .validator = sharg::arithmetic_range_validator{0, 1}});
     parser.add_option(arguments.query_file,
                       sharg::config{.short_id = '\0',
@@ -60,7 +57,6 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                       sharg::config{.short_id = '\0',
                                     .long_id = "error",
                                     .description = "The number of errors. Mutually exclusive with --threshold.",
-                                    .hidden = arguments.is_socks,
                                     .validator = positive_integer_validator{true}});
     parser.add_option(arguments.threshold,
                       sharg::config{.short_id = '\0',
@@ -68,14 +64,12 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                                     .description = "Ratio of k-mers that need to be found for a hit to occur. "
                                                    "Mutually exclusive with --error.",
                                     .default_message = "None",
-                                    .hidden = arguments.is_socks,
                                     .validator = sharg::arithmetic_range_validator{0, 1}});
     parser.add_option(arguments.pattern_size,
                       sharg::config{.short_id = '\0',
                                     .long_id = "query_length",
                                     .description = "The query length. Only used with --error.",
-                                    .default_message = "Median of sequence lengths in query file",
-                                    .hidden = arguments.is_socks});
+                                    .default_message = "Median of sequence lengths in query file"});
 
     parser.add_subsection("Dynamic thresholding options");
     parser.add_line("\\fBThese option only take effect when using --error.\\fP");
@@ -83,13 +77,11 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                       sharg::config{.short_id = '\0',
                                     .long_id = "tau",
                                     .description = "The higher tau, the lower the threshold.",
-                                    .hidden = arguments.is_socks,
                                     .validator = sharg::arithmetic_range_validator{0, 1}});
     parser.add_option(arguments.p_max,
                       sharg::config{.short_id = '\0',
                                     .long_id = "p_max",
                                     .description = "The higher p_max, the lower the threshold.",
-                                    .hidden = arguments.is_socks,
                                     .validator = sharg::arithmetic_range_validator{0, 1}});
     parser.add_flag(
         arguments.cache_thresholds,
@@ -112,10 +104,9 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
         sharg::config{.short_id = '\0', .long_id = "time", .description = "Write timing file.", .advanced = true});
 }
 
-void search_parsing(sharg::parser & parser, bool const is_socks)
+void search_parsing(sharg::parser & parser)
 {
     search_arguments arguments{};
-    arguments.is_socks = is_socks;
     init_search_parser(parser, arguments);
     parser.parse();
 
@@ -136,10 +127,7 @@ void search_parsing(sharg::parser & parser, bool const is_socks)
             seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
     // GCOVR_EXCL_STOP
 
-    if (!arguments.is_socks)
-    {
-        sharg::input_file_validator{raptor::detail::combined_extensions}(arguments.query_file);
-    }
+    sharg::input_file_validator{raptor::detail::combined_extensions}(arguments.query_file);
 
     if (std::filesystem::is_empty(arguments.query_file))
         throw sharg::parser_error{"The query file is empty."};
@@ -160,19 +148,16 @@ void search_parsing(sharg::parser & parser, bool const is_socks)
     // ==========================================
     // Process --query_length.
     // ==========================================
-    if (!arguments.is_socks)
+    if (!parser.is_option_set("query_length"))
     {
-        if (!parser.is_option_set("query_length"))
+        std::vector<uint64_t> sequence_lengths{};
+        seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>> query_in{arguments.query_file};
+        for (auto & [seq] : query_in | seqan3::views::async_input_buffer(16))
         {
-            std::vector<uint64_t> sequence_lengths{};
-            seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>> query_in{arguments.query_file};
-            for (auto & [seq] : query_in | seqan3::views::async_input_buffer(16))
-            {
-                sequence_lengths.push_back(std::ranges::size(seq));
-            }
-            std::sort(sequence_lengths.begin(), sequence_lengths.end());
-            arguments.pattern_size = sequence_lengths[sequence_lengths.size() / 2];
+            sequence_lengths.push_back(std::ranges::size(seq));
         }
+        std::sort(sequence_lengths.begin(), sequence_lengths.end());
+        arguments.pattern_size = sequence_lengths[sequence_lengths.size() / 2];
     }
 
     // ==========================================
@@ -192,8 +177,6 @@ void search_parsing(sharg::parser & parser, bool const is_socks)
         arguments.parts = tmp.parts();
         arguments.compressed = tmp.compressed();
         arguments.bin_path = tmp.bin_path();
-        if (arguments.is_socks)
-            arguments.pattern_size = arguments.shape_size;
     }
 
     if (arguments.pattern_size < arguments.window_size)

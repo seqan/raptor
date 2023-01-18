@@ -20,7 +20,7 @@ int main(int argc, char ** argv)
                                        argc,
                                        argv,
                                        sharg::update_notifications::on,
-                                       {"build", "layout", "search", "socks", "upgrade"}};
+                                       {"build", "layout", "search", "upgrade"}};
         raptor::init_shared_meta(top_level_parser);
         top_level_parser.info.description.emplace_back(
             "Raptor is a system for approximately searching many queries such as "
@@ -35,25 +35,11 @@ int main(int argc, char ** argv)
 
         sharg::parser & sub_parser = top_level_parser.get_sub_parser();
         if (sub_parser.info.app_name == std::string_view{"Raptor-build"})
-            raptor::build_parsing(sub_parser, false);
+            raptor::build_parsing(sub_parser);
         if (sub_parser.info.app_name == std::string_view{"Raptor-layout"})
             raptor::chopper_layout(sub_parser);
         if (sub_parser.info.app_name == std::string_view{"Raptor-search"})
-            raptor::search_parsing(sub_parser, false);
-        if (sub_parser.info.app_name == std::string_view{"Raptor-socks"})
-        {
-            sharg::parser socks_parser{"socks",
-                                       argc - 1,
-                                       argv + 1,
-                                       sharg::update_notifications::off,
-                                       {"build", "lookup-kmer"}};
-            socks_parser.parse();
-            sharg::parser & socks_sub_parser = socks_parser.get_sub_parser();
-            if (socks_sub_parser.info.app_name == std::string_view{"socks-build"})
-                raptor::build_parsing(socks_sub_parser, true);
-            if (socks_sub_parser.info.app_name == std::string_view{"socks-lookup-kmer"})
-                raptor::search_parsing(socks_sub_parser, true);
-        }
+            raptor::search_parsing(sub_parser);
         if (sub_parser.info.app_name == std::string_view{"Raptor-upgrade"})
             raptor::upgrade_parsing(sub_parser);
     }

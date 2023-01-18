@@ -44,7 +44,6 @@ struct search_arguments
     std::filesystem::path query_file{};
     std::filesystem::path out_file{"search.out"};
     bool write_time{false};
-    bool is_socks{false};
     bool is_hibf{false};
     bool cache_thresholds{false};
 

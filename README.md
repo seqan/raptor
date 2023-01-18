@@ -193,14 +193,6 @@ time. `raptor search` will automatically detect the parts, and does not need any
 An old index can be upgraded by running `raptor upgrade` and providing some information about how the index was
 constructed.
 
-### SOCKS interface
-We implement the core interface of [SOCKS](https://gitlab.ub.uni-bielefeld.de/gi/socks).
-For a list of options, see the help pages:
-```console
-raptor socks build --help
-raptor socks lookup-kmer --help
-```
-
 ## Authorship and Copyright
 Raptor is being developed by [Enrico Seiler](mailto:enrico.seiler@fu-berlin.de), but also incorporates much work from
 other members of [SeqAn](https://www.seqan.de).

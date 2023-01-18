@@ -42,10 +42,6 @@ declare_internal_datasource (FILE query_empty.fq
                              URL ${CMAKE_CURRENT_LIST_DIR}/query_empty.fq
                              URL_HASH SHA256=80cd7628b6fdcb7dbbe99dd7f05a7a5578b462db9dd67b6d0e6982b03c5d4cd5
 )
-declare_internal_datasource (FILE query_socks.fq
-                             URL ${CMAKE_CURRENT_LIST_DIR}/query_socks.fq
-                             URL_HASH SHA256=c21cfd169d5b16192486b3175fb33f09eb3e0ae1154cde4aa102b62fc12b6683
-)
 
 declare_internal_datasource (FILE 1bins19window.index
                              URL ${CMAKE_CURRENT_LIST_DIR}/1bins19window.index
@@ -128,19 +124,6 @@ declare_internal_datasource (FILE 128bins23window.hibf
 declare_internal_datasource (FILE three_levels.hibf
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/three_levels.hibf
                              URL_HASH SHA256=060af28fd7fa175a52848a969acaf8796140a7fec26a622c85768c188b0d4d22
-)
-
-declare_internal_datasource (FILE 1bins19window0errorsocks.out
-                             URL ${CMAKE_CURRENT_LIST_DIR}/1bins19window0errorsocks.out
-                             URL_HASH SHA256=b1053f5b749071c54528f7b00cc66f278eb50f5643d46db01774932ea510fbbd
-)
-declare_internal_datasource (FILE 64bins19window0errorsocks.out
-                             URL ${CMAKE_CURRENT_LIST_DIR}/64bins19window0errorsocks.out
-                             URL_HASH SHA256=d5e883ce66d1fc574cd6c9ae62c2d25a7671ad7be0948c49d969b1de88293def
-)
-declare_internal_datasource (FILE 128bins19window0errorsocks.out
-                             URL ${CMAKE_CURRENT_LIST_DIR}/128bins19window0errorsocks.out
-                             URL_HASH SHA256=3087b98c1f4e0d0a1a54f0dc11100f25fdfa8eba62d8f24c082ea1c523146618
 )
 
 declare_internal_datasource (FILE 1bins.pack
