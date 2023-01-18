@@ -207,7 +207,7 @@ public:
      *
      * ### Example
      *
-     * \include test/snippet/bin_indices_of_ibf.cpp
+     * \include test/snippet/hibf/bin_indices_of_ibf.cpp
      */
     std::vector<int64_t> & bin_indices_of_ibf(size_t const idx)
     {
@@ -221,7 +221,7 @@ public:
      *
      * ### Example
      *
-     * \include test/snippet/filename_of_user_bin.cpp
+     * \include test/snippet/hibf/filename_of_user_bin.cpp
      */
     std::string & filename_of_user_bin(size_t const idx)
     {
