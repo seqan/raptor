@@ -134,7 +134,7 @@ int main(int argc, char ** argv)
         std::exit(-1);
     }
 
-    raptor::detail::parse_bin_path(cfg.bin_file, cfg.bin_path, false, false);
+    raptor::detail::parse_bin_path(cfg.bin_file, cfg.bin_path, false);
 
     compute_minimisers(cfg);
 }
