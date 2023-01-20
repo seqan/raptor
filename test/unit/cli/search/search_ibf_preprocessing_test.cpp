@@ -105,6 +105,7 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
                                                 "--kmer 19",
                                                 "--window ",
                                                 std::to_string(window_size),
+                                                "--enable-cutoffs",
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output precomputed_minimisers",
