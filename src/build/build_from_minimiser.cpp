@@ -6,8 +6,8 @@
 // --------------------------------------------------------------------------------------------------
 
 #include <raptor/build/build_from_minimiser.hpp>
-#include <raptor/build/call_parallel_on_bins.hpp>
 #include <raptor/build/store_index.hpp>
+#include <raptor/call_parallel_on_bins.hpp>
 
 namespace raptor
 {
@@ -33,7 +33,7 @@ void build_from_minimiser(build_arguments const & arguments)
         }
     };
 
-    call_parallel_on_bins(std::move(worker), arguments);
+    call_parallel_on_bins(std::move(worker), arguments.bin_path, arguments.threads);
 
     if (arguments.compressed)
     {

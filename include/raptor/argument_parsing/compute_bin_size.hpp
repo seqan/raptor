@@ -12,6 +12,6 @@
 namespace raptor
 {
 
-void compute_minimiser(build_arguments const & arguments);
+size_t compute_bin_size(raptor::build_arguments const & arguments);
 
 } // namespace raptor

@@ -40,12 +40,13 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                                     .long_id = "query",
                                     .description = "Provide a path to the query file.",
                                     .required = true,
-                                    .validator = sharg::input_file_validator{}});
+                                    .validator = sequence_file_validator{raptor::detail::combined_extensions}});
     parser.add_option(arguments.out_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "output",
-                                    .description = "Provide a path to the output.",
-                                    .required = true});
+                                    .description = "",
+                                    .required = true,
+                                    .validator = output_file_validator{}});
     parser.add_option(arguments.threads,
                       sharg::config{.short_id = '\0',
                                     .long_id = "threads",
@@ -97,9 +98,6 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
 
     parser.add_subsection("Advanced options", true);
     parser.add_flag(
-        arguments.is_hibf,
-        sharg::config{.short_id = '\0', .long_id = "hibf", .description = "Index is an HIBF.", .advanced = true});
-    parser.add_flag(
         arguments.write_time,
         sharg::config{.short_id = '\0', .long_id = "time", .description = "Write timing file.", .advanced = true});
 }
@@ -116,18 +114,6 @@ void search_parsing(sharg::parser & parser)
 
     if (parser.is_option_set("error") && parser.is_option_set("threshold"))
         throw sharg::parser_error{"You cannot set both error and threshold arguments."};
-
-    std::filesystem::path output_directory = arguments.out_file.parent_path();
-    std::error_code ec{};
-    std::filesystem::create_directories(output_directory, ec);
-
-    // GCOVR_EXCL_START
-    if (!output_directory.empty() && ec)
-        throw sharg::parser_error{
-            seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
-    // GCOVR_EXCL_STOP
-
-    sharg::input_file_validator{raptor::detail::combined_extensions}(arguments.query_file);
 
     if (std::filesystem::is_empty(arguments.query_file))
         throw sharg::parser_error{"The query file is empty."};
@@ -177,26 +163,14 @@ void search_parsing(sharg::parser & parser)
         arguments.parts = tmp.parts();
         arguments.compressed = tmp.compressed();
         arguments.bin_path = tmp.bin_path();
+        arguments.fpr = tmp.fpr();
+        arguments.is_hibf = tmp.is_hibf();
     }
 
     if (arguments.pattern_size < arguments.window_size)
         throw sharg::parser_error{std::string{"The query size ("} + std::to_string(arguments.pattern_size)
                                   + ") is too short to be used with window size "
                                   + std::to_string(arguments.window_size) + '.'};
-
-    // ==========================================
-    // Temporary.
-    // ==========================================
-    if (arguments.shape_size != arguments.window_size && !parser.is_option_set("threshold")
-        && !parser.is_option_set("fpr"))
-    {
-        std::cerr << "[WARNING] The search needs the FPR that was used for building the index.\n"
-                  << "          Currently, the default value of " << std::setprecision(4) << arguments.fpr
-                  << " is used.\n"
-                  << "          If the index was built with a different FPR, the search results are not reliable.\n"
-                  << "          The final version will store the FPR in the index and this parameter will be removed.\n"
-                  << "          To disable this warning, explicitly pass the FPR to raptor search (--fpr 0.05).\n";
-    }
 
     // ==========================================
     // Partitioned index: Check that all parts are available.

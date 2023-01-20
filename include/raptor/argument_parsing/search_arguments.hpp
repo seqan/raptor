@@ -55,7 +55,6 @@ struct search_arguments
                 .errors{errors},
                 .percentage{threshold},
                 .p_max{p_max},
-                .fpr{fpr},
                 .tau{tau},
                 .cache_thresholds{cache_thresholds},
                 .output_directory{index_file.parent_path()}};

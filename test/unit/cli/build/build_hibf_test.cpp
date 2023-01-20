@@ -21,7 +21,6 @@ TEST_P(build_hibf, with_file)
                                                "--kmer 19",
                                                "--window",
                                                std::to_string(window_size),
-                                               "--fpr 0.05",
                                                "--threads",
                                                run_parallel ? "2" : "1",
                                                "--output raptor.index",
@@ -46,7 +45,6 @@ TEST_P(build_hibf, with_shape)
                                                "--shape 1111111111111111111",
                                                "--window",
                                                std::to_string(window_size),
-                                               "--fpr 0.05",
                                                "--threads",
                                                run_parallel ? "2" : "1",
                                                "--output raptor.index",
@@ -80,7 +78,6 @@ TEST_F(build_hibf, three_levels)
                                                "--hibf",
                                                "--kmer 19",
                                                "--window 19",
-                                               "--fpr 0.05",
                                                "--threads 1",
                                                "--output raptor.index",
                                                data("three_levels.pack"));

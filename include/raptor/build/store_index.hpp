@@ -36,6 +36,7 @@ static inline void store_index(std::filesystem::path const & path,
                                                                  arguments.parts,
                                                                  arguments.compressed,
                                                                  arguments.bin_path,
+                                                                 arguments.fpr,
                                                                  std::move(ibf)};
 
     std::ofstream os{path, std::ios::binary};

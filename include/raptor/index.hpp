@@ -42,11 +42,14 @@ private:
     uint8_t parts_{};
     bool compressed_{};
     std::vector<std::vector<std::string>> bin_path_{};
+    double fpr_{};
+    bool is_hibf_{std::same_as<data_t, index_structure::hibf>
+                  || std::same_as<data_t, index_structure::hibf_compressed>};
     data_t ibf_{};
 
 public:
     static constexpr seqan3::data_layout data_layout_mode = data_t::data_layout_mode;
-    static constexpr uint32_t version{1u};
+    static constexpr uint32_t version{2u};
 
     raptor_index() = default;
     raptor_index(raptor_index const &) = default;
@@ -60,12 +63,14 @@ public:
                           uint8_t const parts,
                           bool const compressed,
                           std::vector<std::vector<std::string>> const & bin_path,
+                          double const fpr,
                           data_t && ibf) :
         window_size_{window_size.v},
         shape_{shape},
         parts_{parts},
         compressed_{compressed},
         bin_path_{bin_path},
+        fpr_{fpr},
         ibf_{std::move(ibf)}
     {}
 
@@ -74,7 +79,8 @@ public:
         shape_{arguments.shape},
         parts_{arguments.parts},
         compressed_{arguments.compressed},
-        bin_path_{arguments.bin_path},
+        bin_path_{arguments.original_bin_path},
+        fpr_{arguments.fpr},
         ibf_{seqan3::bin_count{arguments.bins},
              seqan3::bin_size{arguments.bits / arguments.parts},
              seqan3::hash_function_count{arguments.hash}}
@@ -92,6 +98,7 @@ public:
         compressed_ = true;
         bin_path_ = other.bin_path_;
         ibf_ = data_t{other.ibf_};
+        fpr_ = other.fpr_;
     }
 
     template <typename other_data_t>
@@ -103,6 +110,7 @@ public:
         parts_ = std::move(other.parts_);
         compressed_ = true;
         bin_path_ = std::move(other.bin_path_);
+        fpr_ = std::move(other.fpr_);
         ibf_ = std::move(data_t{std::move(other.ibf_)});
     }
 
@@ -129,6 +137,16 @@ public:
     std::vector<std::vector<std::string>> const & bin_path() const
     {
         return bin_path_;
+    }
+
+    double fpr() const
+    {
+        return fpr_;
+    }
+
+    double is_hibf() const
+    {
+        return is_hibf_;
     }
 
     data_t & ibf()
@@ -168,6 +186,8 @@ public:
                     throw sharg::parser_error{"Data layouts of serialised and specified index differ."};
                 }
                 archive(bin_path_);
+                archive(fpr_);
+                archive(is_hibf_);
                 archive(ibf_);
             }
             catch (std::exception const & e)
@@ -203,6 +223,8 @@ public:
                 archive(parts_);
                 archive(compressed_);
                 archive(bin_path_);
+                archive(fpr_);
+                archive(is_hibf_);
             }
             // GCOVR_EXCL_START
             catch (std::exception const & e)

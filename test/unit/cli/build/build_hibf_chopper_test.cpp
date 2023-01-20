@@ -17,15 +17,14 @@ struct build_hibf_layout : public raptor_base
 
 TEST_F(build_hibf_layout, pipeline)
 {
-    seqan3::test::tmp_directory count_dir{};
+    seqan3::test::tmp_directory const count_dir{};
     std::filesystem::path const count_prefix = count_dir.path() / "raptor_cli_test";
-    seqan3::test::tmp_directory out_dir{};
+    seqan3::test::tmp_directory const out_dir{};
     std::filesystem::path const data_filename = out_dir.path() / "raptor_cli_test.txt";
     std::filesystem::path const layout_filename = out_dir.path() / "raptor_cli_test.layout";
     std::filesystem::path const index_filename = out_dir.path() / "raptor.index";
     std::filesystem::path const search_filename = out_dir.path() / "search.out";
     size_t const number_of_repeated_bins{16};
-    size_t const window_size{19};
     size_t const number_of_errors{0}; // search
 
     { // generate sequence (data) input file
@@ -63,8 +62,7 @@ TEST_F(build_hibf_layout, pipeline)
                                                    "build",
                                                    "--hibf",
                                                    "--kmer 19",
-                                                   "--window",
-                                                   std::to_string(window_size),
+                                                   "--window 19",
                                                    "--fpr 0.05",
                                                    "--threads 1",
                                                    "--output",
@@ -79,12 +77,10 @@ TEST_F(build_hibf_layout, pipeline)
     { // check with search if index contains expected input
         cli_test_result const result = execute_app("raptor",
                                                    "search",
-                                                   "--fpr 0.05",
                                                    "--output",
                                                    search_filename,
                                                    "--error",
                                                    std::to_string(number_of_errors),
-                                                   "--hibf",
                                                    "--index",
                                                    index_filename,
                                                    "--query",

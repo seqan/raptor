@@ -45,7 +45,7 @@ void insert_into_ibf(build_arguments const & arguments,
 {
     auto const bin_index = seqan3::bin_index{static_cast<size_t>(record.bin_indices.back())};
 
-    if (arguments.is_minimiser)
+    if (arguments.input_is_minimiser)
     {
         uint64_t minimiser_value{};
         for (auto const & filename : record.filenames)

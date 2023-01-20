@@ -18,7 +18,7 @@ void compute_kmers(robin_hood::unordered_flat_set<size_t> & kmers,
                    build_arguments const & arguments,
                    chopper_pack_record const & record)
 {
-    if (arguments.is_minimiser)
+    if (arguments.input_is_minimiser)
     {
         uint64_t minimiser_value{};
         for (auto const & filename : record.filenames)

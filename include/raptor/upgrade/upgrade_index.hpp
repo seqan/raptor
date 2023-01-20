@@ -13,6 +13,7 @@
 namespace raptor
 {
 
+// Compressed could be removed from raptor_index ctor, etc, when adapting this?
 template <bool compressed>
 void upgrade_index(upgrade_arguments const & arguments)
 {

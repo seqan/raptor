@@ -47,15 +47,12 @@ public:
     /*!\brief Constructs a minimiser from given k-mer, window size and a seed.
      * \param[in] window_size_ The window size.
      * \param[in] shape_       The shape.
-     * \param[in] seed_        The seed to use. Default: 0x8F3F73B5CF1C9ADE.
      */
-    forward_strand_minimiser(window const window_size_,
-                             seqan3::shape const shape_,
-                             uint64_t const seed_ = 0x8F3F73B5CF1C9ADE) :
+    forward_strand_minimiser(window const window_size_, seqan3::shape const shape_) :
         window_size{window_size_.v},
         shape{shape_},
         shape_size{shape.size()},
-        seed{adjust_seed(shape.count(), seed_)}
+        seed{adjust_seed(shape.count())}
     {
         assert(window_size >= shape_size);
     }
@@ -63,14 +60,13 @@ public:
     /*!\brief Resize the minimiser.
      * \param[in] window_size_ The new window size.
      * \param[in] shape_       The new shape.
-     * \param[in] seed_        The new seed to use. Default: 0x8F3F73B5CF1C9ADE.
      */
-    void resize(window const window_size_, seqan3::shape const shape_, uint64_t const seed_ = 0x8F3F73B5CF1C9ADE)
+    void resize(window const window_size_, seqan3::shape const shape_)
     {
         window_size = window_size_.v;
         shape = shape_;
         shape_size = shape.size();
-        seed = adjust_seed(shape.count(), seed_);
+        seed = adjust_seed(shape.count());
         assert(window_size >= shape_size);
     }
 

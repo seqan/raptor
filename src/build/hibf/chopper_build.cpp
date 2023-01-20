@@ -31,6 +31,7 @@ void chopper_build(build_arguments const & arguments)
                                                                                 arguments.parts,
                                                                                 arguments.compressed,
                                                                                 bin_path,
+                                                                                arguments.fpr,
                                                                                 std::move(data.hibf)};
 
     store_index(arguments.out_path, index, arguments);

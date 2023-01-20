@@ -7,23 +7,21 @@
 
 #include <raptor/build/build_from_files.hpp>
 #include <raptor/build/build_from_minimiser.hpp>
-#include <raptor/build/compute_minimiser.hpp>
 #include <raptor/build/hibf/chopper_build.hpp>
 #include <raptor/build/raptor_build.hpp>
+#include <raptor/prepare/compute_minimiser.hpp>
 
 namespace raptor
 {
 
 void raptor_build(build_arguments const & arguments)
 {
-    if (arguments.compute_minimiser)
-        compute_minimiser(arguments);
-    else if (arguments.is_hibf)
+    if (arguments.is_hibf)
         if (arguments.compressed)
             hibf::chopper_build<seqan3::data_layout::compressed>(arguments);
         else
             hibf::chopper_build<seqan3::data_layout::uncompressed>(arguments);
-    else if (arguments.is_minimiser)
+    else if (arguments.input_is_minimiser)
         build_from_minimiser(arguments);
     else if (arguments.compressed)
         build_from_files<true>(arguments);

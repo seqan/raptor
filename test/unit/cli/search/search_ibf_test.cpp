@@ -16,7 +16,6 @@ TEST_P(search_ibf, with_error)
 
     cli_test_result const result = execute_app("raptor",
                                                "search",
-                                               "--fpr 0.05",
                                                "--output search.out",
                                                "--error ",
                                                std::to_string(number_of_errors),
@@ -38,7 +37,6 @@ TEST_P(search_ibf, threshold)
 
     cli_test_result const result = execute_app("raptor",
                                                "search",
-                                               "--fpr 0.05",
                                                "--output search.out",
                                                "--threshold 0.50",
                                                "--index ",
@@ -58,7 +56,6 @@ TEST_P(search_ibf, no_hits)
 
     cli_test_result const result = execute_app("raptor",
                                                "search",
-                                               "--fpr 0.05",
                                                "--output search.out",
                                                "--error ",
                                                std::to_string(number_of_errors),
@@ -82,7 +79,6 @@ TEST_F(search_ibf, cache_thresholds)
     {
         cli_test_result const result = execute_app("raptor",
                                                    "search",
-                                                   "--fpr 0.05",
                                                    "--cache-thresholds",
                                                    "--output search.out",
                                                    "--error ",
@@ -99,7 +95,6 @@ TEST_F(search_ibf, cache_thresholds)
 
     cli_test_result const result = execute_app("raptor",
                                                "search",
-                                               "--fpr 0.05",
                                                "--cache-thresholds",
                                                "--output search.out",
                                                "--error ",

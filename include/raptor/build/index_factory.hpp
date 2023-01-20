@@ -10,7 +10,7 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <raptor/adjust_seed.hpp>
-#include <raptor/build/call_parallel_on_bins.hpp>
+#include <raptor/call_parallel_on_bins.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/index.hpp>
 
@@ -82,7 +82,7 @@ private:
                             ibf.emplace(value, seqan3::bin_index{bin_number});
         };
 
-        call_parallel_on_bins(worker, *arguments);
+        call_parallel_on_bins(worker, arguments->bin_path, arguments->threads);
 
         return index;
     }

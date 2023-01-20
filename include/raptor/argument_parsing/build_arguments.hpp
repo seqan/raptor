@@ -12,6 +12,7 @@
 
 #include <seqan3/search/kmer_index/shape.hpp>
 
+#include <raptor/argument_parsing/prepare_arguments.hpp>
 #include <raptor/strong_types.hpp>
 
 namespace raptor
@@ -24,12 +25,9 @@ struct build_arguments
     uint32_t window_size{kmer_size};
     std::string shape_string{};
     seqan3::shape shape{seqan3::ungapped{kmer_size}};
-    bool compute_minimiser{false};
-    bool disable_cutoffs{false};
 
     // Related to IBF
     std::filesystem::path out_path{"./"};
-    std::string size{"1k"};
     uint64_t bins{64};
     uint64_t bits{4096};
     uint64_t hash{2};
@@ -38,11 +36,23 @@ struct build_arguments
     bool compressed{false};
 
     // General arguments
-    std::vector<std::vector<std::string>> bin_path{};
+    std::vector<std::vector<std::string>> original_bin_path{};
     std::filesystem::path bin_file{};
+    std::vector<std::vector<std::string>> bin_path{};
     uint8_t threads{1u};
     bool is_hibf{false};
-    bool is_minimiser{false};
+    bool input_is_minimiser{false};
+
+    prepare_arguments make_prepare_arguments(std::filesystem::path const out_dir) const noexcept
+    {
+        return {.kmer_size{kmer_size},
+                .window_size{window_size},
+                .shape{shape},
+                .enable_cutoffs{false},
+                .out_dir{out_dir},
+                .bin_path{original_bin_path},
+                .threads{threads}};
+    }
 };
 
 } // namespace raptor

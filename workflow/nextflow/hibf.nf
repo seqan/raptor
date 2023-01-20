@@ -148,11 +148,9 @@ process SEARCH {
     raptor search --index $index \
                   --query $reads \
                   --output hibf_search.out \
-                  --fpr $fpr \
                   --error $errors \
                   --threads $task.cpus \
                   --p_max 0.4 \
                   --tau 0.99 \
-                  --hibf
     """
 }

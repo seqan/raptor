@@ -56,7 +56,15 @@ void parse_bin_path(std::filesystem::path const & bin_file,
 
 void parse_bin_path(build_arguments & arguments)
 {
-    raptor::detail::parse_bin_path(arguments.bin_file, arguments.bin_path, arguments.is_hibf);
+    raptor::detail::parse_bin_path(arguments.bin_file, arguments.original_bin_path, arguments.is_hibf);
+    arguments.bins = arguments.original_bin_path.size();
+    std::filesystem::path first_bin_path = arguments.original_bin_path[0][0];
+    arguments.input_is_minimiser = first_bin_path.extension() == ".minimiser";
+}
+
+void parse_bin_path(prepare_arguments & arguments)
+{
+    raptor::detail::parse_bin_path(arguments.bin_file, arguments.bin_path, false);
 }
 
 void parse_bin_path(upgrade_arguments & arguments)
