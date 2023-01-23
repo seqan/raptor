@@ -8,10 +8,11 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <raptor/adjust_seed.hpp>
+#include <raptor/build/partition_config.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/search/do_parallel.hpp>
 #include <raptor/search/load_index.hpp>
-#include <raptor/search/search_multiple.hpp>
+#include <raptor/search/search_partitioned_ibf.hpp>
 #include <raptor/search/sync_out.hpp>
 #include <raptor/threshold/threshold.hpp>
 
@@ -19,10 +20,11 @@ namespace raptor
 {
 
 template <bool compressed>
-void search_multiple(search_arguments const & arguments)
+void search_partitioned_ibf(search_arguments const & arguments)
 {
     using index_structure_t = std::conditional_t<compressed, index_structure::ibf_compressed, index_structure::ibf>;
     auto index = raptor_index<index_structure_t>{};
+    partition_config const cfg{arguments.parts};
 
     seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::id, seqan3::field::seq>> fin{
         arguments.query_file};
@@ -79,11 +81,14 @@ void search_multiple(search_arguments const & arguments)
             records.size(),
             seqan3::counting_vector<uint16_t>(index.ibf().bin_count(), 0));
 
+        size_t part{};
+
         auto count_task = [&](size_t const start, size_t const end)
         {
             auto & ibf = index.ibf();
             auto counter = ibf.template counting_agent<uint16_t>();
             size_t counter_id = start;
+            std::vector<uint64_t> minimiser;
 
             auto hash_view = seqan3::views::minimiser_hash(arguments.shape,
                                                            seqan3::window_size{arguments.window_size},
@@ -92,20 +97,31 @@ void search_multiple(search_arguments const & arguments)
             for (auto && [id, seq] : records | seqan3::views::slice(start, end))
             {
                 (void)id;
-                auto & result = counter.bulk_count(seq | hash_view);
-                counts[counter_id++] += result;
+                auto minimiser_view = seq | hash_view | std::views::common;
+                minimiser.assign(minimiser_view.begin(), minimiser_view.end());
+
+                auto filtered = minimiser
+                              | std::views::filter(
+                                    [&](auto && hash)
+                                    {
+                                        return (hash & cfg.mask) / cfg.suffixes_per_part == part;
+                                    });
+
+                counts[counter_id++] += counter.bulk_count(filtered);
             }
         };
 
         do_parallel(count_task, records.size(), arguments.threads, compute_time);
+        ++part;
 
-        for (size_t const part : std::views::iota(1u, static_cast<unsigned int>(arguments.parts - 1)))
+        for (; part < arguments.parts - 1u; ++part)
         {
             load_index(index, arguments, part, index_io_time);
             do_parallel(count_task, records.size(), arguments.threads, compute_time);
         }
 
-        load_index(index, arguments, arguments.parts - 1, index_io_time);
+        assert(part == arguments.parts - 1u);
+        load_index(index, arguments, part, index_io_time);
 
         auto output_task = [&](size_t const start, size_t const end)
         {
@@ -127,8 +143,14 @@ void search_multiple(search_arguments const & arguments)
 
                 auto minimiser_view = seq | hash_adaptor | std::views::common;
                 minimiser.assign(minimiser_view.begin(), minimiser_view.end());
+                auto filtered = minimiser
+                              | std::views::filter(
+                                    [&](auto && hash)
+                                    {
+                                        return (hash & cfg.mask) / cfg.suffixes_per_part == part;
+                                    });
+                counts[counter_id] += counter.bulk_count(filtered);
 
-                counts[counter_id] += counter.bulk_count(minimiser);
                 size_t const minimiser_count{minimiser.size()};
                 size_t current_bin{0};
 
@@ -166,8 +188,8 @@ void search_multiple(search_arguments const & arguments)
     // GCOVR_EXCL_STOP
 }
 
-template void search_multiple<false>(search_arguments const & arguments);
+template void search_partitioned_ibf<false>(search_arguments const & arguments);
 
-template void search_multiple<true>(search_arguments const & arguments);
+template void search_partitioned_ibf<true>(search_arguments const & arguments);
 
 } // namespace raptor

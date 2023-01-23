@@ -10,6 +10,7 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <raptor/adjust_seed.hpp>
+#include <raptor/build/partition_config.hpp>
 #include <raptor/call_parallel_on_bins.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/index.hpp>
@@ -31,10 +32,14 @@ public:
     explicit index_factory(build_arguments const & args) : arguments{std::addressof(args)}
     {}
 
-    template <typename view_t = int>
-    [[nodiscard]] auto operator()(view_t && hash_filter_view = 0) const
+    explicit index_factory(build_arguments const & args, partition_config const & cfg) :
+        arguments{std::addressof(args)},
+        config{std::addressof(cfg)}
+    {}
+
+    [[nodiscard]] auto operator()(size_t const part = 0u) const
     {
-        auto tmp = construct(std::move(hash_filter_view));
+        auto tmp = construct(part);
 
         if constexpr (!compressed)
             return tmp;
@@ -44,42 +49,37 @@ public:
 
 private:
     build_arguments const * const arguments{nullptr};
+    partition_config const * const config{nullptr};
 
-    template <typename view_t>
-    auto construct(view_t && hash_filter_view) const
+    auto construct(size_t const part) const
     {
-        using sequence_file_t = seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>>;
-
         assert(arguments != nullptr);
 
         raptor_index<> index{*arguments};
 
-        auto hash_view = [&]()
-        {
-            if constexpr (std::same_as<view_t, int>)
-            {
-                return seqan3::views::minimiser_hash(arguments->shape,
-                                                     seqan3::window_size{arguments->window_size},
-                                                     seqan3::seed{adjust_seed(arguments->shape.count())});
-            }
-            else
-            {
-                return seqan3::views::minimiser_hash(arguments->shape,
-                                                     seqan3::window_size{arguments->window_size},
-                                                     seqan3::seed{adjust_seed(arguments->shape.count())})
-                     | hash_filter_view;
-            }
-        };
-
         auto worker = [&](auto && zipped_view, auto &&)
         {
+            uint64_t hash;
             auto & ibf = index.ibf();
 
             for (auto && [file_names, bin_number] : zipped_view)
+            {
                 for (auto && file_name : file_names)
-                    for (auto && [seq] : sequence_file_t{file_name})
-                        for (auto && value : seq | hash_view())
-                            ibf.emplace(value, seqan3::bin_index{bin_number});
+                {
+                    std::ifstream infile{file_name, std::ios::binary};
+                    if (config == nullptr)
+                    {
+                        while (infile.read(reinterpret_cast<char *>(&hash), sizeof(hash)))
+                            ibf.emplace(hash, seqan3::bin_index{bin_number});
+                    }
+                    else
+                    {
+                        while (infile.read(reinterpret_cast<char *>(&hash), sizeof(hash)))
+                            if ((hash & config->mask) / config->suffixes_per_part == part)
+                                ibf.emplace(hash, seqan3::bin_index{bin_number});
+                    }
+                }
+            }
         };
 
         call_parallel_on_bins(worker, arguments->bin_path, arguments->threads);

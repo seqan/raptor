@@ -5,11 +5,9 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include <raptor/build/build_from_files.hpp>
-#include <raptor/build/build_from_minimiser.hpp>
+#include <raptor/build/build_ibf.hpp>
 #include <raptor/build/hibf/chopper_build.hpp>
 #include <raptor/build/raptor_build.hpp>
-#include <raptor/prepare/compute_minimiser.hpp>
 
 namespace raptor
 {
@@ -21,12 +19,10 @@ void raptor_build(build_arguments const & arguments)
             hibf::chopper_build<seqan3::data_layout::compressed>(arguments);
         else
             hibf::chopper_build<seqan3::data_layout::uncompressed>(arguments);
-    else if (arguments.input_is_minimiser)
-        build_from_minimiser(arguments);
     else if (arguments.compressed)
-        build_from_files<true>(arguments);
+        build_ibf<true>(arguments);
     else
-        build_from_files<false>(arguments);
+        build_ibf<false>(arguments);
 }
 
 } // namespace raptor
