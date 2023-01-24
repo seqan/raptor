@@ -7,7 +7,7 @@
 
 #include <raptor/search/search_hibf.hpp>
 #include <raptor/search/search_ibf.hpp>
-#include <raptor/search/search_multiple.hpp>
+#include <raptor/search/search_partitioned_ibf.hpp>
 
 namespace raptor
 {
@@ -31,9 +31,9 @@ void raptor_search(search_arguments const & arguments)
     else
     {
         if (arguments.compressed)
-            search_multiple<true>(arguments);
+            search_partitioned_ibf<true>(arguments);
         else
-            search_multiple<false>(arguments);
+            search_partitioned_ibf<false>(arguments);
     }
 
     return;

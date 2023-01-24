@@ -20,7 +20,7 @@ namespace raptor
 {
 
 template <typename index_t>
-void search_single(search_arguments const & arguments, index_t && index)
+void search_singular_ibf(search_arguments const & arguments, index_t && index)
 {
     constexpr bool is_ibf = std::same_as<index_t, raptor_index<index_structure::ibf>>
                          || std::same_as<index_t, raptor_index<index_structure::ibf_compressed>>;

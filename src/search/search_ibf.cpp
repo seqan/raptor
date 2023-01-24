@@ -6,7 +6,7 @@
 // --------------------------------------------------------------------------------------------------
 
 #include <raptor/search/search_ibf.hpp>
-#include <raptor/search/search_single.hpp>
+#include <raptor/search/search_singular_ibf.hpp>
 
 namespace raptor
 {
@@ -16,7 +16,7 @@ void search_ibf(search_arguments const & arguments)
 {
     using index_structure_t = std::conditional_t<compressed, index_structure::ibf_compressed, index_structure::ibf>;
     auto index = raptor_index<index_structure_t>{};
-    search_single(arguments, std::move(index));
+    search_singular_ibf(arguments, std::move(index));
 }
 
 template void search_ibf<false>(search_arguments const & arguments);

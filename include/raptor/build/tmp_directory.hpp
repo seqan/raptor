@@ -19,6 +19,7 @@
 #include <cassert>
 #include <filesystem>
 #include <optional>
+#include <utility>
 
 #if defined(_WIN32)
 namespace

@@ -13,6 +13,6 @@ namespace raptor
 {
 
 template <bool compressed>
-void search_multiple(search_arguments const & arguments);
+void search_partitioned_ibf(search_arguments const & arguments);
 
 } // namespace raptor

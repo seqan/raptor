@@ -12,6 +12,7 @@
 namespace raptor
 {
 
-void build_from_minimiser(build_arguments const & arguments);
+template <bool compressed>
+void build_ibf(build_arguments const & arguments);
 
 } // namespace raptor

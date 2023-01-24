@@ -5,22 +5,17 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include <raptor/search/search_hibf.hpp>
-#include <raptor/search/search_singular_ibf.hpp>
+#pragma once
+
+#include <string>
+#include <vector>
+
+#include <raptor/build/partition_config.hpp>
 
 namespace raptor
 {
 
-template <bool compressed>
-void search_hibf(search_arguments const & arguments)
-{
-    using index_structure_t = std::conditional_t<compressed, index_structure::hibf_compressed, index_structure::hibf>;
-    auto index = raptor_index<index_structure_t>{};
-    search_singular_ibf(arguments, std::move(index));
-}
-
-template void search_hibf<false>(search_arguments const & arguments);
-
-template void search_hibf<true>(search_arguments const & arguments);
+std::vector<size_t> max_count_per_partition(partition_config const & cfg,
+                                            std::vector<std::vector<std::string>> const & bin_path);
 
 } // namespace raptor
