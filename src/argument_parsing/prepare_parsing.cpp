@@ -63,10 +63,17 @@ void init_prepare_parser(sharg::parser & parser, prepare_arguments & arguments)
                       .validator = sharg::regex_validator{"[01]+"}});
 
     parser.add_subsection("Processing options");
-    parser.add_flag(arguments.enable_cutoffs,
+    parser.add_option(arguments.kmer_count_cutoff,
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "kmer-count-cutoff",
+                                    .description = "Only store k-mers with at least (>=) x occurrences. "
+                                                   "Mutually exclusive with --use-filesize-dependent-cutoff.",
+                                    .validator = positive_integer_validator{}});
+    parser.add_flag(arguments.use_filesize_dependent_cutoff,
                     sharg::config{.short_id = '\0',
-                                  .long_id = "enable-cutoffs",
-                                  .description = "Apply cutoffs from Mantis(Pandey et al., 2018)."});
+                                  .long_id = "use-filesize-dependent-cutoff",
+                                  .description = "Apply cutoffs from Mantis(Pandey et al., 2018). "
+                                                 "Mutually exclusive with --kmer-count-cutoff."});
 }
 
 void prepare_parsing(sharg::parser & parser)
@@ -74,6 +81,9 @@ void prepare_parsing(sharg::parser & parser)
     prepare_arguments arguments{};
     init_prepare_parser(parser, arguments);
     parser.parse();
+
+    if (parser.is_option_set("kmer-count-cutoff") && parser.is_option_set("use-filesize-dependent-cutoff"))
+        throw sharg::parser_error{"You cannot use both --kmer-count-cutoff and --use-filesize-dependent-cutoff."};
 
     validate_shape(parser, arguments);
 

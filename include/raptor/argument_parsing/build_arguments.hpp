@@ -48,7 +48,8 @@ struct build_arguments
         return {.kmer_size{kmer_size},
                 .window_size{window_size},
                 .shape{shape},
-                .enable_cutoffs{false},
+                .use_filesize_dependent_cutoff{false},
+                .kmer_count_cutoff{1u},
                 .out_dir{out_dir},
                 .bin_path{original_bin_path},
                 .threads{threads}};

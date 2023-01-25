@@ -23,7 +23,8 @@ struct prepare_arguments
     uint32_t window_size{kmer_size};
     std::string shape_string{};
     seqan3::shape shape{seqan3::ungapped{kmer_size}};
-    bool enable_cutoffs{false};
+    bool use_filesize_dependent_cutoff{false};
+    uint16_t kmer_count_cutoff{1u};
 
     std::filesystem::path out_dir{"./"};
 
