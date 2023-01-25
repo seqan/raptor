@@ -40,7 +40,6 @@ TEST_F(build_hibf_layout, pipeline)
         cli_test_result const result = execute_app("raptor",
                                                    "layout",
                                                    "--kmer-size 19",
-                                                   "--disable-sketch-output",
                                                    "--column-index 2",
                                                    "--threads 1",
                                                    "--input-file",
