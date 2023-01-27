@@ -9,8 +9,8 @@
 #include <chopper/count/execute.hpp>
 #include <chopper/data_store.hpp>
 #include <chopper/layout/execute.hpp>
-#include <chopper/sketch/estimate_kmer_counts.hpp>
 #include <chopper/set_up_parser.hpp>
+#include <chopper/sketch/estimate_kmer_counts.hpp>
 
 #include <raptor/layout/raptor_layout.hpp>
 
