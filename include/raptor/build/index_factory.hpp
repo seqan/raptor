@@ -60,25 +60,29 @@ private:
         auto worker = [&](auto && zipped_view, auto &&)
         {
             uint64_t hash;
+            std::vector<uint64_t> hashes{};
             auto & ibf = index.ibf();
 
             for (auto && [file_names, bin_number] : zipped_view)
             {
+                hashes.clear();
                 for (auto && file_name : file_names)
                 {
                     std::ifstream infile{file_name, std::ios::binary};
                     if (config == nullptr)
                     {
                         while (infile.read(reinterpret_cast<char *>(&hash), sizeof(hash)))
-                            ibf.emplace(hash, seqan3::bin_index{bin_number});
+                            hashes.push_back(hash);
                     }
                     else
                     {
                         while (infile.read(reinterpret_cast<char *>(&hash), sizeof(hash)))
                             if ((hash & config->mask) / config->suffixes_per_part == part)
-                                ibf.emplace(hash, seqan3::bin_index{bin_number});
+                                hashes.push_back(hash);
                     }
                 }
+                for (auto && value : hashes)
+                    ibf.emplace(value, seqan3::bin_index{bin_number});
             }
         };
 

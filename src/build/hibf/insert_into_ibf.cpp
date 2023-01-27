@@ -44,6 +44,7 @@ void insert_into_ibf(build_arguments const & arguments,
                      seqan3::interleaved_bloom_filter<> & ibf)
 {
     auto const bin_index = seqan3::bin_index{static_cast<size_t>(record.bin_indices.back())};
+    std::vector<uint64_t> values;
 
     if (arguments.input_is_minimiser)
     {
@@ -53,8 +54,11 @@ void insert_into_ibf(build_arguments const & arguments,
             std::ifstream infile{filename, std::ios::binary};
 
             while (infile.read(reinterpret_cast<char *>(&minimiser_value), sizeof(minimiser_value)))
-                ibf.emplace(minimiser_value, bin_index);
+                values.push_back(minimiser_value);
         }
+
+        for (auto && value : values)
+            ibf.emplace(value, bin_index);
     }
     else
     {
@@ -66,8 +70,11 @@ void insert_into_ibf(build_arguments const & arguments,
 
         for (auto const & filename : record.filenames)
             for (auto && [seq] : sequence_file_t{filename})
-                for (auto hash : seq | hash_view)
-                    ibf.emplace(hash, bin_index);
+                for (auto && hash : seq | hash_view)
+                    values.push_back(hash);
+
+        for (auto && value : values)
+            ibf.emplace(value, bin_index);
     }
 }
 
