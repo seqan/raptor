@@ -9,41 +9,58 @@
 #include <fstream>
 
 #include <raptor/build/max_count_per_partition.hpp>
+#include <raptor/call_parallel_on_bins.hpp>
+#include <raptor/file_reader.hpp>
 
 namespace raptor
 {
 
-std::vector<size_t> max_count_per_partition(partition_config const & cfg,
-                                            std::vector<std::vector<std::string>> const & bin_path)
+namespace detail
+{
+
+template <file_types file_type>
+std::vector<size_t> max_count_per_partition(partition_config const & cfg, build_arguments const & arguments)
 {
     std::vector<size_t> kmers_per_partition(cfg.partitions);
+    std::mutex callback_mutex{};
+    file_reader<file_type> const reader{arguments.shape, arguments.window_size};
 
-    auto callback = [&kmers_per_partition, &cfg](std::vector<size_t> const & kmer_counts)
+    auto callback = [&callback_mutex, &kmers_per_partition, &cfg](std::vector<size_t> const & kmer_counts)
     {
+        std::lock_guard<std::mutex> guard{callback_mutex};
         for (size_t i = 0; i < cfg.partitions; ++i)
             kmers_per_partition[i] = std::max<size_t>(kmers_per_partition[i], kmer_counts[i]);
     };
 
-    std::vector<size_t> kmer_counts(cfg.partitions);
-
-    for (size_t part = 0; part < cfg.partitions; ++part)
+    auto worker = [&callback, &reader, &cfg](auto && zipped_view, auto &&)
     {
-        uint64_t hash;
-        for (auto && file_names : bin_path)
+        std::vector<size_t> max_kmer_counts(cfg.partitions);
+        std::vector<size_t> kmer_counts(cfg.partitions);
+        for (auto && [file_names, bin_number] : zipped_view)
         {
-            for (auto && file_name : file_names)
-            {
-                std::ifstream infile{file_name, std::ios::binary};
-
-                while (infile.read(reinterpret_cast<char *>(&hash), sizeof(hash)))
-                    ++kmer_counts[(hash & cfg.mask) / cfg.suffixes_per_part];
-            }
-            callback(kmer_counts);
+            reader.for_each_hash(file_names,
+                                 [&](auto && hash)
+                                 {
+                                     ++kmer_counts[(hash & cfg.mask) / cfg.suffixes_per_part];
+                                 });
+            for (size_t i = 0; i < cfg.partitions; ++i)
+                max_kmer_counts[i] = std::max<size_t>(max_kmer_counts[i], kmer_counts[i]);
             std::ranges::fill(kmer_counts, 0u);
         }
-    }
+        callback(max_kmer_counts);
+    };
+
+    call_parallel_on_bins(worker, arguments.bin_path, arguments.threads);
 
     return kmers_per_partition;
+}
+
+} // namespace detail
+
+std::vector<size_t> max_count_per_partition(partition_config const & cfg, build_arguments const & arguments)
+{
+    return arguments.input_is_minimiser ? detail::max_count_per_partition<file_types::minimiser>(cfg, arguments)
+                                        : detail::max_count_per_partition<file_types::sequence>(cfg, arguments);
 }
 
 } // namespace raptor

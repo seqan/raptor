@@ -12,6 +12,7 @@
 #include <raptor/build/hibf/bin_size_in_bits.hpp>
 #include <raptor/call_parallel_on_bins.hpp>
 #include <raptor/dna4_traits.hpp>
+#include <raptor/file_reader.hpp>
 
 namespace raptor
 {
@@ -72,11 +73,36 @@ inline size_t kmer_count_from_minimiser_files(raptor::build_arguments const & ar
     return max_count;
 }
 
+inline size_t kmer_count_from_sequence_files(raptor::build_arguments const & arguments)
+{
+    size_t max_count{};
+    std::mutex callback_mutex{};
+    file_reader<file_types::sequence> const reader{arguments.shape, arguments.window_size};
+
+    auto callback = [&callback_mutex, &max_count](auto && view)
+    {
+        auto const count = std::ranges::distance(view);
+        std::lock_guard<std::mutex> guard{callback_mutex};
+        max_count = std::max<size_t>(max_count, count);
+    };
+
+    auto worker = [&callback, &reader](auto && zipped_view, auto &&)
+    {
+        for (auto && [file_names, bin_number] : zipped_view)
+            reader.on_hash(file_names, callback);
+    };
+
+    call_parallel_on_bins(worker, arguments.bin_path, arguments.threads);
+
+    return max_count;
+}
+
 } // namespace detail
 
 size_t compute_bin_size(raptor::build_arguments const & arguments)
 {
-    size_t const max_count = detail::kmer_count_from_minimiser_files(arguments);
+    size_t const max_count = arguments.input_is_minimiser ? detail::kmer_count_from_minimiser_files(arguments)
+                                                          : detail::kmer_count_from_sequence_files(arguments);
 
     assert(max_count > 0u);
 

@@ -13,6 +13,7 @@
 #include <raptor/build/partition_config.hpp>
 #include <raptor/call_parallel_on_bins.hpp>
 #include <raptor/dna4_traits.hpp>
+#include <raptor/file_reader.hpp>
 #include <raptor/index.hpp>
 
 namespace raptor
@@ -30,12 +31,22 @@ public:
     ~index_factory() = default;
 
     explicit index_factory(build_arguments const & args) : arguments{std::addressof(args)}
-    {}
+    {
+        if (arguments->input_is_minimiser)
+            reader = file_reader<file_types::minimiser>{};
+        else
+            reader = file_reader<file_types::sequence>{arguments->shape, arguments->window_size};
+    }
 
     explicit index_factory(build_arguments const & args, partition_config const & cfg) :
         arguments{std::addressof(args)},
         config{std::addressof(cfg)}
-    {}
+    {
+        if (arguments->input_is_minimiser)
+            reader = file_reader<file_types::minimiser>{};
+        else
+            reader = file_reader<file_types::sequence>{arguments->shape, arguments->window_size};
+    }
 
     [[nodiscard]] auto operator()(size_t const part = 0u) const
     {
@@ -50,6 +61,7 @@ public:
 private:
     build_arguments const * const arguments{nullptr};
     partition_config const * const config{nullptr};
+    std::variant<file_reader<file_types::sequence>, file_reader<file_types::minimiser>> reader;
 
     auto construct(size_t const part) const
     {
@@ -59,28 +71,27 @@ private:
 
         auto worker = [&](auto && zipped_view, auto &&)
         {
-            uint64_t hash;
             std::vector<uint64_t> hashes{};
             auto & ibf = index.ibf();
 
             for (auto && [file_names, bin_number] : zipped_view)
             {
                 hashes.clear();
-                for (auto && file_name : file_names)
-                {
-                    std::ifstream infile{file_name, std::ios::binary};
-                    if (config == nullptr)
+                std::visit(
+                    [&](auto const & reader)
                     {
-                        while (infile.read(reinterpret_cast<char *>(&hash), sizeof(hash)))
-                            hashes.push_back(hash);
-                    }
-                    else
-                    {
-                        while (infile.read(reinterpret_cast<char *>(&hash), sizeof(hash)))
-                            if ((hash & config->mask) / config->suffixes_per_part == part)
-                                hashes.push_back(hash);
-                    }
-                }
+                        if (config == nullptr)
+                            reader.hash_into(file_names, std::back_inserter(hashes));
+                        else
+                            reader.hash_into_if(file_names,
+                                                std::back_inserter(hashes),
+                                                [&](uint64_t const hash)
+                                                {
+                                                    return ((hash & config->mask) / config->suffixes_per_part == part);
+                                                });
+                    },
+                    reader);
+
                 for (auto && value : hashes)
                     ibf.emplace(value, seqan3::bin_index{bin_number});
             }

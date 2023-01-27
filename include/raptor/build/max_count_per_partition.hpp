@@ -10,12 +10,12 @@
 #include <string>
 #include <vector>
 
+#include <raptor/argument_parsing/build_arguments.hpp>
 #include <raptor/build/partition_config.hpp>
 
 namespace raptor
 {
 
-std::vector<size_t> max_count_per_partition(partition_config const & cfg,
-                                            std::vector<std::vector<std::string>> const & bin_path);
+std::vector<size_t> max_count_per_partition(partition_config const & cfg, build_arguments const & arguments);
 
 } // namespace raptor
