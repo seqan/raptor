@@ -5,10 +5,12 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
+#include <chopper/configuration.hpp>
 #include <chopper/count/execute.hpp>
-#include <chopper/detail_apply_prefix.hpp>
+#include <chopper/data_store.hpp>
 #include <chopper/layout/execute.hpp>
 #include <chopper/set_up_parser.hpp>
+#include <chopper/sketch/estimate_kmer_counts.hpp>
 
 #include <raptor/layout/raptor_layout.hpp>
 
@@ -22,12 +24,18 @@ void chopper_layout(sharg::parser & parser)
 
     parser.parse();
 
-    config.input_prefix = config.output_prefix;
+    // The output streams facilitate writing the layout file in hierarchical structure.
+    // chopper::layout::execute currently writes the filled buffers to the output file.
+    std::stringstream output_buffer;
+    std::stringstream header_buffer;
 
-    chopper::detail::apply_prefix(config.output_prefix, config.count_filename, config.sketch_directory);
+    chopper::data_store store{.false_positive_rate = config.false_positive_rate,
+                              .output_buffer = &output_buffer,
+                              .header_buffer = &header_buffer};
 
-    chopper::count::execute(config);
-    chopper::layout::execute(config);
+    chopper::count::execute(config, store);
+    chopper::sketch::estimate_kmer_counts(store);
+    chopper::layout::execute(config, store);
 }
 
 } // namespace raptor
