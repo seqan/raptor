@@ -68,7 +68,7 @@ void init_prepare_parser(sharg::parser & parser, prepare_arguments & arguments)
                                     .long_id = "kmer-count-cutoff",
                                     .description = "Only store k-mers with at least (>=) x occurrences. "
                                                    "Mutually exclusive with --use-filesize-dependent-cutoff.",
-                                    .validator = positive_integer_validator{}});
+                                    .validator = sharg::arithmetic_range_validator{1, 254}});
     parser.add_flag(arguments.use_filesize_dependent_cutoff,
                     sharg::config{.short_id = '\0',
                                   .long_id = "use-filesize-dependent-cutoff",
