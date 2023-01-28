@@ -47,7 +47,7 @@ void compute_minimiser(prepare_arguments const & arguments)
 
             std::filesystem::path const file_name{file_names[0]};
             bool const is_compressed = raptor::cutoff::file_is_compressed(file_name);
-            uint16_t cutoff = cutoffs.get(file_name);
+            uint8_t const cutoff = cutoffs.get(file_name);
             uint64_t count{};
 
             // Store binary file
@@ -70,8 +70,8 @@ void compute_minimiser(prepare_arguments const & arguments)
             output_path.replace_extension("header");
             {
                 std::ofstream headerfile{output_path};
-                headerfile << arguments.shape.to_string() << '\t' << arguments.window_size << '\t' << cutoff << '\t'
-                           << count << '\n';
+                headerfile << arguments.shape.to_string() << '\t' << arguments.window_size << '\t'
+                           << static_cast<uint16_t>(cutoff) << '\t' << count << '\n';
             }
 
             minimiser_table.clear();

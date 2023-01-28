@@ -24,7 +24,7 @@ struct prepare_arguments
     std::string shape_string{};
     seqan3::shape shape{seqan3::ungapped{kmer_size}};
     bool use_filesize_dependent_cutoff{false};
-    uint16_t kmer_count_cutoff{1u};
+    uint8_t kmer_count_cutoff{1u};
 
     std::filesystem::path out_dir{"./"};
 
