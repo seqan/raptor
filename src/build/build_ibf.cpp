@@ -26,7 +26,7 @@ void build_ibf(build_arguments const & arguments)
     else
     {
         partition_config const cfg{arguments.parts};
-        std::vector<size_t> const kmers_per_partition = max_count_per_partition(cfg, arguments.bin_path);
+        std::vector<size_t> const kmers_per_partition = max_count_per_partition(cfg, arguments);
         build_arguments args = arguments;
         index_factory<compressed> factory{args, cfg};
 

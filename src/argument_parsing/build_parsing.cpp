@@ -12,48 +12,9 @@
 #include <raptor/argument_parsing/shared.hpp>
 #include <raptor/argument_parsing/validators.hpp>
 #include <raptor/build/raptor_build.hpp>
-#include <raptor/build/tmp_directory.hpp>
-#include <raptor/prepare/compute_minimiser.hpp>
 
 namespace raptor
 {
-
-inline void precompute_minimiser(build_arguments & arguments, std::optional<raptor::tmp_directory> & minimiser_dir)
-{
-    minimiser_dir = raptor::tmp_directory{};
-    std::filesystem::path output_dir = minimiser_dir.value().path();
-    prepare_arguments precompute_args = arguments.make_prepare_arguments(output_dir);
-    compute_minimiser(precompute_args);
-
-    {
-        std::ifstream original_bins{arguments.bin_file};
-        std::ofstream precomputed_bins{output_dir / "bins.list"};
-        std::string line{};
-
-        std::string bin_filename{};
-        std::filesystem::path bin_path{};
-        std::filesystem::path new_path{};
-
-        while (std::getline(original_bins, line) && !line.empty())
-        {
-            std::stringstream sstream{line};
-
-            while (std::getline(sstream, bin_filename, ' ') && !bin_filename.empty())
-            {
-                bin_path = bin_filename;
-                bool const is_compressed =
-                    bin_path.extension() == ".gz" || bin_path.extension() == ".bgzf" || bin_path.extension() == ".bz2";
-                new_path = output_dir;
-                new_path /= is_compressed ? bin_path.stem().stem() : bin_path.stem();
-                new_path += ".minimiser";
-                precomputed_bins << new_path.c_str() << ' ';
-            }
-            precomputed_bins << '\n';
-        }
-    }
-
-    detail::parse_bin_path(output_dir / "bins.list", arguments.bin_path, arguments.is_hibf);
-}
 
 inline void parse_shape_from_minimiser(sharg::parser & parser, build_arguments & arguments)
 {
@@ -64,7 +25,7 @@ inline void parse_shape_from_minimiser(sharg::parser & parser, build_arguments &
     if (parser.is_option_set("window"))
         throw sharg::parser_error{"You cannot set --window when using minimiser files as input."};
 
-    std::filesystem::path header_file_path = arguments.original_bin_path[0][0];
+    std::filesystem::path header_file_path = arguments.bin_path[0][0];
     header_file_path.replace_extension("header");
     std::ifstream file_stream{header_file_path};
     std::string shape_string{};
@@ -160,17 +121,8 @@ void build_parsing(sharg::parser & parser)
     else
         parse_shape_from_minimiser(parser, arguments);
 
-    std::optional<raptor::tmp_directory> minimiser_dir{};
-    if (!arguments.input_is_minimiser && !arguments.is_hibf)
-        precompute_minimiser(arguments, minimiser_dir);
-    else
-        arguments.bin_path = arguments.original_bin_path;
-
-    if (!arguments.is_hibf)
-    {
+    if (!arguments.is_hibf && arguments.parts == 1u)
         arguments.bits = compute_bin_size(arguments);
-        arguments.input_is_minimiser = true;
-    }
 
     raptor_build(arguments);
 }

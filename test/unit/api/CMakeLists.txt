@@ -8,4 +8,3 @@
 cmake_minimum_required (VERSION 3.10)
 
 add_unit_test (issue_142.cpp)
-add_unit_test (tmp_directory.cpp)

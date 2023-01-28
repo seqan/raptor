@@ -36,9 +36,8 @@ struct build_arguments
     bool compressed{false};
 
     // General arguments
-    std::vector<std::vector<std::string>> original_bin_path{};
-    std::filesystem::path bin_file{};
     std::vector<std::vector<std::string>> bin_path{};
+    std::filesystem::path bin_file{};
     uint8_t threads{1u};
     bool is_hibf{false};
     bool input_is_minimiser{false};
@@ -51,7 +50,7 @@ struct build_arguments
                 .use_filesize_dependent_cutoff{false},
                 .kmer_count_cutoff{1u},
                 .out_dir{out_dir},
-                .bin_path{original_bin_path},
+                .bin_path{bin_path},
                 .threads{threads}};
     }
 };

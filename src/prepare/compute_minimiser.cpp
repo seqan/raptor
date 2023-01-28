@@ -13,6 +13,7 @@
 #include <raptor/adjust_seed.hpp>
 #include <raptor/call_parallel_on_bins.hpp>
 #include <raptor/dna4_traits.hpp>
+#include <raptor/file_reader.hpp>
 #include <raptor/prepare/compute_minimiser.hpp>
 #include <raptor/prepare/cutoff.hpp>
 
@@ -21,10 +22,7 @@ namespace raptor
 
 void compute_minimiser(prepare_arguments const & arguments)
 {
-    auto minimiser_view = seqan3::views::minimiser_hash(arguments.shape,
-                                                        seqan3::window_size{arguments.window_size},
-                                                        seqan3::seed{adjust_seed(arguments.shape.count())});
-
+    file_reader<file_types::sequence> const reader{arguments.shape, arguments.window_size};
     raptor::cutoff const cutoffs{arguments};
 
     auto worker = [&](auto && zipped_view, auto &&)
@@ -36,14 +34,11 @@ void compute_minimiser(prepare_arguments const & arguments)
 
         for (auto && [file_names, bin_number] : zipped_view)
         {
-            for (auto && file_name : file_names)
-            {
-                seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>> fin{file_name};
-
-                for (auto & [seq] : fin)
-                    for (auto && hash : seq | minimiser_view)
-                        minimiser_table[hash] = std::min<uint8_t>(254u, minimiser_table[hash] + 1);
-            }
+            reader.for_each_hash(file_names,
+                                 [&](auto && hash)
+                                 {
+                                     minimiser_table[hash] = std::min<uint8_t>(254u, minimiser_table[hash] + 1);
+                                 });
 
             std::filesystem::path const file_name{file_names[0]};
             bool const is_compressed = raptor::cutoff::file_is_compressed(file_name);
