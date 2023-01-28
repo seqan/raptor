@@ -82,8 +82,10 @@ inline size_t kmer_count_from_sequence_files(raptor::build_arguments const & arg
     auto callback = [&callback_mutex, &max_count](auto && view)
     {
         auto const count = std::ranges::distance(view);
-        std::lock_guard<std::mutex> guard{callback_mutex};
-        max_count = std::max<size_t>(max_count, count);
+        {
+            std::lock_guard<std::mutex> guard{callback_mutex};
+            max_count = std::max<size_t>(max_count, count);
+        }
     };
 
     auto worker = [&callback, &reader](auto && zipped_view, auto &&)
