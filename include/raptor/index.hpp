@@ -79,7 +79,7 @@ public:
         shape_{arguments.shape},
         parts_{arguments.parts},
         compressed_{arguments.compressed},
-        bin_path_{arguments.original_bin_path},
+        bin_path_{arguments.bin_path},
         fpr_{arguments.fpr},
         ibf_{seqan3::bin_count{arguments.bins},
              seqan3::bin_size{arguments.bits / arguments.parts},
