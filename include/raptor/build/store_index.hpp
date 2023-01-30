@@ -17,13 +17,32 @@
 namespace raptor
 {
 
-template <typename data_t, typename arguments_t>
-static inline void
-store_index(std::filesystem::path const & path, raptor_index<data_t> const & index, arguments_t const &)
+// Compresion handled in chopper_build
+template <index_structure::is_hibf data_t, typename arguments_t>
+static inline void store_index(std::filesystem::path const & path, raptor_index<data_t> && index, arguments_t const &)
 {
     std::ofstream os{path, std::ios::binary};
     cereal::BinaryOutputArchive oarchive{os};
     oarchive(index);
+}
+
+template <index_structure::is_ibf data_t, typename arguments_t>
+static inline void
+store_index(std::filesystem::path const & path, raptor_index<data_t> && index, arguments_t const & arguments)
+{
+    if (!arguments.compressed)
+    {
+        std::ofstream os{path, std::ios::binary};
+        cereal::BinaryOutputArchive oarchive{os};
+        oarchive(index);
+    }
+    else
+    {
+        raptor_index<index_structure::ibf_compressed> compressed_index{std::move(index)};
+        std::ofstream os{path, std::ios::binary};
+        cereal::BinaryOutputArchive oarchive{os};
+        oarchive(compressed_index);
+    }
 }
 
 template <seqan3::data_layout layout, typename arguments_t>

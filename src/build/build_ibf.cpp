@@ -14,21 +14,20 @@
 namespace raptor
 {
 
-template <bool compressed>
 void build_ibf(build_arguments const & arguments)
 {
     if (arguments.parts == 1u)
     {
-        index_factory<compressed> factory{arguments};
+        index_factory factory{arguments};
         auto index = factory();
-        store_index(arguments.out_path, index, arguments);
+        store_index(arguments.out_path, std::move(index), arguments);
     }
     else
     {
         partition_config const cfg{arguments.parts};
         std::vector<size_t> const kmers_per_partition = max_count_per_partition(cfg, arguments);
         build_arguments args = arguments;
-        index_factory<compressed> factory{args, cfg};
+        index_factory factory{args, cfg};
 
         for (size_t part = 0; part < arguments.parts; ++part)
         {
@@ -36,13 +35,9 @@ void build_ibf(build_arguments const & arguments)
             auto index = factory(part);
             std::filesystem::path out_path{arguments.out_path};
             out_path += "_" + std::to_string(part);
-            store_index(out_path, index, arguments);
+            store_index(out_path, std::move(index), arguments);
         }
     }
 }
-
-template void build_ibf<false>(build_arguments const & arguments);
-
-template void build_ibf<true>(build_arguments const & arguments);
 
 } // namespace raptor

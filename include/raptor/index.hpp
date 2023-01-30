@@ -28,6 +28,13 @@ template <typename return_t, typename input_t>
 concept compressible_from = (std::same_as<return_t, ibf_compressed> && std::same_as<input_t, ibf>)
                          || (std::same_as<return_t, hibf_compressed> && std::same_as<input_t, hibf>);
 
+template <typename index_t>
+concept is_ibf = std::same_as<index_t, index_structure::ibf> || std::same_as<index_t, index_structure::ibf_compressed>;
+
+template <typename index_t>
+concept is_hibf =
+    std::same_as<index_t, index_structure::hibf> || std::same_as<index_t, index_structure::hibf_compressed>;
+
 } // namespace index_structure
 
 template <typename data_t = index_structure::ibf>
@@ -43,8 +50,7 @@ private:
     bool compressed_{};
     std::vector<std::vector<std::string>> bin_path_{};
     double fpr_{};
-    bool is_hibf_{std::same_as<data_t, index_structure::hibf>
-                  || std::same_as<data_t, index_structure::hibf_compressed>};
+    bool is_hibf_{index_structure::is_hibf<data_t>};
     data_t ibf_{};
 
 public:
