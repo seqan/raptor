@@ -104,7 +104,7 @@ void search_partitioned_ibf(search_arguments const & arguments)
                               | std::views::filter(
                                     [&](auto && hash)
                                     {
-                                        return (hash & cfg.mask) / cfg.suffixes_per_part == part;
+                                        return cfg.hash_partition(hash) == part;
                                     });
 
                 counts[counter_id++] += counter.bulk_count(filtered);
@@ -147,7 +147,7 @@ void search_partitioned_ibf(search_arguments const & arguments)
                               | std::views::filter(
                                     [&](auto && hash)
                                     {
-                                        return (hash & cfg.mask) / cfg.suffixes_per_part == part;
+                                        return cfg.hash_partition(hash) == part;
                                     });
                 counts[counter_id] += counter.bulk_count(filtered);
 
