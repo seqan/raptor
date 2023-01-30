@@ -41,7 +41,7 @@ std::vector<size_t> max_count_per_partition(partition_config const & cfg, build_
             reader.for_each_hash(file_names,
                                  [&](auto && hash)
                                  {
-                                     ++kmer_counts[(hash & cfg.mask) / cfg.suffixes_per_part];
+                                     ++kmer_counts[cfg.hash_partition(hash)];
                                  });
             for (size_t i = 0; i < cfg.partitions; ++i)
                 max_kmer_counts[i] = std::max<size_t>(max_kmer_counts[i], kmer_counts[i]);

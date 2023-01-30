@@ -81,7 +81,7 @@ private:
                                                 std::back_inserter(hashes),
                                                 [&](uint64_t const hash)
                                                 {
-                                                    return ((hash & config->mask) / config->suffixes_per_part == part);
+                                                    return config->hash_partition(hash) == part;
                                                 });
                     },
                     reader);
