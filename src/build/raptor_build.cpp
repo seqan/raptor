@@ -19,10 +19,8 @@ void raptor_build(build_arguments const & arguments)
             hibf::chopper_build<seqan3::data_layout::compressed>(arguments);
         else
             hibf::chopper_build<seqan3::data_layout::uncompressed>(arguments);
-    else if (arguments.compressed)
-        build_ibf<true>(arguments);
     else
-        build_ibf<false>(arguments);
+        build_ibf(arguments);
 }
 
 } // namespace raptor

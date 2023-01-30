@@ -12,7 +12,6 @@
 namespace raptor
 {
 
-template <bool compressed>
 void build_ibf(build_arguments const & arguments);
 
 } // namespace raptor

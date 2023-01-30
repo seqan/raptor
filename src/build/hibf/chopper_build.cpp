@@ -34,7 +34,7 @@ void chopper_build(build_arguments const & arguments)
                                                                                 arguments.fpr,
                                                                                 std::move(data.hibf)};
 
-    store_index(arguments.out_path, index, arguments);
+    store_index(arguments.out_path, std::move(index), arguments);
 }
 
 template void chopper_build<seqan3::data_layout::uncompressed>(build_arguments const &);

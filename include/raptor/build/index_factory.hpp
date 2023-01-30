@@ -19,7 +19,6 @@
 namespace raptor
 {
 
-template <bool compressed>
 class index_factory
 {
 public:
@@ -48,14 +47,9 @@ public:
             reader = file_reader<file_types::sequence>{arguments->shape, arguments->window_size};
     }
 
-    [[nodiscard]] auto operator()(size_t const part = 0u) const
+    [[nodiscard]] raptor_index<> operator()(size_t const part = 0u) const
     {
-        auto tmp = construct(part);
-
-        if constexpr (!compressed)
-            return tmp;
-        else
-            return raptor_index<index_structure::ibf_compressed>{std::move(tmp)};
+        return construct(part);
     }
 
 private:
@@ -63,7 +57,7 @@ private:
     partition_config const * const config{nullptr};
     std::variant<file_reader<file_types::sequence>, file_reader<file_types::minimiser>> reader;
 
-    auto construct(size_t const part) const
+    raptor_index<> construct(size_t const part) const
     {
         assert(arguments != nullptr);
 
