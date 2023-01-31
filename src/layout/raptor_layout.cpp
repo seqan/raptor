@@ -23,6 +23,7 @@ void chopper_layout(sharg::parser & parser)
     set_up_parser(parser, config);
 
     parser.parse();
+    config.disable_sketch_output = !parser.is_option_set("output-sketches-to");
 
     // The output streams facilitate writing the layout file in hierarchical structure.
     // chopper::layout::execute currently writes the filled buffers to the output file.
