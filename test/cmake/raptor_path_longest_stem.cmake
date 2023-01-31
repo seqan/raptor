@@ -20,5 +20,6 @@ function (raptor_path_longest_stem out_var filename)
 
     set ("${out_var}"
          "${result}"
-         PARENT_SCOPE) # out-var
+         PARENT_SCOPE
+    )
 endfunction ()
