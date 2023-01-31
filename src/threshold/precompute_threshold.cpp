@@ -26,7 +26,7 @@ namespace raptor::threshold
 [[nodiscard]] std::string const threshold_filename(threshold_parameters const & arguments)
 {
     std::stringstream stream{};
-    stream << "threshold_" << std::hex << arguments.pattern_size << '_' << arguments.window_size << '_'
+    stream << "threshold_" << std::hex << arguments.query_length << '_' << arguments.window_size << '_'
            << arguments.shape.to_ulong() << '_' << static_cast<uint16_t>(arguments.errors) << '_' << arguments.tau
            << ".bin";
     std::string result = stream.str();
@@ -71,15 +71,15 @@ bool read_thresholds(std::vector<size_t> & vec, threshold_parameters const & arg
 
     double const log_tau{std::log(arguments.tau)};
     size_t const kmers_per_window{arguments.window_size - kmer_size + 1};
-    size_t const kmers_per_pattern{arguments.pattern_size - kmer_size + 1};
+    size_t const kmers_per_pattern{arguments.query_length - kmer_size + 1};
     size_t const minimal_number_of_minimisers{kmers_per_pattern / kmers_per_window};
-    size_t const maximal_number_of_minimisers{arguments.pattern_size - arguments.window_size + 1};
+    size_t const maximal_number_of_minimisers{arguments.query_length - arguments.window_size + 1};
 
     thresholds.reserve(maximal_number_of_minimisers - minimal_number_of_minimisers + 1);
 
     // Probability that i minimisers are indirectly affected by one error.
     std::vector<double> const affected_by_one_error_indirectly_prob{
-        one_indirect_error_model(arguments.pattern_size, arguments.window_size, arguments.shape)};
+        one_indirect_error_model(arguments.query_length, arguments.window_size, arguments.shape)};
 
     // Iterate over the possible number of minimisers.
     for (size_t number_of_minimisers = minimal_number_of_minimisers;

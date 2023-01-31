@@ -256,24 +256,24 @@ public:
 
 template <seqan3::alphabet alphabet_t>
 std::vector<double>
-destroyed_indirectly_by_error(size_t const pattern_size, size_t const window_size, uint8_t const kmer_size)
+destroyed_indirectly_by_error(size_t const query_length, size_t const window_size, uint8_t const kmer_size)
 {
     using rank_type = decltype(seqan3::to_rank(alphabet_t{}));
     rank_type max_rank = seqan3::alphabet_size<alphabet_t> - 1;
 
     std::mt19937_64 gen(0x1D2B8284D988C4D0);
     std::uniform_int_distribution<> dis(0, max_rank);
-    std::uniform_int_distribution<> dis2(0, pattern_size - 1);
-    std::vector<bool> mins(pattern_size, false);
-    std::vector<bool> minse(pattern_size, false);
+    std::uniform_int_distribution<> dis2(0, query_length - 1);
+    std::vector<bool> mins(query_length, false);
+    std::vector<bool> minse(query_length, false);
     std::vector<double> result(window_size - kmer_size + 1, 0);
 
     for (size_t iteration = 0; iteration < 10'000; ++iteration)
     {
         std::vector<alphabet_t> sequence;
-        sequence.reserve(pattern_size);
+        sequence.reserve(query_length);
 
-        for (size_t i = 0; i < pattern_size; ++i)
+        for (size_t i = 0; i < query_length; ++i)
             sequence.push_back(seqan3::assign_rank_to(dis(gen), alphabet_t{}));
 
         boring_minimizer mini{window{window_size}, kmer{kmer_size}};
@@ -281,7 +281,7 @@ destroyed_indirectly_by_error(size_t const pattern_size, size_t const window_siz
         for (auto x : mini.minimizer_begin)
             mins[x] = true;
 
-        size_t error_pos = dis2(gen) % pattern_size;
+        size_t error_pos = dis2(gen) % query_length;
         rank_type new_base = dis(gen) % seqan3::alphabet_size<alphabet_t>;
         while (new_base == seqan3::to_rank(sequence[error_pos]))
             new_base = dis(gen) % seqan3::alphabet_size<alphabet_t>;
@@ -315,12 +315,12 @@ double impl_2(size_t const pos, size_t const kmer_size, double const p_mean)
 }
 
 std::vector<double>
-destroyed_by_overlapping_errors(size_t const pattern_size, uint8_t const kmer_size, double const p_mean)
+destroyed_by_overlapping_errors(size_t const query_length, uint8_t const kmer_size, double const p_mean)
 {
     std::vector<double> result(kmer_size, 0);
 
     for (size_t i = 0; i < kmer_size; ++i)
-        result[i] = pattern_size * impl_2(i, kmer_size, p_mean);
+        result[i] = query_length * impl_2(i, kmer_size, p_mean);
 
     double sum = std::accumulate(result.begin(), result.end(), 0.0);
     for (auto & x : result)
@@ -329,7 +329,7 @@ destroyed_by_overlapping_errors(size_t const pattern_size, uint8_t const kmer_si
     return result;
 }
 
-std::vector<size_t> precompute_threshold(size_t const pattern_size,
+std::vector<size_t> precompute_threshold(size_t const query_length,
                                          size_t const window_size,
                                          uint8_t const kmer_size,
                                          size_t const errors,
@@ -339,14 +339,14 @@ std::vector<size_t> precompute_threshold(size_t const pattern_size,
 {
     std::vector<size_t> thresholds;
     size_t kmers_per_window = window_size - kmer_size + 1;
-    size_t kmers_per_pattern = pattern_size - kmer_size + 1;
+    size_t kmers_per_pattern = query_length - kmer_size + 1;
 
     size_t minimal_number_of_minimizers = kmers_per_pattern / kmers_per_window;
-    size_t maximal_number_of_minimizers = pattern_size - window_size + 1;
+    size_t maximal_number_of_minimizers = query_length - window_size + 1;
 
     std::vector<double> indirect_errors;
     if (with_indirect_errors)
-        indirect_errors = destroyed_indirectly_by_error<seqan3::dna4>(pattern_size, window_size, kmer_size);
+        indirect_errors = destroyed_indirectly_by_error<seqan3::dna4>(query_length, window_size, kmer_size);
 
     // Iterate over the possible number of minimizers
     for (size_t number_of_minimizers = minimal_number_of_minimizers;
@@ -372,7 +372,7 @@ std::vector<size_t> precompute_threshold(size_t const pattern_size,
         std::vector<double> proba_error_ex(number_of_minimizers, 0);
         if (with_overlapping_errors)
         {
-            std::vector<double> overlapping_errors = destroyed_by_overlapping_errors(pattern_size, kmer_size, p_mean);
+            std::vector<double> overlapping_errors = destroyed_by_overlapping_errors(query_length, kmer_size, p_mean);
 
             for (size_t i = 0; i < number_of_minimizers; ++i)
             {

@@ -36,16 +36,16 @@ public:
         else if (kmers_per_window == 1u)
         {
             threshold_kind = threshold_kinds::lemma;
-            size_t const kmer_lemma_minuend = arguments.pattern_size + 1u;
+            size_t const kmer_lemma_minuend = arguments.query_length + 1u;
             size_t const kmer_lemma_subtrahend = (arguments.errors + 1u) * kmer_size;
             kmer_lemma = kmer_lemma_minuend > kmer_lemma_subtrahend ? kmer_lemma_minuend - kmer_lemma_subtrahend : 0;
         }
         else
         {
             threshold_kind = threshold_kinds::probabilistic;
-            size_t const kmers_per_pattern = arguments.pattern_size - kmer_size + 1;
+            size_t const kmers_per_pattern = arguments.query_length - kmer_size + 1;
             minimal_number_of_minimizers = kmers_per_pattern / kmers_per_window;
-            maximal_number_of_minimizers = arguments.pattern_size - arguments.window_size + 1;
+            maximal_number_of_minimizers = arguments.query_length - arguments.window_size + 1;
             precomp_correction = precompute_correction(arguments);
             precomp_thresholds = precompute_threshold(arguments);
         }

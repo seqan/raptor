@@ -50,7 +50,7 @@ private:
         file << "## Shape count (number of 1s) = " << static_cast<uint16_t>(arguments.shape_weight) << '\n';
         file << "### Search parameters\n";
         file << "## Query file = " << arguments.query_file << '\n';
-        file << "## Pattern size = " << arguments.pattern_size << '\n';
+        file << "## Pattern size = " << arguments.query_length << '\n';
         file << "## Output file = " << arguments.out_file << '\n';
         file << "## Threads = " << static_cast<uint16_t>(arguments.threads) << '\n';
         file << "## tau = " << arguments.tau << '\n';

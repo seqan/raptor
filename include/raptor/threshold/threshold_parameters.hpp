@@ -19,7 +19,7 @@ struct threshold_parameters
     // Basic.
     uint32_t window_size{};
     seqan3::shape shape{};
-    uint64_t pattern_size{};
+    uint64_t query_length{};
 
     // Threshold.
     uint8_t errors{};                                            // threshold_kinds::(probabilistic|lemma)

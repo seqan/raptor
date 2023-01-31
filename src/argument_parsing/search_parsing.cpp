@@ -30,11 +30,6 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                                     .long_id = "index",
                                     .description = "Provide a valid path to an index. Parts: Without suffix _0",
                                     .required = true});
-    parser.add_option(arguments.fpr,
-                      sharg::config{.short_id = '\0',
-                                    .long_id = "fpr",
-                                    .description = "The false positive rate used for building the index.",
-                                    .validator = sharg::arithmetic_range_validator{0, 1}});
     parser.add_option(arguments.query_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "query",
@@ -66,7 +61,7 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                                                    "Mutually exclusive with --error.",
                                     .default_message = "None",
                                     .validator = sharg::arithmetic_range_validator{0, 1}});
-    parser.add_option(arguments.pattern_size,
+    parser.add_option(arguments.query_length,
                       sharg::config{.short_id = '\0',
                                     .long_id = "query_length",
                                     .description = "The query length. Only used with --error.",
@@ -143,7 +138,7 @@ void search_parsing(sharg::parser & parser)
             sequence_lengths.push_back(std::ranges::size(seq));
         }
         std::sort(sequence_lengths.begin(), sequence_lengths.end());
-        arguments.pattern_size = sequence_lengths[sequence_lengths.size() / 2];
+        arguments.query_length = sequence_lengths[sequence_lengths.size() / 2];
     }
 
     // ==========================================
@@ -167,8 +162,8 @@ void search_parsing(sharg::parser & parser)
         arguments.is_hibf = tmp.is_hibf();
     }
 
-    if (arguments.pattern_size < arguments.window_size)
-        throw sharg::parser_error{std::string{"The query size ("} + std::to_string(arguments.pattern_size)
+    if (arguments.query_length < arguments.window_size)
+        throw sharg::parser_error{std::string{"The query size ("} + std::to_string(arguments.query_length)
                                   + ") is too short to be used with window size "
                                   + std::to_string(arguments.window_size) + '.'};
 
