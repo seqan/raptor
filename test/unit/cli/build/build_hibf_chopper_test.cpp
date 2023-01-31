@@ -17,8 +17,6 @@ struct build_hibf_layout : public raptor_base
 
 TEST_F(build_hibf_layout, pipeline)
 {
-    seqan3::test::tmp_directory const count_dir{};
-    std::filesystem::path const count_prefix = count_dir.path() / "raptor_cli_test";
     seqan3::test::tmp_directory const out_dir{};
     std::filesystem::path const data_filename = out_dir.path() / "raptor_cli_test.txt";
     std::filesystem::path const layout_filename = out_dir.path() / "raptor_cli_test.layout";
