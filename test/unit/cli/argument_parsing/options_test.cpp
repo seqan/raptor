@@ -350,7 +350,8 @@ TEST_F(argparse_search, queries_too_short)
                                                data("1bins23window.index"),
                                                "--output search.out");
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] The query size (21) is too short to be used with window size 23.\n"});
+    EXPECT_EQ(result.err,
+              std::string{"[Error] The (minimal) query length (21) is too short to be used with window size 23.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
