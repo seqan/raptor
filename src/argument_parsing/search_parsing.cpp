@@ -131,6 +131,8 @@ void search_parsing(sharg::parser & parser)
     // ==========================================
     // Process --query_length.
     // ==========================================
+    size_t min_query_length{arguments.query_length};
+
     if (!parser.is_option_set("query_length"))
     {
         std::vector<uint64_t> sequence_lengths{};
@@ -141,15 +143,15 @@ void search_parsing(sharg::parser & parser)
 
         std::ranges::sort(sequence_lengths);
         arguments.query_length = sequence_lengths[sequence_lengths.size() / 2];
+        min_query_length = sequence_lengths.front();
 
         if (!parser.is_option_set("threshold"))
         {
-            uint64_t const min_length = sequence_lengths.front();
-            uint64_t const max_length = sequence_lengths.back();
-            if (max_length - min_length > arguments.query_length / 20u)
+            uint64_t const max_query_length = sequence_lengths.back();
+            if (max_query_length - min_query_length > arguments.query_length / 20u)
             {
                 std::cerr << "[WARNING] There is variance in the provided queries. The shortest length is "
-                          << min_length << ". The longest length is " << max_length
+                          << min_query_length << ". The longest length is " << max_query_length
                           << ". The tresholding will use a single query length (" << arguments.query_length
                           << "). Therefore, results may be inprecise.\n";
             }
@@ -177,8 +179,8 @@ void search_parsing(sharg::parser & parser)
         arguments.is_hibf = tmp.is_hibf();
     }
 
-    if (arguments.query_length < arguments.window_size)
-        throw sharg::parser_error{std::string{"The query size ("} + std::to_string(arguments.query_length)
+    if (min_query_length < arguments.window_size)
+        throw sharg::parser_error{std::string{"The (minimal) query length ("} + std::to_string(min_query_length)
                                   + ") is too short to be used with window size "
                                   + std::to_string(arguments.window_size) + '.'};
 
