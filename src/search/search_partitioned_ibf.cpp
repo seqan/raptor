@@ -40,28 +40,7 @@ void search_partitioned_ibf(search_arguments const & arguments)
         load_index(index, arguments, 0, index_io_time);
     };
 
-    sync_out synced_out{arguments.out_file};
-
-    {
-        size_t position{};
-        std::string line{};
-        for (auto const & file_list : arguments.bin_path)
-        {
-            line.clear();
-            line = '#';
-            line += std::to_string(position);
-            line += '\t';
-            for (auto const & filename : file_list)
-            {
-                line += filename;
-                line += ',';
-            }
-            line.back() = '\n';
-            synced_out << line;
-            ++position;
-        }
-        synced_out << "#QUERY_NAME\tUSER_BINS\n";
-    }
+    sync_out synced_out{arguments};
 
     raptor::threshold::threshold const thresholder{arguments.make_threshold_parameters()};
 
