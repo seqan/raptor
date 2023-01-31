@@ -363,19 +363,22 @@ struct raptor_base : public cli_test
         std::string line;
         std::string expected_hits;
 
+        // Skip parameter information
+        while (std::getline(search_result, line) && line.starts_with("##"))
+        {}
+
         for (size_t i = 0; i < number_of_bins; ++i)
         {
-            ASSERT_TRUE(std::getline(search_result, line));
             std::string_view line_view{line};
             if (!empty && !line_view.ends_with(missed_bin))
                 expected_hits += line_view.substr(1, line_view.find('\t'));
+            ASSERT_TRUE(std::getline(search_result, line));
         }
 
         if (!expected_hits.empty())
             expected_hits.pop_back(); // remove trailing '\t'
         std::ranges::replace(expected_hits, '\t', ',');
 
-        ASSERT_TRUE(std::getline(search_result, line));
         ASSERT_EQ(line, "#QUERY_NAME\tUSER_BINS");
 
         std::string const query_prefix{"query"};
