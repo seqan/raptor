@@ -233,6 +233,10 @@ else ()
     raptor_config_print ("Suppressing GCC 4 warnings: not found")
 endif ()
 
+# ----------------------------------------------------------------------------
+# Optimizations
+# ----------------------------------------------------------------------------
+
 option (RAPTOR_NATIVE_BUILD "Optimize build for current architecture." ON)
 
 if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug" OR "${CMAKE_BUILD_TYPE}" MATCHES "Coverage")
@@ -248,6 +252,15 @@ else ()
     else ()
         raptor_config_print ("Optimize build:             disabled")
     endif ()
+endif ()
+
+option (RAPTOR_LTO_BUILD "Enable link-time optimization." ON)
+
+if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug" OR "${CMAKE_BUILD_TYPE}" MATCHES "Coverage" OR NOT RAPTOR_LTO_BUILD)
+    raptor_config_print ("Link-time optimization:     disabled")
+else ()
+    set (RAPTOR_CXX_FLAGS "${RAPTOR_CXX_FLAGS} -flto=auto")
+    raptor_config_print ("Link-time optimization:     via -flto=auto")
 endif ()
 
 # ----------------------------------------------------------------------------
