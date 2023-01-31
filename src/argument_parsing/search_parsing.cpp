@@ -64,7 +64,9 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
     parser.add_option(arguments.query_length,
                       sharg::config{.short_id = '\0',
                                     .long_id = "query_length",
-                                    .description = "The query length. Only used with --error.",
+                                    .description =
+                                        "The query length. Only influences the threshold when using --error. Enables "
+                                        "skipping of the query length computation for both --error and --threshold.",
                                     .default_message = "Median of sequence lengths in query file"});
 
     parser.add_subsection("Dynamic thresholding options");
@@ -140,11 +142,18 @@ void search_parsing(sharg::parser & parser)
         std::ranges::sort(sequence_lengths);
         arguments.query_length = sequence_lengths[sequence_lengths.size() / 2];
 
-        if (sequence_lengths.back() - sequence_lengths.front() > arguments.query_length / 20u)
-            std::cerr << "[WARNING] There is variance in the provided queries. The shortest length is "
-                      << sequence_lengths.front() << ". The longest length is " << sequence_lengths.back()
-                      << ". The tresholding will use a single query length (" << arguments.query_length
-                      << "). Therefore, results may be inprecise.\n";
+        if (!parser.is_option_set("threshold"))
+        {
+            uint64_t const min_length = sequence_lengths.front();
+            uint64_t const max_length = sequence_lengths.back();
+            if (max_length - min_length > arguments.query_length / 20u)
+            {
+                std::cerr << "[WARNING] There is variance in the provided queries. The shortest length is "
+                          << min_length << ". The longest length is " << max_length
+                          << ". The tresholding will use a single query length (" << arguments.query_length
+                          << "). Therefore, results may be inprecise.\n";
+            }
+        }
     }
 
     // ==========================================
