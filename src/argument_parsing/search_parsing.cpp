@@ -30,11 +30,6 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                                     .long_id = "index",
                                     .description = "Provide a valid path to an index. Parts: Without suffix _0",
                                     .required = true});
-    parser.add_option(arguments.fpr,
-                      sharg::config{.short_id = '\0',
-                                    .long_id = "fpr",
-                                    .description = "The false positive rate used for building the index.",
-                                    .validator = sharg::arithmetic_range_validator{0, 1}});
     parser.add_option(arguments.query_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "query",
