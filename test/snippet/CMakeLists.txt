@@ -24,7 +24,8 @@ macro (raptor_snippet test_name_prefix snippet snippet_base_path)
     add_executable (${target} "${snippet_base_path}/${snippet}")
     target_link_libraries (${target} PUBLIC snippet_main)
     set_target_properties (${target} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
-                                                "${CMAKE_CURRENT_BINARY_DIR}/${snippet_target_path}")
+                                                "${CMAKE_CURRENT_BINARY_DIR}/${snippet_target_path}"
+    )
 
     set (snippet_test_target "${test_name_prefix}/${snippet_test_name}_snippet")
     add_test (NAME "${snippet_test_target}" COMMAND ${target})
@@ -37,7 +38,8 @@ macro (raptor_snippet test_name_prefix snippet snippet_base_path)
     add_test (NAME "${snippet_compare_test_target}"
               COMMAND ${CMAKE_COMMAND} -DTARGET_FILE=$<TARGET_FILE:${target}>
                       -DSOURCE_FILE=${snippet_base_path}/${snippet} #
-                      -P "${CMAKE_SOURCE_DIR}/compare_snippet_output.cmake")
+                      -P "${CMAKE_SOURCE_DIR}/compare_snippet_output.cmake"
+    )
 
     # disable version checker, as it interferes with comparing the snippet output
     set_tests_properties ("${snippet_compare_test_target}" PROPERTIES ENVIRONMENT SHARG_NO_VERSION_CHECK=0)

@@ -55,8 +55,15 @@ endif ()
 # Raptor library
 if (NOT TARGET raptor_lib)
     add_library ("raptor_lib" INTERFACE)
-    target_link_libraries ("raptor_lib" INTERFACE "raptor_argument_parsing" "raptor_build" "raptor_build_hibf" "raptor_prepare"
-                                                  "raptor_search" "raptor_threshold" "raptor_upgrade" "raptor_layout"
+    target_link_libraries ("raptor_lib"
+                           INTERFACE "raptor_argument_parsing"
+                                     "raptor_build"
+                                     "raptor_build_hibf"
+                                     "raptor_prepare"
+                                     "raptor_search"
+                                     "raptor_threshold"
+                                     "raptor_upgrade"
+                                     "raptor_layout"
     )
 endif ()
 

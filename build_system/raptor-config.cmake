@@ -237,9 +237,14 @@ endif ()
 # Optimizations
 # ----------------------------------------------------------------------------
 
-option (RAPTOR_NATIVE_BUILD "Optimize build for current architecture." ON)
-
 if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug" OR "${CMAKE_BUILD_TYPE}" MATCHES "Coverage")
+    set (RAPTOR_IS_DEBUG TRUE)
+else ()
+    set (RAPTOR_IS_DEBUG FALSE)
+endif ()
+
+option (RAPTOR_NATIVE_BUILD "Optimize build for current architecture." ON)
+if (RAPTOR_IS_DEBUG)
     raptor_config_print ("Optimize build:             disabled")
 elseif (RAPTOR_NATIVE_BUILD)
     set (RAPTOR_CXX_FLAGS "${RAPTOR_CXX_FLAGS} -march=native")
@@ -255,8 +260,7 @@ else ()
 endif ()
 
 option (RAPTOR_LTO_BUILD "Enable link-time optimization." ON)
-
-if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug" OR "${CMAKE_BUILD_TYPE}" MATCHES "Coverage" OR NOT RAPTOR_LTO_BUILD)
+if (RAPTOR_IS_DEBUG OR NOT RAPTOR_LTO_BUILD)
     raptor_config_print ("Link-time optimization:     disabled")
 else ()
     set (RAPTOR_CXX_FLAGS "${RAPTOR_CXX_FLAGS} -flto=auto")
@@ -264,8 +268,7 @@ else ()
 endif ()
 
 option (RAPTOR_STRIP_BINARY "Enable binary-stripping." ON)
-
-if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug" OR "${CMAKE_BUILD_TYPE}" MATCHES "Coverage" OR NOT RAPTOR_STRIP_BINARY)
+if (RAPTOR_IS_DEBUG OR NOT RAPTOR_STRIP_BINARY)
     raptor_config_print ("Binary-stripping:           disabled")
 else ()
     set (RAPTOR_CXX_FLAGS "${RAPTOR_CXX_FLAGS} -s")

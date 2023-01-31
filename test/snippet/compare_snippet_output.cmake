@@ -32,7 +32,8 @@ execute_process (COMMAND "${TARGET_FILE}"
                  WORKING_DIRECTORY "${TARGET_FILE_DIR}"
                  OUTPUT_FILE "${ACTUAL_OUTPUT_FILE}"
                  ERROR_FILE "${ACTUAL_ERROR_FILE}"
-                 RESULT_VARIABLE error_result)
+                 RESULT_VARIABLE error_result
+)
 
 if (error_result) # != 0 return code
     message (SEND_ERROR "error: executing snippet exited with '${error_result}'")
@@ -43,7 +44,8 @@ function (compare_files actual_file expected_file)
 
     if (actual_output AND EXISTS "${expected_file}")
         execute_process (COMMAND ${CMAKE_COMMAND} -E compare_files "${actual_file}" "${expected_file}"
-                         RESULT_VARIABLE error_result)
+                         RESULT_VARIABLE error_result
+        )
 
         if (NOT error_result) # == 0 return code => files are identical
             # if successful move one
