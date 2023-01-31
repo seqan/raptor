@@ -133,12 +133,18 @@ void search_parsing(sharg::parser & parser)
     {
         std::vector<uint64_t> sequence_lengths{};
         seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>> query_in{arguments.query_file};
-        for (auto & [seq] : query_in | seqan3::views::async_input_buffer(16))
-        {
-            sequence_lengths.push_back(std::ranges::size(seq));
-        }
-        std::sort(sequence_lengths.begin(), sequence_lengths.end());
+
+        for (auto && record : query_in | seqan3::views::async_input_buffer(1024))
+            sequence_lengths.push_back(std::ranges::size(record.sequence()));
+
+        std::ranges::sort(sequence_lengths);
         arguments.query_length = sequence_lengths[sequence_lengths.size() / 2];
+
+        if (sequence_lengths.back() - sequence_lengths.front() > arguments.query_length / 20u)
+            std::cerr << "[WARNING] There is variance in the provided queries. The shortest length is "
+                      << sequence_lengths.front() << ". The longest length is " << sequence_lengths.back()
+                      << ". The tresholding will use a single query length (" << arguments.query_length
+                      << "). Therefore, results may be inprecise.\n";
     }
 
     // ==========================================
@@ -171,12 +177,8 @@ void search_parsing(sharg::parser & parser)
     // Partitioned index: Check that all parts are available.
     // ==========================================
     if (partitioned)
-    {
-        for (size_t part{0}; part < arguments.parts; ++part)
-        {
+        for (size_t part{}; part < arguments.parts; ++part)
             validator(arguments.index_file.string() + std::string{"_"} + std::to_string(part));
-        }
-    }
 
     // ==========================================
     // Dispatch

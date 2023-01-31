@@ -354,6 +354,24 @@ TEST_F(argparse_search, queries_too_short)
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
+TEST_F(argparse_search, queries_have_variance)
+{
+    cli_test_result const result = execute_app("raptor",
+                                               "search",
+                                               "--query ",
+                                               data("query_variance.fq"),
+                                               "--index ",
+                                               data("1bins23window.index"),
+                                               "--output search.out");
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(
+        result.err,
+        std::string{
+            "[WARNING] There is variance in the provided queries. The shortest length is 28. The longest length is 65. "
+            "The tresholding will use a single query length (65). Therefore, results may be inprecise.\n"});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
+}
+
 TEST_F(argparse_upgrade, kmer_window)
 {
     cli_test_result const result = execute_app("raptor",
