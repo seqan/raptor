@@ -73,7 +73,7 @@ LEGAL
     Raptor Copyright: BSD 3-Clause License
     Author: Enrico Seiler
     Contact: enrico.seiler@fu-berlin.de
-    SeqAn Copyright: 2006-2022 Knut Reinert, FU-Berlin; released under the 3-clause BSDL.
+    SeqAn Copyright: 2006-2023 Knut Reinert, FU-Berlin; released under the 3-clause BSDL.
     In your academic works please cite: Raptor: A fast and space-efficient pre-filter for querying very large
     collections of nucleotide sequences; Enrico Seiler, Svenja Mehringer, Mitra Darvish, Etienne Turc, and Knut
     Reinert; iScience 2021 24 (7): 102782. doi: https://doi.org/10.1016/j.isci.2021.102782
