@@ -75,7 +75,7 @@ struct cmd_arguments
     uint64_t window_size{26};
     uint8_t kmer_size{20};
     uint8_t errors{3};
-    uint64_t pattern_size{};
+    uint64_t query_length{};
     double tau{0.99};
     bool from_file{};
     std::vector<std::string> method{};
@@ -189,7 +189,7 @@ void compute_heuristic_threshold(cmd_arguments const & args)
     std::unordered_set<uint64_t> reference_hashes = hash_reference(mini, args.reference_file);
     threshold_result result;
     result.method = "heuristic";
-    std::vector<uint64_t> threshold_per_count(args.pattern_size, 0);
+    std::vector<uint64_t> threshold_per_count(args.query_length, 0);
 
     // Process the queries.
     seqan3::sequence_file_input<my_traits, seqan3::fields<seqan3::field::seq>> query_in{args.query_file};
@@ -236,7 +236,7 @@ void compute_lemma_threshold(cmd_arguments const & args)
 
         auto start = std::chrono::high_resolution_clock::now();
         lemma_threshold lemma{};
-        auto threshold = lemma.threshold(args.pattern_size, args.window_size, args.errors);
+        auto threshold = lemma.threshold(args.query_length, args.window_size, args.errors);
         auto end = std::chrono::high_resolution_clock::now();
         result.threshold_time += end - start;
         result.threshold_per_read.push_back(threshold);
@@ -255,11 +255,11 @@ void compute_simple_model(cmd_arguments const & args, bool const indirect, bool 
     result.method = (indirect && overlapping ? "indirect_overlapping"
                                              : (indirect ? "indirect" : (overlapping ? "overlapping" : "simple")));
 
-    std::vector<uint64_t> threshold_per_count(args.pattern_size, 0);
+    std::vector<uint64_t> threshold_per_count(args.query_length, 0);
     size_t kmers_per_window = args.window_size - args.kmer_size + 1;
-    size_t kmers_per_pattern = args.pattern_size - args.kmer_size + 1;
+    size_t kmers_per_pattern = args.query_length - args.kmer_size + 1;
     size_t minimal_number_of_minimizers = kmers_per_pattern / kmers_per_window;
-    size_t maximal_number_of_minimizers = args.pattern_size - args.window_size + 1;
+    size_t maximal_number_of_minimizers = args.query_length - args.window_size + 1;
 
     std::vector<size_t> precomp_thresholds;
     auto start2 = std::chrono::high_resolution_clock::now();
@@ -270,7 +270,7 @@ void compute_simple_model(cmd_arguments const & args, bool const indirect, bool 
     }
     else
     {
-        precomp_thresholds = precompute_threshold(args.pattern_size,
+        precomp_thresholds = precompute_threshold(args.query_length,
                                                   args.window_size,
                                                   args.kmer_size,
                                                   args.errors,
@@ -358,7 +358,7 @@ void initialize_argument_parser(sharg::parser & parser, cmd_arguments & args)
                                     .long_id = "tau",
                                     .description = "Threshold for probabilistic models.",
                                     .validator = sharg::arithmetic_range_validator{0, 1}});
-    parser.add_option(args.pattern_size,
+    parser.add_option(args.query_length,
                       sharg::config{.short_id = 'p',
                                     .long_id = "query_length",
                                     .description =
@@ -400,7 +400,7 @@ int main(int argc, char ** argv)
         return -1;
     }
 
-    if (!args.pattern_size)
+    if (!args.query_length)
     {
         std::vector<uint64_t> sequence_lengths{};
         seqan3::sequence_file_input<my_traits, seqan3::fields<seqan3::field::seq>> query_in{args.query_file};
@@ -409,7 +409,7 @@ int main(int argc, char ** argv)
             sequence_lengths.push_back(std::ranges::size(seq));
         }
         std::sort(sequence_lengths.begin(), sequence_lengths.end());
-        args.pattern_size = sequence_lengths[sequence_lengths.size() / 2];
+        args.query_length = sequence_lengths[sequence_lengths.size() / 2];
     }
 
     bool all = std::find(args.method.begin(), args.method.end(), "all") != args.method.end();

@@ -32,7 +32,7 @@ struct search_arguments
     double threshold{std::numeric_limits<double>::quiet_NaN()};
     double p_max{0.15};
     double fpr{0.05};
-    uint64_t pattern_size{};
+    uint64_t query_length{};
     uint8_t errors{0};
 
     // Related to IBF
@@ -51,7 +51,7 @@ struct search_arguments
     {
         return {.window_size{window_size},
                 .shape{shape},
-                .pattern_size{pattern_size},
+                .query_length{query_length},
                 .errors{errors},
                 .percentage{threshold},
                 .p_max{p_max},

@@ -32,9 +32,9 @@ void threshold_info(raptor::search_arguments const & arguments, std::string cons
 
     uint8_t const kmer_size{arguments.shape.size()};
     size_t const kmers_per_window = arguments.window_size - kmer_size + 1;
-    size_t const kmers_per_pattern = arguments.pattern_size - kmer_size + 1;
+    size_t const kmers_per_pattern = arguments.query_length - kmer_size + 1;
     size_t const minimal_number_of_minimizers = kmers_per_pattern / kmers_per_window;
-    size_t const maximal_number_of_minimizers = arguments.pattern_size - arguments.window_size + 1;
+    size_t const maximal_number_of_minimizers = arguments.query_length - arguments.window_size + 1;
 
     auto const parameters = arguments.make_threshold_parameters();
     std::vector<size_t> const precomp_correction = raptor::threshold::precompute_correction(parameters);
@@ -84,7 +84,7 @@ void threshold_info(raptor::search_arguments const & arguments, std::string cons
         << "#tau: " << arguments.tau << '\n'
         << "#p_max: " << arguments.p_max << '\n'
         << "#fpr: " << arguments.fpr << '\n'
-        << "#pattern: " << arguments.pattern_size << '\n'
+        << "#pattern: " << arguments.query_length << '\n'
         << "#threads: " << std::to_string(arguments.threads) << '\n'
         << "##minimal_number_of_minimizers: " << minimal_number_of_minimizers << '\n'
         << "##maximal_number_of_minimizers: " << maximal_number_of_minimizers << '\n'
@@ -182,7 +182,7 @@ void init_search_parser(sharg::parser & parser, raptor::search_arguments & argum
                                     .long_id = "fpr",
                                     .description = "The false positive rate used for building the index.",
                                     .validator = sharg::arithmetic_range_validator{0, 1}});
-    parser.add_option(arguments.pattern_size,
+    parser.add_option(arguments.query_length,
                       sharg::config{
                           .short_id = '\0',
                           .long_id = "query_length",
@@ -242,7 +242,7 @@ int main(int argc, char ** argv)
         throw sharg::parser_error{
             seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
 
-    if (!arguments.pattern_size)
+    if (!arguments.query_length)
     {
         std::vector<uint64_t> sequence_lengths{};
         seqan3::sequence_file_input<raptor::dna4_traits, seqan3::fields<seqan3::field::seq>> fin{arguments.query_file};
@@ -251,7 +251,7 @@ int main(int argc, char ** argv)
             sequence_lengths.push_back(std::ranges::size(seq));
         }
         std::sort(sequence_lengths.begin(), sequence_lengths.end());
-        arguments.pattern_size = sequence_lengths[sequence_lengths.size() / 2];
+        arguments.query_length = sequence_lengths[sequence_lengths.size() / 2];
     }
 
     threshold_info(arguments, shape_string);

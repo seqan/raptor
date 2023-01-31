@@ -24,7 +24,7 @@ namespace raptor::threshold
 [[nodiscard]] std::string const correction_filename(threshold_parameters const & arguments)
 {
     std::stringstream stream{};
-    stream << "correction_" << std::hex << arguments.pattern_size << '_' << arguments.window_size << '_'
+    stream << "correction_" << std::hex << arguments.query_length << '_' << arguments.window_size << '_'
            << arguments.shape.to_ulong() << '_' << arguments.p_max << '_' << arguments.fpr << ".bin";
     std::string result = stream.str();
     if (auto it = result.find("0."); it != std::string::npos)
@@ -72,9 +72,9 @@ bool read_correction(std::vector<size_t> & vec, threshold_parameters const & arg
     double const inv_fpr{std::log(1.0 - arguments.fpr)};
     double const log_p_max{std::log(arguments.p_max)};
     size_t const kmers_per_window{arguments.window_size - kmer_size + 1};
-    size_t const kmers_per_pattern{arguments.pattern_size - kmer_size + 1};
+    size_t const kmers_per_pattern{arguments.query_length - kmer_size + 1};
     size_t const minimal_number_of_minimisers{kmers_per_pattern / kmers_per_window};
-    size_t const maximal_number_of_minimisers{arguments.pattern_size - arguments.window_size + 1};
+    size_t const maximal_number_of_minimisers{arguments.query_length - arguments.window_size + 1};
 
     correction.reserve(maximal_number_of_minimisers - minimal_number_of_minimisers + 1);
 
