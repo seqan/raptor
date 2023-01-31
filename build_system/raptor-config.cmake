@@ -263,6 +263,15 @@ else ()
     raptor_config_print ("Link-time optimization:     via -flto=auto")
 endif ()
 
+option (RAPTOR_STRIP_BINARY "Enable binary-stripping." ON)
+
+if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug" OR "${CMAKE_BUILD_TYPE}" MATCHES "Coverage" OR NOT RAPTOR_STRIP_BINARY)
+    raptor_config_print ("Binary-stripping:           disabled")
+else ()
+    set (RAPTOR_CXX_FLAGS "${RAPTOR_CXX_FLAGS} -s")
+    raptor_config_print ("Binary-stripping:           via -s")
+endif ()
+
 # ----------------------------------------------------------------------------
 # thread support (pthread, windows threads)
 # ----------------------------------------------------------------------------
