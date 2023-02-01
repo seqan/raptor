@@ -60,7 +60,7 @@ do
     seq -f "$output_dir/bins/bin_%0${#BIN_NUMBER}.0f.fasta" 0 1 $((BIN_NUMBER-1)) > $list_file
     $BINARY_DIR/generate_reads \
         --output $read_dir \
-        --max_errors $ERRORS \
+        --errors $ERRORS \
         --number_of_reads $READ_COUNT \
         --read_length $read_length \
         --number_of_haplotypes $HAPLOTYPE_COUNT \
