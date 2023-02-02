@@ -27,6 +27,10 @@ void compute_minimiser(prepare_arguments const & arguments)
 
     auto worker = [&](auto && zipped_view, auto &&)
     {
+        timer local_compute_minimiser_timer{};
+        timer local_write_minimiser_timer{};
+        timer local_write_header_timer{};
+
         // The hash table stores how often a minimiser appears. It does not matter whether a minimiser appears
         // 50 times or 2000 times, it is stored regardless because the biggest cutoff value is 50. Hence,
         // the hash table stores only values up to 254 to save memory.
@@ -34,11 +38,13 @@ void compute_minimiser(prepare_arguments const & arguments)
 
         for (auto && [file_names, bin_number] : zipped_view)
         {
+            local_compute_minimiser_timer.start();
             reader.for_each_hash(file_names,
                                  [&](auto && hash)
                                  {
                                      minimiser_table[hash] = std::min<uint8_t>(254u, minimiser_table[hash] + 1);
                                  });
+            local_compute_minimiser_timer.stop();
 
             std::filesystem::path const file_name{file_names[0]};
             bool const is_compressed = raptor::cutoff::file_is_compressed(file_name);
@@ -49,6 +55,8 @@ void compute_minimiser(prepare_arguments const & arguments)
             std::filesystem::path output_path{arguments.out_dir};
             output_path /= is_compressed ? file_name.stem().stem() : file_name.stem();
             output_path += ".minimiser";
+
+            local_write_minimiser_timer.start();
             {
                 std::ofstream outfile{output_path, std::ios::binary};
                 for (auto && [hash, occurrences] : minimiser_table)
@@ -60,17 +68,25 @@ void compute_minimiser(prepare_arguments const & arguments)
                     }
                 }
             }
+            local_write_minimiser_timer.stop();
 
             // Store header file
             output_path.replace_extension("header");
+
+            local_write_header_timer.start();
             {
                 std::ofstream headerfile{output_path};
                 headerfile << arguments.shape.to_string() << '\t' << arguments.window_size << '\t'
                            << static_cast<uint16_t>(cutoff) << '\t' << count << '\n';
             }
+            local_write_header_timer.stop();
 
             minimiser_table.clear();
         }
+
+        arguments.compute_minimiser_timer += local_compute_minimiser_timer;
+        arguments.write_minimiser_timer += local_write_minimiser_timer;
+        arguments.write_header_timer += local_write_header_timer;
     };
 
     call_parallel_on_bins(worker, arguments.bin_path, arguments.threads);
