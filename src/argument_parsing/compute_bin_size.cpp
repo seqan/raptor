@@ -103,8 +103,10 @@ inline size_t kmer_count_from_sequence_files(raptor::build_arguments const & arg
 
 size_t compute_bin_size(raptor::build_arguments const & arguments)
 {
+    arguments.bin_size_timer.start();
     size_t const max_count = arguments.input_is_minimiser ? detail::kmer_count_from_minimiser_files(arguments)
                                                           : detail::kmer_count_from_sequence_files(arguments);
+    arguments.bin_size_timer.stop();
 
     assert(max_count > 0u);
 

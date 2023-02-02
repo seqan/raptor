@@ -12,6 +12,8 @@
 
 #include <seqan3/search/kmer_index/shape.hpp>
 
+#include <raptor/argument_parsing/memory_usage.hpp>
+#include <raptor/argument_parsing/timer.hpp>
 #include <raptor/strong_types.hpp>
 
 namespace raptor
@@ -28,7 +30,7 @@ struct build_arguments
     // Related to IBF
     std::filesystem::path out_path{"./"};
     uint64_t bins{64};
-    uint64_t bits{4096};
+    mutable uint64_t bits{4096}; // Allow to change bits for each partition
     uint64_t hash{2};
     uint8_t parts{1u};
     double fpr{0.05};
@@ -40,6 +42,31 @@ struct build_arguments
     uint8_t threads{1u};
     bool is_hibf{false};
     bool input_is_minimiser{false};
+    bool verbose{false};
+
+    // Timers do not copy the stored duration upon copy construction/assignment
+    mutable timer wall_clock_timer{};
+    mutable timer bin_size_timer{};
+    mutable timer index_allocation_timer{};
+    mutable timer user_bin_io_timer{};
+    mutable timer fill_ibf_timer{};
+    mutable timer store_index_timer{};
+
+    // GCOVR_EXCL_START
+    void print_timings() const
+    {
+        if (!verbose)
+            return;
+        std::cerr << std::fixed << std::setprecision(2) << "============= Timings =============\n";
+        std::cerr << "Wall clock time [s]: " << wall_clock_timer.in_seconds() << '\n';
+        std::cerr << "Peak memory usage " << formatted_peak_ram() << '\n';
+        std::cerr << "Determine IBF size [s]: " << bin_size_timer.in_seconds() << '\n';
+        std::cerr << "Index allocation [s]: " << index_allocation_timer.in_seconds() << '\n';
+        std::cerr << "User bin I/O [s]: " << user_bin_io_timer.in_seconds() / threads << '\n';
+        std::cerr << "Fill IBF [s]: " << fill_ibf_timer.in_seconds() / threads << '\n';
+        std::cerr << "Store index [s]: " << store_index_timer.in_seconds() << '\n';
+    }
+    // GCOVR_EXCL_STOP
 };
 
 } // namespace raptor
