@@ -47,6 +47,9 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                                     .long_id = "threads",
                                     .description = "The number of threads to use.",
                                     .validator = positive_integer_validator{}});
+    parser.add_flag(
+        arguments.verbose,
+        sharg::config{.short_id = '\0', .long_id = "verbose", .description = "Print time and memory usage."});
 
     parser.add_subsection("Threshold method options");
     parser.add_option(arguments.errors,
@@ -92,16 +95,13 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                 "Two files are stored:\n"
                 "\\fBthreshold_*.bin\\fP: Depends on query_length, window, kmer/shape, errors, and tau.\n"
                 "\\fBcorrection_*.bin\\fP: Depends on query_length, window, kmer/shape, p_max, and fpr."});
-
-    parser.add_subsection("Advanced options", true);
-    parser.add_flag(
-        arguments.write_time,
-        sharg::config{.short_id = '\0', .long_id = "time", .description = "Write timing file.", .advanced = true});
 }
 
 void search_parsing(sharg::parser & parser)
 {
     search_arguments arguments{};
+    arguments.wall_clock_timer.start();
+
     init_search_parser(parser, arguments);
     parser.parse();
 
@@ -135,6 +135,7 @@ void search_parsing(sharg::parser & parser)
 
     if (!parser.is_option_set("query_length"))
     {
+        arguments.query_length_timer.start();
         std::vector<uint64_t> sequence_lengths{};
         seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>> query_in{arguments.query_file};
 
@@ -156,6 +157,7 @@ void search_parsing(sharg::parser & parser)
                           << "). Therefore, results may be inprecise.\n";
             }
         }
+        arguments.query_length_timer.stop();
     }
 
     // ==========================================
@@ -195,6 +197,9 @@ void search_parsing(sharg::parser & parser)
     // Dispatch
     // ==========================================
     raptor_search(arguments);
+
+    arguments.wall_clock_timer.stop();
+    arguments.print_timings();
 }
 
 } // namespace raptor

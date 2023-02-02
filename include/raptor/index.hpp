@@ -150,7 +150,7 @@ public:
         return fpr_;
     }
 
-    double is_hibf() const
+    bool is_hibf() const
     {
         return is_hibf_;
     }

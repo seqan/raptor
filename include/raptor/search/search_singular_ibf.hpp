@@ -25,13 +25,9 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
     constexpr bool is_ibf = std::same_as<index_t, raptor_index<index_structure::ibf>>
                          || std::same_as<index_t, raptor_index<index_structure::ibf_compressed>>;
 
-    double index_io_time{0.0};
-    double reads_io_time{0.0};
-    double compute_time{0.0};
-
     auto cereal_worker = [&]()
     {
-        load_index(index, arguments, index_io_time);
+        load_index(index, arguments);
     };
     auto cereal_handle = std::async(std::launch::async, cereal_worker);
 
@@ -46,6 +42,10 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
 
     auto worker = [&](size_t const start, size_t const end)
     {
+        timer local_compute_minimiser_timer{};
+        timer local_query_ibf_timer{};
+        timer local_generate_results_timer{};
+
         auto counter = [&index]()
         {
             if constexpr (is_ibf)
@@ -67,15 +67,20 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
             result_string += '\t';
 
             auto minimiser_view = seq | hash_adaptor | std::views::common;
+            local_compute_minimiser_timer.start();
             minimiser.assign(minimiser_view.begin(), minimiser_view.end());
+            local_compute_minimiser_timer.stop();
 
             size_t const minimiser_count{minimiser.size()};
             size_t const threshold = thresholder.get(minimiser_count);
 
             if constexpr (is_ibf)
             {
+                local_query_ibf_timer.start();
                 auto & result = counter.bulk_count(minimiser);
+                local_query_ibf_timer.stop();
                 size_t current_bin{0};
+                local_generate_results_timer.start();
                 for (auto && count : result)
                 {
                     if (count >= threshold)
@@ -88,7 +93,10 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
             }
             else
             {
+                local_query_ibf_timer.start();
                 auto & result = counter.bulk_contains(minimiser, threshold); // Results contains user bin IDs
+                local_query_ibf_timer.stop();
+                local_generate_results_timer.start();
                 for (auto && count : result)
                 {
                     result_string += std::to_string(count);
@@ -100,34 +108,27 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
                 last_char = '\n';
             else
                 result_string += '\n';
+
             synced_out.write(result_string);
+            local_generate_results_timer.stop();
         }
+
+        arguments.compute_minimiser_timer += local_compute_minimiser_timer;
+        arguments.query_ibf_timer += local_query_ibf_timer;
+        arguments.generate_results_timer += local_generate_results_timer;
     };
 
     for (auto && chunked_records : fin | seqan3::views::chunk((1ULL << 20) * 10))
     {
         records.clear();
-        auto start = std::chrono::high_resolution_clock::now();
+        arguments.query_file_io_timer.start();
         std::ranges::move(chunked_records, std::back_inserter(records));
-        auto end = std::chrono::high_resolution_clock::now();
-        reads_io_time += std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
+        arguments.query_file_io_timer.stop();
 
         cereal_handle.wait();
 
-        do_parallel(worker, records.size(), arguments.threads, compute_time);
+        do_parallel(worker, records.size(), arguments.threads);
     }
-
-    // GCOVR_EXCL_START
-    if (arguments.write_time)
-    {
-        std::filesystem::path file_path{arguments.out_file};
-        file_path += ".time";
-        std::ofstream file_handle{file_path};
-        file_handle << "Index I/O\tReads I/O\tCompute\n";
-        file_handle << std::fixed << std::setprecision(2) << index_io_time << '\t' << reads_io_time << '\t'
-                    << compute_time;
-    }
-    // GCOVR_EXCL_STOP
 }
 
 } // namespace raptor
