@@ -12,7 +12,6 @@
 
 #include <seqan3/search/kmer_index/shape.hpp>
 
-#include <raptor/argument_parsing/prepare_arguments.hpp>
 #include <raptor/strong_types.hpp>
 
 namespace raptor
@@ -41,18 +40,6 @@ struct build_arguments
     uint8_t threads{1u};
     bool is_hibf{false};
     bool input_is_minimiser{false};
-
-    prepare_arguments make_prepare_arguments(std::filesystem::path const out_dir) const noexcept
-    {
-        return {.kmer_size{kmer_size},
-                .window_size{window_size},
-                .shape{shape},
-                .use_filesize_dependent_cutoff{false},
-                .kmer_count_cutoff{1u},
-                .out_dir{out_dir},
-                .bin_path{bin_path},
-                .threads{threads}};
-    }
 };
 
 } // namespace raptor
