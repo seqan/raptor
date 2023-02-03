@@ -373,6 +373,46 @@ TEST_F(argparse_search, queries_have_variance)
     RAPTOR_ASSERT_ZERO_EXIT(result);
 }
 
+TEST_F(argparse_search, queries_unsupported_length)
+{
+    std::filesystem::path const query_file = test_directory.path() / "unsupported_length.fa";
+    {
+        std::ofstream os{query_file};
+        // Add a long query. 65536 = 2^16, which is exactly one more than uint16_t can represent.
+        os << ">query1\n";
+        os << std::string(65536, 'A') << '\n';
+        // Add a query shorter than the window size such that we throw.
+        // Searching the long query takes too long for testing.
+        os << ">query2\n";
+        os << std::string(22, 'A') << '\n';
+    }
+
+    cli_test_result const result = execute_app("raptor",
+                                               "search",
+                                               "--query ",
+                                               query_file,
+                                               "--index ",
+                                               data("1bins23window.index"),
+                                               "--output search.out");
+
+    std::string cerr_message{};
+    cerr_message.reserve(553);
+
+    // First part: We have a short and a long query -> high variance.
+    cerr_message +=
+        "[WARNING] There is variance in the provided queries. The shortest length is 22. The longest length is 65536. "
+        "The tresholding will use a single query length (65536). Therefore, results may be inprecise.\n";
+    // Second part: The actual warning for our query being too long.
+    cerr_message += "[WARNING] There are queries which exceed the maximum safely supported length of 65535. Results "
+                    "may be wrong, especially when using window size == k-mer size. If you need longer queries to be "
+                    "supported, please open an issue at https://github.com/seqan/raptor/issues.\n";
+    // Third part: Error message for the short query being too short. Early exit because querying takes too long.
+    cerr_message += "[Error] The (minimal) query length (22) is too short to be used with window size 23.\n";
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, cerr_message);
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
 TEST_F(argparse_upgrade, kmer_window)
 {
     cli_test_result const result = execute_app("raptor",
