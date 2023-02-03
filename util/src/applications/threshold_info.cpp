@@ -28,8 +28,6 @@
 
 void threshold_info(raptor::search_arguments const & arguments, std::string const & shape_string)
 {
-    double compute_time{};
-
     uint8_t const kmer_size{arguments.shape.size()};
     size_t const kmers_per_window = arguments.window_size - kmer_size + 1;
     size_t const kmers_per_pattern = arguments.query_length - kmer_size + 1;
@@ -69,7 +67,7 @@ void threshold_info(raptor::search_arguments const & arguments, std::string cons
         records.clear();
         std::ranges::move(record_batch, std::back_inserter(records));
 
-        raptor::do_parallel(worker, records.size(), arguments.threads, compute_time);
+        raptor::do_parallel(worker, records.size(), arguments.threads);
     }
 
     std::ofstream out{arguments.out_file};
