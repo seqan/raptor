@@ -132,6 +132,7 @@ void search_parsing(sharg::parser & parser)
     // Process --query_length.
     // ==========================================
     size_t min_query_length{arguments.query_length};
+    size_t max_query_length{arguments.query_length};
 
     if (!parser.is_option_set("query_length"))
     {
@@ -145,19 +146,25 @@ void search_parsing(sharg::parser & parser)
         std::ranges::sort(sequence_lengths);
         arguments.query_length = sequence_lengths[sequence_lengths.size() / 2];
         min_query_length = sequence_lengths.front();
+        max_query_length = sequence_lengths.back();
 
-        if (!parser.is_option_set("threshold"))
+        if (!parser.is_option_set("threshold") && max_query_length - min_query_length > arguments.query_length / 20u)
         {
-            uint64_t const max_query_length = sequence_lengths.back();
-            if (max_query_length - min_query_length > arguments.query_length / 20u)
-            {
-                std::cerr << "[WARNING] There is variance in the provided queries. The shortest length is "
-                          << min_query_length << ". The longest length is " << max_query_length
-                          << ". The tresholding will use a single query length (" << arguments.query_length
-                          << "). Therefore, results may be inprecise.\n";
-            }
+            std::cerr << "[WARNING] There is variance in the provided queries. The shortest length is "
+                      << min_query_length << ". The longest length is " << max_query_length
+                      << ". The tresholding will use a single query length (" << arguments.query_length
+                      << "). Therefore, results may be inprecise.\n";
         }
         arguments.query_length_timer.stop();
+    }
+
+    // We currently use counting_agent<uint16_t> and membership_agent (which uses uint16_t fixed).
+    if (max_query_length > std::numeric_limits<uint16_t>::max())
+    {
+        std::cerr << "[WARNING] There are queries which exceed the maximum safely supported length of "
+                  << std::numeric_limits<uint16_t>::max()
+                  << ". Results may be wrong, especially when using window size == k-mer size. If you need longer "
+                     "queries to be supported, please open an issue at https://github.com/seqan/raptor/issues.\n";
     }
 
     // ==========================================
