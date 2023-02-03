@@ -59,8 +59,13 @@ std::vector<size_t> max_count_per_partition(partition_config const & cfg, build_
 
 std::vector<size_t> max_count_per_partition(partition_config const & cfg, build_arguments const & arguments)
 {
-    return arguments.input_is_minimiser ? detail::max_count_per_partition<file_types::minimiser>(cfg, arguments)
-                                        : detail::max_count_per_partition<file_types::sequence>(cfg, arguments);
+    arguments.bin_size_timer.start();
+    std::vector<size_t> result = arguments.input_is_minimiser
+                                   ? detail::max_count_per_partition<file_types::minimiser>(cfg, arguments)
+                                   : detail::max_count_per_partition<file_types::sequence>(cfg, arguments);
+    arguments.bin_size_timer.stop();
+
+    return result;
 }
 
 } // namespace raptor

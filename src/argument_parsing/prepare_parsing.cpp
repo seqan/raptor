@@ -40,6 +40,9 @@ void init_prepare_parser(sharg::parser & parser, prepare_arguments & arguments)
                                     .long_id = "threads",
                                     .description = "The number of threads to use.",
                                     .validator = positive_integer_validator{}});
+    parser.add_flag(
+        arguments.verbose,
+        sharg::config{.short_id = '\0', .long_id = "verbose", .description = "Print time and memory usage."});
 
     parser.add_subsection("k-mer options");
     parser.add_option(arguments.kmer_size,
@@ -79,6 +82,8 @@ void init_prepare_parser(sharg::parser & parser, prepare_arguments & arguments)
 void prepare_parsing(sharg::parser & parser)
 {
     prepare_arguments arguments{};
+    arguments.wall_clock_timer.start();
+
     init_prepare_parser(parser, arguments);
     parser.parse();
 
@@ -90,6 +95,9 @@ void prepare_parsing(sharg::parser & parser)
     parse_bin_path(arguments);
 
     compute_minimiser(arguments);
+
+    arguments.wall_clock_timer.stop();
+    arguments.print_timings();
 }
 
 } // namespace raptor

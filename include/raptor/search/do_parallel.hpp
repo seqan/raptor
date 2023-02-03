@@ -15,9 +15,8 @@ namespace raptor
 {
 
 template <typename algorithm_t>
-void do_parallel(algorithm_t && worker, size_t const num_records, size_t const threads, double & compute_time)
+void do_parallel(algorithm_t && worker, size_t const num_records, size_t const threads)
 {
-    auto start = std::chrono::high_resolution_clock::now();
     std::vector<decltype(std::async(std::launch::async, worker, size_t{}, size_t{}))> tasks;
     size_t const records_per_thread = num_records / threads;
 
@@ -30,9 +29,6 @@ void do_parallel(algorithm_t && worker, size_t const num_records, size_t const t
 
     for (auto && task : tasks)
         task.wait();
-
-    auto end = std::chrono::high_resolution_clock::now();
-    compute_time += std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
 }
 
 } // namespace raptor

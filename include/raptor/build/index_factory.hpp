@@ -61,16 +61,21 @@ private:
     {
         assert(arguments != nullptr);
 
+        arguments->index_allocation_timer.start();
         raptor_index<> index{*arguments};
+        arguments->index_allocation_timer.stop();
 
         auto worker = [&](auto && zipped_view, auto &&)
         {
+            timer local_user_bin_io_timer{};
+            timer local_fill_ibf_timer{};
             std::vector<uint64_t> hashes{};
             auto & ibf = index.ibf();
 
             for (auto && [file_names, bin_number] : zipped_view)
             {
                 hashes.clear();
+                local_user_bin_io_timer.start();
                 std::visit(
                     [&](auto const & reader)
                     {
@@ -85,10 +90,16 @@ private:
                                                 });
                     },
                     reader);
+                local_user_bin_io_timer.stop();
 
+                local_fill_ibf_timer.start();
                 for (auto && value : hashes)
                     ibf.emplace(value, seqan3::bin_index{bin_number});
+                local_fill_ibf_timer.stop();
             }
+
+            arguments->user_bin_io_timer += local_user_bin_io_timer;
+            arguments->fill_ibf_timer += local_fill_ibf_timer;
         };
 
         call_parallel_on_bins(worker, arguments->bin_path, arguments->threads);

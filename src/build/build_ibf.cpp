@@ -20,22 +20,25 @@ void build_ibf(build_arguments const & arguments)
     {
         index_factory factory{arguments};
         auto index = factory();
+        arguments.store_index_timer.start();
         store_index(arguments.out_path, std::move(index), arguments);
+        arguments.store_index_timer.stop();
     }
     else
     {
         partition_config const cfg{arguments.parts};
+        index_factory factory{arguments, cfg};
         std::vector<size_t> const kmers_per_partition = max_count_per_partition(cfg, arguments);
-        build_arguments args = arguments;
-        index_factory factory{args, cfg};
 
         for (size_t part = 0; part < arguments.parts; ++part)
         {
-            args.bits = hibf::bin_size_in_bits(args, kmers_per_partition[part]);
+            arguments.bits = hibf::bin_size_in_bits(arguments, kmers_per_partition[part]);
             auto index = factory(part);
             std::filesystem::path out_path{arguments.out_path};
             out_path += "_" + std::to_string(part);
+            arguments.store_index_timer.start();
             store_index(out_path, std::move(index), arguments);
+            arguments.store_index_timer.stop();
         }
     }
 }

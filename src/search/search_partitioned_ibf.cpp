@@ -31,13 +31,9 @@ void search_partitioned_ibf(search_arguments const & arguments)
     using record_type = typename decltype(fin)::record_type;
     std::vector<record_type> records{};
 
-    double index_io_time{0.0};
-    double reads_io_time{0.0};
-    double compute_time{0.0};
-
     auto cereal_worker = [&]()
     {
-        load_index(index, arguments, 0, index_io_time);
+        load_index(index, arguments, 0);
     };
 
     sync_out synced_out{arguments};
@@ -49,10 +45,9 @@ void search_partitioned_ibf(search_arguments const & arguments)
         auto cereal_handle = std::async(std::launch::async, cereal_worker);
 
         records.clear();
-        auto start = std::chrono::high_resolution_clock::now();
+        arguments.query_file_io_timer.start();
         std::ranges::move(chunked_records, std::back_inserter(records));
-        auto end = std::chrono::high_resolution_clock::now();
-        reads_io_time += std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
+        arguments.query_file_io_timer.stop();
 
         cereal_handle.wait();
 
@@ -64,6 +59,9 @@ void search_partitioned_ibf(search_arguments const & arguments)
 
         auto count_task = [&](size_t const start, size_t const end)
         {
+            timer local_compute_minimiser_timer{};
+            timer local_query_ibf_timer{};
+
             auto & ibf = index.ibf();
             auto counter = ibf.template counting_agent<uint16_t>();
             size_t counter_id = start;
@@ -75,9 +73,10 @@ void search_partitioned_ibf(search_arguments const & arguments)
 
             for (auto && [id, seq] : records | seqan3::views::slice(start, end))
             {
-                (void)id;
                 auto minimiser_view = seq | hash_view | std::views::common;
+                local_compute_minimiser_timer.start();
                 minimiser.assign(minimiser_view.begin(), minimiser_view.end());
+                local_compute_minimiser_timer.stop();
 
                 auto filtered = minimiser
                               | std::views::filter(
@@ -86,24 +85,33 @@ void search_partitioned_ibf(search_arguments const & arguments)
                                         return cfg.hash_partition(hash) == part;
                                     });
 
+                local_query_ibf_timer.start();
                 counts[counter_id++] += counter.bulk_count(filtered);
+                local_query_ibf_timer.stop();
             }
+
+            arguments.compute_minimiser_timer += local_compute_minimiser_timer;
+            arguments.query_ibf_timer += local_query_ibf_timer;
         };
 
-        do_parallel(count_task, records.size(), arguments.threads, compute_time);
+        do_parallel(count_task, records.size(), arguments.threads);
         ++part;
 
         for (; part < arguments.parts - 1u; ++part)
         {
-            load_index(index, arguments, part, index_io_time);
-            do_parallel(count_task, records.size(), arguments.threads, compute_time);
+            load_index(index, arguments, part);
+            do_parallel(count_task, records.size(), arguments.threads);
         }
 
         assert(part == arguments.parts - 1u);
-        load_index(index, arguments, part, index_io_time);
+        load_index(index, arguments, part);
 
         auto output_task = [&](size_t const start, size_t const end)
         {
+            timer local_compute_minimiser_timer{};
+            timer local_query_ibf_timer{};
+            timer local_generate_results_timer{};
+
             auto & ibf = index.ibf();
             auto counter = ibf.template counting_agent<uint16_t>();
             size_t counter_id = start;
@@ -121,19 +129,25 @@ void search_partitioned_ibf(search_arguments const & arguments)
                 result_string += '\t';
 
                 auto minimiser_view = seq | hash_adaptor | std::views::common;
+                local_compute_minimiser_timer.start();
                 minimiser.assign(minimiser_view.begin(), minimiser_view.end());
+                local_compute_minimiser_timer.stop();
+
                 auto filtered = minimiser
                               | std::views::filter(
                                     [&](auto && hash)
                                     {
                                         return cfg.hash_partition(hash) == part;
                                     });
+                local_query_ibf_timer.start();
                 counts[counter_id] += counter.bulk_count(filtered);
+                local_query_ibf_timer.stop();
 
                 size_t const minimiser_count{minimiser.size()};
                 size_t current_bin{0};
 
                 size_t const threshold = thresholder.get(minimiser_count);
+                local_generate_results_timer.start();
                 for (auto && count : counts[counter_id++])
                 {
                     if (count >= threshold)
@@ -147,24 +161,18 @@ void search_partitioned_ibf(search_arguments const & arguments)
                     last_char = '\n';
                 else
                     result_string += '\n';
+
                 synced_out.write(result_string);
+                local_generate_results_timer.stop();
             }
+
+            arguments.compute_minimiser_timer += local_compute_minimiser_timer;
+            arguments.query_ibf_timer += local_query_ibf_timer;
+            arguments.generate_results_timer += local_generate_results_timer;
         };
 
-        do_parallel(output_task, records.size(), arguments.threads, compute_time);
+        do_parallel(output_task, records.size(), arguments.threads);
     }
-
-    // GCOVR_EXCL_START
-    if (arguments.write_time)
-    {
-        std::filesystem::path file_path{arguments.out_file};
-        file_path += ".time";
-        std::ofstream file_handle{file_path};
-        file_handle << "Index I/O\tReads I/O\tCompute\n";
-        file_handle << std::fixed << std::setprecision(2) << index_io_time << '\t' << reads_io_time << '\t'
-                    << compute_time;
-    }
-    // GCOVR_EXCL_STOP
 }
 
 template void search_partitioned_ibf<false>(search_arguments const & arguments);

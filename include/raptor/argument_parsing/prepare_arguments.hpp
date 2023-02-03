@@ -12,6 +12,8 @@
 
 #include <seqan3/search/kmer_index/shape.hpp>
 
+#include <raptor/argument_parsing/memory_usage.hpp>
+#include <raptor/argument_parsing/timer.hpp>
 #include <raptor/strong_types.hpp>
 
 namespace raptor
@@ -31,6 +33,27 @@ struct prepare_arguments
     std::vector<std::vector<std::string>> bin_path{};
     std::filesystem::path bin_file{};
     uint8_t threads{1u};
+    bool verbose{false};
+
+    // Timers do not copy the stored duration upon copy construction/assignment
+    mutable timer wall_clock_timer{};
+    mutable timer compute_minimiser_timer{};
+    mutable timer write_minimiser_timer{};
+    mutable timer write_header_timer{};
+
+    // GCOVR_EXCL_START
+    void print_timings() const
+    {
+        if (!verbose)
+            return;
+        std::cerr << std::fixed << std::setprecision(2) << "============= Timings =============\n";
+        std::cerr << "Wall clock time [s]: " << wall_clock_timer.in_seconds() << '\n';
+        std::cerr << "Peak memory usage " << formatted_peak_ram() << '\n';
+        std::cerr << "Compute minimiser [s]: " << compute_minimiser_timer.in_seconds() / threads << '\n';
+        std::cerr << "Write minimiser files [s]: " << write_minimiser_timer.in_seconds() / threads << '\n';
+        std::cerr << "Write header files [s]: " << write_header_timer.in_seconds() / threads << '\n';
+    }
+    // GCOVR_EXCL_STOP
 };
 
 } // namespace raptor
