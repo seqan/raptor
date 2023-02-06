@@ -17,7 +17,6 @@ TEST_P(build_hibf, with_file)
 
     cli_test_result const result = execute_app("raptor",
                                                "build",
-                                               "--hibf",
                                                "--kmer 19",
                                                "--window",
                                                std::to_string(window_size),
@@ -41,7 +40,6 @@ TEST_P(build_hibf, with_shape)
 
     cli_test_result const result = execute_app("raptor",
                                                "build",
-                                               "--hibf",
                                                "--shape 1111111111111111111",
                                                "--window",
                                                std::to_string(window_size),
@@ -75,7 +73,6 @@ TEST_F(build_hibf, three_levels)
 {
     cli_test_result const result = execute_app("raptor",
                                                "build",
-                                               "--hibf",
                                                "--kmer 19",
                                                "--window 19",
                                                "--threads 1",
