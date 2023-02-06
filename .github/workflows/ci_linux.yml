@@ -62,15 +62,16 @@ jobs:
           submodules: true
 
       - name: Add package source
-        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/configure_apt.sh
+        run: |
+          sudo sed -i 's@azure.archive.ubuntu.com@mirror.enzu.com@' /etc/apt/sources.list
+          bash ./raptor/lib/seqan3/.github/workflows/scripts/configure_apt.sh
 
       - name: Install CMake
         run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_cmake.sh
 
       - name: Install ccache
         run: |
-          conda install --yes --override-channels --channel conda-forge ccache
-          sudo ln -s $CONDA/bin/ccache /usr/bin/ccache
+          sudo apt-get install --yes ccache
 
       - name: Install compiler ${{ matrix.cxx }}
         run: sudo apt-get install --yes ${{ matrix.cxx }}
