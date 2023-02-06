@@ -50,8 +50,7 @@ protected:
         {
             std::ostringstream command{};
             command << "SHARG_NO_VERSION_CHECK=1 " << BINDIR;
-            int a[] = {0, ((void)(command << command_items << ' '), 0)...};
-            (void)a;
+            (void)((command << command_items << ' '), ...); // (void) silences "state has no effect" warning if no items
             return command.str();
         }();
 

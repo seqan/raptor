@@ -57,7 +57,6 @@ TEST_P(search_hibf_preprocessing, pipeline)
 
     cli_test_result const result2 = execute_app("raptor",
                                                 "build",
-                                                "--hibf",
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output raptor.index",
@@ -132,7 +131,6 @@ TEST_P(search_hibf_preprocessing, pipeline_compressed_index)
 
     cli_test_result const result2 = execute_app("raptor",
                                                 "build",
-                                                "--hibf",
                                                 "--compressed",
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",

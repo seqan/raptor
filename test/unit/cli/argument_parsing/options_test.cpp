@@ -5,9 +5,9 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include <seqan3/test/tmp_directory.hpp>
-
+#include <raptor/build/hibf/bin_prefixes.hpp>
 #include <raptor/test/cli_test.hpp>
+#include <raptor/test/tmp_test_file.hpp>
 
 struct argparse_build : public raptor_base
 {};
@@ -18,66 +18,19 @@ struct argparse_search : public raptor_base
 struct argparse_upgrade : public raptor_base
 {};
 
-seqan3::test::tmp_directory const test_directory{};
-std::filesystem::path const tmp_index_file = []()
-{
-    std::filesystem::path const tmp_index_file = test_directory.path() / "tmp.index";
-    std::ofstream file{tmp_index_file};
-    file << "some_content";
-    return tmp_index_file;
-}();
-std::filesystem::path const dummy_sequence_file = []()
-{
-    std::filesystem::path const dummy_sequence_file = test_directory.path() / "dummy.fasta";
-    std::ofstream file{dummy_sequence_file};
-    file << ">ID\nACGTCACGATCGTACGATCGATCGATCG";
-    return dummy_sequence_file;
-}();
-std::filesystem::path const tmp_bin_list_file = [](std::filesystem::path const dummy_sequence_file)
-{
-    std::filesystem::path const tmp_bin_list_file = test_directory.path() / "all_bins.txt";
-    std::ofstream file{tmp_bin_list_file};
-    file << dummy_sequence_file.c_str();
-    return tmp_bin_list_file;
-}(dummy_sequence_file);
-
-std::filesystem::path const tmp_bin_list_empty = []()
-{
-    std::filesystem::path const tmp_bin_list_empty = test_directory.path() / "empty.txt";
-    std::ofstream file{tmp_bin_list_empty};
-    return tmp_bin_list_empty;
-}();
-
-std::filesystem::path const empty_sequence_file = []()
-{
-    std::filesystem::path const empty_sequence_file = test_directory.path() / "empty.fasta";
-    std::ofstream file{empty_sequence_file};
-    return empty_sequence_file;
-}();
-
-std::filesystem::path const tmp_empty_bin_file = [](std::filesystem::path const empty_sequence_file)
-{
-    std::filesystem::path const tmp_empty_bin_file = test_directory.path() / "empty_bin.txt";
-    std::ofstream file{tmp_empty_bin_file};
-    file << empty_sequence_file.c_str();
-    return tmp_empty_bin_file;
-}(empty_sequence_file);
-
-std::filesystem::path const minimiser_file = []()
-{
-    std::filesystem::path const minimiser_file = test_directory.path() / "bin1.minimiser";
-    std::ofstream file{minimiser_file};
-    file << "0";
-    return minimiser_file;
-}();
-
-std::filesystem::path const mixed_bin_file = [](std::filesystem::path const minimiser_file)
-{
-    std::filesystem::path const mixed_bin_file = test_directory.path() / "mixed.txt";
-    std::ofstream file{mixed_bin_file};
-    file << minimiser_file.c_str() << "\nbin2.fasta";
-    return mixed_bin_file;
-}(minimiser_file);
+raptor::test::tmp_test_file const test_files{};
+// clang-format off
+std::filesystem::path const
+    tmp_index_file         = test_files.create("tmp.index",     "some_content"),
+    dummy_sequence_file    = test_files.create("dummy.fasta",   ">ID\nACGTCACGATCGTACGATCGATCGATCG"),
+    tmp_bin_list_file      = test_files.create("all_bins.txt",   dummy_sequence_file.c_str()),
+    tmp_bin_list_empty     = test_files.create("empty.txt"),
+    tmp_bin_list_corrupted = test_files.create("corrupted.txt",  raptor::hibf::pack_file_first_line_prefix),
+    empty_sequence_file    = test_files.create("empty.fasta"),
+    tmp_empty_bin_file     = test_files.create("empty_bin.txt",  empty_sequence_file.c_str()),
+    minimiser_file         = test_files.create("bin1.minimiser", "0"),
+    mixed_bin_file         = test_files.create("mixed.txt",      minimiser_file.c_str(), "\nbin2.fasta");
+// clang-format on
 
 TEST_F(argparse_main, no_options)
 {
@@ -216,6 +169,15 @@ TEST_F(argparse_build, no_bins_in_file)
 {
     cli_test_result const result =
         execute_app("raptor", "build", "--kmer 20", "--output index.raptor", tmp_bin_list_empty);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] The input file is empty.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
+TEST_F(argparse_build, corrupted_input)
+{
+    cli_test_result const result =
+        execute_app("raptor", "build", "--kmer 20", "--output index.raptor", tmp_bin_list_corrupted);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] The list of input files cannot be empty.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
@@ -375,7 +337,7 @@ TEST_F(argparse_search, queries_have_variance)
 
 TEST_F(argparse_search, queries_unsupported_length)
 {
-    std::filesystem::path const query_file = test_directory.path() / "unsupported_length.fa";
+    std::filesystem::path const query_file = test_files.path() / "unsupported_length.fa";
     {
         std::ofstream os{query_file};
         // Add a long query. 65536 = 2^16, which is exactly one more than uint16_t can represent.

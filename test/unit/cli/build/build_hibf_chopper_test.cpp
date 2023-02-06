@@ -57,7 +57,6 @@ TEST_F(build_hibf_layout, pipeline)
     { // build index
         cli_test_result const result = execute_app("raptor",
                                                    "build",
-                                                   "--hibf",
                                                    "--kmer 19",
                                                    "--window 19",
                                                    "--fpr 0.05",

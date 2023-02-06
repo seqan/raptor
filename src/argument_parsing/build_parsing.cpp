@@ -11,6 +11,7 @@
 #include <raptor/argument_parsing/parse_bin_path.hpp>
 #include <raptor/argument_parsing/shared.hpp>
 #include <raptor/argument_parsing/validators.hpp>
+#include <raptor/build/hibf/bin_prefixes.hpp>
 #include <raptor/build/raptor_build.hpp>
 
 namespace raptor
@@ -104,8 +105,15 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
     parser.add_flag(
         arguments.compressed,
         sharg::config{.short_id = '\0', .long_id = "compressed", .description = "Build a compressed index."});
-    parser.add_flag(arguments.is_hibf,
-                    sharg::config{.short_id = '\0', .long_id = "hibf", .description = "Build an HIBF."});
+}
+
+bool input_is_pack_file(std::filesystem::path const & path)
+{
+    std::ifstream file{path};
+    std::string line{};
+    while (std::getline(file, line) && line.starts_with("##")) // Skip parameter information
+    {}
+    return line.starts_with(raptor::hibf::pack_file_first_line_prefix);
 }
 
 void build_parsing(sharg::parser & parser)
@@ -115,6 +123,11 @@ void build_parsing(sharg::parser & parser)
 
     init_build_parser(parser, arguments);
     parser.parse();
+
+    if (std::filesystem::is_empty(arguments.bin_file))
+        throw sharg::parser_error{"The input file is empty."};
+
+    arguments.is_hibf = input_is_pack_file(arguments.bin_file);
 
     if (arguments.is_hibf && arguments.parts != 1u)
         throw sharg::parser_error{"The HIBF cannot yet be partitioned."};
