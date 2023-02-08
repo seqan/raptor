@@ -49,6 +49,7 @@ struct build_arguments
     mutable timer bin_size_timer{};
     mutable timer index_allocation_timer{};
     mutable timer user_bin_io_timer{};
+    mutable timer merge_kmers_timer{};
     mutable timer fill_ibf_timer{};
     mutable timer store_index_timer{};
 
@@ -60,10 +61,18 @@ struct build_arguments
         std::cerr << std::fixed << std::setprecision(2) << "============= Timings =============\n";
         std::cerr << "Wall clock time [s]: " << wall_clock_timer.in_seconds() << '\n';
         std::cerr << "Peak memory usage " << formatted_peak_ram() << '\n';
-        std::cerr << "Determine IBF size [s]: " << bin_size_timer.in_seconds() << '\n';
+        if (!is_hibf)
+            std::cerr << "Determine IBF size [s]: " << bin_size_timer.in_seconds() << '\n';
         std::cerr << "Index allocation [s]: " << index_allocation_timer.in_seconds() << '\n';
-        std::cerr << "User bin I/O [s]: " << user_bin_io_timer.in_seconds() / threads << '\n';
-        std::cerr << "Fill IBF [s]: " << fill_ibf_timer.in_seconds() / threads << '\n';
+        std::cerr << "User bin I/O avg per thread [s]: " << user_bin_io_timer.in_seconds() / threads << '\n';
+        std::cerr << "User bin I/O sum [s]: " << user_bin_io_timer.in_seconds() << '\n';
+        if (is_hibf)
+        {
+            std::cerr << "Merge kmer sets avg per thread [s]: " << merge_kmers_timer.in_seconds() / threads << '\n';
+            std::cerr << "Merge kmer sets sum [s]: " << merge_kmers_timer.in_seconds() << '\n';
+        }
+        std::cerr << "Fill IBF avg per thread [s]: " << fill_ibf_timer.in_seconds() / threads << '\n';
+        std::cerr << "Fill IBF sum [s]: " << fill_ibf_timer.in_seconds() << '\n';
         std::cerr << "Store index [s]: " << store_index_timer.in_seconds() << '\n';
     }
     // GCOVR_EXCL_STOP

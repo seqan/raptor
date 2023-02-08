@@ -50,14 +50,21 @@ void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                 size_t const mutex_id{parent_bin_index / 64};
                 std::lock_guard<std::mutex> guard{local_ibf_mutex[mutex_id]};
                 ibf_positions[parent_bin_index] = ibf_pos;
-                insert_into_ibf(parent_kmers, kmers, 1, parent_bin_index, ibf, is_root);
+                insert_into_ibf(parent_kmers,
+                                kmers,
+                                1,
+                                parent_bin_index,
+                                ibf,
+                                is_root,
+                                arguments.fill_ibf_timer,
+                                arguments.merge_kmers_timer);
             }
         }
     };
 
     size_t number_of_threads{};
-    auto indices_view = std::views::iota(0u, children.size()) | std::views::common;
-    std::vector<size_t> indices{indices_view.begin(), indices_view.end()};
+    std::vector<size_t> indices(children.size());
+    std::iota(indices.begin(), indices.end(), size_t{});
 
     if (is_root)
     {

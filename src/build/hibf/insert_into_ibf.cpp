@@ -9,7 +9,7 @@
 
 #include <raptor/adjust_seed.hpp>
 #include <raptor/build/hibf/insert_into_ibf.hpp>
-#include <raptor/dna4_traits.hpp>
+#include <raptor/file_reader.hpp>
 
 namespace raptor::hibf
 {
@@ -20,23 +20,32 @@ void insert_into_ibf(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                      size_t const number_of_bins,
                      size_t const bin_index,
                      seqan3::interleaved_bloom_filter<> & ibf,
-                     bool is_root)
+                     bool is_root,
+                     timer & fill_ibf_timer,
+                     timer & merge_kmers_timer)
 {
     size_t const chunk_size = kmers.size() / number_of_bins + 1;
     size_t chunk_number{};
 
+    timer local_fill_ibf_timer{};
+    local_fill_ibf_timer.start();
     for (auto chunk : kmers | seqan3::views::chunk(chunk_size))
     {
         assert(chunk_number < number_of_bins);
         seqan3::bin_index const bin_idx{bin_index + chunk_number};
         ++chunk_number;
         for (size_t const value : chunk)
-        {
             ibf.emplace(value, bin_idx);
-            if (!is_root)
-                parent_kmers.insert(value);
-        }
     }
+    local_fill_ibf_timer.stop();
+    fill_ibf_timer += local_fill_ibf_timer;
+
+    timer local_merge_kmers_timer{};
+    local_merge_kmers_timer.start();
+    if (!is_root)
+        parent_kmers.insert(kmers.begin(), kmers.end());
+    local_merge_kmers_timer.stop();
+    merge_kmers_timer += local_merge_kmers_timer;
 }
 
 void insert_into_ibf(build_arguments const & arguments,
@@ -46,36 +55,27 @@ void insert_into_ibf(build_arguments const & arguments,
     auto const bin_index = seqan3::bin_index{static_cast<size_t>(record.bin_indices.back())};
     std::vector<uint64_t> values;
 
+    timer local_user_bin_io_timer{};
+    local_user_bin_io_timer.start();
     if (arguments.input_is_minimiser)
     {
-        uint64_t minimiser_value{};
-        for (auto const & filename : record.filenames)
-        {
-            std::ifstream infile{filename, std::ios::binary};
-
-            while (infile.read(reinterpret_cast<char *>(&minimiser_value), sizeof(minimiser_value)))
-                values.push_back(minimiser_value);
-        }
-
-        for (auto && value : values)
-            ibf.emplace(value, bin_index);
+        file_reader<file_types::minimiser> const reader{};
+        reader.hash_into(record.filenames, std::back_inserter(values));
     }
     else
     {
-        using sequence_file_t = seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>>;
-
-        auto hash_view = seqan3::views::minimiser_hash(arguments.shape,
-                                                       seqan3::window_size{arguments.window_size},
-                                                       seqan3::seed{adjust_seed(arguments.shape.count())});
-
-        for (auto const & filename : record.filenames)
-            for (auto && [seq] : sequence_file_t{filename})
-                for (auto && hash : seq | hash_view)
-                    values.push_back(hash);
-
-        for (auto && value : values)
-            ibf.emplace(value, bin_index);
+        file_reader<file_types::sequence> const reader{arguments.shape, arguments.window_size};
+        reader.hash_into(record.filenames, std::back_inserter(values));
     }
+    local_user_bin_io_timer.stop();
+    arguments.user_bin_io_timer += local_user_bin_io_timer;
+
+    timer local_fill_ibf_timer{};
+    local_fill_ibf_timer.start();
+    for (auto && value : values)
+        ibf.emplace(value, bin_index);
+    local_fill_ibf_timer.stop();
+    arguments.fill_ibf_timer += local_fill_ibf_timer;
 }
 
 } // namespace raptor::hibf
