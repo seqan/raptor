@@ -226,16 +226,12 @@ public:
             throw sharg::validation_error{
                 sharg::detail::to_string("Failed to create directory\"", out_dir.c_str(), "\": ", ec.message())};
 
-        if (!std::filesystem::is_empty(out_dir))
-            throw sharg::validation_error{
-                sharg::detail::to_string("The output directory \"", out_dir.c_str(), "\" is not empty.")};
-
         validator(out_dir);
     }
 
     std::string get_help_page_message() const
     {
-        return "A valid path for the output directory. The directory must be empty.";
+        return "A valid path for the output directory.";
     }
 
 private:
