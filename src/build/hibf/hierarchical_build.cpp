@@ -55,7 +55,14 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
         else
         {
             compute_kmers(kmers, arguments, record);
-            insert_into_ibf(parent_kmers, kmers, record.number_of_bins.back(), record.bin_indices.back(), ibf, is_root);
+            insert_into_ibf(parent_kmers,
+                            kmers,
+                            record.number_of_bins.back(),
+                            record.bin_indices.back(),
+                            ibf,
+                            is_root,
+                            arguments.fill_ibf_timer,
+                            arguments.merge_kmers_timer);
         }
 
         update_user_bins(data, filename_indices, record);

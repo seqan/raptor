@@ -38,7 +38,7 @@ public:
     void stop()
     {
         stop_ = std::chrono::steady_clock::now();
-        assert(stop_ > start_);
+        assert(stop_ >= start_);
         ticks += (stop_ - start_).count();
     }
 
@@ -53,7 +53,7 @@ public:
     }
 
 private:
-    std::chrono::steady_clock::time_point start_{};
+    std::chrono::steady_clock::time_point start_{std::chrono::time_point<std::chrono::steady_clock>::max()};
     std::chrono::steady_clock::time_point stop_{};
     std::atomic<std::chrono::steady_clock::rep> ticks{};
 };
