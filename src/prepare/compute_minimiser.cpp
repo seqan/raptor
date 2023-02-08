@@ -38,6 +38,28 @@ void compute_minimiser(prepare_arguments const & arguments)
 
         for (auto && [file_names, bin_number] : zipped_view)
         {
+            std::filesystem::path const file_name{file_names[0]};
+            bool const is_compressed = raptor::cutoff::file_is_compressed(file_name);
+
+            std::filesystem::path output_path{arguments.out_dir};
+            output_path /= is_compressed ? file_name.stem().stem() : file_name.stem();
+
+            std::filesystem::path const minimiser_file =
+                std::filesystem::path{output_path}.replace_extension("minimiser");
+            std::filesystem::path const progress_file =
+                std::filesystem::path{output_path}.replace_extension("in_progress");
+            std::filesystem::path const header_file = std::filesystem::path{output_path}.replace_extension("header");
+
+            // If we are already done with this file, we can skip it. Otherwise, we create a ".in_progress" file to keep
+            // track of whether the minimiser computation was successful.
+            bool const already_done = std::filesystem::exists(minimiser_file) && std::filesystem::exists(header_file)
+                                   && !std::filesystem::exists(progress_file);
+
+            if (already_done)
+                continue;
+            else
+                std::ofstream outfile{progress_file, std::ios::binary};
+
             local_compute_minimiser_timer.start();
             reader.for_each_hash(file_names,
                                  [&](auto && hash)
@@ -46,19 +68,12 @@ void compute_minimiser(prepare_arguments const & arguments)
                                  });
             local_compute_minimiser_timer.stop();
 
-            std::filesystem::path const file_name{file_names[0]};
-            bool const is_compressed = raptor::cutoff::file_is_compressed(file_name);
             uint8_t const cutoff = cutoffs.get(file_name);
             uint64_t count{};
 
-            // Store binary file
-            std::filesystem::path output_path{arguments.out_dir};
-            output_path /= is_compressed ? file_name.stem().stem() : file_name.stem();
-            output_path += ".minimiser";
-
             local_write_minimiser_timer.start();
             {
-                std::ofstream outfile{output_path, std::ios::binary};
+                std::ofstream outfile{minimiser_file, std::ios::binary};
                 for (auto && [hash, occurrences] : minimiser_table)
                 {
                     if (occurrences >= cutoff)
@@ -70,17 +85,15 @@ void compute_minimiser(prepare_arguments const & arguments)
             }
             local_write_minimiser_timer.stop();
 
-            // Store header file
-            output_path.replace_extension("header");
-
             local_write_header_timer.start();
             {
-                std::ofstream headerfile{output_path};
+                std::ofstream headerfile{header_file};
                 headerfile << arguments.shape.to_string() << '\t' << arguments.window_size << '\t'
                            << static_cast<uint16_t>(cutoff) << '\t' << count << '\n';
             }
             local_write_header_timer.stop();
 
+            std::filesystem::remove(progress_file);
             minimiser_table.clear();
         }
 
