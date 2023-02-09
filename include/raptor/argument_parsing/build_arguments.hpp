@@ -45,13 +45,13 @@ struct build_arguments
     bool verbose{false};
 
     // Timers do not copy the stored duration upon copy construction/assignment
-    mutable timer wall_clock_timer{};
-    mutable timer bin_size_timer{};
-    mutable timer index_allocation_timer{};
-    mutable timer user_bin_io_timer{};
-    mutable timer merge_kmers_timer{};
-    mutable timer fill_ibf_timer{};
-    mutable timer store_index_timer{};
+    mutable timer<concurrent::yes> wall_clock_timer{};
+    mutable timer<concurrent::yes> bin_size_timer{};
+    mutable timer<concurrent::yes> index_allocation_timer{};
+    mutable timer<concurrent::yes> user_bin_io_timer{};
+    mutable timer<concurrent::yes> merge_kmers_timer{};
+    mutable timer<concurrent::yes> fill_ibf_timer{};
+    mutable timer<concurrent::yes> store_index_timer{};
 
     // GCOVR_EXCL_START
     void print_timings() const

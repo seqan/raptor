@@ -51,13 +51,13 @@ struct search_arguments
     bool verbose{false};
 
     // Timers do not copy the stored duration upon copy construction/assignment
-    mutable timer wall_clock_timer{};
-    mutable timer query_length_timer{};
-    mutable timer query_file_io_timer{};
-    mutable timer load_index_timer{};
-    mutable timer compute_minimiser_timer{};
-    mutable timer query_ibf_timer{};
-    mutable timer generate_results_timer{};
+    mutable timer<concurrent::yes> wall_clock_timer{};
+    mutable timer<concurrent::yes> query_length_timer{};
+    mutable timer<concurrent::yes> query_file_io_timer{};
+    mutable timer<concurrent::yes> load_index_timer{};
+    mutable timer<concurrent::yes> compute_minimiser_timer{};
+    mutable timer<concurrent::yes> query_ibf_timer{};
+    mutable timer<concurrent::yes> generate_results_timer{};
 
     // GCOVR_EXCL_START
     void print_timings() const

@@ -18,7 +18,7 @@ void compute_kmers(robin_hood::unordered_flat_set<size_t> & kmers,
                    build_arguments const & arguments,
                    chopper_pack_record const & record)
 {
-    timer local_user_bin_io_timer{};
+    timer<concurrent::no> local_user_bin_io_timer{};
     local_user_bin_io_timer.start();
     if (arguments.input_is_minimiser)
     {

@@ -36,10 +36,10 @@ struct prepare_arguments
     bool verbose{false};
 
     // Timers do not copy the stored duration upon copy construction/assignment
-    mutable timer wall_clock_timer{};
-    mutable timer compute_minimiser_timer{};
-    mutable timer write_minimiser_timer{};
-    mutable timer write_header_timer{};
+    mutable timer<concurrent::yes> wall_clock_timer{};
+    mutable timer<concurrent::yes> compute_minimiser_timer{};
+    mutable timer<concurrent::yes> write_minimiser_timer{};
+    mutable timer<concurrent::yes> write_header_timer{};
 
     // GCOVR_EXCL_START
     void print_timings() const
