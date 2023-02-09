@@ -272,6 +272,22 @@ TEST_F(argparse_search, old_index)
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
+TEST_F(argparse_search, ambiguous_index)
+{
+    {
+        std::ofstream monolithic_index{"raptor.index"};
+        std::ofstream partitioned_index{"raptor.index_0"};
+    }
+
+    cli_test_result const result =
+        execute_app("raptor", "search", "--query ", data("query.fq"), "--index raptor.index", "--output search.out");
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err,
+              std::string{"[Error] Ambiguous index. Both monolithic (raptor.index) and partitioned index "
+                          "(raptor.index_0) exist. Please rename the monolithic index.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
 TEST_F(argparse_search, error_treshold)
 {
     cli_test_result const result = execute_app("raptor",
@@ -382,7 +398,7 @@ TEST_F(argparse_upgrade, kmer_window)
                                                "--bins ",
                                                tmp_bin_list_file,
                                                "--input ",
-                                               data("1_1.index"),
+                                               data("1bins19window.index"),
                                                "--output index.raptor",
                                                "--window 19",
                                                "--kmer 20");

@@ -115,17 +115,26 @@ void search_parsing(sharg::parser & parser)
     if (std::filesystem::is_empty(arguments.query_file))
         throw sharg::parser_error{"The query file is empty."};
 
-    bool partitioned{false};
-    sharg::input_file_validator validator{};
+    std::filesystem::path const partitioned_index_file = arguments.index_file.string() + "_0";
+    bool const index_is_monolithic = std::filesystem::exists(arguments.index_file);
+    bool const index_is_partitioned = std::filesystem::exists(partitioned_index_file);
+    sharg::input_file_validator const index_validator{};
 
-    try
+    if (index_is_monolithic && index_is_partitioned)
     {
-        validator(arguments.index_file.string() + std::string{"_0"});
-        partitioned = true;
+        throw sharg::validation_error{sharg::detail::to_string("Ambiguous index. Both monolithic (",
+                                                               arguments.index_file.c_str(),
+                                                               ") and partitioned index (",
+                                                               partitioned_index_file.c_str(),
+                                                               ") exist. Please rename the monolithic index.")};
     }
-    catch (sharg::validation_error const & e)
+    else if (index_is_partitioned)
     {
-        validator(arguments.index_file);
+        index_validator(partitioned_index_file);
+    }
+    else
+    {
+        index_validator(arguments.index_file);
     }
 
     // ==========================================
@@ -171,9 +180,7 @@ void search_parsing(sharg::parser & parser)
     // Read window and kmer size, and the bin paths.
     // ==========================================
     {
-        std::ifstream is{partitioned ? arguments.index_file.string() + std::string{"_0"}
-                                     : arguments.index_file.string(),
-                         std::ios::binary};
+        std::ifstream is{index_is_partitioned ? partitioned_index_file : arguments.index_file, std::ios::binary};
         cereal::BinaryInputArchive iarchive{is};
         raptor_index<> tmp{};
         tmp.load_parameters(iarchive);
@@ -189,16 +196,27 @@ void search_parsing(sharg::parser & parser)
     }
 
     if (min_query_length < arguments.window_size)
-        throw sharg::parser_error{std::string{"The (minimal) query length ("} + std::to_string(min_query_length)
-                                  + ") is too short to be used with window size "
-                                  + std::to_string(arguments.window_size) + '.'};
+        throw sharg::parser_error{sharg::detail::to_string("The (minimal) query length (",
+                                                           min_query_length,
+                                                           ") is too short to be used with window size ",
+                                                           arguments.window_size,
+                                                           '.')};
 
     // ==========================================
     // Partitioned index: Check that all parts are available.
     // ==========================================
-    if (partitioned)
-        for (size_t part{}; part < arguments.parts; ++part)
-            validator(arguments.index_file.string() + std::string{"_"} + std::to_string(part));
+    if (index_is_partitioned)
+    {
+        std::string const index_path_base{[&partitioned_index_file]()
+                                          {
+                                              std::string_view sv = partitioned_index_file.c_str();
+                                              assert(sv.size() > 0u);
+                                              sv.remove_suffix(1u);
+                                              return sv;
+                                          }()};
+        for (size_t part{1u}; part < arguments.parts; ++part)
+            index_validator(index_path_base + std::to_string(part));
+    }
 
     // ==========================================
     // Dispatch
