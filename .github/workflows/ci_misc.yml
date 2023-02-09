@@ -173,7 +173,7 @@ jobs:
           CCACHE_DIR: ${{ github.workspace }}/.ccache
           CCACHE_COMPRESS: true
           CCACHE_COMPRESSLEVEL: 12
-          CCACHE_MAXSIZE: 50M
+          CCACHE_MAXSIZE: 150M
           CCACHE_IGNOREOPTIONS: "-fprofile-abs-path"
           CMAKE_BUILD_PARALLEL_LEVEL: ${{ matrix.build_threads }}
         run: |
