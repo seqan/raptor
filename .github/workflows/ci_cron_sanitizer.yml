@@ -1,0 +1,98 @@
+name: Cron Sanitizer
+
+on:
+  schedule:
+    - cron: "0 6 * * SAT"
+  workflow_dispatch:
+
+concurrency:
+  group: sanitizer-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CMAKE_VERSION: 3.18.4
+  SHARG_NO_VERSION_CHECK: 1
+  TZ: Europe/Berlin
+  ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1
+  UBSAN_OPTIONS: print_stacktrace=1
+
+defaults:
+  run:
+    shell: bash -euxo pipefail {0}
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 240
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "AddressSanitizer"
+            cxx: "g++-12"
+            cc: "gcc-12"
+            build: unit
+            build_type: Debug
+            cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=address"
+
+          - name: "ThreadSanitizer"
+            cxx: "g++-12"
+            cc: "gcc-12"
+            build: unit
+            build_type: Debug
+            cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=thread"
+
+          - name: "UndefinedBehaviorSanitizer"
+            cxx: "g++-12"
+            cc: "gcc-12"
+            build: unit
+            build_type: Debug
+            cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=undefined"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: raptor
+          fetch-depth: 1
+          submodules: true
+
+      - name: Add package source
+        run: |
+          sudo sed -i 's@azure.archive.ubuntu.com@mirror.enzu.com@' /etc/apt/sources.list
+          bash ./raptor/lib/seqan3/.github/workflows/scripts/configure_apt.sh
+
+      - name: Configure OS
+        run: |
+          sudo bash -c "echo 0 > /proc/sys/vm/overcommit_memory"
+          sudo bash -c "echo 2 >/proc/sys/kernel/randomize_va_space"
+
+      - name: Install CMake
+        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_cmake.sh
+
+      - name: Install compiler ${{ matrix.cxx }}
+        run: sudo apt-get install --yes ${{ matrix.cxx }}
+
+      - name: Configure tests
+        env:
+          CXX: ${{ matrix.cxx }}
+          CC: ${{ matrix.cc }}
+        run: |
+          mkdir build
+          cd build
+          cmake ../raptor/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                                                   -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size"
+          make -j2 gtest_build
+
+      - name: Build tests
+        run: |
+          cd build
+          make -k -j2
+
+      - name: Run tests
+        run: |
+          cd build
+          ctest . -j2 --output-on-failure
+
