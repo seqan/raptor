@@ -22,33 +22,23 @@ defaults:
 
 jobs:
   build:
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name }} ${{ matrix.build_type }}
     runs-on: ubuntu-22.04
     timeout-minutes: 240
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
     strategy:
       fail-fast: false
       matrix:
+        name: [AddressSanitizer, ThreadSanitizer, UndefinedBehaviorSanitizer]
+        build_type: [Release, Debug]
         include:
           - name: "AddressSanitizer"
-            cxx: "g++-12"
-            cc: "gcc-12"
-            build: unit
-            build_type: Debug
             cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=address"
 
           - name: "ThreadSanitizer"
-            cxx: "g++-12"
-            cc: "gcc-12"
-            build: unit
-            build_type: Debug
             cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=thread"
 
           - name: "UndefinedBehaviorSanitizer"
-            cxx: "g++-12"
-            cc: "gcc-12"
-            build: unit
-            build_type: Debug
             cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=undefined"
 
     steps:
@@ -72,18 +62,18 @@ jobs:
       - name: Install CMake
         run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_cmake.sh
 
-      - name: Install compiler ${{ matrix.cxx }}
-        run: sudo apt-get install --yes ${{ matrix.cxx }}
+      - name: Install compiler g++-12
+        run: sudo apt-get install --yes g++-12
 
       - name: Configure tests
         env:
-          CXX: ${{ matrix.cxx }}
-          CC: ${{ matrix.cc }}
+          CXX: g++-12
+          CC: gcc-12
         run: |
           mkdir build
           cd build
-          cmake ../raptor/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                                   -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size"
+          cmake ../raptor/test/unit -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                                    -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size"
           make -j2 gtest_build
 
       - name: Build tests
