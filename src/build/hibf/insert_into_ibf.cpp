@@ -21,13 +21,13 @@ void insert_into_ibf(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                      size_t const bin_index,
                      seqan3::interleaved_bloom_filter<> & ibf,
                      bool is_root,
-                     timer & fill_ibf_timer,
-                     timer & merge_kmers_timer)
+                     timer<concurrent::yes> & fill_ibf_timer,
+                     timer<concurrent::yes> & merge_kmers_timer)
 {
     size_t const chunk_size = kmers.size() / number_of_bins + 1;
     size_t chunk_number{};
 
-    timer local_fill_ibf_timer{};
+    timer<concurrent::no> local_fill_ibf_timer{};
     local_fill_ibf_timer.start();
     for (auto chunk : kmers | seqan3::views::chunk(chunk_size))
     {
@@ -40,7 +40,7 @@ void insert_into_ibf(robin_hood::unordered_flat_set<size_t> & parent_kmers,
     local_fill_ibf_timer.stop();
     fill_ibf_timer += local_fill_ibf_timer;
 
-    timer local_merge_kmers_timer{};
+    timer<concurrent::no> local_merge_kmers_timer{};
     local_merge_kmers_timer.start();
     if (!is_root)
         parent_kmers.insert(kmers.begin(), kmers.end());
@@ -55,7 +55,7 @@ void insert_into_ibf(build_arguments const & arguments,
     auto const bin_index = seqan3::bin_index{static_cast<size_t>(record.bin_indices.back())};
     std::vector<uint64_t> values;
 
-    timer local_user_bin_io_timer{};
+    timer<concurrent::no> local_user_bin_io_timer{};
     local_user_bin_io_timer.start();
     if (arguments.input_is_minimiser)
     {
@@ -70,7 +70,7 @@ void insert_into_ibf(build_arguments const & arguments,
     local_user_bin_io_timer.stop();
     arguments.user_bin_io_timer += local_user_bin_io_timer;
 
-    timer local_fill_ibf_timer{};
+    timer<concurrent::no> local_fill_ibf_timer{};
     local_fill_ibf_timer.start();
     for (auto && value : values)
         ibf.emplace(value, bin_index);

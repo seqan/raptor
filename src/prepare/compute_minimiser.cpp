@@ -27,9 +27,9 @@ void compute_minimiser(prepare_arguments const & arguments)
 
     auto worker = [&](auto && zipped_view, auto &&)
     {
-        timer local_compute_minimiser_timer{};
-        timer local_write_minimiser_timer{};
-        timer local_write_header_timer{};
+        timer<concurrent::no> local_compute_minimiser_timer{};
+        timer<concurrent::no> local_write_minimiser_timer{};
+        timer<concurrent::no> local_write_header_timer{};
 
         // The hash table stores how often a minimiser appears. It does not matter whether a minimiser appears
         // 50 times or 2000 times, it is stored regardless because the biggest cutoff value is 50. Hence,

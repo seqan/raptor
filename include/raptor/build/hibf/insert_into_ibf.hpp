@@ -24,8 +24,8 @@ void insert_into_ibf(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                      size_t const bin_index,
                      seqan3::interleaved_bloom_filter<> & ibf,
                      bool is_root,
-                     timer & fill_ibf_timer,
-                     timer & merge_kmers_timer);
+                     timer<concurrent::yes> & fill_ibf_timer,
+                     timer<concurrent::yes> & merge_kmers_timer);
 
 void insert_into_ibf(build_arguments const & arguments,
                      chopper_pack_record const & record,

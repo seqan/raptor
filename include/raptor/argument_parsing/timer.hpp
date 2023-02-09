@@ -14,21 +14,49 @@
 namespace raptor
 {
 
+enum class concurrent
+{
+    no,
+    yes
+};
+
+template <concurrent concurrency>
 class timer
 {
+private:
+    static constexpr bool is_concurrent{concurrency == concurrent::yes};
+
+    using rep_t =
+        std::conditional_t<is_concurrent, std::atomic<std::chrono::steady_clock::rep>, std::chrono::steady_clock::rep>;
+
+    template <concurrent concurrency_>
+    friend class timer;
+
 public:
     timer() = default;
-    timer(timer const & other) : start_{other.start_}, stop_{other.stop_} // this will have ticks = 0
-    {}
     timer(timer &&) = default;
-    timer & operator=(timer const & other) // this will have ticks = 0
+    timer & operator=(timer &&) = default;
+    ~timer() = default;
+
+    timer(timer const & other)
+        requires (!is_concurrent)
+    = default;
+    timer & operator=(timer const & other)
+        requires (!is_concurrent)
+    = default;
+
+    timer(timer const & other)
+        requires is_concurrent
+        : start_{other.start_}, stop_{other.stop_}, ticks{other.ticks.load()}
+    {}
+    timer & operator=(timer const & other)
+        requires is_concurrent
     {
         start_ = other.start_;
         stop_ = other.stop_;
+        ticks = other.ticks.load();
         return *this;
     }
-    timer & operator=(timer &&) = default;
-    ~timer() = default;
 
     void start()
     {
@@ -42,20 +70,28 @@ public:
         ticks += (stop_ - start_).count();
     }
 
-    void operator+=(timer const & other)
+    template <concurrent concurrency_>
+    void operator+=(timer<concurrency_> const & other)
     {
         ticks += other.ticks;
     }
 
     double in_seconds() const
+        requires is_concurrent
     {
         return std::chrono::duration<double>(std::chrono::steady_clock::duration{ticks.load()}).count();
+    }
+
+    double in_seconds() const
+        requires (!is_concurrent)
+    {
+        return std::chrono::duration<double>(std::chrono::steady_clock::duration{ticks}).count();
     }
 
 private:
     std::chrono::steady_clock::time_point start_{std::chrono::time_point<std::chrono::steady_clock>::max()};
     std::chrono::steady_clock::time_point stop_{};
-    std::atomic<std::chrono::steady_clock::rep> ticks{};
+    rep_t ticks{};
 };
 
 } // namespace raptor

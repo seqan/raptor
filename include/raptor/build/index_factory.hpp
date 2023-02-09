@@ -67,8 +67,8 @@ private:
 
         auto worker = [&](auto && zipped_view, auto &&)
         {
-            timer local_user_bin_io_timer{};
-            timer local_fill_ibf_timer{};
+            timer<concurrent::no> local_user_bin_io_timer{};
+            timer<concurrent::no> local_fill_ibf_timer{};
             std::vector<uint64_t> hashes{};
             auto & ibf = index.ibf();
 

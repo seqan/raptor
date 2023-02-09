@@ -42,9 +42,9 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
 
     auto worker = [&](size_t const start, size_t const end)
     {
-        timer local_compute_minimiser_timer{};
-        timer local_query_ibf_timer{};
-        timer local_generate_results_timer{};
+        timer<concurrent::no> local_compute_minimiser_timer{};
+        timer<concurrent::no> local_query_ibf_timer{};
+        timer<concurrent::no> local_generate_results_timer{};
 
         auto counter = [&index]()
         {
