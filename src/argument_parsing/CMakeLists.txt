@@ -50,7 +50,7 @@ if (NOT TARGET raptor_argument_parsing)
     )
 
     target_compile_definitions ("raptor_argument_parsing"
-                                PUBLIC "-DRAPTOR_VERSION=\"${RAPTOR_PROJECT_VERSION} (${RAPTOR_COMMIT_HASH})\""
+                                PUBLIC "-DRAPTOR_VERSION=\"${PACKAGE_VERSION} (${RAPTOR_COMMIT_HASH})\""
                                        "-DRAPTOR_DATE=\"${RAPTOR_COMMIT_DATE}\""
     )
 
