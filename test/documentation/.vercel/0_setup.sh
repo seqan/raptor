@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
-DOXYGEN_VERSION=1.9.5
+DOXYGEN_VERSION=1.9.6
 WORK_DIR=`pwd`
 CACHE_DIR="${WORK_DIR}/node_modules" # The node_modules directory is always cached.
 

@@ -5,6 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
+/*!\file
+ * \brief Provides raptor::call_parallel_on_bins.
+ * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
+ */
+
 #pragma once
 
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>

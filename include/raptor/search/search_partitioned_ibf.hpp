@@ -5,6 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
+/*!\file
+ * \brief Provides raptor::search_partitioned_ibf.
+ * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
+ */
+
 #pragma once
 
 #include <raptor/argument_parsing/search_arguments.hpp>

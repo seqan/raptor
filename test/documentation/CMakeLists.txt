@@ -8,13 +8,15 @@
 # Minimum cmake version
 cmake_minimum_required (VERSION 3.7)
 
-project (docs
-         LANGUAGES NONE
-         VERSION "2.0.1"
-)
-
 set (RAPTOR_DOXYGEN_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 get_filename_component (RAPTOR_CLONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../.." ABSOLUTE)
+
+include (${RAPTOR_CLONE_DIR}/build_system/raptor-config-version.cmake)
+
+project (docs
+         LANGUAGES NONE
+         VERSION "${RAPTOR_PROJECT_VERSION}"
+)
 
 include (raptor-doxygen.cmake)
 
