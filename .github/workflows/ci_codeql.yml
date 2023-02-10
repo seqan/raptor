@@ -1,0 +1,49 @@
+name: CodeQL
+
+on:
+  schedule:
+    - cron: "0 6 * * SAT"
+  workflow_dispatch:
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CMAKE_VERSION: 3.18.4
+  SHARG_NO_VERSION_CHECK: 1
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -Eeuxo pipefail {0}
+
+jobs:
+  codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: raptor
+        fetch-depth: 0
+        submodules: true
+
+    - name: Install CMake
+      run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_cmake.sh
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: cpp
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:cpp"
