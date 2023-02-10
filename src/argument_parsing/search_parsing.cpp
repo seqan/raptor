@@ -91,10 +91,9 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
             .long_id = "cache-thresholds",
             .description =
                 "Stores the computed thresholds with an unique name next to the index. In the next search call "
-                "using this option, the stored thresholds are re-used.\n"
-                "Two files are stored:\n"
-                "\\fBthreshold_*.bin\\fP: Depends on query_length, window, kmer/shape, errors, and tau.\n"
-                "\\fBcorrection_*.bin\\fP: Depends on query_length, window, kmer/shape, p_max, and fpr."});
+                "using this option, the stored thresholds are re-used. Two files are stored:"});
+    parser.add_list_item("", "\\fBthreshold_*.bin\\fP: Depends on query_length, window, kmer/shape, errors, and tau.");
+    parser.add_list_item("", "\\fBcorrection_*.bin\\fP: Depends on query_length, window, kmer/shape, p_max, and fpr.");
 }
 
 void search_parsing(sharg::parser & parser)
