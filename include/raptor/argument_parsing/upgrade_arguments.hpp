@@ -18,16 +18,16 @@ namespace raptor
 struct upgrade_arguments
 {
     uint32_t window_size{};
-    uint8_t kmer_size{};
     seqan3::shape shape{};
+    bool compressed{};
+    bool input_is_minimiser{};
     uint8_t parts{1u};
-    bool compressed{false};
-    double fpr{0.05};
-    bool is_hibf{false};
+    uint8_t threads{1u};
+    double fpr{std::numeric_limits<double>::quiet_NaN()};
 
     std::filesystem::path bin_file{};
-    std::filesystem::path in_file{};
-    std::filesystem::path out_file{};
+    std::filesystem::path index_file{};
+    std::filesystem::path output_file{};
 
     std::vector<std::vector<std::string>> bin_path{};
 };

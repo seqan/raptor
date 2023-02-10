@@ -12,6 +12,6 @@
 namespace raptor
 {
 
-void raptor_upgrade(upgrade_arguments const & arguments);
+void raptor_upgrade(upgrade_arguments & arguments);
 
 } // namespace raptor

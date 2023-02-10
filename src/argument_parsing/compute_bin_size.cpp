@@ -20,7 +20,7 @@ namespace raptor
 namespace detail
 {
 
-inline size_t kmer_count_from_minimiser_files(raptor::build_arguments const & arguments)
+size_t kmer_count_from_minimiser_files(std::vector<std::vector<std::string>> const & bin_path, uint8_t const threads)
 {
     std::mutex callback_mutex{};
     size_t max_filesize{};
@@ -59,7 +59,7 @@ inline size_t kmer_count_from_minimiser_files(raptor::build_arguments const & ar
         callback(biggest_file, max_filesize);
     };
 
-    call_parallel_on_bins(worker, arguments.bin_path, arguments.threads);
+    call_parallel_on_bins(worker, bin_path, threads);
 
     std::string shape_string{};
     uint64_t window_size{};
@@ -73,11 +73,14 @@ inline size_t kmer_count_from_minimiser_files(raptor::build_arguments const & ar
     return max_count;
 }
 
-inline size_t kmer_count_from_sequence_files(raptor::build_arguments const & arguments)
+size_t kmer_count_from_sequence_files(std::vector<std::vector<std::string>> const & bin_path,
+                                      uint8_t const threads,
+                                      seqan3::shape const & shape,
+                                      uint32_t const window_size)
 {
     size_t max_count{};
     std::mutex callback_mutex{};
-    file_reader<file_types::sequence> const reader{arguments.shape, arguments.window_size};
+    file_reader<file_types::sequence> const reader{shape, window_size};
 
     auto callback = [&callback_mutex, &max_count](auto && view)
     {
@@ -94,23 +97,36 @@ inline size_t kmer_count_from_sequence_files(raptor::build_arguments const & arg
             reader.on_hash(file_names, callback);
     };
 
-    call_parallel_on_bins(worker, arguments.bin_path, arguments.threads);
+    call_parallel_on_bins(worker, bin_path, threads);
 
     return max_count;
 }
 
 } // namespace detail
 
-size_t compute_bin_size(raptor::build_arguments const & arguments)
+size_t compute_bin_size(build_arguments const & arguments)
 {
     arguments.bin_size_timer.start();
-    size_t const max_count = arguments.input_is_minimiser ? detail::kmer_count_from_minimiser_files(arguments)
-                                                          : detail::kmer_count_from_sequence_files(arguments);
+    size_t const max_count = arguments.input_is_minimiser
+                               ? detail::kmer_count_from_minimiser_files(arguments.bin_path, arguments.threads)
+                               : detail::kmer_count_from_sequence_files(arguments.bin_path,
+                                                                        arguments.threads,
+                                                                        arguments.shape,
+                                                                        arguments.window_size);
     arguments.bin_size_timer.stop();
 
     assert(max_count > 0u);
 
     return hibf::bin_size_in_bits(arguments, max_count);
+}
+
+size_t max_bin_count(upgrade_arguments const & arguments)
+{
+    return arguments.input_is_minimiser ? detail::kmer_count_from_minimiser_files(arguments.bin_path, arguments.threads)
+                                        : detail::kmer_count_from_sequence_files(arguments.bin_path,
+                                                                                 arguments.threads,
+                                                                                 arguments.shape,
+                                                                                 arguments.window_size);
 }
 
 } // namespace raptor

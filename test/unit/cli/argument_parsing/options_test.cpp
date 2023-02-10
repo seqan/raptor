@@ -265,7 +265,7 @@ TEST_F(argparse_search, old_index)
                                                "--query ",
                                                data("query.fq"),
                                                "--index ",
-                                               data("1_1.index"),
+                                               data("2.0.index"),
                                                "--output search.out");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Unsupported index version. Check raptor upgrade.\n"});
@@ -391,18 +391,49 @@ TEST_F(argparse_search, queries_unsupported_length)
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
-TEST_F(argparse_upgrade, kmer_window)
+TEST_F(argparse_upgrade, exclusive_options)
+{
+    {
+        std::ofstream monolithic_index{"raptor.index"};
+        std::ofstream bins{"bins.list"};
+    }
+
+    cli_test_result const result = execute_app("raptor",
+                                               "upgrade",
+                                               "--input raptor.index",
+                                               "--output upgrade.index",
+                                               "--fpr 0.05",
+                                               "--bins bins.list");
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] You cannot set both --fpr and --bins.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
+TEST_F(argparse_upgrade, ambiguous_index)
+{
+    {
+        std::ofstream monolithic_index{"raptor.index"};
+        std::ofstream partitioned_index{"raptor.index_0"};
+    }
+
+    cli_test_result const result =
+        execute_app("raptor", "upgrade", "--input raptor.index", "--output upgrade.index", "--fpr 0.05");
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err,
+              std::string{"[Error] Ambiguous index. Both monolithic (raptor.index) and partitioned index "
+                          "(raptor.index_0) exist. Please rename the monolithic index.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
+TEST_F(argparse_upgrade, unsupported_index)
 {
     cli_test_result const result = execute_app("raptor",
                                                "upgrade",
-                                               "--bins ",
-                                               tmp_bin_list_file,
-                                               "--input ",
-                                               data("1bins19window.index"),
-                                               "--output index.raptor",
-                                               "--window 19",
-                                               "--kmer 20");
+                                               "--input",
+                                               data("1bins23window.index"),
+                                               "--output upgrade.index",
+                                               "--fpr 0.05");
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] The k-mer size cannot be bigger than the window size.\n"});
+    EXPECT_EQ(result.err, std::string{"[Error] Unsupported index version. Use Raptor 2.0's upgrade first.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }

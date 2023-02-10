@@ -11,11 +11,13 @@
 #include <vector>
 
 #include <raptor/argument_parsing/build_arguments.hpp>
+#include <raptor/argument_parsing/upgrade_arguments.hpp>
 #include <raptor/build/partition_config.hpp>
 
 namespace raptor
 {
 
 std::vector<size_t> max_count_per_partition(partition_config const & cfg, build_arguments const & arguments);
+std::vector<size_t> max_count_per_partition(partition_config const & cfg, upgrade_arguments const & arguments);
 
 } // namespace raptor
