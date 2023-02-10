@@ -35,7 +35,14 @@ template <typename index_t>
 concept is_hibf =
     std::same_as<index_t, index_structure::hibf> || std::same_as<index_t, index_structure::hibf_compressed>;
 
+template <typename index_t>
+concept is_compressed =
+    std::same_as<index_t, index_structure::ibf_compressed> || std::same_as<index_t, index_structure::hibf_compressed>;
+
 } // namespace index_structure
+
+template <seqan3::data_layout data_layout_mode_>
+class index_upgrader;
 
 template <typename data_t = index_structure::ibf>
 class raptor_index
@@ -47,7 +54,7 @@ private:
     uint64_t window_size_{};
     seqan3::shape shape_{};
     uint8_t parts_{};
-    bool compressed_{};
+    bool compressed_{index_structure::is_compressed<data_t>};
     std::vector<std::vector<std::string>> bin_path_{};
     double fpr_{};
     bool is_hibf_{index_structure::is_hibf<data_t>};
@@ -185,12 +192,10 @@ public:
                 archive(window_size_);
                 archive(shape_);
                 archive(parts_);
+                bool const type_is_compressed{compressed_};
                 archive(compressed_);
-                if ((data_layout_mode == seqan3::data_layout::compressed && !compressed_)
-                    || (data_layout_mode == seqan3::data_layout::uncompressed && compressed_))
-                {
+                if (type_is_compressed != compressed_)
                     throw sharg::parser_error{"Data layouts of serialised and specified index differ."};
-                }
                 archive(bin_path_);
                 archive(fpr_);
                 archive(is_hibf_);
@@ -242,6 +247,71 @@ public:
         else
         {
             throw sharg::parser_error{"Unsupported index version. Check raptor upgrade."}; // GCOVR_EXCL_LINE
+        }
+    }
+
+    //!\brief Load parameters from old index format for use with raptor upgrade.
+    template <seqan3::cereal_input_archive archive_t>
+    void load_old_parameters(archive_t & archive)
+    {
+        uint32_t parsed_version{};
+        archive(parsed_version);
+        if (parsed_version == 1u)
+        {
+            try
+            {
+                archive(window_size_);
+                archive(shape_);
+                archive(parts_);
+                archive(compressed_);
+                archive(bin_path_);
+            }
+            // GCOVR_EXCL_START
+            catch (std::exception const & e)
+            {
+                throw sharg::parser_error{"Cannot read index: " + std::string{e.what()}};
+            }
+            // GCOVR_EXCL_STOP
+        }
+        else
+        {
+            throw sharg::parser_error{"Unsupported index version. Use Raptor 2.0's upgrade first."}; // LCOV_EXCL_LINE
+        }
+    }
+    //!\endcond
+
+private:
+    template <seqan3::data_layout data_layout_mode_>
+    friend class index_upgrader;
+
+    //!\cond DEV
+    //!\brief Load old index format for use with raptor upgrade.
+    template <seqan3::cereal_archive archive_t>
+    void load_old_index(archive_t & archive)
+    {
+        uint32_t parsed_version{};
+        archive(parsed_version);
+        if (parsed_version == 1u)
+        {
+            try
+            {
+                archive(window_size_);
+                archive(shape_);
+                archive(parts_);
+                archive(compressed_);
+                archive(bin_path_);
+                archive(ibf_);
+            }
+            // GCOVR_EXCL_START
+            catch (std::exception const & e)
+            {
+                throw sharg::parser_error{"Cannot read index: " + std::string{e.what()}};
+            }
+            // GCOVR_EXCL_STOP
+        }
+        else
+        {
+            throw sharg::parser_error{"Unsupported index version. Use Raptor 2.0's upgrade first."}; // LCOV_EXCL_LINE
         }
     }
     //!\endcond

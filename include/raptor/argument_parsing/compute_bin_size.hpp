@@ -8,10 +8,12 @@
 #pragma once
 
 #include <raptor/argument_parsing/build_arguments.hpp>
+#include <raptor/argument_parsing/upgrade_arguments.hpp>
 
 namespace raptor
 {
 
 size_t compute_bin_size(raptor::build_arguments const & arguments);
+size_t max_bin_count(upgrade_arguments const & arguments);
 
 } // namespace raptor

@@ -67,9 +67,30 @@ declare_internal_datasource (FILE 128bins23window.index
                              URL ${CMAKE_CURRENT_LIST_DIR}/128bins23window.index
                              URL_HASH SHA256=500afa4fc9ac0acca90c108b4e9ad664bad1717c92a4bb3d39ce4e1869f684e0
 )
-declare_internal_datasource (FILE 1_1.index
-                             URL ${CMAKE_CURRENT_LIST_DIR}/1_1.index
-                             URL_HASH SHA256=2a00d9fd2cf9865841b559219cb1896d33e8a20e77604906ba551e94fbdbed7f
+
+declare_internal_datasource (FILE 2.0.index
+                             URL ${CMAKE_CURRENT_LIST_DIR}/2.0.index
+                             URL_HASH SHA256=c7dcacfa9b170446a279c33e13663c8f45c07afe657d9fb127b6a797afd7767d
+)
+declare_internal_datasource (FILE 2.0.compressed.index
+                             URL ${CMAKE_CURRENT_LIST_DIR}/2.0.compressed.index
+                             URL_HASH SHA256=220fa3cf85a3669ffc67eb9664918092367d53f2d76db821db8048e9bce40446
+)
+declare_internal_datasource (FILE 2.0.partitioned.index_0
+                             URL ${CMAKE_CURRENT_LIST_DIR}/2.0.partitioned.index_0
+                             URL_HASH SHA256=54b7e93b39c4b67df704b639d0f45a1365e809188a899c6bd11ce34cc9cd77fd
+)
+declare_internal_datasource (FILE 2.0.partitioned.index_1
+                             URL ${CMAKE_CURRENT_LIST_DIR}/2.0.partitioned.index_1
+                             URL_HASH SHA256=732c155bf2ed32be2da3d00e5907b58cf7b8adf92f327cf4d27ec160b8456a8b
+)
+declare_internal_datasource (FILE 2.0.partitioned.index_2
+                             URL ${CMAKE_CURRENT_LIST_DIR}/2.0.partitioned.index_2
+                             URL_HASH SHA256=27f2d356f54baf061ca6f89022cf623921c4a2414f3eebea5efd65bc943c5070
+)
+declare_internal_datasource (FILE 2.0.partitioned.index_3
+                             URL ${CMAKE_CURRENT_LIST_DIR}/2.0.partitioned.index_3
+                             URL_HASH SHA256=6e8358f1757c9667541a14e3ac637fbc9efcbfcf520daa28db2f27e4e4d6ee9d
 )
 
 declare_internal_datasource (FILE 64bins23windowc.index

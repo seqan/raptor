@@ -9,6 +9,8 @@
 #include <raptor/argument_parsing/parse_bin_path.hpp>
 #include <raptor/argument_parsing/upgrade_parsing.hpp>
 #include <raptor/argument_parsing/validators.hpp>
+#include <raptor/build/partition_config.hpp>
+#include <raptor/index.hpp>
 #include <raptor/upgrade/upgrade.hpp>
 
 namespace raptor
@@ -17,44 +19,39 @@ namespace raptor
 void init_upgrade_parser(sharg::parser & parser, upgrade_arguments & arguments)
 {
     init_shared_meta(parser);
-    parser.info.description.emplace_back("Upgrades a Raptor index created with an older version of Raptor to be"
-                                         " compatible with the currently used version of Raptor.");
+    parser.info.description.emplace_back("Upgrades a Raptor index created with Raptor 2.0 to be"
+                                         " compatible with Raptor 3.0.");
+    parser.info.description.emplace_back("The only new parameter need is the false positive rate. The false positive"
+                                         " rate affects the search results. This can be done in three different ways:");
+    parser.info.description.emplace_back("\\fB1)\\fP Pass the false positive rate via --fpr.");
+    parser.info.description.emplace_back("\\fB2)\\fP The false positive rate can be automatically determined if the"
+                                         " paths of the files used to build the index are still available.");
+    parser.info.description.emplace_back("\\fB3)\\fP Pass a file containing the path to the original files, one line"
+                                         " per file. The false positive rate can then be automatically determined. The"
+                                         " order of the files does not matter. The file with the most k-mers will"
+                                         " determine the false positive rate.");
 
+    parser.add_option(arguments.fpr,
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "fpr",
+                                    .description = "The false positive rate.",
+                                    .default_message = "None",
+                                    .validator = sharg::arithmetic_range_validator{0.0, 1.0}});
     parser.add_option(arguments.bin_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "bins",
                                     .description = "File containing one file per line per bin.",
-                                    .required = true,
+                                    .default_message = "None",
+                                    .required = false,
                                     .validator = sharg::input_file_validator{}});
-    parser.add_option(arguments.in_file,
+    parser.add_option(arguments.index_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "input",
                                     .description = "The index to upgrade. Parts: Without suffix _0",
                                     .required = true});
     parser.add_option(
-        arguments.out_file,
+        arguments.output_file,
         sharg::config{.short_id = '\0', .long_id = "output", .description = "Path to new index.", .required = true});
-    parser.add_option(arguments.window_size,
-                      sharg::config{.short_id = '\0',
-                                    .long_id = "window",
-                                    .description = "The original window size.",
-                                    .required = true,
-                                    .validator = positive_integer_validator{}});
-    parser.add_option(arguments.kmer_size,
-                      sharg::config{.short_id = '\0',
-                                    .long_id = "kmer",
-                                    .description = "The original kmer size.",
-                                    .required = true,
-                                    .validator = sharg::arithmetic_range_validator{1, 32}});
-    parser.add_option(arguments.parts,
-                      sharg::config{.short_id = '\0',
-                                    .long_id = "parts",
-                                    .description = "Original index consisted of this many parts.",
-                                    .validator = power_of_two_validator{}});
-
-    parser.add_flag(
-        arguments.compressed,
-        sharg::config{.short_id = '\0', .long_id = "compressed", .description = "Original index was compressed."});
 }
 
 void upgrade_parsing(sharg::parser & parser)
@@ -63,45 +60,64 @@ void upgrade_parsing(sharg::parser & parser)
     init_upgrade_parser(parser, arguments);
     parser.parse();
 
-    // ==========================================
-    // Various checks.
-    // ==========================================
-    if (arguments.kmer_size > arguments.window_size)
-        throw sharg::parser_error{"The k-mer size cannot be bigger than the window size."};
+    if (parser.is_option_set("fpr") && parser.is_option_set("bins"))
+        throw sharg::validation_error{"You cannot set both --fpr and --bins."};
 
-    arguments.shape = seqan3::shape{seqan3::ungapped{arguments.kmer_size}};
+    std::filesystem::path const partitioned_index_file = arguments.index_file.string() + "_0";
+    bool const index_is_monolithic = std::filesystem::exists(arguments.index_file);
+    bool const index_is_partitioned = std::filesystem::exists(partitioned_index_file);
+    sharg::input_file_validator const index_validator{};
 
-    std::filesystem::path output_directory = arguments.out_file.parent_path();
-    std::error_code ec{};
-    std::filesystem::create_directories(output_directory, ec);
-
-    // GCOVR_EXCL_START
-    if (!output_directory.empty() && ec)
-        throw sharg::parser_error{
-            seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
-    // GCOVR_EXCL_STOP
-
-    if (arguments.parts == 1)
+    if (index_is_monolithic && index_is_partitioned)
     {
-        sharg::input_file_validator{}(arguments.in_file);
+        throw sharg::validation_error{sharg::detail::to_string("Ambiguous index. Both monolithic (",
+                                                               arguments.index_file.c_str(),
+                                                               ") and partitioned index (",
+                                                               partitioned_index_file.c_str(),
+                                                               ") exist. Please rename the monolithic index.")};
+    }
+    else if (index_is_partitioned)
+    {
+        index_validator(partitioned_index_file);
     }
     else
     {
-        sharg::input_file_validator validator{};
-        for (size_t part{0}; part < arguments.parts; ++part)
+        index_validator(arguments.index_file);
+    }
+
+    if (parser.is_option_set("bins"))
+        parse_bin_path(arguments);
+
+    {
+        std::ifstream is{index_is_partitioned ? partitioned_index_file : arguments.index_file, std::ios::binary};
+        cereal::BinaryInputArchive iarchive{is};
+        raptor_index<> tmp{};
+        tmp.load_old_parameters(iarchive);
+        arguments.shape = tmp.shape();
+        arguments.window_size = tmp.window_size();
+        arguments.parts = tmp.parts();
+        arguments.compressed = tmp.compressed();
+        if (arguments.bin_path.empty() && !parser.is_option_set("fpr"))
         {
-            validator(arguments.in_file.string() + std::string{"_"} + std::to_string(part));
+            arguments.bin_path = tmp.bin_path();
+            bin_validator{}(arguments.bin_path);
+            arguments.input_is_minimiser = arguments.bin_path[0][0].ends_with(".minimiser");
         }
     }
 
-    // ==========================================
-    // Process bin_path
-    // ==========================================
-    parse_bin_path(arguments);
+    if (index_is_partitioned)
+    {
+        std::string const index_path_base{[&partitioned_index_file]()
+                                          {
+                                              std::string_view sv = partitioned_index_file.c_str();
+                                              assert(sv.size() > 0u);
+                                              sv.remove_suffix(1u);
+                                              return sv;
+                                          }()};
+        for (size_t part{1u}; part < arguments.parts; ++part)
+            index_validator(index_path_base + std::to_string(part));
+    }
 
-    // ==========================================
-    // Dispatch
-    // ==========================================
     raptor_upgrade(arguments);
 }
 

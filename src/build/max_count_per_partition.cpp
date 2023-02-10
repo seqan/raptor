@@ -19,11 +19,15 @@ namespace detail
 {
 
 template <file_types file_type>
-std::vector<size_t> max_count_per_partition(partition_config const & cfg, build_arguments const & arguments)
+std::vector<size_t> max_count_per_partition(partition_config const & cfg,
+                                            std::vector<std::vector<std::string>> const & bin_path,
+                                            uint8_t const threads,
+                                            seqan3::shape const & shape,
+                                            uint32_t const window_size)
 {
     std::vector<size_t> kmers_per_partition(cfg.partitions);
     std::mutex callback_mutex{};
-    file_reader<file_type> const reader{arguments.shape, arguments.window_size};
+    file_reader<file_type> const reader{shape, window_size};
 
     auto callback = [&callback_mutex, &kmers_per_partition, &cfg](std::vector<size_t> const & kmer_counts)
     {
@@ -50,7 +54,7 @@ std::vector<size_t> max_count_per_partition(partition_config const & cfg, build_
         callback(max_kmer_counts);
     };
 
-    call_parallel_on_bins(worker, arguments.bin_path, arguments.threads);
+    call_parallel_on_bins(worker, bin_path, threads);
 
     return kmers_per_partition;
 }
@@ -60,10 +64,39 @@ std::vector<size_t> max_count_per_partition(partition_config const & cfg, build_
 std::vector<size_t> max_count_per_partition(partition_config const & cfg, build_arguments const & arguments)
 {
     arguments.bin_size_timer.start();
+    // GCOVR_EXCL_START
     std::vector<size_t> result = arguments.input_is_minimiser
-                                   ? detail::max_count_per_partition<file_types::minimiser>(cfg, arguments)
-                                   : detail::max_count_per_partition<file_types::sequence>(cfg, arguments);
+                                   ? detail::max_count_per_partition<file_types::minimiser>(cfg,
+                                                                                            arguments.bin_path,
+                                                                                            arguments.threads,
+                                                                                            arguments.shape,
+                                                                                            arguments.window_size)
+                                   : detail::max_count_per_partition<file_types::sequence>(cfg,
+                                                                                           arguments.bin_path,
+                                                                                           arguments.threads,
+                                                                                           arguments.shape,
+                                                                                           arguments.window_size);
+    // GCOVR_EXCL_STOP
     arguments.bin_size_timer.stop();
+
+    return result;
+}
+
+std::vector<size_t> max_count_per_partition(partition_config const & cfg, upgrade_arguments const & arguments)
+{
+    // GCOVR_EXCL_START
+    std::vector<size_t> result = arguments.input_is_minimiser
+                                   ? detail::max_count_per_partition<file_types::minimiser>(cfg,
+                                                                                            arguments.bin_path,
+                                                                                            arguments.threads,
+                                                                                            arguments.shape,
+                                                                                            arguments.window_size)
+                                   : detail::max_count_per_partition<file_types::sequence>(cfg,
+                                                                                           arguments.bin_path,
+                                                                                           arguments.threads,
+                                                                                           arguments.shape,
+                                                                                           arguments.window_size);
+    // GCOVR_EXCL_STOP
 
     return result;
 }
