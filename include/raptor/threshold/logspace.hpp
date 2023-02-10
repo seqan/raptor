@@ -5,6 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
+/*!\file
+ * \brief Provides functionality for working with probabilities in logspace.
+ * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
+ */
+
 #pragma once
 
 #include <cmath>

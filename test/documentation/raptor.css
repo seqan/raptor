@@ -260,6 +260,9 @@ div.solution {
 #nav-tree .label a[class^="namespace"][class$="html"],
 #nav-tree .label a[class="nolink"],
 #nav-tree .label a[class="annotated.html"],
+#nav-tree .label a[class="classes.html"],
+#nav-tree .label a[class^="functions"][class$="html"],
+#nav-tree .label a[class^="globals"][class$="html"],
 #nav-tree .label a[class="hierarchy.html"],
 #nav-tree .label a[class="index.html"],
 #nav-tree .label a[class="files.html"],
@@ -293,6 +296,12 @@ div.solution {
 #nav-tree .label a[class^="class"][class$="html"]::after,
 #nav-tree .label a[class^="struct"][class$="html"]::after {
     content: " Class";
+    color: grey;
+}
+
+/* Remove suffix from Class Index */
+#nav-tree .label a[class^="classes.html"]::after {
+    content: "" !important;
     color: grey;
 }
 

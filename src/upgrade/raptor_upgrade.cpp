@@ -5,6 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
+/*!\file
+ * \brief Provides raptor::raptor_upgrade.
+ * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
+ */
+
 #include <raptor/argument_parsing/compute_bin_size.hpp>
 #include <raptor/argument_parsing/validators.hpp>
 #include <raptor/build/max_count_per_partition.hpp>

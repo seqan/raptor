@@ -5,6 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
+/*!\file
+ * \brief Provides raptor::compute_bin_size and raptor::max_bin_count.
+ * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
+ */
+
 #pragma once
 
 #include <raptor/argument_parsing/build_arguments.hpp>

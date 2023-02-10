@@ -1,11 +1,11 @@
-# Doxyfile 1.9.5
+# Doxyfile 1.9.6
 
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = Raptor
-PROJECT_NUMBER         = ${PROJECT_VERSION}
+PROJECT_NUMBER         = ${PACKAGE_VERSION}
 PROJECT_BRIEF          = "A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences"
 PROJECT_LOGO           =
 ## PATHS
@@ -42,15 +42,15 @@ INHERIT_DOCS           = YES
 SEPARATE_MEMBER_PAGES  = NO
 TAB_SIZE               = 4
 ## Custom doxygen commands
-ALIASES                = tutorial_head{4}="<table><tr><th>Difficulty</th><td>\1</td></tr><tr><th>Duration</th><td>\2</td></tr><tr><th>Prerequisite tutorials</th><td>\3</td></tr><tr><th>Recommended reading</th><td>\4</td></tr></table>"
-ALIASES                += startcollapsible{1}="\htmlonly<details class=\"seqan\"><summary class = \"seqan\">\1</summary>\endhtmlonly"
-ALIASES                += endcollapsible="\htmlonly</details>\endhtmlonly"
-ALIASES                += assignment{1}="\htmlonly <div class=\"assignment\"><h4>\1</h4><div class=\"assignment_content\">\endhtmlonly"
-ALIASES                += endassignment="\htmlonly</div></div>\endhtmlonly"
-ALIASES                += solution="\htmlonly <div class=\"solution\"> <details><summary><b>Solution</b></summary> \endhtmlonly"
-ALIASES                += endsolution="\htmlonly </details> </div> \endhtmlonly"
-ALIASES                += hint="\htmlonly <div class=\"assignment\"> <details><summary><b>Hint</b></summary> \endhtmlonly"
-ALIASES                += endhint="\htmlonly </details> </div> \endhtmlonly"
+ALIASES                = "tutorial_head{4}=<table><tr><th>Difficulty</th><td>\1</td></tr><tr><th>Duration</th><td>\2</td></tr><tr><th>Prerequisite tutorials</th><td>\3</td></tr><tr><th>Recommended reading</th><td>\4</td></tr></table>" \
+                         "startcollapsible{1}=\htmlonly<details class=\"seqan\"><summary class = \"seqan\">\1</summary>\endhtmlonly" \
+                         "endcollapsible=\htmlonly</details>\endhtmlonly" \
+                         "assignment{1}=\htmlonly <div class=\"assignment\"><h4>\1</h4><div class=\"assignment_content\">\endhtmlonly" \
+                         "endassignment=\htmlonly</div></div>\endhtmlonly" \
+                         "solution=\htmlonly <div class=\"solution\"> <details><summary><b>Solution</b></summary> \endhtmlonly" \
+                         "endsolution=\htmlonly </details> </div> \endhtmlonly" \
+                         "hint=\htmlonly <div class=\"assignment\"> <details><summary><b>Hint</b></summary> \endhtmlonly" \
+                         "endhint=\htmlonly </details> </div> \endhtmlonly"
 OPTIMIZE_OUTPUT_FOR_C  = NO
 OPTIMIZE_OUTPUT_JAVA   = NO
 OPTIMIZE_FOR_FORTRAN   = NO
@@ -113,7 +113,7 @@ ENABLED_SECTIONS       = ${RAPTOR_DOXYGEN_ENABLED_SECTIONS}
 MAX_INITIALIZER_LINES  = 30
 SHOW_USED_FILES        = YES
 SHOW_FILES             = YES
-SHOW_NAMESPACES        = YES
+SHOW_NAMESPACES        = NO
 FILE_VERSION_FILTER    =
 LAYOUT_FILE            = ${RAPTOR_DOXYGEN_OUTPUT_DIR}/DoxygenLayout.xml
 CITE_BIB_FILES         =
@@ -126,6 +126,7 @@ WARN_IF_UNDOCUMENTED   = NO
 WARN_IF_DOC_ERROR      = YES
 WARN_IF_INCOMPLETE_DOC = YES
 WARN_NO_PARAMDOC       = NO
+WARN_IF_UNDOC_ENUM_VAL = NO
 WARN_AS_ERROR          = NO
 WARN_FORMAT            = "$file:$line: $text"
 WARN_LINE_FORMAT       = "at line $line of file $file"
@@ -134,6 +135,7 @@ WARN_LOGFILE           =
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
 INPUT                  = ${RAPTOR_DOXYGEN_SOURCE_DIR}/include \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/src \
                          ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc \
                          ${RAPTOR_DOXYGEN_SOURCE_DIR}/LICENSE.md \
                          ${RAPTOR_DOXYGEN_SOURCE_DIR}/CHANGELOG.md
@@ -145,7 +147,7 @@ EXCLUDE                =
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = */doc/*.cpp
 EXCLUDE_SYMBOLS        = ${RAPTOR_DOXYGEN_EXCLUDE_SYMBOLS}
-EXAMPLE_PATH           = ${RAPTOR_DOXYGEN_SOURCE_DIR}
+EXAMPLE_PATH           = ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/snippet
 EXAMPLE_PATTERNS       = *
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc \
@@ -343,7 +345,7 @@ DOT_EDGE_ATTR          = "labelfontname=Helvetica,labelfontsize=10"
 DOT_NODE_ATTR          = "shape=box,height=0.2,width=0.4"
 DOT_FONTPATH           =
 CLASS_GRAPH            = YES
-COLLABORATION_GRAPH    = NO
+COLLABORATION_GRAPH    = YES
 GROUP_GRAPHS           = YES
 UML_LOOK               = NO
 UML_LIMIT_NUM_FIELDS   = 10
@@ -352,8 +354,8 @@ DOT_WRAP_THRESHOLD     = 17
 TEMPLATE_RELATIONS     = YES
 INCLUDE_GRAPH          = YES
 INCLUDED_BY_GRAPH      = YES
-CALL_GRAPH             = NO
-CALLER_GRAPH           = NO
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
 GRAPHICAL_HIERARCHY    = YES
 DIRECTORY_GRAPH        = YES
 DIR_GRAPH_MAX_DEPTH    = 1

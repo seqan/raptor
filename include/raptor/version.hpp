@@ -5,14 +5,14 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------------
 
+/*!\file
+ * \brief Provides RAPTOR version macros and global variables.
+ * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
+ */
+
 #pragma once
 
 #include <cstdint>
-
-/*!\file
- * \brief Provides RAPTOR version macros and global variables.
- * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
- */
 
 //!\brief The major version as MACRO.
 #define RAPTOR_VERSION_MAJOR 3
