@@ -90,5 +90,5 @@ if (NOT "${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
     # might not.
     # set(PACKAGE_VERSION "${PACKAGE_VERSION} (${installedBits}bit)")
     # set(PACKAGE_VERSION_UNSUITABLE TRUE)
-    message (AUTHOR_WARNING "B.I.O. does not support 32bit architectures; No guarantees; Patches are welcome.")
+    message (AUTHOR_WARNING "Raptor does not support 32bit architectures; No guarantees; Patches are welcome.")
 endif ()
