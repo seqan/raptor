@@ -5,6 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
+/*!\file
+ * \brief Implements raptor::hibf::bin_size_in_bits.
+ * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
+ */
+
 #include <cmath>
 
 #include <raptor/build/hibf/bin_size_in_bits.hpp>

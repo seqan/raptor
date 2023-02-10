@@ -6,7 +6,7 @@
 // --------------------------------------------------------------------------------------------------
 
 /*!\file
- * \brief Provides raptor::raptor_upgrade.
+ * \brief Implements raptor::raptor_upgrade.
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 

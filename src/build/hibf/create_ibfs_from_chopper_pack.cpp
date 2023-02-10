@@ -5,6 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
+/*!\file
+ * \brief Implements raptor::hibf::create_ibfs_from_chopper_pack.
+ * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
+ */
+
 #include <lemon/list_graph.h> /// Must be first include.
 
 #include <raptor/build/hibf/create_ibfs_from_chopper_pack.hpp>

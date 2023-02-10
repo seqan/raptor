@@ -5,6 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
+/*!\file
+ * \brief Implements raptor::hibf::loop_over_children.
+ * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
+ */
+
 #include <lemon/list_graph.h> /// Must be first include.
 
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>

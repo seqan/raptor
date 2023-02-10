@@ -6,8 +6,8 @@
 // --------------------------------------------------------------------------------------------------
 
 /*!\file
+ * \brief Implements raptor::threshold::precompute_threshold.
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
- * \brief Provides stuff.
  */
 
 #include <fstream>
