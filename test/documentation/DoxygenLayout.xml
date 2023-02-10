@@ -4,11 +4,15 @@
   <navindex>
     <tab type="mainpage" visible="yes" title=""/>
     <tab type="pages" visible="no" title="" intro=""/>
-    <tab type="usergroup" visible="yes" title="Setup" intro=""/>
-    <tab type="usergroup" visible="yes" title="Tutorial" intro=""/>
+    <!-- Setup pages are added in raptor-doxygen-layout.cmake automatically for each doc/setup/*/index.md file -->
+    <tab type="usergroup" visible="yes" title="Setup" intro="">
+    </tab>
+    <!-- Tutorials are added in raptor-doxygen-layout.cmake automatically for each doc/tutorial/*/index.md file -->
+    <tab type="usergroup" visible="yes" title="Tutorial" intro="">
+    </tab>
     <tab type="modules" visible="yes" title="API Reference" intro=""/>
     <tab type="usergroup" visible="yes" title="API Reference (details)" intro="">
-      <tab type="namespaces" visible="yes" title="">
+      <tab type="namespaces" visible="no" title="">
         <tab type="namespacelist" visible="yes" title="" intro=""/>
         <tab type="namespacemembers" visible="yes" title="" intro=""/>
       </tab>

@@ -5,6 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
+/*!\file
+ * \brief Implements raptor.
+ * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
+ */
+
 #include <raptor/argument_parsing/build_parsing.hpp>
 #include <raptor/argument_parsing/init_shared_meta.hpp>
 #include <raptor/argument_parsing/prepare_parsing.hpp>

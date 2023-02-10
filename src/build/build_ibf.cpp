@@ -5,6 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
+/*!\file
+ * \brief Implements raptor::build_ibf.
+ * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
+ */
+
 #include <raptor/build/hibf/bin_size_in_bits.hpp>
 #include <raptor/build/index_factory.hpp>
 #include <raptor/build/max_count_per_partition.hpp>

@@ -5,6 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
+/*!\file
+ * \brief Implements raptor::raptor_build.
+ * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
+ */
+
 #include <raptor/build/build_ibf.hpp>
 #include <raptor/build/hibf/chopper_build.hpp>
 #include <raptor/build/raptor_build.hpp>

@@ -5,6 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
+/*!\file
+ * \brief Implements raptor::parse_bin_path.
+ * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
+ */
+
 #include <raptor/argument_parsing/parse_bin_path.hpp>
 #include <raptor/argument_parsing/validators.hpp>
 #include <raptor/build/hibf/parse_chopper_pack_line.hpp>
