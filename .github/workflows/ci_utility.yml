@@ -1,12 +1,9 @@
-name: CI util
+name: Utility
 
 on:
   push:
     branches:
       - 'main'
-  # pull_request:
-  #   types:
-  #     - unlabeled
   workflow_dispatch:
 
 concurrency:
@@ -20,31 +17,31 @@ env:
 
 defaults:
   run:
-    shell: bash -ex {0}
+    shell: bash -Eeuxo pipefail {0}
 
 jobs:
   build:
     name: ${{ matrix.name }}
     runs-on: ubuntu-22.04
     timeout-minutes: 120
-    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'clang-format'
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: "gcc12 util"
+          - name: "gcc12"
             cxx: "g++-12"
             cc: "gcc-12"
             build_type: Release
             cxx_flags: "-std=c++23"
 
-          - name: "gcc11 util"
+          - name: "gcc11"
             cxx: "g++-11"
             cc: "gcc-11"
             build_type: Release
             cxx_flags: "-std=c++23"
 
-          - name: "gcc10 util"
+          - name: "gcc10"
             cxx: "g++-10"
             cc: "gcc-10"
             build_type: Release
@@ -59,16 +56,13 @@ jobs:
           submodules: true
 
       - name: Add package source
-        run: |
-          sudo sed -i 's@azure.archive.ubuntu.com@mirror.enzu.com@' /etc/apt/sources.list
-          bash ./raptor/lib/seqan3/.github/workflows/scripts/configure_apt.sh
+        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/configure_apt.sh
 
       - name: Install CMake
         run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_cmake.sh
 
       - name: Install ccache
-        run: |
-          sudo apt-get install --yes ccache
+        run: sudo apt-get install --yes ccache
 
       - name: Install compiler ${{ matrix.cxx }}
         run: sudo apt-get install --yes ${{ matrix.cxx }}

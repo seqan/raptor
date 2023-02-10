@@ -1,4 +1,4 @@
-name: Cron Sanitizer
+name: Sanitizer
 
 on:
   schedule:
@@ -18,7 +18,7 @@ env:
 
 defaults:
   run:
-    shell: bash -euxo pipefail {0}
+    shell: bash -Eeuxo pipefail {0}
 
 jobs:
   build:
@@ -50,9 +50,7 @@ jobs:
           submodules: true
 
       - name: Add package source
-        run: |
-          sudo sed -i 's@azure.archive.ubuntu.com@mirror.enzu.com@' /etc/apt/sources.list
-          bash ./raptor/lib/seqan3/.github/workflows/scripts/configure_apt.sh
+        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/configure_apt.sh
 
       - name: Configure OS
         run: |

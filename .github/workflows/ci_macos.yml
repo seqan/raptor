@@ -1,4 +1,4 @@
-name: CI on macOS
+name: macOS
 
 on:
   push:
@@ -20,14 +20,14 @@ env:
 
 defaults:
   run:
-    shell: bash -ex {0}
+    shell: bash -Eeuxo pipefail {0}
 
 jobs:
   build:
     name: ${{ matrix.name }}
     runs-on: macos-12
     timeout-minutes: 120
-    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'clang-format'
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
       fail-fast: true
       matrix:
