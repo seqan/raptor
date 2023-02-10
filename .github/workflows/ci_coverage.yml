@@ -138,6 +138,38 @@ jobs:
                 --output ${{ github.workspace }}/build/coverage_report.xml
 
       - name: Submit coverage report
+        id: submission1
+        uses: codecov/codecov-action@v3
+        continue-on-error: true
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ${{ github.workspace }}/build/coverage_report.xml
+          root_dir: ${{ github.workspace }}/raptor
+          fail_ci_if_error: true
+
+      # When running on a PR, the token is not available. Because of the token-less upload, GitHub API rate limits apply
+      # and the upload may fail.
+      - name: Wait before retrying submission
+        if: steps.submission1.outcome == 'failure'
+        run: sleep 15
+
+      - name: Retry submission
+        id: submission2
+        uses: codecov/codecov-action@v3
+        if: steps.submission1.outcome == 'failure'
+        continue-on-error: true
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ${{ github.workspace }}/build/coverage_report.xml
+          root_dir: ${{ github.workspace }}/raptor
+          fail_ci_if_error: true
+
+      - name: Wait before retrying submission
+        if: steps.submission2.outcome == 'failure'
+        run: sleep 15
+
+      - name: Retry submission
+        if: steps.submission2.outcome == 'failure'
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
