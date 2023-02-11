@@ -228,8 +228,10 @@ public:
         std::error_code ec{};
         std::filesystem::create_directories(out_dir, ec);
         if (ec)
+            // GCOVR_EXCL_START
             throw sharg::validation_error{
                 sharg::detail::to_string("Failed to create directory\"", out_dir.c_str(), "\": ", ec.message())};
+        // GCOVR_EXCL_STOP
 
         validator(out_dir);
     }
@@ -264,8 +266,10 @@ public:
             std::error_code ec{};
             std::filesystem::create_directories(out_dir, ec);
             if (ec)
+                // GCOVR_EXCL_START
                 throw sharg::validation_error{
                     sharg::detail::to_string("Failed to create directory \"", out_dir.c_str(), "\": ", ec.message())};
+            // GCOVR_EXCL_STOP
         }
 
         validator(out_path);

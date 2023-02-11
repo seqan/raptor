@@ -391,6 +391,19 @@ TEST_F(argparse_search, queries_unsupported_length)
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
+TEST_F(argparse_upgrade, no_options)
+{
+    cli_test_result const result = execute_app("raptor", "prepare");
+    std::string const expected{"Raptor-prepare - A fast and space-efficient pre-filter for querying very large "
+                               "collections of nucleotide sequences.\n"
+                               "======================================================================================="
+                               "============================\n"
+                               "    Try -h or --help for more information.\n"};
+    EXPECT_EQ(result.out, expected);
+    EXPECT_EQ(result.err, std::string{});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
+}
+
 TEST_F(argparse_upgrade, exclusive_options)
 {
     {
