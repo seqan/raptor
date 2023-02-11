@@ -92,10 +92,15 @@ jobs:
       - name: Get changed files
         id: changed_files
         run: |
-          LIST=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} | \
+          CPP_LIST=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} | \
           { grep -v -E "(lib/)" || test $? = 1; } | \
-          { grep -E "(\.cpp|\.hpp|\.cmake|CMakeLists.txt)$" || test $? = 1; } | xargs)
-          echo "list=$LIST" >> $GITHUB_OUTPUT
+          { grep -E "(\.cpp|\.hpp)$" || test $? = 1; } | xargs)
+          echo "cpp_list=$CPP_LIST" >> $GITHUB_OUTPUT
+
+          CMAKE_LIST=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} | \
+          { grep -v -E "(lib/)" || test $? = 1; } | \
+          { grep -E "(\.cmake|CMakeLists.txt)$" || test $? = 1; } | xargs)
+          echo "cmake_list=$CMAKE_LIST" >> $GITHUB_OUTPUT
 
       - name: Switch to fork
         run: |
@@ -104,21 +109,21 @@ jobs:
           git checkout --force --track fork/${{ github.event.pull_request.head.ref }}
 
       - name: Run clang-format
-        if: ${{ steps.changed_files.outputs.list }}
+        if: ${{ steps.changed_files.outputs.cpp_list }}
         uses: DoozyX/clang-format-lint-action@v0.15
         with:
-          source: ${{ steps.changed_files.outputs.list }}
+          source: ${{ steps.changed_files.outputs.cpp_list }}
           clangFormatVersion: 15
           inplace: True
 
       - name: Run cmake-format
-        if: ${{ steps.changed_files.outputs.list }}
+        if: ${{ steps.changed_files.outputs.cmake_list }}
         uses: PuneetMatharu/cmake-format-lint-action@v1.0.1
         with:
           args: --config-files .cmake-format.yaml --in-place
 
       - name: Import GPG key
-        if: ${{ steps.changed_files.outputs.list }}
+        if: ${{ steps.changed_files.outputs.cpp_list }} || ${{ steps.changed_files.outputs.cmake_list }}
         uses: crazy-max/ghaction-import-gpg@v5
         with:
           gpg_private_key: ${{ secrets.SEQAN_ACTIONS_GPG_KEY }}
@@ -127,7 +132,7 @@ jobs:
           git_commit_gpgsign: true
 
       - name: Commit changes
-        if: ${{ steps.changed_files.outputs.list }}
+        if: ${{ steps.changed_files.outputs.cpp_list }} || ${{ steps.changed_files.outputs.cmake_list }}
         run: |
           git config user.name "seqan-actions[bot]"
           git config user.email "seqan-actions@users.noreply.github.com"
@@ -137,7 +142,7 @@ jobs:
 
       # Wait for 5 seconds such that workflows triggered by adding the label run on the newest commit.
       - name: Defer workflow
-        if: ${{ steps.changed_files.outputs.list }}
+        if: ${{ steps.changed_files.outputs.cpp_list }} || ${{ steps.changed_files.outputs.cmake_list }}
         run: sleep 5
 
       - name: Remove label
