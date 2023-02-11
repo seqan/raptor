@@ -154,9 +154,10 @@ TEST_F(search_hibf_preprocessing, pipeline_with_continuation)
                                                     std::to_string(window_size),
                                                     "--threads 2",
                                                     "--output precomputed_minimisers",
+                                                    "--verbose",
                                                     "raptor_cli_test2.txt");
         EXPECT_EQ(result1.out, std::string{});
-        EXPECT_EQ(result1.err, std::string{});
+        EXPECT_NE(result1.err, std::string{});
         RAPTOR_ASSERT_ZERO_EXIT(result1);
     }
     {

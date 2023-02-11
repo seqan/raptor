@@ -121,3 +121,22 @@ INSTANTIATE_TEST_SUITE_P(search_ibf_suite,
                                               + std::to_string(std::get<2>(info.param)) + "_error";
                              return name;
                          });
+
+TEST_F(search_ibf, verbose)
+{
+    cli_test_result const result = execute_app("raptor",
+                                               "search",
+                                               "--output search.out",
+                                               "--error 1",
+                                               "--p_max 0.4",
+                                               "--verbose",
+                                               "--index ",
+                                               ibf_path(16, 19),
+                                               "--query ",
+                                               data("query.fq"));
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_NE(result.err, std::string{});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
+
+    compare_search(16, 1, "search.out");
+}

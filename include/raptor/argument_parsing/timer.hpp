@@ -87,11 +87,13 @@ public:
         return std::chrono::duration<double>(std::chrono::steady_clock::duration{ticks.load()}).count();
     }
 
+    // GCOVR_EXCL_START
     double in_seconds() const
         requires (!is_concurrent)
     {
         return std::chrono::duration<double>(std::chrono::steady_clock::duration{ticks}).count();
     }
+    // GCOVR_EXCL_STOP
 
 private:
     std::chrono::steady_clock::time_point start_{std::chrono::time_point<std::chrono::steady_clock>::max()};
