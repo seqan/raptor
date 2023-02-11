@@ -54,7 +54,7 @@ struct partition_config
     static constexpr size_t next_power_of_four(size_t number)
     {
         if (number == 0ULL || number == 1ULL)
-            return 1ULL;
+            return 1ULL; // GCOVR_EXCL_LINE
 
         --number;
         int const highest_set_bit_pos = std::bit_width(number);
