@@ -84,3 +84,20 @@ TEST_F(build_hibf, three_levels)
 
     compare_index<raptor::index_structure::hibf>(data("three_levels.hibf"), "raptor.index");
 }
+
+TEST_F(build_hibf, verbose)
+{
+    cli_test_result const result = execute_app("raptor",
+                                               "build",
+                                               "--kmer 19",
+                                               "--window 19",
+                                               "--threads 1",
+                                               "--output raptor.index",
+                                               "--verbose",
+                                               data("three_levels.pack"));
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_NE(result.err, std::string{});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
+
+    compare_index<raptor::index_structure::hibf>(data("three_levels.hibf"), "raptor.index");
+}

@@ -112,6 +112,7 @@ void upgrade_parsing(sharg::parser & parser)
 
     if (index_is_partitioned)
     {
+        // GCOVR_EXCL_START
         std::string const index_path_base{[&partitioned_index_file]()
                                           {
                                               std::string_view sv = partitioned_index_file.c_str();
@@ -119,6 +120,7 @@ void upgrade_parsing(sharg::parser & parser)
                                               sv.remove_suffix(1u);
                                               return sv;
                                           }()};
+        // GCOVR_EXCL_STOP
         for (size_t part{1u}; part < arguments.parts; ++part)
             index_validator(index_path_base + std::to_string(part));
     }

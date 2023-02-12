@@ -131,7 +131,6 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
                                                 "--output search.out",
                                                 "--error ",
                                                 std::to_string(number_of_errors),
-                                                // "--p_max 0.4",
                                                 "--index ",
                                                 "raptor.index",
                                                 "--query ",

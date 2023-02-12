@@ -47,7 +47,7 @@ public:
         config{std::addressof(cfg)}
     {
         if (arguments->input_is_minimiser)
-            reader = file_reader<file_types::minimiser>{};
+            reader = file_reader<file_types::minimiser>{}; // GCOVR_EXCL_LINE
         else
             reader = file_reader<file_types::sequence>{arguments->shape, arguments->window_size};
     }

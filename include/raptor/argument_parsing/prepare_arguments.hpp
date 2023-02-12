@@ -46,7 +46,6 @@ struct prepare_arguments
     mutable timer<concurrent::yes> write_minimiser_timer{};
     mutable timer<concurrent::yes> write_header_timer{};
 
-    // GCOVR_EXCL_START
     void print_timings() const
     {
         if (!verbose)
@@ -58,7 +57,6 @@ struct prepare_arguments
         std::cerr << "Write minimiser files [s]: " << write_minimiser_timer.in_seconds() / threads << '\n';
         std::cerr << "Write header files [s]: " << write_header_timer.in_seconds() / threads << '\n';
     }
-    // GCOVR_EXCL_STOP
 };
 
 } // namespace raptor

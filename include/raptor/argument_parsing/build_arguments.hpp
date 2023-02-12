@@ -58,7 +58,6 @@ struct build_arguments
     mutable timer<concurrent::yes> fill_ibf_timer{};
     mutable timer<concurrent::yes> store_index_timer{};
 
-    // GCOVR_EXCL_START
     void print_timings() const
     {
         if (!verbose)
@@ -80,7 +79,6 @@ struct build_arguments
         std::cerr << "Fill IBF sum [s]: " << fill_ibf_timer.in_seconds() << '\n';
         std::cerr << "Store index [s]: " << store_index_timer.in_seconds() << '\n';
     }
-    // GCOVR_EXCL_STOP
 };
 
 } // namespace raptor

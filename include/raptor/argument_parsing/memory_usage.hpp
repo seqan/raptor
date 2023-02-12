@@ -22,8 +22,11 @@
 namespace raptor
 {
 
+namespace detail
+{
+
 #if __has_include(<sys/resource.h>)
-// Returns -1 if not available.
+// Returns -1 if not available. Actually returns bytes instead of KiB on macOS.
 inline long peak_ram_in_KiB()
 {
     rusage usage;
@@ -36,13 +39,10 @@ inline long peak_ram_in_KiB()
 }
 #endif
 
-[[nodiscard]] inline std::string formatted_peak_ram()
+[[nodiscard]] inline std::string formatted_peak_ram(size_t const bytes)
 {
-    long const peak_ram_KiB = peak_ram_in_KiB();
-    if (peak_ram_KiB == -1L)
-        return {": Not available"};
+    assert(bytes > 0);
 
-    size_t const bytes = static_cast<size_t>(peak_ram_KiB) << 10;
     size_t iterations{};
     size_t integer{bytes};
 
@@ -90,35 +90,38 @@ inline long peak_ram_in_KiB()
         }
     };
 
-    std::string result{};
+    std::string const formatted{formatted_string()};
     switch (iterations)
     {
     case 0:
-        result = "[Bytes]: ";
-        break;
+        return "[Bytes]: " + formatted;
     case 1:
-        result = "[KiB]: ";
-        break;
+        return "[KiB]: " + formatted;
     case 2:
-        result = "[MiB]: ";
-        break;
+        return "[MiB]: " + formatted;
     case 3:
-        result = "[GiB]: ";
-        break;
+        return "[GiB]: " + formatted;
     case 4:
-        result = "[TiB]: ";
-        break;
+        return "[TiB]: " + formatted;
     case 5:
-        result = "[PiB]: ";
-        break;
+        return "[PiB]: " + formatted;
     default:
-        result = "[EiB]: ";
-        break;
+        return "[EiB]: " + formatted;
     }
+}
 
-    result += formatted_string();
+} // namespace detail
 
-    return result;
+[[nodiscard]] inline std::string formatted_peak_ram()
+{
+    long const peak_ram_KiB = detail::peak_ram_in_KiB();
+    if (peak_ram_KiB == -1L)
+        return {": Not available"}; // GCOVR_EXCL_LINE
+#if __APPLE__
+    return detail::formatted_peak_ram(static_cast<size_t>(peak_ram_KiB));
+#else
+    return detail::formatted_peak_ram(static_cast<size_t>(peak_ram_KiB) << 10);
+#endif
 }
 
 } // namespace raptor

@@ -78,3 +78,27 @@ INSTANTIATE_TEST_SUITE_P(build_ibf_suite,
                                               + (std::get<2>(info.param) ? "parallel" : "serial");
                              return name;
                          });
+
+TEST_F(build_ibf, verbose)
+{
+    { // generate input file
+        std::ofstream file{"raptor_cli_test.txt"};
+        for (auto && file_path : get_repeated_bins(16u))
+            file << file_path << '\n';
+        file << '\n';
+    }
+
+    cli_test_result const result = execute_app("raptor",
+                                               "build",
+                                               "--kmer 19",
+                                               "--window 19",
+                                               "--threads 1",
+                                               "--verbose",
+                                               "--output raptor.index",
+                                               "raptor_cli_test.txt");
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_NE(result.err, std::string{});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
+
+    compare_index(ibf_path(16, 19), "raptor.index");
+}

@@ -64,7 +64,6 @@ struct search_arguments
     mutable timer<concurrent::yes> query_ibf_timer{};
     mutable timer<concurrent::yes> generate_results_timer{};
 
-    // GCOVR_EXCL_START
     void print_timings() const
     {
         if (!verbose)
@@ -79,7 +78,6 @@ struct search_arguments
         std::cerr << "Query IBF [s]: " << query_ibf_timer.in_seconds() / threads << '\n';
         std::cerr << "Generate results [s]: " << generate_results_timer.in_seconds() / threads << '\n';
     }
-    // GCOVR_EXCL_STOP
 
     raptor::threshold::threshold_parameters make_threshold_parameters() const noexcept
     {

@@ -83,12 +83,14 @@ void search_partitioned_ibf(search_arguments const & arguments)
                 minimiser.assign(minimiser_view.begin(), minimiser_view.end());
                 local_compute_minimiser_timer.stop();
 
+                // GCOVR_EXCL_START
                 auto filtered = minimiser
                               | std::views::filter(
                                     [&](auto && hash)
                                     {
                                         return cfg.hash_partition(hash) == part;
                                     });
+                // GCOVR_EXCL_STOP
 
                 local_query_ibf_timer.start();
                 counts[counter_id++] += counter.bulk_count(filtered);
@@ -138,12 +140,14 @@ void search_partitioned_ibf(search_arguments const & arguments)
                 minimiser.assign(minimiser_view.begin(), minimiser_view.end());
                 local_compute_minimiser_timer.stop();
 
+                // GCOVR_EXCL_START
                 auto filtered = minimiser
                               | std::views::filter(
                                     [&](auto && hash)
                                     {
                                         return cfg.hash_partition(hash) == part;
                                     });
+                // GCOVR_EXCL_STOP
                 local_query_ibf_timer.start();
                 counts[counter_id] += counter.bulk_count(filtered);
                 local_query_ibf_timer.stop();
