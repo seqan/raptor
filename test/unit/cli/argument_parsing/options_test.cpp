@@ -17,6 +17,8 @@ struct argparse_search : public raptor_base
 {};
 struct argparse_upgrade : public raptor_base
 {};
+struct argparse_prepare : public raptor_base
+{};
 
 raptor::test::tmp_test_file const test_files{};
 // clang-format off
@@ -28,7 +30,9 @@ std::filesystem::path const
     tmp_bin_list_corrupted = test_files.create("corrupted.txt",  raptor::hibf::pack_file_first_line_prefix),
     empty_sequence_file    = test_files.create("empty.fasta"),
     tmp_empty_bin_file     = test_files.create("empty_bin.txt",  empty_sequence_file.c_str()),
+    header_file            = test_files.create("bin1.header",    "1111111111111111111\t19\t0\t1\n"),
     minimiser_file         = test_files.create("bin1.minimiser", "0"),
+    minimiser_list         = test_files.create("minimiser.list", minimiser_file.c_str()),
     mixed_bin_file         = test_files.create("mixed.txt",      minimiser_file.c_str(), "\nbin2.fasta");
 // clang-format on
 
@@ -120,22 +124,6 @@ TEST_F(argparse_build, output_missing)
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
-TEST_F(argparse_build, directory_missing)
-{
-    cli_test_result const result = execute_app("raptor", "build", "--compute-minimiser", tmp_bin_list_file);
-    EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
-    RAPTOR_ASSERT_FAIL_EXIT(result);
-}
-
-TEST_F(argparse_build, alias)
-{
-    cli_test_result const result = execute_app("raptor", "build", "--compute-minimizer", tmp_bin_list_file);
-    EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
-    RAPTOR_ASSERT_FAIL_EXIT(result);
-}
-
 TEST_F(argparse_build, kmer_window)
 {
     cli_test_result const result =
@@ -210,6 +198,41 @@ TEST_F(argparse_build, wrong_parts)
     EXPECT_EQ(result.err,
               std::string{"[Error] Validation failed for option --parts: The value must be a power of "
                           "two.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
+TEST_F(argparse_build, partitioned_parts)
+{
+    cli_test_result const result =
+        execute_app("raptor", "build", "--parts 4", "--output index.raptor", data("three_levels.pack"));
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] The HIBF cannot yet be partitioned.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
+TEST_F(argparse_build, minimiser_and_shape)
+{
+    cli_test_result const result =
+        execute_app("raptor", "build", "--shape 11111", "--output index.raptor", minimiser_list);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] You cannot set --shape when using minimiser files as input.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
+TEST_F(argparse_build, minimiser_and_kmer)
+{
+    cli_test_result const result = execute_app("raptor", "build", "--kmer 19", "--output index.raptor", minimiser_list);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] You cannot set --kmer when using minimiser files as input.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
+TEST_F(argparse_build, minimiser_and_window)
+{
+    cli_test_result const result =
+        execute_app("raptor", "build", "--window 19", "--output index.raptor", minimiser_list);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] You cannot set --window when using minimiser files as input.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
@@ -448,5 +471,19 @@ TEST_F(argparse_upgrade, unsupported_index)
                                                "--fpr 0.05");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Unsupported index version. Use Raptor 2.0's upgrade first.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
+TEST_F(argparse_prepare, cutoffs)
+{
+    cli_test_result const result = execute_app("raptor",
+                                               "prepare",
+                                               "--output directory",
+                                               "--kmer-count-cutoff 1",
+                                               "--use-filesize-dependent-cutoff",
+                                               tmp_bin_list_file);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err,
+              std::string{"[Error] You cannot use both --kmer-count-cutoff and --use-filesize-dependent-cutoff.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
