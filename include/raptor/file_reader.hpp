@@ -37,7 +37,7 @@ class file_reader<file_types::sequence>
 public:
     file_reader() = default;
     file_reader(file_reader const &) = default;
-    file_reader(file_reader &&) = default;
+    file_reader(file_reader &&) = default; // GCOVR_EXCL_LINE
     file_reader & operator=(file_reader const &) = default;
     file_reader & operator=(file_reader &&) = default;
     ~file_reader() = default;

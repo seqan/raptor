@@ -95,7 +95,7 @@ bool read_correction(std::vector<size_t> & vec, threshold_parameters const & arg
         // How many FPs to expect for a given fpr and number of minimisers?
         // The probability of seeing this many FP must be below p_max.
         while (binom(binom_coeff, number_of_minimisers, number_of_fp) >= log_p_max)
-            ++number_of_fp;
+            ++number_of_fp; // GCOVR_EXCL_LINE
 
         correction.push_back(number_of_fp - 1);
     }

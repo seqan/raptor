@@ -62,31 +62,44 @@ TEST_P(build_ibf_partitioned, pipeline)
 TEST_F(build_ibf_partitioned, pipeline_misc)
 {
     std::stringstream header{};
-    { // generate input file
+    { // generate input files
         std::ofstream file{"raptor_cli_test.txt"};
+        std::ofstream file2{"raptor_cli_test.minimiser"};
         size_t usr_bin_id{0};
         for (auto && file_path : get_repeated_bins(16))
         {
-            header << '#' << usr_bin_id++ << '\t' << file_path << '\n';
             file << file_path << '\n';
+            auto line = seqan3::detail::to_string("precomputed_minimisers/",
+                                                  std::filesystem::path{file_path}.stem().c_str(),
+                                                  ".minimiser");
+            header << '#' << usr_bin_id++ << '\t' << line << '\n';
+            file2 << line << '\n';
         }
         header << "#QUERY_NAME\tUSER_BINS\n";
         file << '\n';
     }
 
     cli_test_result const result1 = execute_app("raptor",
-                                                "build",
+                                                "prepare",
                                                 "--kmer 19",
-                                                "--fpr 0.016",
                                                 "--window 23",
-                                                "--output raptor.index",
-                                                "--parts 4",
+                                                "--output precomputed_minimisers",
                                                 "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result1);
 
     cli_test_result const result2 = execute_app("raptor",
+                                                "build",
+                                                "--fpr 0.016",
+                                                "--output raptor.index",
+                                                "--parts 4",
+                                                "raptor_cli_test.minimiser");
+    EXPECT_EQ(result2.out, std::string{});
+    EXPECT_EQ(result2.err, std::string{});
+    RAPTOR_ASSERT_ZERO_EXIT(result2);
+
+    cli_test_result const result3 = execute_app("raptor",
                                                 "search",
                                                 "--output search.out",
                                                 "--threshold 0.5",
@@ -94,13 +107,13 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
                                                 "raptor.index",
                                                 "--query ",
                                                 data("query.fq"));
-    EXPECT_EQ(result2.out, std::string{});
-    EXPECT_EQ(result2.err, std::string{});
-    RAPTOR_ASSERT_ZERO_EXIT(result2);
+    EXPECT_EQ(result3.out, std::string{});
+    EXPECT_EQ(result3.err, std::string{});
+    RAPTOR_ASSERT_ZERO_EXIT(result3);
 
     compare_search(16, 1 /* Always finds everything */, "search.out");
 
-    cli_test_result const result3 = execute_app("raptor",
+    cli_test_result const result4 = execute_app("raptor",
                                                 "search",
                                                 "--output search2.out",
                                                 "--error 1",
@@ -108,9 +121,9 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
                                                 "raptor.index",
                                                 "--query ",
                                                 data("query_empty.fq"));
-    EXPECT_EQ(result3.out, std::string{});
-    EXPECT_EQ(result3.err, std::string{});
-    RAPTOR_ASSERT_ZERO_EXIT(result3);
+    EXPECT_EQ(result4.out, std::string{});
+    EXPECT_EQ(result4.err, std::string{});
+    RAPTOR_ASSERT_ZERO_EXIT(result4);
 
     compare_search(16, 1, "search2.out", is_empty::yes);
 }
