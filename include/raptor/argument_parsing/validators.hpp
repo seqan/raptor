@@ -194,7 +194,7 @@ public:
         return seqan3::detail::to_string("The file must contain at least one file path per line, with multiple paths "
                                          "being separated by a whitespace. Each line in the file corresponds to one "
                                          "bin. Valid extensions for the paths in the file are [minimiser] when "
-                                         " using preprocessed input in raptor build, and ",
+                                         " using preprocessed input from \\fBraptor prepare\\fP, and ",
                                          raptor::detail::sequence_extensions,
 #if defined(SEQAN3_HAS_BZIP2) || defined(SEQAN3_HAS_ZLIB)
                                          ", possibly followed by ",
