@@ -35,20 +35,25 @@ void init_upgrade_parser(sharg::parser & parser, upgrade_arguments & arguments)
                                          " per file. The false positive rate can then be automatically determined. The"
                                          " order of the files does not matter. The file with the most k-mers will"
                                          " determine the false positive rate.");
+    parser.info.examples.emplace_back("raptor upgrade --input old.index --output new.index");
+    parser.info.examples.emplace_back("raptor upgrade --input old.index --output new.index --fpr 0.05");
+    parser.info.examples.emplace_back("raptor upgrade --input old.index --output new.index --bins bins.list");
+    parser.info.synopsis.emplace_back("raptor upgrade --input <file> --output <file> [--fpr <number>|--bins <file>]");
 
     parser.add_option(arguments.fpr,
                       sharg::config{.short_id = '\0',
                                     .long_id = "fpr",
-                                    .description = "The false positive rate.",
+                                    .description = "The false positive rate. Mutually exclusive with --bins.",
                                     .default_message = "None",
                                     .validator = sharg::arithmetic_range_validator{0.0, 1.0}});
-    parser.add_option(arguments.bin_file,
-                      sharg::config{.short_id = '\0',
-                                    .long_id = "bins",
-                                    .description = "File containing one file per line per bin.",
-                                    .default_message = "None",
-                                    .required = false,
-                                    .validator = sharg::input_file_validator{}});
+    parser.add_option(
+        arguments.bin_file,
+        sharg::config{.short_id = '\0',
+                      .long_id = "bins",
+                      .description = "File containing one file per line per bin. Mutually exclusive with --fpr.",
+                      .default_message = "None",
+                      .required = false,
+                      .validator = sharg::input_file_validator{}});
     parser.add_option(arguments.index_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "input",

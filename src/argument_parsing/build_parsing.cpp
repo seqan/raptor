@@ -46,12 +46,25 @@ inline void parse_shape_from_minimiser(sharg::parser & parser, build_arguments &
 void init_build_parser(sharg::parser & parser, build_arguments & arguments)
 {
     init_shared_meta(parser);
-    parser.info.description.emplace_back("Constructs a Raptor index of large collections of nucleotide sequences.");
-    parser.info.examples = {"raptor build --kmer 19 --window 23 --fpr 0.05 --output raptor.index all_bin_paths.txt"};
+    parser.info.description.emplace_back("Constructs a Raptor index.");
+    parser.info.description.emplace_back("The input may be a layout file from \\fBraptor layout\\fP, a list of "
+                                         "minimiser files produced from \\fBraptor prepare\\fP, or a file with a list "
+                                         "of files to process.");
+    parser.info.examples.emplace_back("raptor build --kmer 19 --window 23 --fpr 0.05 --output raptor.index bins.list");
+    parser.info.examples.emplace_back("raptor build --shape 11011 --window 8 --output raptor.index bins.list");
+    parser.info.examples.emplace_back(
+        "raptor build --kmer 32 --window 32 --hash 3 --parts 4 --output raptor.index bins.list");
+    parser.info.examples.emplace_back("raptor build --fpr 0.05 --output raptor.index minimiser.list");
+    parser.info.examples.emplace_back(
+        "raptor build  --kmer 19 --window 23 --fpr 0.05 --output raptor.index raptor.layout");
+    parser.info.synopsis.emplace_back("raptor build --output <file> [--threads <number>] [--verbose] [--kmer <number>"
+                                      "|--shape <01-pattern>] [--window <number>] [--fpr <number>] [--hash <number>] "
+                                      "[--parts <number>] [--compressed] [--] <INPUT>");
 
     parser.add_positional_option(
         arguments.bin_file,
-        sharg::config{.description = "File containing file names. " + bin_validator{}.get_help_page_message(),
+        sharg::config{.description = "A layout file from \\fBraptor layout\\fP, or a file containing file names. "
+                                   + bin_validator{}.get_help_page_message(),
                       .validator = sharg::input_file_validator{}});
 
     parser.add_subsection("General options");
