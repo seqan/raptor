@@ -24,9 +24,16 @@ namespace raptor
 void init_prepare_parser(sharg::parser & parser, prepare_arguments & arguments)
 {
     init_shared_meta(parser);
-    parser.info.description.emplace_back("Computes minimisers for the use with raptor build. Creates minimiser and "
-                                         "header files for each given file in the input file.");
-    // parser.info.examples = {};
+    parser.info.description.emplace_back(
+        "Computes minimisers for the use with \\fBraptor layout\\fP and \\fBraptor build\\fP.");
+    parser.info.description.emplace_back("Can continue where it left off after a crash or in multiple runs.");
+    parser.info.examples.emplace_back("raptor prepare --output some_directory --kmer 20 --window 24 bins.list");
+    parser.info.examples.emplace_back("raptor prepare --output some_directory --kmer-count-cutoff 2 bins.list");
+    parser.info.examples.emplace_back(
+        "raptor prepare --output some_directory --use-filesize-dependent-cutoff bins.list");
+    parser.info.synopsis.emplace_back(
+        "raptor prepare --output <directory> [--threads <number>] [--verbose] [--kmer <number>|--shape <01-pattern>] "
+        "[--window <number>] [--kmer-count-cutoff <number>|--use-filesize-dependent-cutoff] [--] <INPUT>");
 
     parser.add_positional_option(
         arguments.bin_file,
@@ -40,6 +47,15 @@ void init_prepare_parser(sharg::parser & parser, prepare_arguments & arguments)
                                     .description = "",
                                     .required = true,
                                     .validator = output_directory_validator{}});
+    parser.add_list_item("",
+                         "\\fBWhen you manually delete a .in_progress file, also delete the corresponding .header and "
+                         ".minimiser file!\\fP");
+    parser.add_list_item("", "Created output files for each file:");
+    parser.add_list_item("", "\\fB*.header\\fP: Contains the shape, window size, cutoff and minimiser count.");
+    parser.add_list_item("", "\\fB*.minimiser\\fP: Contains binary minimiser values, one minimiser per line.");
+    parser.add_list_item(
+        "",
+        "\\fB*.in_progress\\fP: Temporary file to track process. Deleted after finishing computation.");
     parser.add_option(arguments.threads,
                       sharg::config{.short_id = '\0',
                                     .long_id = "threads",
