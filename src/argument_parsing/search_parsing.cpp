@@ -25,10 +25,18 @@ namespace raptor
 void init_search_parser(sharg::parser & parser, search_arguments & arguments)
 {
     init_shared_meta(parser);
-    parser.info.description.emplace_back("Searches a Raptor index using one or more sequences queries.");
-    parser.info.examples = {
-        "raptor search --error 2 --index raptor.index --query queries.fastq --output search.output"};
-
+    parser.info.description.emplace_back("Queries a Raptor index.");
+    parser.info.examples.emplace_back(
+        "raptor search --index raptor.index --query queries.fastq --output search.output");
+    parser.info.examples.emplace_back(
+        "raptor search --index raptor.index --query queries.fastq --output search.output --threshold 0.7");
+    parser.info.examples.emplace_back(
+        "raptor search --index raptor.index --query queries.fastq --output search.output --error 2");
+    parser.info.examples.emplace_back(
+        "raptor search --index raptor.index --query queries.fastq --output search.output --error 2 --query_length 250");
+    parser.info.synopsis.emplace_back("raptor search --index <file> --query <file> --output <file> [--threads "
+                                      "<number>] [--verbose] [--error <number>|--threshold <number>] [--query_length "
+                                      "<number>] [--tau <number>] [--pmax <number>] [--cache-thresholds]");
     parser.add_subsection("General options");
     parser.add_option(arguments.index_file,
                       sharg::config{.short_id = '\0',
@@ -57,6 +65,11 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
         sharg::config{.short_id = '\0', .long_id = "verbose", .description = "Print time and memory usage."});
 
     parser.add_subsection("Threshold method options");
+    parser.add_line("\\fBIf no option is set, --error " + std::to_string(arguments.errors)
+                    + " will be used as default.\\fP");
+    parser.add_line("Setting --query_length also skips validations associated with the query length, e.g., too long/"
+                    "short queries or a high variance in the query lengths. Notably, queries that are shorter than the "
+                    "window size result in undefined behavior.");
     parser.add_option(arguments.errors,
                       sharg::config{.short_id = '\0',
                                     .long_id = "error",
@@ -78,7 +91,10 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                                     .default_message = "Median of sequence lengths in query file"});
 
     parser.add_subsection("Dynamic thresholding options");
-    parser.add_line("\\fBThese option only take effect when using --error.\\fP");
+    parser.add_line("\\fBThese option have no effect when using --threshold or k-mer size == window size.\\fP");
+    parser.add_line("A higher threshold means that less, in the extreme case even false negative, results will be "
+                    "produced.");
+    parser.add_line("A lower threshold means that more, possibly false positive, results will be produced.");
     parser.add_option(arguments.tau,
                       sharg::config{.short_id = '\0',
                                     .long_id = "tau",
