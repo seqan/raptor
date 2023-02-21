@@ -54,17 +54,22 @@ struct build_data
         hibf.next_ibf_id.resize(number_of_ibfs);
     }
 
-    void compute_fp_correction(size_t const tmax, size_t const hash, double const fpr)
+    /*!\brief Precompute f_h factors that adjust the split bin size to prevent FPR inflation due to multiple testing.
+     * \sa https://godbolt.org/z/zTj1v9W94
+     */
+    void compute_fp_correction(size_t const requested_max_tb, size_t const num_hash_functions, double const desired_fpr)
     {
-        fp_correction.resize(tmax + 1, 1.0);
+        fp_correction.resize(requested_max_tb + 1, 0.0);
+        fp_correction[1] = 1.0;
 
-        double const denominator = std::log(1 - std::exp(std::log(fpr) / hash));
+        // std::log1p(arg) = std::log(1 + arg). More precise than std::log(1 + arg) if arg is close to zero.
+        double const numerator = std::log1p(-std::exp(std::log(desired_fpr) / num_hash_functions));
 
-        for (size_t i = 2; i <= tmax; ++i)
+        for (size_t split = 2u; split <= requested_max_tb; ++split)
         {
-            double const tmp = 1.0 - std::pow(1 - fpr, static_cast<double>(i));
-            fp_correction[i] = std::log(1 - std::exp(std::log(tmp) / hash)) / denominator;
-            assert(fp_correction[i] >= 1.0);
+            double const log_target_fpr = std::log1p(-std::exp(std::log1p(-desired_fpr) / split));
+            fp_correction[split] = numerator / std::log1p(-std::exp(log_target_fpr / num_hash_functions));
+            assert(fp_correction[split] >= 1.0);
         }
     }
 };

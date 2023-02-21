@@ -58,12 +58,22 @@ size_t bin_size_in_bits(config const & cfg)
     return bin_size_in_bits(cfg, cfg.elements);
 }
 
+// New
 double compute_fp_correction(config const & cfg)
 {
-    double const denominator = std::log(1.0 - std::exp(std::log(cfg.fpr) / cfg.hash));
-    double const tmp = 1.0 - std::pow(1.0 - cfg.fpr, cfg.splits);
-    return std::log(1 - std::exp(std::log(tmp) / cfg.hash)) / denominator;
+    // std::log1p(arg) = std::log(1 + arg). More precise than std::log(1 + arg) if arg is close to zero.
+    double const numerator = std::log1p(-std::exp(std::log(cfg.fpr) / cfg.hash));
+    double const log_target_fpr = std::log1p(-std::exp(std::log1p(-cfg.fpr) / cfg.splits));
+    return numerator / std::log1p(-std::exp(log_target_fpr / cfg.hash));
 }
+
+// Old
+// double compute_fp_correction(config const & cfg)
+// {
+//     double const denominator = std::log(1.0 - std::exp(std::log(cfg.fpr) / cfg.hash));
+//     double const tmp = 1.0 - std::pow(1.0 - cfg.fpr, cfg.splits);
+//     return std::log(1 - std::exp(std::log(tmp) / cfg.hash)) / denominator;
+// }
 
 void print_results(size_t const fp_count, size_t const all_kmers, size_t const elements)
 {
@@ -91,7 +101,7 @@ void single_tb(config const & cfg)
         ibf.emplace(value, seqan3::bin_index{0u});
 
     // Check all possible kmer values.
-    for (uint64_t value{}; value <= all_kmers; ++value)
+    for (uint64_t value{}; value < all_kmers; ++value)
     {
         auto & result = agent.bulk_contains(value);
         if (result[0] && !inserted_values.count(value))
@@ -133,14 +143,17 @@ void multiple_tb(config const & cfg, size_t const bin_size)
             ibf.emplace(value, seqan3::bin_index{i});
 
     // Check all possible kmer values.
-    for (uint64_t value{}; value <= all_kmers; ++value)
+    for (uint64_t value{}; value < all_kmers; ++value)
     {
         auto & result = agent.bulk_contains(value);
         if (!all_values.count(value))
         {
             for (size_t i{}; i < cfg.splits; ++i)
                 if (result[i])
+                {
                     ++fp_count;
+                    break;
+                }
         }
         else
         {
@@ -155,7 +168,10 @@ void multiple_tb(config const & cfg, size_t const bin_size)
             }
             for (size_t i{}; i < cfg.splits; ++i)
                 if (i != containing_bin && result[i])
+                {
                     ++fp_count;
+                    break;
+                }
         }
     }
 
@@ -178,6 +194,5 @@ int main(int argc, char ** argv)
     multiple_tb(cfg, bin_size_in_bits(cfg, elements_per_bin));
 
     std::cout << "=== Split bin corrected ===\n";
-    std::cout << compute_fp_correction(cfg) << '\n';
     multiple_tb(cfg, bin_size_in_bits(cfg, elements_per_bin) * compute_fp_correction(cfg));
 }

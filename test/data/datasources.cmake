@@ -100,11 +100,11 @@ declare_internal_datasource (FILE 64bins23windowc.index
 
 declare_internal_datasource (FILE 1bins19window.hibf
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/1bins19window.hibf
-                             URL_HASH SHA256=621817cea53051553d1f3bee99f6ba856f88e7ff8c08bb1a39e6185a9309aa1c
+                             URL_HASH SHA256=2a49572c03edded5bd80f6a21d360344f5f39667c223d8a7652295a72673b973
 )
 declare_internal_datasource (FILE 1bins23window.hibf
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/1bins23window.hibf
-                             URL_HASH SHA256=ad3a927d4e1eea6617f20114b914b77fe5c0cd40b710e24a28cc150b9cf5f2b1
+                             URL_HASH SHA256=14eb9a5b77ab98deaf0ec2c126107fce4bf558815acb4ab509d471ee129cf902
 )
 declare_internal_datasource (FILE 64bins19window.hibf
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/64bins19window.hibf
@@ -116,15 +116,15 @@ declare_internal_datasource (FILE 64bins23window.hibf
 )
 declare_internal_datasource (FILE 128bins19window.hibf
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/128bins19window.hibf
-                             URL_HASH SHA256=f6618f22feeff358d880fd727ce6d82da74d24e30f72ba7b1d954836a84e1115
+                             URL_HASH SHA256=21165f0bef2ac8c3b2a9c243d3afb60febdf18507b5d6154bdb3a074339caa96
 )
 declare_internal_datasource (FILE 128bins23window.hibf
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/128bins23window.hibf
-                             URL_HASH SHA256=8b12e56bf0cb732ed96b896ca7ee7c0cb4f8a5a8079755077e6adf585666ae2a
+                             URL_HASH SHA256=da8eecf7a1ed4e5aa09c3de09088dacbb6d8549cbc598c4b047df7894080416e
 )
 declare_internal_datasource (FILE three_levels.hibf
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/three_levels.hibf
-                             URL_HASH SHA256=963f4cad2539ee33d3ed0fec585b04279ebd104733387ca2a03399a654689b3f
+                             URL_HASH SHA256=d04b045cf1db05a5ebc53b26e1bd2aaec430742310698dd4605990ab962fa439
 )
 
 declare_internal_datasource (FILE 1bins.pack
