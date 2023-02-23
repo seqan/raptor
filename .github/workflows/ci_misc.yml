@@ -45,6 +45,20 @@ jobs:
             skip_build_tests: false
             skip_run_tests: false
 
+          - name: "Performance gcc12"
+            cxx: "g++-12"
+            cc: "gcc-12"
+            cxx_flags: "-std=c++23"
+            build_type: Release
+            build: performance
+            build_threads: 2
+            test_threads: 2
+            cmake: 3.18.4
+            requires_toolchain: true
+            requires_ccache: true
+            skip_build_tests: false
+            skip_run_tests: false
+
           - name: "Documentation"
             build: documentation
             build_threads: 2
@@ -159,6 +173,7 @@ jobs:
                                                    -DRAPTOR_NATIVE_BUILD=OFF
           case "${{ matrix.build }}" in
             snippet) make -j${{ matrix.build_threads }} gtest_build;;
+            performance) make -j${{ matrix.build_threads }} gbenchmark_build;;
             header) make -j${{ matrix.build_threads }} gtest_build gbenchmark_build;;
             documentation) make -j${{ matrix.build_threads }} download-cppreference-doxygen-web-tag;;
           esac

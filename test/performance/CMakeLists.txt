@@ -7,15 +7,12 @@
 
 cmake_minimum_required (VERSION 3.10)
 
-project (raptor_test_benchmark CXX)
+project (raptor_test_performance CXX)
 
-set (RAPTOR_ENABLE_BENCHMARK TRUE)
+option (BUILD_RAPTOR_APP_FOR_TEST "" OFF)
 include (../raptor-test.cmake)
 
 raptor_require_benchmark ()
 raptor_require_ccache ()
-raptor_require_test ()
 
-add_custom_target (cli_test)
-
-add_cli_test (bin_influence_benchmark.cpp)
+raptor_add_benchmark (bin_influence_benchmark.cpp)
