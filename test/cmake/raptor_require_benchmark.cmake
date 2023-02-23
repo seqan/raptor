@@ -12,7 +12,7 @@ cmake_minimum_required (VERSION 3.18)
 macro (raptor_require_benchmark)
     enable_testing ()
 
-    set (benchmark_version "1.7.0")
+    set (benchmark_version "1.7.1")
     set (gbenchmark_git_tag "v${benchmark_version}")
 
     find_package (benchmark ${benchmark_version} EXACT QUIET)
@@ -26,8 +26,12 @@ macro (raptor_require_benchmark)
                               GIT_TAG "${gbenchmark_git_tag}"
         )
         option (BENCHMARK_ENABLE_TESTING "" OFF)
-        option (BENCHMARK_ENABLE_WERROR "" OFF) # Does not apply to Debug builds.
+        option (BENCHMARK_ENABLE_WERROR "" OFF)
         option (BENCHMARK_ENABLE_INSTALL "" OFF)
+        if (RAPTOR_LTO_BUILD AND NOT RAPTOR_IS_DEBUG)
+            option (BENCHMARK_ENABLE_LTO "" ON)
+        endif ()
+
         FetchContent_MakeAvailable (gbenchmark_fetch_content)
     else ()
         message (STATUS "Found Google Benchmark ${benchmark_version}")

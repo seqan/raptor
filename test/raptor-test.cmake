@@ -59,7 +59,16 @@ endif ()
 # needed for performance test cases in raptor/test/performance
 if (NOT TARGET raptor::test::performance)
     add_library (raptor_test_performance INTERFACE)
-    target_link_libraries (raptor_test_performance INTERFACE "raptor::test" "benchmark_main" "benchmark")
+    target_compile_options (raptor_test_performance INTERFACE "-pedantic" "-Wall" "-Wextra" "-Werror")
+
+    # GCC12 and above: Disable warning about std::hardware_destructive_interference_size not being ABI-stable.
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 12)
+            target_compile_options (raptor_test_performance INTERFACE "-Wno-interference-size")
+        endif ()
+    endif ()
+
+    target_link_libraries (raptor_test_performance INTERFACE "raptor::raptor" "benchmark_main" "benchmark")
 
     add_library (raptor::test::performance ALIAS raptor_test_performance)
 endif ()
@@ -87,9 +96,10 @@ endif ()
 # Commonly used macros for the different test modules in seqan3.
 # ----------------------------------------------------------------------------
 
-include (add_unit_test)
 include (app_datasources)
 include (app_internal_datasources)
+include (raptor_add_benchmark)
+include (raptor_add_unit_test)
 include (raptor_require_benchmark)
 include (raptor_require_ccache)
 include (raptor_require_test)
@@ -99,8 +109,12 @@ include (${CMAKE_CURRENT_LIST_DIR}/data/datasources.cmake)
 # Add app.
 # ----------------------------------------------------------------------------
 
-get_filename_component (RAPTOR_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../src" ABSOLUTE)
-add_subdirectory ("${RAPTOR_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/src")
+option (BUILD_RAPTOR_APP_FOR_TEST "Enable building of Raptor." ON)
+
+if (BUILD_RAPTOR_APP_FOR_TEST)
+    get_filename_component (RAPTOR_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../src" ABSOLUTE)
+    add_subdirectory ("${RAPTOR_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/src")
+endif ()
 
 # ----------------------------------------------------------------------------
 # Set directories for test output files, input data and binaries.

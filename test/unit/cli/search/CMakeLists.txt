@@ -7,7 +7,7 @@
 
 cmake_minimum_required (VERSION 3.18)
 
-add_unit_test (search_hibf_test.cpp)
-add_unit_test (search_hibf_preprocessing_test.cpp)
-add_unit_test (search_ibf_preprocessing_test.cpp)
-add_unit_test (search_ibf_test.cpp)
+raptor_add_unit_test (search_hibf_test.cpp)
+raptor_add_unit_test (search_hibf_preprocessing_test.cpp)
+raptor_add_unit_test (search_ibf_preprocessing_test.cpp)
+raptor_add_unit_test (search_ibf_test.cpp)

@@ -7,6 +7,6 @@
 
 cmake_minimum_required (VERSION 3.10)
 
-add_unit_test (issue_142.cpp)
-add_unit_test (memory_usage.cpp)
-add_unit_test (validate_shape.cpp)
+raptor_add_unit_test (issue_142.cpp)
+raptor_add_unit_test (memory_usage.cpp)
+raptor_add_unit_test (validate_shape.cpp)

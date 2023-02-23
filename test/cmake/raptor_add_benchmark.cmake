@@ -5,20 +5,15 @@
 # shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 # --------------------------------------------------------------------------------------------------
 
-# A macro that adds an api or cli test.
-macro (add_unit_test test_filename)
+# A macro that adds a benchmark.
+macro (raptor_add_benchmark test_filename)
     # Extract the test target name.
     file (RELATIVE_PATH source_file "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_LIST_DIR}/${test_filename}")
     get_filename_component (target "${source_file}" NAME_WE)
 
     # Create the test target.
     add_executable (${target} ${test_filename})
-    target_link_libraries (${target} raptor::test::unit)
-    if (RAPTOR_ENABLE_BENCHMARK)
-        target_link_libraries (${target} raptor::test::performance)
-    endif ()
-
-    add_dependencies (${target} "raptor")
+    target_link_libraries (${target} raptor::test::performance)
 
     # Generate and set the test name.
     get_filename_component (target_relative_path "${source_file}" DIRECTORY)

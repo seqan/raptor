@@ -7,4 +7,4 @@
 
 cmake_minimum_required (VERSION 3.18)
 
-add_unit_test (options_test.cpp)
+raptor_add_unit_test (options_test.cpp)
