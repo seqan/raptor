@@ -17,6 +17,7 @@
 #include <chopper/set_up_parser.hpp>
 #include <chopper/sketch/estimate_kmer_counts.hpp>
 
+#include <raptor/argument_parsing/init_shared_meta.hpp>
 #include <raptor/layout/raptor_layout.hpp>
 
 namespace raptor
@@ -26,6 +27,9 @@ void chopper_layout(sharg::parser & parser)
 {
     chopper::configuration config;
     set_up_parser(parser, config);
+    init_shared_meta(parser);
+    parser.info.author = "Svenja Mehringer";
+    parser.info.email = "svenja.mehringer@fu-berlin.de";
 
     parser.parse();
     config.disable_sketch_output = !parser.is_option_set("output-sketches-to");
