@@ -1,12 +1,11 @@
 #include <cassert>
-#include <iostream>
 #include <fstream>
-#include <unordered_map>
+#include <iostream>
 #include <ranges>
-#include <string>
-#include <vector>
-
 #include <seqan3/std/algorithm>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 int main(int argc, char ** argv)
 {
@@ -42,7 +41,13 @@ int main(int argc, char ** argv)
     std::vector<std::string> genes{};
     for (auto && gene : line | std::views::split('\t'))
     {
-        std::string gene_str = [] (auto v) { std::string s; for (auto c : v) s.push_back(c); return s; }(gene);
+        std::string gene_str = [](auto v)
+        {
+            std::string s;
+            for (auto c : v)
+                s.push_back(c);
+            return s;
+        }(gene);
         genes.push_back(gene_str);
     }
     // process rest of files
@@ -75,7 +80,13 @@ int main(int argc, char ** argv)
     while (std::getline(raptor_result, line))
     {
         auto gv = line | std::views::split('|') | std::views::drop(5);
-        std::string gene = [] (auto v) { std::string s; for (auto c : v) s.push_back(c); return s; }(*gv.begin());
+        std::string gene = [](auto v)
+        {
+            std::string s;
+            for (auto c : v)
+                s.push_back(c);
+            return s;
+        }(*gv.begin());
 
         auto it = truth_set.find(gene);
         if (it == truth_set.end())
@@ -95,7 +106,13 @@ int main(int argc, char ** argv)
 
         while (truth_it != truth_fields.end() && raptor_it != raptor_fields_view.end())
         {
-            std::string raptor_str = [] (auto v) { std::string s; for (auto c : v) s.push_back(c); return s; }(*raptor_it);
+            std::string raptor_str = [](auto v)
+            {
+                std::string s;
+                for (auto c : v)
+                    s.push_back(c);
+                return s;
+            }(*raptor_it);
             uint64_t raptor_value = std::atoi(raptor_str.data());
 
             uint64_t truth_value = *truth_it;
@@ -121,9 +138,9 @@ int main(int argc, char ** argv)
             {
                 ++true_positives;
                 //  ++all_mantis;
-                 ++all_raptor;
-                 ++truth_it;
-                 ++raptor_it;
+                ++all_raptor;
+                ++truth_it;
+                ++raptor_it;
             }
         }
 
@@ -138,7 +155,13 @@ int main(int argc, char ** argv)
 
         while (raptor_it != raptor_fields_view.end()) // process the rest of raptor if any
         {
-            std::string raptor_str = [] (auto v) { std::string s; for (auto c : v) s.push_back(c); return s; }(*raptor_it);
+            std::string raptor_str = [](auto v)
+            {
+                std::string s;
+                for (auto c : v)
+                    s.push_back(c);
+                return s;
+            }(*raptor_it);
             uint64_t raptor_value = std::atoi(raptor_str.data());
             false_positives_file << gene << ":" << raptor_value << '\n';
             ++false_positives;

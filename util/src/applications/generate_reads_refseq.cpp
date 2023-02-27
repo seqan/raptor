@@ -111,7 +111,8 @@ void run_program(cmd_arguments const & arguments)
             for (auto const & [seq] : fin)
             {
                 uint64_t const reference_length = std::ranges::size(seq);
-                uint64_t const dis_range_end = reference_length - std::min<uint64_t>(reference_length, arguments.read_length);
+                uint64_t const dis_range_end =
+                    reference_length - std::min<uint64_t>(reference_length, arguments.read_length);
                 std::uniform_int_distribution<uint64_t> read_start_dis(0, dis_range_end);
                 for (uint32_t current_read_number = 0;
                      current_read_number < reads_per_record && bin_read_counter < reads_per_bin;
@@ -133,7 +134,9 @@ void run_program(cmd_arguments const & arguments)
                     }
 
                     std::vector<seqan3::phred42> correct_quality{quality.begin(), quality.begin() + read.size()};
-                    fout.emplace_back(read, out_file.stem().string() + std::to_string(bin_read_counter), correct_quality);
+                    fout.emplace_back(read,
+                                      out_file.stem().string() + std::to_string(bin_read_counter),
+                                      correct_quality);
                     // no clue why std::views::take does not work
                     // fout.emplace_back(read, out_file.stem().string() + std::to_string(bin_read_counter), (quality | std::views::take(reference_length)));
                 }
@@ -142,9 +145,8 @@ void run_program(cmd_arguments const & arguments)
     };
 
     size_t const chunk_size = std::bit_ceil(number_of_bins / arguments.threads);
-    auto chunked_view = seqan3::views::zip(arguments.bin_path,
-                                           arguments.number_of_reads_per_bin,
-                                           std::views::iota(0u)) | seqan3::views::chunk(chunk_size);
+    auto chunked_view = seqan3::views::zip(arguments.bin_path, arguments.number_of_reads_per_bin, std::views::iota(0u))
+                      | seqan3::views::chunk(chunk_size);
     seqan3::detail::execution_handler_parallel executioner{arguments.threads};
     executioner.bulk_execute(std::move(worker), std::move(chunked_view), []() {});
 }
@@ -240,7 +242,9 @@ int main(int argc, char ** argv)
         throw sharg::parser_error{"Must simulate at least one read per bin."};
 
     if (number_of_bins != arguments.number_of_reads_per_bin.size())
-        throw seqan3::argument_parser_error{"number_of_bins (" + std::to_string(number_of_bins) + " != arguments.number_of_reads_per_bin.size()" + std::to_string(arguments.number_of_reads_per_bin.size()) + ")"};
+        throw seqan3::argument_parser_error{"number_of_bins (" + std::to_string(number_of_bins)
+                                            + " != arguments.number_of_reads_per_bin.size()"
+                                            + std::to_string(arguments.number_of_reads_per_bin.size()) + ")"};
 
     for (size_t & weight : arguments.number_of_reads_per_bin) // was initialised with the weights of the bins
         weight = std::ceil((static_cast<double>(weight) / sum_of_weights) * arguments.number_of_reads);

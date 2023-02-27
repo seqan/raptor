@@ -43,10 +43,8 @@ inline void check_output_file(std::filesystem::path const & output_file)
     std::filesystem::create_directories(output_directory, ec);
 
     if (!output_directory.empty() && ec)
-        throw seqan3::argument_parser_error{seqan3::detail::to_string("Failed to create directory\"",
-                                                                      output_directory.c_str(),
-                                                                      "\": ",
-                                                                      ec.message())};
+        throw seqan3::argument_parser_error{
+            seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
 }
 
 struct config
@@ -56,22 +54,22 @@ struct config
     std::filesystem::path output_file{};
 };
 
-robin_hood::unordered_map<std::string, uint64_t> create_ub_to_ub_mapping_from_header(std::ifstream & raptor_result_in,
-                                                                                     std::string & line_buffer,
-                                                                                     config const & cfg)
+robin_hood::unordered_map<std::string, uint64_t>
+create_ub_to_ub_mapping_from_header(std::ifstream & raptor_result_in, std::string & line_buffer, config const & cfg)
 {
     // map[reference_name] = number
     std::cerr << "Reading " << cfg.truth_user_bin_ids_file << " ... " << std::flush;
-    robin_hood::unordered_map<std::string, uint64_t> const truth_ub_name_to_id{parse_user_bin_ids(cfg.truth_user_bin_ids_file)};
+    robin_hood::unordered_map<std::string, uint64_t> const truth_ub_name_to_id{
+        parse_user_bin_ids(cfg.truth_user_bin_ids_file)};
     std::cerr << "Done" << std::endl;
 
     robin_hood::unordered_map<std::string, uint64_t> ub_to_ub;
 
-    std::cerr << "Create ub_to_ub mapping ... "  << std::flush;
+    std::cerr << "Create ub_to_ub mapping ... " << std::flush;
     while (std::getline(raptor_result_in, line_buffer) && line_buffer.starts_with('#') && line_buffer[1] != ('Q'))
     {
         auto tab_it{line_buffer.begin() + line_buffer.find('\t')};
-        std::string_view const idx{line_buffer.begin() + 1/* skip '#' */,
+        std::string_view const idx{line_buffer.begin() + 1 /* skip '#' */,
                                    line_buffer.begin() + line_buffer.find('\t')};
         std::string_view const name_key{line_buffer.begin() + line_buffer.find_last_of('/') + 1,
                                         line_buffer.begin() + line_buffer.find(".fna.gz")};
@@ -123,7 +121,8 @@ void normalise_output(config const & cfg)
         {
             auto ub_it = ub_to_ub.find(std::string(&bins[current_pos], comma_pos - current_pos));
             if (ub_it == ub_to_ub.end())
-                throw std::runtime_error{"Could not find id " + std::string(&bins[current_pos], comma_pos - current_pos) + " in ub_to_ub."};
+                throw std::runtime_error{"Could not find id " + std::string(&bins[current_pos], comma_pos - current_pos)
+                                         + " in ub_to_ub."};
             result_user_bins.push_back(ub_it->second);
             current_pos = comma_pos + 1;
             comma_pos = bins.find(',', current_pos);
@@ -131,7 +130,8 @@ void normalise_output(config const & cfg)
         // process last ub
         auto ub_it = ub_to_ub.find(std::string(&bins[current_pos], bins.size() - current_pos));
         if (ub_it == ub_to_ub.end())
-            throw std::runtime_error{"Could not find id " + std::string(&bins[current_pos], bins.size() - current_pos) + " in ub_to_ub."};
+            throw std::runtime_error{"Could not find id " + std::string(&bins[current_pos], bins.size() - current_pos)
+                                     + " in ub_to_ub."};
         result_user_bins.push_back(ub_it->second);
         std::sort(result_user_bins.begin(), result_user_bins.end()); // compare script afterwards requires sorted UBs
 

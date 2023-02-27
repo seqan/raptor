@@ -1,15 +1,16 @@
 #include <cassert>
-#include <iostream>
 #include <fstream>
-#include <unordered_map>
+#include <iostream>
 #include <ranges>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 int main(int argc, char ** argv)
 {
     if (argc != 4)
-        throw std::runtime_error{"Please provide user_bin.id mantis.ready and raptor.ready"}; // $FILENAME_USER_BIN_IDS $FILENAME_MANTIS_READY_TO_COMPARE $FILENAME_RAPTOR_READY_TO_COMPARE
+        throw std::runtime_error{
+            "Please provide user_bin.id mantis.ready and raptor.ready"}; // $FILENAME_USER_BIN_IDS $FILENAME_MANTIS_READY_TO_COMPARE $FILENAME_RAPTOR_READY_TO_COMPARE
 
     std::ifstream user_bin_ids_file{argv[1]};
 
@@ -51,7 +52,8 @@ int main(int argc, char ** argv)
         if (mantis_query_name != raptor_query_name)
             throw std::runtime_error{"Query names do not match, something went wrong"};
 
-        std::string query_name{mantis_query_name.begin(), mantis_query_name.begin() + mantis_query_name.find("genomic") + 7};
+        std::string query_name{mantis_query_name.begin(),
+                               mantis_query_name.begin() + mantis_query_name.find("genomic") + 7};
         uint64_t query_id = user_bin_ids[query_name];
         bool found_query_id_in_mantis{false};
         bool found_query_id_in_raptor{false};
@@ -65,8 +67,20 @@ int main(int argc, char ** argv)
 
         while (mantis_it != mantis_fields_view.end() && raptor_it != raptor_fields_view.end())
         {
-            std::string mantis_str = [] (auto v) { std::string s; for (auto c : v) s.push_back(c); return s; }(*mantis_it);
-            std::string raptor_str = [] (auto v) { std::string s; for (auto c : v) s.push_back(c); return s; }(*raptor_it);
+            std::string mantis_str = [](auto v)
+            {
+                std::string s;
+                for (auto c : v)
+                    s.push_back(c);
+                return s;
+            }(*mantis_it);
+            std::string raptor_str = [](auto v)
+            {
+                std::string s;
+                for (auto c : v)
+                    s.push_back(c);
+                return s;
+            }(*raptor_it);
             // Should also work:
             // std::string_view mantis_str{*mantis_it};
             // std::string_view raptor_str{*raptor_it};
@@ -106,17 +120,24 @@ int main(int argc, char ** argv)
             }
             else
             {
-                 ++all_mantis;
-                 ++all_raptor;
-                 ++mantis_it;
-                 ++raptor_it;
+                ++all_mantis;
+                ++all_raptor;
+                ++mantis_it;
+                ++raptor_it;
             }
         }
 
         while (mantis_it != mantis_fields_view.end()) // process the rest of mantis
         {
-            std::string mantis_str = [] (auto v) { std::string s; for (auto c : v) s.push_back(c); return s; }(*mantis_it);
-            std::string query_name{mantis_query_name.begin(), mantis_query_name.begin() + mantis_query_name.find("genomic") + 7};
+            std::string mantis_str = [](auto v)
+            {
+                std::string s;
+                for (auto c : v)
+                    s.push_back(c);
+                return s;
+            }(*mantis_it);
+            std::string query_name{mantis_query_name.begin(),
+                                   mantis_query_name.begin() + mantis_query_name.find("genomic") + 7};
             // uint64_t query_id = user_bin_ids[query_name];
             uint64_t mantis_value = std::atoi(mantis_str.data());
             found_query_id_in_mantis = found_query_id_in_mantis || mantis_value == query_id;
@@ -128,8 +149,15 @@ int main(int argc, char ** argv)
 
         while (raptor_it != raptor_fields_view.end()) // process the rest of raptor if any
         {
-            std::string raptor_str = [] (auto v) { std::string s; for (auto c : v) s.push_back(c); return s; }(*raptor_it);
-            std::string query_name{mantis_query_name.begin(), mantis_query_name.begin() + mantis_query_name.find("genomic") + 7};
+            std::string raptor_str = [](auto v)
+            {
+                std::string s;
+                for (auto c : v)
+                    s.push_back(c);
+                return s;
+            }(*raptor_it);
+            std::string query_name{mantis_query_name.begin(),
+                                   mantis_query_name.begin() + mantis_query_name.find("genomic") + 7};
             // uint64_t query_id = user_bin_ids[query_name];
             uint64_t raptor_value = std::atoi(raptor_str.data());
             if (raptor_value == query_id)
@@ -146,15 +174,11 @@ int main(int argc, char ** argv)
         }
 
         if (!found_query_id_in_mantis)
-            std::cerr << "Warning in line " << line_no <<": Could not find query "
-                      << mantis_query_name << "(" << query_name << ":" << query_id
-                      << ") in its respective gemnome in mantis."
-                      << std::endl;
+            std::cerr << "Warning in line " << line_no << ": Could not find query " << mantis_query_name << "("
+                      << query_name << ":" << query_id << ") in its respective gemnome in mantis." << std::endl;
         if (!found_query_id_in_raptor)
-            std::cerr << "Warning in line " << line_no <<": Could not find query "
-                      << raptor_query_name << "(" << query_name << ":" << query_id
-                      << ") in its respective gemnome in raptor."
-                      << std::endl;
+            std::cerr << "Warning in line " << line_no << ": Could not find query " << raptor_query_name << "("
+                      << query_name << ":" << query_id << ") in its respective gemnome in raptor." << std::endl;
 
         ++line_no;
     }

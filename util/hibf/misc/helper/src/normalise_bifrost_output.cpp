@@ -41,10 +41,8 @@ inline void check_output_file(std::filesystem::path const & output_file)
     std::filesystem::create_directories(output_directory, ec);
 
     if (!output_directory.empty() && ec)
-        throw seqan3::argument_parser_error{seqan3::detail::to_string("Failed to create directory\"",
-                                                                      output_directory.c_str(),
-                                                                      "\": ",
-                                                                      ec.message())};
+        throw seqan3::argument_parser_error{
+            seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
 }
 
 struct config
@@ -95,7 +93,7 @@ void normalise_output(config const & cfg)
 
     // ## Bifrost results ##
     // Bifrost outputs a matrix. Column names = user bin id. Row names = query names
-    auto split_line_by_tab_and = [] (std::string_view bifrost_line, auto do_me)
+    auto split_line_by_tab_and = [](std::string_view bifrost_line, auto do_me)
     {
         std::string_view::size_type current_pos = 0;
         std::string_view::size_type tab_pos{bifrost_line.find('\t')};
@@ -114,12 +112,12 @@ void normalise_output(config const & cfg)
         do_me(last, column_idx);
     };
 
-    auto parse_header_user_bin_id = [&bifrost_user_bins, &ub_name_to_id] (std::string const & sv, size_t idx)
+    auto parse_header_user_bin_id = [&bifrost_user_bins, &ub_name_to_id](std::string const & sv, size_t idx)
     {
         if (idx != 0)
         {
             auto filename_start = sv.find_last_of('/') + 1;
-            auto user_bin_id = sv.substr(filename_start, sv.size() - filename_start - 7/* |".fna.gz"| */);
+            auto user_bin_id = sv.substr(filename_start, sv.size() - filename_start - 7 /* |".fna.gz"| */);
 
             try
             {
@@ -137,7 +135,7 @@ void normalise_output(config const & cfg)
         }
     };
 
-    auto insert_if_one = [&normalised_bifrost_line, &bifrost_user_bins] (std::string_view sv, size_t idx)
+    auto insert_if_one = [&normalised_bifrost_line, &bifrost_user_bins](std::string_view sv, size_t idx)
     {
         if (sv == std::string_view{"1"}) // excludes 0 and the first column which is alywas the query name
         {

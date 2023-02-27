@@ -24,10 +24,8 @@ inline void check_output_file(std::filesystem::path const & output_file)
     std::filesystem::create_directories(output_directory, ec);
 
     if (!output_directory.empty() && ec)
-        throw seqan3::argument_parser_error{seqan3::detail::to_string("Failed to create directory\"",
-                                                                      output_directory.c_str(),
-                                                                      "\": ",
-                                                                      ec.message())};
+        throw seqan3::argument_parser_error{
+            seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
 }
 
 enum class validation
@@ -127,8 +125,13 @@ void correct_truth_file(config const & cfg)
         result_user_bins.push_back(user_bin_id_buffer);
 
         // remove true false posiives
-        auto find_fps = [&](auto s){ auto & l = fps_truths_per_query[id]; return std::find(l.begin(), l.end(), s) != l.end(); };
-        result_user_bins.erase(std::remove_if(result_user_bins.begin(), result_user_bins.end(), find_fps), result_user_bins.end());
+        auto find_fps = [&](auto s)
+        {
+            auto & l = fps_truths_per_query[id];
+            return std::find(l.begin(), l.end(), s) != l.end();
+        };
+        result_user_bins.erase(std::remove_if(result_user_bins.begin(), result_user_bins.end(), find_fps),
+                               result_user_bins.end());
 
         // insert false negatives
         // currently we don't have false negatives
@@ -150,8 +153,8 @@ void correct_truth_file(config const & cfg)
         while (it != result_user_bins.end())
             raptor_result_out << ',' << *(it++);
         raptor_result_out << '\n';
-
-    } while (std::getline(raptor_result_in, line_buffer));
+    }
+    while (std::getline(raptor_result_in, line_buffer));
 
     std::cerr << "Done" << std::endl;
 }

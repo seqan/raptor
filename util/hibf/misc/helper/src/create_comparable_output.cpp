@@ -1,9 +1,9 @@
 #include <cassert>
-#include <iostream>
 #include <fstream>
-#include <unordered_map>
+#include <iostream>
 #include <ranges>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 int main(int argc, char ** argv)
@@ -68,11 +68,11 @@ int main(int argc, char ** argv)
     //   * t = c - e * k
     // However, for mantis, we need - 1. Maybe this is some edge case in mantis that isn't covered.
     // 155 is the threshold, 154 gets reported.
-    auto threshold = [destroyed_kmers] (int const kmer_count)
+    auto threshold = [destroyed_kmers](int const kmer_count)
     {
         assert(kmer_count > 0);
         assert(kmer_count - 1 >= destroyed_kmers);
-        return kmer_count - (destroyed_kmers) - 1;
+        return kmer_count - (destroyed_kmers)-1;
     };
 
     int mantis_threshold{}; // Needs to be set for each query.
@@ -90,14 +90,14 @@ int main(int argc, char ** argv)
     // [...]/GCF_020162095.1_ASM2016209v1_genomic.squeakr       1
     // seq1    219
     std::string ub_name_buffer{};
-    auto parse_user_bin_id = [&ub_name_buffer, &ub_name_to_id] (std::string const & line)
+    auto parse_user_bin_id = [&ub_name_buffer, &ub_name_to_id](std::string const & line)
     {
         ub_name_buffer.assign(line.begin() + line.find_last_of('/') + 1, // Skip absolute path
-                              line.begin() + line.find_last_of('.')); // Skip .squeakr extension
+                              line.begin() + line.find_last_of('.'));    // Skip .squeakr extension
         return ub_name_to_id[ub_name_buffer];
     };
 
-    auto parse_kmer_count = [] (std::string const & line)
+    auto parse_kmer_count = [](std::string const & line)
     {
         std::string_view const sv{line.begin() + line.find('\t') + 1, // Skip seqX
                                   line.end()};
