@@ -3,12 +3,12 @@ cmake_minimum_required (VERSION 3.18)
 if (NOT TARGET raptor_argument_parsing)
     # Fallback to these values if there is no git or no git repository
     set (RAPTOR_COMMIT_DATE
-         "2022-01-17--no-git"
+         "Unavailable"
          CACHE STRING
                "Set to provide a commit date if git is not available or the source directory is not a git repository."
     )
     set (RAPTOR_COMMIT_HASH
-         "80736310204cb2fa5724f1d9316e6391667dfe08--no-git"
+         "commit unavailable"
          CACHE STRING
                "Set to provide a commit hash if git is not available or the source directory is not a git repository."
     )
