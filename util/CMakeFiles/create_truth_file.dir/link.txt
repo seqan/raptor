@@ -1,1 +1,0 @@
-/usr/local/package/bin/g++11  -O3 -DNDEBUG   CMakeFiles/create_truth_file.dir/hibf/misc/helper/src/create_truth_file.cpp.o  -o bin/create_truth_file  -pthread /usr/lib/libz.so /usr/lib/libbz2.so -lrt 

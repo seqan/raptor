@@ -1,1 +1,0 @@
-/usr/local/package/bin/g++11  -O3 -DNDEBUG   CMakeFiles/generate_reads.dir/src/applications/generate_reads.cpp.o  -o bin/generate_reads  -pthread /usr/lib/libz.so /usr/lib/libbz2.so -lrt 
