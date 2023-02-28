@@ -333,8 +333,8 @@ private:
 
             if (current_filename_index < 0) // merged bin
             {
-                if (sum >= threshold)
-                    bulk_contains_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
+                // if (sum >= threshold)
+                bulk_contains_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
                 sum = 0u;
             }
             else if (bin + 1u == result.size() ||                                                    // last bin

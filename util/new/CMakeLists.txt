@@ -70,6 +70,10 @@ target_compile_options ("new_common" INTERFACE "-pedantic" "-Wall" "-Wextra")
 add_executable ("normalise_mantis_output" applications/normalise_mantis_output.cpp)
 target_link_libraries ("normalise_mantis_output" "new_common")
 
+add_executable ("normalise_raptor_output" applications/normalise_raptor_output.cpp)
+target_link_libraries ("normalise_raptor_output" "common")
+install (TARGETS "normalise_raptor_output" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
 add_executable ("compare_mantis_raptor_output" applications/compare_mantis_raptor_output.cpp)
 target_link_libraries ("compare_mantis_raptor_output" "new_common")
 

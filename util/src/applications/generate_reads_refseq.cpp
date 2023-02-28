@@ -18,6 +18,7 @@ struct cmd_arguments
 {
     std::filesystem::path bin_file_path{};
     std::vector<std::filesystem::path> bin_path{};
+    std::vector<size_t> number_of_reads_per_bin{};
     std::filesystem::path output_directory{};
     uint8_t errors{2u};
     uint32_t read_length{100u};
@@ -77,16 +78,15 @@ void run_program(cmd_arguments const & arguments)
     std::uniform_int_distribution<uint8_t> dna4_rank_dis(0, 3);
 
     size_t const number_of_bins{arguments.bin_path.size()};
-    uint32_t const reads_per_bin = arguments.number_of_reads / number_of_bins;
+    // uint32_t const reads_per_bin = arguments.number_of_reads / number_of_bins;
 
     std::vector<seqan3::phred42> const quality(arguments.read_length, seqan3::assign_rank_to(40u, seqan3::phred42{}));
 
     auto worker = [&](auto && zipped_view, auto &&)
     {
-        for (auto && [bin_file, bin_number] : zipped_view)
+        for (auto && [bin_file, reads_per_bin, bin_number] : zipped_view)
         {
             std::mt19937_64 rng(bin_number);
-            uint32_t read_counter{bin_number * reads_per_bin};
             // Immediately invoked initialising lambda expession (IIILE).
             std::filesystem::path const out_file = [&]()
             {
@@ -111,7 +111,9 @@ void run_program(cmd_arguments const & arguments)
             for (auto const & [seq] : fin)
             {
                 uint64_t const reference_length = std::ranges::size(seq);
-                std::uniform_int_distribution<uint64_t> read_start_dis(0, reference_length - arguments.read_length);
+                uint64_t const dis_range_end =
+                    reference_length - std::min<uint64_t>(reference_length, arguments.read_length);
+                std::uniform_int_distribution<uint64_t> read_start_dis(0, dis_range_end);
                 for (uint32_t current_read_number = 0;
                      current_read_number < reads_per_record && bin_read_counter < reads_per_bin;
                      ++current_read_number, ++read_counter, ++bin_read_counter)
@@ -123,7 +125,7 @@ void run_program(cmd_arguments const & arguments)
 
                     for (uint8_t error_count = 0; error_count < arguments.errors; ++error_count)
                     {
-                        uint32_t const error_pos = read_error_position_dis(rng);
+                        uint32_t const error_pos = std::min<size_t>(read_error_position_dis(rng), read.size());
                         seqan3::dna4 const current_base = read[error_pos];
                         seqan3::dna4 new_base = current_base;
                         while (new_base == current_base)
@@ -131,14 +133,20 @@ void run_program(cmd_arguments const & arguments)
                         read[error_pos] = new_base;
                     }
 
-                    fout.emplace_back(read, std::to_string(read_counter), quality);
+                    std::vector<seqan3::phred42> correct_quality{quality.begin(), quality.begin() + read.size()};
+                    fout.emplace_back(read,
+                                      out_file.stem().string() + std::to_string(bin_read_counter),
+                                      correct_quality);
+                    // no clue why std::views::take does not work
+                    // fout.emplace_back(read, out_file.stem().string() + std::to_string(bin_read_counter), (quality | std::views::take(reference_length)));
                 }
             }
         }
     };
 
     size_t const chunk_size = std::bit_ceil(number_of_bins / arguments.threads);
-    auto chunked_view = seqan3::views::zip(arguments.bin_path, std::views::iota(0u)) | seqan3::views::chunk(chunk_size);
+    auto chunked_view = seqan3::views::zip(arguments.bin_path, arguments.number_of_reads_per_bin, std::views::iota(0u))
+                      | seqan3::views::chunk(chunk_size);
     seqan3::detail::execution_handler_parallel executioner{arguments.threads};
     executioner.bulk_execute(std::move(worker), std::move(chunked_view), []() {});
 }
@@ -201,13 +209,27 @@ int main(int argc, char ** argv)
     std::string line;
     sharg::input_file_validator validator{};
 
+    size_t sum_of_weights{};
     while (std::getline(istrm, line))
     {
         if (!line.empty())
         {
-            std::filesystem::path bin_path{line};
+            auto tab = std::find(line.begin(), line.end(), '\t');
+
+            // parse file path
+            std::filesystem::path bin_path{line.begin(), tab};
             validator(bin_path);
             arguments.bin_path.push_back(std::move(bin_path));
+
+            // parse weight if given
+            if (tab != line.end())
+            {
+                ++tab;
+                size_t tmp{};
+                std::from_chars(&(*tab), &line[line.size() - 1], tmp);
+                sum_of_weights += tmp;
+                arguments.number_of_reads_per_bin.push_back(tmp); // initialise with weight
+            }
         }
     }
 
@@ -219,8 +241,13 @@ int main(int argc, char ** argv)
     if (number_of_bins > arguments.number_of_reads)
         throw sharg::parser_error{"Must simulate at least one read per bin."};
 
-    if (arguments.number_of_reads % number_of_bins)
-        throw sharg::parser_error{"The number of reads must distribute evenly over the bins."};
+    if (number_of_bins != arguments.number_of_reads_per_bin.size())
+        throw seqan3::argument_parser_error{"number_of_bins (" + std::to_string(number_of_bins)
+                                            + " != arguments.number_of_reads_per_bin.size()"
+                                            + std::to_string(arguments.number_of_reads_per_bin.size()) + ")"};
+
+    for (size_t & weight : arguments.number_of_reads_per_bin) // was initialised with the weights of the bins
+        weight = std::ceil((static_cast<double>(weight) / sum_of_weights) * arguments.number_of_reads);
 
     std::filesystem::create_directory(arguments.output_directory);
     run_program(arguments);

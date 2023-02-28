@@ -130,4 +130,41 @@ target_link_libraries ("generate_reads_refseq" "common")
 add_executable ("ibf_fpr" src/applications/ibf_fpr.cpp)
 target_link_libraries ("ibf_fpr" "common")
 
+add_executable ("check_fastq" src/applications/check_fastq.cpp)
+target_link_libraries ("check_fastq" "common")
+install (TARGETS "check_fastq" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+add_executable ("compare_amr_genes" hibf/misc/helper/src/compare_amr_genes.cpp)
+target_link_libraries ("compare_amr_genes" "common")
+install (TARGETS "compare_amr_genes" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+add_executable ("create_comparable_output" hibf/misc/helper/src/create_comparable_output.cpp)
+target_link_libraries ("create_comparable_output" "common")
+install (TARGETS "create_comparable_output" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+add_executable ("normalise_bifrost_output" hibf/misc/helper/src/normalise_bifrost_output.cpp)
+target_link_libraries ("normalise_bifrost_output" "common")
+install (TARGETS "normalise_bifrost_output" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+add_executable ("normalise_raptor_output" hibf/misc/helper/src/normalise_raptor_output.cpp)
+target_link_libraries ("normalise_raptor_output" "common")
+install (TARGETS "normalise_raptor_output" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+add_executable ("normalise_yara_truth_file" hibf/misc/helper/src/normalise_yara_truth_file.cpp)
+target_link_libraries ("normalise_yara_truth_file" "common")
+install (TARGETS "normalise_yara_truth_file" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+add_executable ("compare_mantis_raptor_output" hibf/misc/helper/src/compare_mantis_raptor_output.cpp)
+target_link_libraries ("compare_mantis_raptor_output" "common")
+install (TARGETS "compare_mantis_raptor_output" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+# formerly create_truth_file
+add_executable ("to_be_deleted" hibf/misc/helper/src/to_be_deleted.cpp)
+target_link_libraries ("to_be_deleted" "common")
+install (TARGETS "to_be_deleted" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+add_executable ("compare_output" hibf/misc/helper/src/compare_output.cpp)
+target_link_libraries ("compare_output" "common")
+install (TARGETS "compare_output" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
 message (STATUS "${FontBold}You can run `make install` to build the application.${FontReset}")
