@@ -241,6 +241,36 @@ TEST_F(argparse_build, minimiser_and_window)
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
+TEST_F(argparse_build, layout_config_and_options)
+{
+    cli_test_result const result = execute_app("raptor",
+                                               "build",
+                                               "--kmer 20",
+                                               "--hash 3",
+                                               "--fpr 0.01",
+                                               "--output index.raptor",
+                                               data("test.layout"));
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(
+        result.err,
+        std::string{"[WARNING] Given k-mer size(20) differs from k-mer size in the layout file (19). The results may "
+                    "be suboptimal. If this was a conscious decision, you can ignore this warning.\n[WARNING] Given "
+                    "hash function count (3) differs from hash function count in the layout file (2). The results may "
+                    "be suboptimal. If this was a conscious decision, you can ignore this warning.\n[WARNING] Given "
+                    "false positive rate (0.01) differs from false positive rate in the layout file (0.05). The "
+                    "results may be suboptimal. If this was a conscious decision, you can ignore this warning."});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
+}
+
+TEST_F(argparse_build, layout_too_small_window)
+{
+    cli_test_result const result =
+        execute_app("raptor", "build", "--window 18", "--output index.raptor", data("test.layout"));
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] The k-mer size cannot be bigger than the window size.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
 TEST_F(argparse_search, ibf_missing)
 {
     cli_test_result const result = execute_app("raptor", "search", "--query ", data("query.fq"), "--output search.out");

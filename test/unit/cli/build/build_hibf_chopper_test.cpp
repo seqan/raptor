@@ -5,8 +5,6 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include <seqan3/test/tmp_directory.hpp>
-
 #include <chopper/count/execute.hpp>
 #include <chopper/layout/execute.hpp>
 
@@ -17,11 +15,10 @@ struct build_hibf_layout : public raptor_base
 
 TEST_F(build_hibf_layout, pipeline)
 {
-    seqan3::test::tmp_directory const out_dir{};
-    std::filesystem::path const data_filename = out_dir.path() / "raptor_cli_test.txt";
-    std::filesystem::path const layout_filename = out_dir.path() / "raptor_cli_test.layout";
-    std::filesystem::path const index_filename = out_dir.path() / "raptor.index";
-    std::filesystem::path const search_filename = out_dir.path() / "search.out";
+    std::filesystem::path const data_filename = "raptor_cli_test.txt";
+    std::filesystem::path const layout_filename = "raptor_cli_test.layout";
+    std::filesystem::path const index_filename = "raptor.index";
+    std::filesystem::path const search_filename = "search.out";
     size_t const number_of_repeated_bins{16};
     size_t const number_of_errors{0}; // search
 
@@ -41,11 +38,11 @@ TEST_F(build_hibf_layout, pipeline)
                                                    "--column-index 2",
                                                    "--threads 1",
                                                    "--input-file",
-                                                   data_filename.c_str(),
+                                                   data_filename,
                                                    "--tmax 64",
                                                    "--false-positive-rate 0.05",
                                                    "--output-filename",
-                                                   layout_filename.c_str());
+                                                   layout_filename);
 
         EXPECT_EQ(result.out, std::string{});
         EXPECT_EQ(result.err, std::string{});
@@ -55,15 +52,8 @@ TEST_F(build_hibf_layout, pipeline)
     ASSERT_TRUE(std::filesystem::exists(layout_filename));
 
     { // build index
-        cli_test_result const result = execute_app("raptor",
-                                                   "build",
-                                                   "--kmer 19",
-                                                   "--window 19",
-                                                   "--fpr 0.05",
-                                                   "--threads 1",
-                                                   "--output",
-                                                   index_filename,
-                                                   layout_filename);
+        cli_test_result const result =
+            execute_app("raptor", "build", "--threads 1", "--output", index_filename, layout_filename);
 
         EXPECT_EQ(result.out, std::string{});
         EXPECT_EQ(result.err, std::string{});

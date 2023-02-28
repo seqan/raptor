@@ -147,6 +147,16 @@ declare_internal_datasource (FILE three_levels.pack
                              URL_HASH SHA256=f4d0061995ba803265396e195154eca1629cdce331354f7a44f1ef1c0a075079
                              CONFIGURE true
 )
+declare_internal_datasource (FILE 1bins.pack
+                             URL ${CMAKE_CURRENT_LIST_DIR}/hibf/1bins.pack
+                             URL_HASH SHA256=bd3475ee141be102213fbfb7c8c625bb80017e3dd65d7c13f540df2d2c857d43
+                             CONFIGURE true
+)
+declare_internal_datasource (FILE test.layout
+                             URL ${CMAKE_CURRENT_LIST_DIR}/test.layout
+                             URL_HASH SHA256=28b1f1e62814aa3fa389704111b6c50eac04b97d4ebbde920fc1db7f84b93aef
+                             CONFIGURE true
+)
 
 declare_internal_datasource (FILE empty.fq
                              URL ${CMAKE_CURRENT_LIST_DIR}/empty.fq
