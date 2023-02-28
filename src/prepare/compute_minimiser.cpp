@@ -25,6 +25,24 @@
 namespace raptor
 {
 
+void write_list_file(prepare_arguments const & arguments)
+{
+    std::filesystem::path const output_dir{arguments.out_dir};
+    std::filesystem::path list_file = output_dir;
+    list_file /= "minimiser.list";
+    std::ofstream file{list_file};
+
+    for (auto && file_names : arguments.bin_path)
+    {
+        std::filesystem::path const file_name{file_names[0]};
+        bool const is_compressed = raptor::cutoff::file_is_compressed(file_name);
+        std::filesystem::path file_path = output_dir;
+        file_path /= is_compressed ? file_name.stem().stem() : file_name.stem();
+        file_path.replace_extension("minimiser");
+        file << file_path.c_str() << '\n';
+    }
+}
+
 void compute_minimiser(prepare_arguments const & arguments)
 {
     file_reader<file_types::sequence> const reader{arguments.shape, arguments.window_size};
@@ -108,6 +126,8 @@ void compute_minimiser(prepare_arguments const & arguments)
     };
 
     call_parallel_on_bins(worker, arguments.bin_path, arguments.threads);
+
+    write_list_file(arguments);
 }
 
 } // namespace raptor
