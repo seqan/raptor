@@ -48,6 +48,9 @@ void init_prepare_parser(sharg::parser & parser, prepare_arguments & arguments)
                                     .required = true,
                                     .validator = output_directory_validator{}});
     parser.add_list_item("",
+                         "Will create a \\fBminimiser.list\\fP inside the output directory. This file contains a "
+                         "list of generated minimiser files, in the same order as the input.");
+    parser.add_list_item("",
                          "\\fBWhen you manually delete a .in_progress file, also delete the corresponding .header and "
                          ".minimiser file!\\fP");
     parser.add_list_item("", "Created output files for each file:");
