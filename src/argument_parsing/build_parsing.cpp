@@ -10,6 +10,10 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
+#include <cereal/archives/json.hpp>
+
+#include <chopper/configuration.hpp>
+
 #include <raptor/argument_parsing/build_parsing.hpp>
 #include <raptor/argument_parsing/compute_bin_size.hpp>
 #include <raptor/argument_parsing/init_shared_meta.hpp>
@@ -21,6 +25,82 @@
 
 namespace raptor
 {
+
+inline bool read_chopper_config(chopper::configuration & config, std::filesystem::path const & config_file)
+{
+    std::ifstream file_in{config_file};
+    std::string line{};
+    std::stringstream config_stream{};
+
+    std::getline(file_in, line, '\n');
+    if (line != "##CONFIG:")
+        return false;
+
+    while (std::getline(file_in, line, '\n') && line.starts_with("##"))
+    {
+        if (line == "##ENDCONFIG")
+            break;
+
+        std::string_view sv{line};
+        assert(line.size() > 1u);
+        sv.remove_prefix(2u);
+        config_stream << sv << '\n';
+    }
+
+    if (line != "##ENDCONFIG")
+        return false; // GCOVR_EXCL_LINE
+
+    cereal::JSONInputArchive iarchive(config_stream);
+    iarchive(config);
+    return true;
+}
+
+inline void parse_chopper_config(sharg::parser & parser, build_arguments & arguments)
+{
+    chopper::configuration config{};
+    if (!read_chopper_config(config, arguments.bin_file))
+        return;
+
+    if (parser.is_option_set("kmer") && config.k != arguments.kmer_size)
+    {
+        std::cerr << sharg::detail::to_string(
+            "[WARNING] Given k-mer size(",
+            arguments.kmer_size,
+            ") differs from k-mer size in the layout file (",
+            config.k,
+            "). The results may be suboptimal. If this was a conscious decision, you can ignore this warning.\n");
+    }
+    else
+    {
+        arguments.kmer_size = config.k;
+    }
+
+    validate_shape(parser, arguments);
+
+    if (parser.is_option_set("hash") && config.num_hash_functions != arguments.hash)
+    {
+        std::cerr << sharg::detail::to_string(
+            "[WARNING] Given hash function count (",
+            arguments.hash,
+            ") differs from hash function count in the layout file (",
+            config.num_hash_functions,
+            "). The results may be suboptimal. If this was a conscious decision, you can ignore this warning.\n");
+    }
+    else
+        arguments.hash = config.num_hash_functions;
+
+    if (parser.is_option_set("fpr") && config.false_positive_rate != arguments.fpr)
+    {
+        std::cerr << sharg::detail::to_string(
+            "[WARNING] Given false positive rate (",
+            arguments.fpr,
+            ") differs from false positive rate in the layout file (",
+            config.false_positive_rate,
+            "). The results may be suboptimal. If this was a conscious decision, you can ignore this warning.");
+    }
+    else
+        arguments.fpr = config.false_positive_rate;
+}
 
 inline void parse_shape_from_minimiser(sharg::parser & parser, build_arguments & arguments)
 {
@@ -55,8 +135,8 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
     parser.info.examples.emplace_back(
         "raptor build --kmer 32 --window 32 --hash 3 --parts 4 --output raptor.index bins.list");
     parser.info.examples.emplace_back("raptor build --fpr 0.05 --output raptor.index minimiser.list");
-    parser.info.examples.emplace_back(
-        "raptor build  --kmer 19 --window 23 --fpr 0.05 --output raptor.index raptor.layout");
+    parser.info.examples.emplace_back("raptor build --output raptor.index raptor.layout");
+    parser.info.examples.emplace_back("raptor build --fpr 0.05 --output raptor.index raptor.layout");
     parser.info.synopsis.emplace_back("raptor build --output <file> [--threads <number>] [--verbose] [--kmer <number>"
                                       "|--shape <01-pattern>] [--window <number>] [--fpr <number>] [--hash <number>] "
                                       "[--parts <number>] [--compressed] [--] <INPUT>");
@@ -84,11 +164,13 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
         sharg::config{.short_id = '\0', .long_id = "verbose", .description = "Print time and memory usage."});
 
     parser.add_subsection("k-mer options");
-    parser.add_option(arguments.kmer_size,
-                      sharg::config{.short_id = '\0',
-                                    .long_id = "kmer",
-                                    .description = "The k-mer size.",
-                                    .validator = sharg::arithmetic_range_validator{1, 32}});
+    parser.add_option(
+        arguments.kmer_size,
+        sharg::config{.short_id = '\0',
+                      .long_id = "kmer",
+                      .description = "The k-mer size.",
+                      .default_message = std::to_string(arguments.kmer_size) + ", or read from layout file",
+                      .validator = sharg::arithmetic_range_validator{1, 32}});
     parser.add_option(arguments.window_size,
                       sharg::config{.short_id = '\0',
                                     .long_id = "window",
@@ -101,7 +183,7 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
                       .long_id = "shape",
                       .description =
                           "The shape to use for k-mers. Mutually exclusive with --kmer. Parsed from right to left.",
-                      .default_message = "11111111111111111111 (a k-mer of size 20)",
+                      .default_message = "11111111111111111111 (a k-mer of size 20), or read from layout file",
                       .validator = sharg::regex_validator{"[01]+"}});
 
     parser.add_subsection("Index options");
@@ -109,11 +191,13 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
                       sharg::config{.short_id = '\0',
                                     .long_id = "fpr",
                                     .description = "The false positive rate.",
+                                    .default_message = std::to_string(arguments.fpr) + ", or read from layout file",
                                     .validator = sharg::arithmetic_range_validator{0.0, 1.0}});
     parser.add_option(arguments.hash,
                       sharg::config{.short_id = '\0',
                                     .long_id = "hash",
                                     .description = "The number of hash functions to use.",
+                                    .default_message = std::to_string(arguments.hash) + ", or read from layout file",
                                     .validator = sharg::arithmetic_range_validator{1, 5}});
     parser.add_option(arguments.parts,
                       sharg::config{.short_id = '\0',
@@ -151,6 +235,9 @@ void build_parsing(sharg::parser & parser)
         throw sharg::parser_error{"The HIBF cannot yet be partitioned."};
 
     parse_bin_path(arguments);
+
+    if (arguments.is_hibf)
+        parse_chopper_config(parser, arguments);
 
     if (!arguments.input_is_minimiser)
         validate_shape(parser, arguments);

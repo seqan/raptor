@@ -1,0 +1,97 @@
+##CONFIG:
+##{
+##    "config": {
+##        "version": 2,
+##        "data_file": {
+##            "value0": "raptor_cli_test.txt"
+##        },
+##        "debug": false,
+##        "sketch_directory": {
+##            "value0": ""
+##        },
+##        "k": 19,
+##        "sketch_bits": 12,
+##        "disable_sketch_output": true,
+##        "precomputed_files": false,
+##        "output_filename": {
+##            "value0": "raptor_cli_test.layout"
+##        },
+##        "tmax": 64,
+##        "num_hash_functions": 2,
+##        "false_positive_rate": 0.05,
+##        "alpha": 1.2,
+##        "max_rearrangement_ratio": 0.5,
+##        "threads": 1,
+##        "estimate_union": false,
+##        "rearrange_user_bins": false,
+##        "determine_best_tmax": false,
+##        "force_all_binnings": false
+##    }
+##}
+##ENDCONFIG
+#HIGH_LEVEL_IBF max_bin_id:48
+#FILES	BIN_INDICES	NUMBER_OF_BINS
+@data_dir@/bin1.fa	0	1
+@data_dir@/bin1.fa	1	1
+@data_dir@/bin1.fa	2	1
+@data_dir@/bin1.fa	3	1
+@data_dir@/bin1.fa	4	1
+@data_dir@/bin1.fa	5	1
+@data_dir@/bin1.fa	6	1
+@data_dir@/bin1.fa	7	1
+@data_dir@/bin1.fa	8	1
+@data_dir@/bin1.fa	9	1
+@data_dir@/bin1.fa	10	1
+@data_dir@/bin1.fa	11	1
+@data_dir@/bin1.fa	12	1
+@data_dir@/bin1.fa	13	1
+@data_dir@/bin1.fa	14	1
+@data_dir@/bin1.fa	15	1
+@data_dir@/bin2.fa	16	1
+@data_dir@/bin2.fa	17	1
+@data_dir@/bin2.fa	18	1
+@data_dir@/bin2.fa	19	1
+@data_dir@/bin2.fa	20	1
+@data_dir@/bin2.fa	21	1
+@data_dir@/bin2.fa	22	1
+@data_dir@/bin2.fa	23	1
+@data_dir@/bin2.fa	24	1
+@data_dir@/bin2.fa	25	1
+@data_dir@/bin2.fa	26	1
+@data_dir@/bin2.fa	27	1
+@data_dir@/bin2.fa	28	1
+@data_dir@/bin2.fa	29	1
+@data_dir@/bin2.fa	30	1
+@data_dir@/bin2.fa	31	1
+@data_dir@/bin3.fa	32	1
+@data_dir@/bin3.fa	33	1
+@data_dir@/bin3.fa	34	1
+@data_dir@/bin3.fa	35	1
+@data_dir@/bin3.fa	36	1
+@data_dir@/bin3.fa	37	1
+@data_dir@/bin3.fa	38	1
+@data_dir@/bin3.fa	39	1
+@data_dir@/bin3.fa	40	1
+@data_dir@/bin3.fa	41	1
+@data_dir@/bin3.fa	42	1
+@data_dir@/bin3.fa	43	1
+@data_dir@/bin3.fa	44	1
+@data_dir@/bin3.fa	45	1
+@data_dir@/bin3.fa	46	1
+@data_dir@/bin3.fa	47	1
+@data_dir@/bin4.fa	48	1
+@data_dir@/bin4.fa	49	1
+@data_dir@/bin4.fa	50	1
+@data_dir@/bin4.fa	51	1
+@data_dir@/bin4.fa	52	1
+@data_dir@/bin4.fa	53	1
+@data_dir@/bin4.fa	54	1
+@data_dir@/bin4.fa	55	1
+@data_dir@/bin4.fa	56	1
+@data_dir@/bin4.fa	57	1
+@data_dir@/bin4.fa	58	1
+@data_dir@/bin4.fa	59	1
+@data_dir@/bin4.fa	60	1
+@data_dir@/bin4.fa	61	1
+@data_dir@/bin4.fa	62	1
+@data_dir@/bin4.fa	63	1
