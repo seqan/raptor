@@ -57,6 +57,8 @@ TEST_P(search_hibf_preprocessing, pipeline)
 
     cli_test_result const result2 = execute_app("raptor",
                                                 "build",
+                                                "--hash 2",
+                                                "--fpr 0.05",
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output raptor.index",
@@ -174,8 +176,13 @@ TEST_F(search_hibf_preprocessing, pipeline_with_continuation)
         RAPTOR_ASSERT_ZERO_EXIT(result1);
     }
 
-    cli_test_result const result2 =
-        execute_app("raptor", "build", "--threads 2", "--output raptor.index", "raptor_cli_test.layout");
+    cli_test_result const result2 = execute_app("raptor",
+                                                "build",
+                                                "--threads 2",
+                                                "--hash 2",
+                                                "--fpr 0.05",
+                                                "--output raptor.index",
+                                                "raptor_cli_test.layout");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result2);
@@ -247,6 +254,8 @@ TEST_P(search_hibf_preprocessing, pipeline_compressed_index)
     cli_test_result const result2 = execute_app("raptor",
                                                 "build",
                                                 "--compressed",
+                                                "--hash 2",
+                                                "--fpr 0.05",
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output raptor.index",
