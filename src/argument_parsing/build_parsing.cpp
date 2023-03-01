@@ -73,7 +73,7 @@ inline void parse_chopper_config(sharg::parser & parser, build_arguments & argum
     {
         if (arguments.input_is_minimiser)
             throw sharg::validation_error{"Could not read config from layout file. Please set --hash and --fpr."};
-            
+
         throw sharg::validation_error{"Could not read config from layout file. Please set --kmer, --hash, and --fpr."};
     }
 
