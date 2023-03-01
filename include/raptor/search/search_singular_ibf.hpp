@@ -123,6 +123,14 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
         arguments.generate_results_timer += local_generate_results_timer;
     };
 
+    auto write_header = [&]()
+    {
+        if constexpr (is_ibf)
+            return synced_out.write_header(arguments, index.ibf().hash_function_count());
+        else
+            return synced_out.write_header(arguments, index.ibf().ibf_vector[0].hash_function_count());
+    };
+
     for (auto && chunked_records : fin | seqan3::views::chunk((1ULL << 20) * 10))
     {
         records.clear();
@@ -131,6 +139,7 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
         arguments.query_file_io_timer.stop();
 
         cereal_handle.wait();
+        [[maybe_unused]] static bool header_written = write_header(); // called exactly once
 
         do_parallel(worker, records.size(), arguments.threads);
     }

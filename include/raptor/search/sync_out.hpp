@@ -34,9 +34,7 @@ public:
     ~sync_out() = default;
 
     sync_out(search_arguments const & arguments) : file{arguments.out_file}
-    {
-        write_header(arguments);
-    }
+    {}
 
     template <typename t>
     void write(t && data)
@@ -45,8 +43,7 @@ public:
         file << std::forward<t>(data);
     }
 
-private:
-    void write_header(search_arguments const & arguments)
+    bool write_header(search_arguments const & arguments, size_t const hash_function_count)
     {
         file << "### Minimiser parameters\n";
         file << "## Window size = " << arguments.window_size << '\n';
@@ -65,6 +62,7 @@ private:
         file << "## Cache thresholds = " << std::boolalpha << arguments.cache_thresholds << '\n';
         file << "### Index parameters\n";
         file << "## Index = " << arguments.index_file << '\n';
+        file << "## Index hashes = " << hash_function_count << '\n';
         file << "## Index parts = " << static_cast<uint16_t>(arguments.parts) << '\n';
         file << "## False positive rate = " << arguments.fpr << '\n';
         file << "## Index is compressed = " << std::boolalpha << arguments.compressed << '\n';
@@ -81,8 +79,11 @@ private:
         }
 
         file << "#QUERY_NAME\tUSER_BINS\n";
+
+        return true;
     }
 
+private:
     std::ofstream file;
     std::mutex write_mutex;
 };
