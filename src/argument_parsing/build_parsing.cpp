@@ -70,11 +70,12 @@ inline void parse_chopper_config(sharg::parser & parser, build_arguments & argum
 
     bool const config_available = read_chopper_config(config, arguments.bin_file);
     if (!config_available && config_required)
-        if (!arguments.input_is_minimiser)
-            throw sharg::validation_error{
-                "Could not read config from layout file. Please set --kmer, --hash, and --fpr."};
-        else
+    {
+        if (arguments.input_is_minimiser)
             throw sharg::validation_error{"Could not read config from layout file. Please set --hash and --fpr."};
+
+        throw sharg::validation_error{"Could not read config from layout file. Please set --kmer, --hash, and --fpr."};
+    }
 
     if (config_available && kmer_set && config.k != arguments.kmer_size)
     {
