@@ -43,6 +43,11 @@ void search_partitioned_ibf(search_arguments const & arguments)
 
     sync_out synced_out{arguments};
 
+    auto write_header = [&]()
+    {
+        return synced_out.write_header(arguments, index.ibf().hash_function_count());
+    };
+
     raptor::threshold::threshold const thresholder{arguments.make_threshold_parameters()};
 
     for (auto && chunked_records : fin | seqan3::views::chunk((1ULL << 20) * 10))
@@ -55,6 +60,7 @@ void search_partitioned_ibf(search_arguments const & arguments)
         arguments.query_file_io_timer.stop();
 
         cereal_handle.wait();
+        [[maybe_unused]] static bool header_written = write_header(); // called exactly once
 
         std::vector<seqan3::counting_vector<uint16_t>> counts(
             records.size(),
