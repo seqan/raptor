@@ -58,10 +58,25 @@ inline bool read_chopper_config(chopper::configuration & config, std::filesystem
 inline void parse_chopper_config(sharg::parser & parser, build_arguments & arguments)
 {
     chopper::configuration config{};
-    if (!read_chopper_config(config, arguments.bin_file))
-        return;
+    bool const kmer_set = parser.is_option_set("kmer");
+    bool const shape_set = parser.is_option_set("shape");
+    bool const hash_set = parser.is_option_set("hash");
+    bool const fpr_set = parser.is_option_set("fpr");
 
-    if (parser.is_option_set("kmer") && config.k != arguments.kmer_size)
+    // If there is no config, but all three options are set, we can ignore the missing config.
+    // If the input are preprocessed minimizer files, we will use their kmer and window size, so we do not require
+    // --kmer to be set in this case.
+    bool const config_required = (!arguments.input_is_minimiser && !kmer_set && !shape_set) || !hash_set || !fpr_set;
+
+    bool const config_available = read_chopper_config(config, arguments.bin_file);
+    if (!config_available && config_required)
+        if (!arguments.input_is_minimiser)
+            throw sharg::validation_error{
+                "Could not read config from layout file. Please set --kmer, --hash, and --fpr."};
+        else
+            throw sharg::validation_error{"Could not read config from layout file. Please set --hash and --fpr."};
+
+    if (config_available && kmer_set && config.k != arguments.kmer_size)
     {
         std::cerr << sharg::detail::to_string(
             "[WARNING] Given k-mer size(",
@@ -77,7 +92,7 @@ inline void parse_chopper_config(sharg::parser & parser, build_arguments & argum
 
     validate_shape(parser, arguments);
 
-    if (parser.is_option_set("hash") && config.num_hash_functions != arguments.hash)
+    if (config_available && hash_set && config.num_hash_functions != arguments.hash)
     {
         std::cerr << sharg::detail::to_string(
             "[WARNING] Given hash function count (",
@@ -89,7 +104,7 @@ inline void parse_chopper_config(sharg::parser & parser, build_arguments & argum
     else
         arguments.hash = config.num_hash_functions;
 
-    if (parser.is_option_set("fpr") && config.false_positive_rate != arguments.fpr)
+    if (config_available && fpr_set && config.false_positive_rate != arguments.fpr)
     {
         std::cerr << sharg::detail::to_string(
             "[WARNING] Given false positive rate (",

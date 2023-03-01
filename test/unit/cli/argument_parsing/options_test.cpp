@@ -271,6 +271,26 @@ TEST_F(argparse_build, layout_too_small_window)
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
+TEST_F(argparse_build, layout_config_missing)
+{
+    cli_test_result const result =
+        execute_app("raptor", "build", "--window 19", "--output index.raptor", data("test_nocfg.layout"));
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err,
+              std::string{"[Error] Could not read config from layout file. Please set --kmer, --hash, and --fpr.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
+TEST_F(argparse_build, layout_config_missing_preprocessed)
+{
+    cli_test_result const result =
+        execute_app("raptor", "build", "--window 19", "--output index.raptor", data("test_preprocessed_nocfg.layout"));
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err,
+              std::string{"[Error] Could not read config from layout file. Please set --hash and --fpr.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
 TEST_F(argparse_search, ibf_missing)
 {
     cli_test_result const result = execute_app("raptor", "search", "--query ", data("query.fq"), "--output search.out");

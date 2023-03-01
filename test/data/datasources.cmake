@@ -157,6 +157,25 @@ declare_internal_datasource (FILE test.layout
                              URL_HASH SHA256=28b1f1e62814aa3fa389704111b6c50eac04b97d4ebbde920fc1db7f84b93aef
                              CONFIGURE true
 )
+declare_internal_datasource (FILE test_nocfg.layout
+                             URL ${CMAKE_CURRENT_LIST_DIR}/test_nocfg.layout
+                             URL_HASH SHA256=2833b8f244af66601d10561c9418ec6aa5ee7dd96c9b77191dd06de1d820240a
+                             CONFIGURE true
+)
+declare_internal_datasource (FILE test_preprocessed_nocfg.layout
+                             URL ${CMAKE_CURRENT_LIST_DIR}/test_preprocessed_nocfg.layout
+                             URL_HASH SHA256=ae774da92e02fb4169e4d736bce7e923fe1a9ba842536a9cc96ac17690f455b4
+                             CONFIGURE true
+)
+
+declare_internal_datasource (FILE bin1.header
+                             URL ${CMAKE_CURRENT_LIST_DIR}/minimiser/bin1.header
+                             URL_HASH SHA256=c1944ce2230abef4648895864c1f48f2072ae01234e49df74a66dc9a55e0b344
+)
+declare_internal_datasource (FILE bin1.minimiser
+                             URL ${CMAKE_CURRENT_LIST_DIR}/minimiser/bin1.minimiser
+                             URL_HASH SHA256=40c06f410d9723a9601444b643ec7124d7152a5c30c33a37d75b3d71d7cff00d
+)
 
 declare_internal_datasource (FILE empty.fq
                              URL ${CMAKE_CURRENT_LIST_DIR}/empty.fq
