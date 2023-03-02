@@ -15,6 +15,7 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <raptor/adjust_seed.hpp>
+#include <raptor/build/emplace_iterator.hpp>
 #include <raptor/build/partition_config.hpp>
 #include <raptor/call_parallel_on_bins.hpp>
 #include <raptor/dna4_traits.hpp>
@@ -72,39 +73,29 @@ private:
 
         auto worker = [&](auto && zipped_view, auto &&)
         {
-            timer<concurrent::no> local_user_bin_io_timer{};
-            timer<concurrent::no> local_fill_ibf_timer{};
-            std::vector<uint64_t> hashes{};
+            timer<concurrent::no> local_timer{};
             auto & ibf = index.ibf();
-
+            local_timer.start();
             for (auto && [file_names, bin_number] : zipped_view)
             {
-                hashes.clear();
-                local_user_bin_io_timer.start();
                 std::visit(
                     [&](auto const & reader)
                     {
                         if (config == nullptr)
-                            reader.hash_into(file_names, std::back_inserter(hashes));
+                            reader.hash_into(file_names, emplacer(ibf, seqan3::bin_index{bin_number}));
                         else
                             reader.hash_into_if(file_names,
-                                                std::back_inserter(hashes),
+                                                emplacer(ibf, seqan3::bin_index{bin_number}),
                                                 [&](uint64_t const hash)
                                                 {
                                                     return config->hash_partition(hash) == part;
                                                 });
                     },
                     reader);
-                local_user_bin_io_timer.stop();
-
-                local_fill_ibf_timer.start();
-                for (auto && value : hashes)
-                    ibf.emplace(value, seqan3::bin_index{bin_number});
-                local_fill_ibf_timer.stop();
             }
-
-            arguments->user_bin_io_timer += local_user_bin_io_timer;
-            arguments->fill_ibf_timer += local_fill_ibf_timer;
+            local_timer.stop();
+            arguments->user_bin_io_timer += local_timer;
+            arguments->fill_ibf_timer += local_timer;
         };
 
         call_parallel_on_bins(worker, arguments->bin_path, arguments->threads);
