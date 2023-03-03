@@ -39,6 +39,7 @@ TEST_P(build_ibf_compressed, pipeline)
                                                 run_parallel ? "2" : "1",
                                                 "--output raptor.index",
                                                 "--compressed",
+                                                "--input",
                                                 "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});

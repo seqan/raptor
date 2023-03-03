@@ -43,7 +43,7 @@ TEST_P(search_ibf_preprocessing, pipeline)
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output precomputed_minimisers",
-                                                "raptor_cli_test.txt");
+                                                "--input raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result1);
@@ -53,7 +53,7 @@ TEST_P(search_ibf_preprocessing, pipeline)
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output raptor.index",
-                                                "raptor_cli_test.minimiser");
+                                                "--input raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result2);
@@ -109,7 +109,7 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output precomputed_minimisers",
-                                                "raptor_cli_test.txt");
+                                                "--input raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result1);
@@ -119,7 +119,7 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output raptor.index",
-                                                "raptor_cli_test.minimiser");
+                                                "--input raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result2);
@@ -162,13 +162,13 @@ TEST_F(search_ibf_preprocessing, pipeline_compressed_index)
                                                 "--kmer 19",
                                                 "--window 23",
                                                 "--output precomputed_minimisers",
-                                                "raptor_cli_test.txt");
+                                                "--input raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result1);
 
     cli_test_result const result2 =
-        execute_app("raptor", "build", "--output raptor.index", "--compressed", "raptor_cli_test.minimiser");
+        execute_app("raptor", "build", "--output raptor.index", "--compressed", "--input raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result2);

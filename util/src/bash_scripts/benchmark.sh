@@ -74,7 +74,7 @@ for size in $SIZES; do
                             --size $size \
                             --threads $THREADS \
                             --hash $HASH \
-                            $working_directory/bins.list
+                            --input $working_directory/bins.list
 
     query_log=$working_directory/$W\_$K\_$size\_query.log # Does not contain HASH
     query_perf=$working_directory/$W\_$K\_$size\_query.perf

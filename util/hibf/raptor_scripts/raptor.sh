@@ -101,7 +101,7 @@ for tmax in $TECHNICAL_BINS; do
             --window $W \
             --threads $THREADS \
             --hash $HASH \
-            $layout_file
+            --input $layout_file
     echo "Done."
 
     query_out=$working_directory/$W\_$K\_$tmax.out # Does not contain HASH
@@ -133,7 +133,7 @@ echo -n "[$(date +"%Y-%m-%d %T")] Building index with ($W, $K)-minimisers, $HASH
         --size "${2}" \
         --threads $THREADS \
         --hash $HASH \
-        $working_directory/bins.list
+        --input $working_directory/bins.list
 echo "Done."
 
 query_out=$working_directory/$W\_$K\_IBF.out # Does not contain HASH

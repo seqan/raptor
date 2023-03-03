@@ -56,10 +56,9 @@ TEST_F(argparse_build, no_options)
         "sequences.\n=================================================================================================="
         "===============\n    "));
     EXPECT_TRUE(result.out.ends_with(
-        " build --output <file> [--threads <number>] [--verbose] [--kmer\n    "
-        "<number>|--shape <01-pattern>] [--window <number>] [--fpr <number>]\n    [--hash <number>] [--parts <number>] "
-        "[--compressed] [--] <INPUT>\n    Try -h or --help for more information.\n"));
-
+        " build --input <file> --output <file> [--threads <number>]\n    [--verbose] [--kmer <number>|--shape "
+        "<01-pattern>] [--window <number>]\n    [--fpr <number>] [--hash <number>] [--parts <number>] [--compressed]\n"
+        "    Try -h or --help for more information.\n"));
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
 }
@@ -105,25 +104,22 @@ TEST_F(argparse_build, input_missing)
 {
     cli_test_result const result = execute_app("raptor", "build", "--output ./index.raptor");
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err,
-              std::string{"[Error] Not enough positional arguments provided (Need at least 1). See "
-                          "-h/--help for more information.\n"});
+    EXPECT_EQ(result.err, std::string{"[Error] Option --input is required but not set.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
 TEST_F(argparse_build, input_invalid)
 {
-    cli_test_result const result = execute_app("raptor", "build", "--output ./index.raptor", "nonexistent");
+    cli_test_result const result = execute_app("raptor", "build", "--output ./index.raptor", "--input nonexistent");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err,
-              std::string{"[Error] Validation failed for positional option 1: The file \"nonexistent\" does"
-                          " not exist!\n"});
+              std::string{"[Error] Validation failed for option --input: The file \"nonexistent\" does not exist!\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
 TEST_F(argparse_build, output_missing)
 {
-    cli_test_result const result = execute_app("raptor", "build", tmp_bin_list_file);
+    cli_test_result const result = execute_app("raptor", "build", "--input", tmp_bin_list_file);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Option --output is required but not set.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
@@ -131,8 +127,13 @@ TEST_F(argparse_build, output_missing)
 
 TEST_F(argparse_build, kmer_window)
 {
-    cli_test_result const result =
-        execute_app("raptor", "build", "--kmer 20", "--window 19", "--output index.raptor", tmp_bin_list_file);
+    cli_test_result const result = execute_app("raptor",
+                                               "build",
+                                               "--kmer 20",
+                                               "--window 19",
+                                               "--output index.raptor",
+                                               "--input",
+                                               tmp_bin_list_file);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] The k-mer size cannot be bigger than the window size.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
@@ -140,8 +141,13 @@ TEST_F(argparse_build, kmer_window)
 
 TEST_F(argparse_build, kmer_shape)
 {
-    cli_test_result const result =
-        execute_app("raptor", "build", "--kmer 20", "--shape 11", "--output index.raptor", tmp_bin_list_file);
+    cli_test_result const result = execute_app("raptor",
+                                               "build",
+                                               "--kmer 20",
+                                               "--shape 11",
+                                               "--output index.raptor",
+                                               "--input",
+                                               tmp_bin_list_file);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] You cannot set both shape and k-mer arguments.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
@@ -149,8 +155,13 @@ TEST_F(argparse_build, kmer_shape)
 
 TEST_F(argparse_build, zero_threads)
 {
-    cli_test_result const result =
-        execute_app("raptor", "build", "--kmer 20", "--threads 0", "--output index.raptor", tmp_bin_list_file);
+    cli_test_result const result = execute_app("raptor",
+                                               "build",
+                                               "--kmer 20",
+                                               "--threads 0",
+                                               "--output index.raptor",
+                                               "--input",
+                                               tmp_bin_list_file);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err,
               std::string{"[Error] Validation failed for option --threads: The value must be a positive "
@@ -161,7 +172,7 @@ TEST_F(argparse_build, zero_threads)
 TEST_F(argparse_build, no_bins_in_file)
 {
     cli_test_result const result =
-        execute_app("raptor", "build", "--kmer 20", "--output index.raptor", tmp_bin_list_empty);
+        execute_app("raptor", "build", "--kmer 20", "--output index.raptor", "--input", tmp_bin_list_empty);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] The input file is empty.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
@@ -170,7 +181,7 @@ TEST_F(argparse_build, no_bins_in_file)
 TEST_F(argparse_build, corrupted_input)
 {
     cli_test_result const result =
-        execute_app("raptor", "build", "--kmer 20", "--output index.raptor", tmp_bin_list_corrupted);
+        execute_app("raptor", "build", "--kmer 20", "--output index.raptor", "--input", tmp_bin_list_corrupted);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] The list of input files cannot be empty.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
@@ -179,7 +190,7 @@ TEST_F(argparse_build, corrupted_input)
 TEST_F(argparse_build, empty_file_in_bin)
 {
     cli_test_result const result =
-        execute_app("raptor", "build", "--kmer 20", "--output index.raptor", tmp_empty_bin_file);
+        execute_app("raptor", "build", "--kmer 20", "--output index.raptor", "--input", tmp_empty_bin_file);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(
         result.err,
@@ -189,7 +200,8 @@ TEST_F(argparse_build, empty_file_in_bin)
 
 TEST_F(argparse_build, mixed_input)
 {
-    cli_test_result const result = execute_app("raptor", "build", "--kmer 20", "--output index.raptor", mixed_bin_file);
+    cli_test_result const result =
+        execute_app("raptor", "build", "--kmer 20", "--output index.raptor", "--input", mixed_bin_file);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] You cannot mix sequence and minimiser files as input.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
@@ -198,7 +210,7 @@ TEST_F(argparse_build, mixed_input)
 TEST_F(argparse_build, wrong_parts)
 {
     cli_test_result const result =
-        execute_app("raptor", "build", "--kmer 20", "--parts 3", "--output index.raptor", tmp_bin_list_file);
+        execute_app("raptor", "build", "--kmer 20", "--parts 3", "--output index.raptor", "--input", tmp_bin_list_file);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err,
               std::string{"[Error] Validation failed for option --parts: The value must be a power of "
@@ -209,7 +221,7 @@ TEST_F(argparse_build, wrong_parts)
 TEST_F(argparse_build, partitioned_parts)
 {
     cli_test_result const result =
-        execute_app("raptor", "build", "--parts 4", "--output index.raptor", data("three_levels.pack"));
+        execute_app("raptor", "build", "--parts 4", "--output index.raptor", "--input", data("three_levels.pack"));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] The HIBF cannot yet be partitioned.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
@@ -218,7 +230,7 @@ TEST_F(argparse_build, partitioned_parts)
 TEST_F(argparse_build, minimiser_and_shape)
 {
     cli_test_result const result =
-        execute_app("raptor", "build", "--shape 11111", "--output index.raptor", minimiser_list);
+        execute_app("raptor", "build", "--shape 11111", "--output index.raptor", "--input", minimiser_list);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] You cannot set --shape when using minimiser files as input.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
@@ -226,7 +238,8 @@ TEST_F(argparse_build, minimiser_and_shape)
 
 TEST_F(argparse_build, minimiser_and_kmer)
 {
-    cli_test_result const result = execute_app("raptor", "build", "--kmer 19", "--output index.raptor", minimiser_list);
+    cli_test_result const result =
+        execute_app("raptor", "build", "--kmer 19", "--output index.raptor", "--input", minimiser_list);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] You cannot set --kmer when using minimiser files as input.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
@@ -235,7 +248,7 @@ TEST_F(argparse_build, minimiser_and_kmer)
 TEST_F(argparse_build, minimiser_and_window)
 {
     cli_test_result const result =
-        execute_app("raptor", "build", "--window 19", "--output index.raptor", minimiser_list);
+        execute_app("raptor", "build", "--window 19", "--output index.raptor", "--input", minimiser_list);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] You cannot set --window when using minimiser files as input.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
@@ -249,6 +262,7 @@ TEST_F(argparse_build, layout_config_and_options)
                                                "--hash 3",
                                                "--fpr 0.01",
                                                "--output index.raptor",
+                                               "--input",
                                                data("test.layout"));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(
@@ -265,7 +279,7 @@ TEST_F(argparse_build, layout_config_and_options)
 TEST_F(argparse_build, layout_too_small_window)
 {
     cli_test_result const result =
-        execute_app("raptor", "build", "--window 18", "--output index.raptor", data("test.layout"));
+        execute_app("raptor", "build", "--window 18", "--output index.raptor", "--input", data("test.layout"));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] The k-mer size cannot be bigger than the window size.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
@@ -274,7 +288,7 @@ TEST_F(argparse_build, layout_too_small_window)
 TEST_F(argparse_build, layout_config_missing)
 {
     cli_test_result const result =
-        execute_app("raptor", "build", "--window 19", "--output index.raptor", data("test_nocfg.layout"));
+        execute_app("raptor", "build", "--window 19", "--output index.raptor", "--input", data("test_nocfg.layout"));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err,
               std::string{"[Error] Could not read config from layout file. Please set --kmer, --hash, and --fpr.\n"});
@@ -283,8 +297,12 @@ TEST_F(argparse_build, layout_config_missing)
 
 TEST_F(argparse_build, layout_config_missing_preprocessed)
 {
-    cli_test_result const result =
-        execute_app("raptor", "build", "--window 19", "--output index.raptor", data("test_preprocessed_nocfg.layout"));
+    cli_test_result const result = execute_app("raptor",
+                                               "build",
+                                               "--window 19",
+                                               "--output index.raptor",
+                                               "--input",
+                                               data("test_preprocessed_nocfg.layout"));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err,
               std::string{"[Error] Could not read config from layout file. Please set --hash and --fpr.\n"});
@@ -469,21 +487,6 @@ TEST_F(argparse_search, queries_unsupported_length)
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
-TEST_F(argparse_upgrade, no_options)
-{
-    cli_test_result const result = execute_app("raptor", "prepare");
-    EXPECT_TRUE(result.out.starts_with(
-        "Raptor-prepare - A fast and space-efficient pre-filter for querying very large collections of nucleotide "
-        "sequences.\n=================================================================================================="
-        "=================\n    "));
-    EXPECT_TRUE(result.out.ends_with(
-        " prepare --output <directory> [--threads <number>] [--verbose]\n   "
-        " [--kmer <number>|--shape <01-pattern>] [--window <number>]\n    [--kmer-count-cutoff "
-        "<number>|--use-filesize-dependent-cutoff] [--]\n    <INPUT>\n    Try -h or --help for more information.\n"));
-    EXPECT_EQ(result.err, std::string{});
-    RAPTOR_ASSERT_ZERO_EXIT(result);
-}
-
 TEST_F(argparse_upgrade, exclusive_options)
 {
     {
@@ -531,6 +534,21 @@ TEST_F(argparse_upgrade, unsupported_index)
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
+TEST_F(argparse_prepare, no_options)
+{
+    cli_test_result const result = execute_app("raptor", "prepare");
+    EXPECT_TRUE(result.out.starts_with(
+        "Raptor-prepare - A fast and space-efficient pre-filter for querying very large collections of nucleotide "
+        "sequences.\n=================================================================================================="
+        "=================\n    "));
+    EXPECT_TRUE(result.out.ends_with(
+        " prepare --input <file> --output <directory> [--threads <number>]\n    [--verbose] [--kmer <number>|--shape "
+        "<01-pattern>] [--window <number>]\n    [--kmer-count-cutoff <number>|--use-filesize-dependent-cutoff]\n    "
+        "Try -h or --help for more information.\n"));
+    EXPECT_EQ(result.err, std::string{});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
+}
+
 TEST_F(argparse_prepare, cutoffs)
 {
     cli_test_result const result = execute_app("raptor",
@@ -538,6 +556,7 @@ TEST_F(argparse_prepare, cutoffs)
                                                "--output directory",
                                                "--kmer-count-cutoff 1",
                                                "--use-filesize-dependent-cutoff",
+                                               "--input",
                                                tmp_bin_list_file);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err,
