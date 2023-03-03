@@ -146,24 +146,27 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
     parser.info.description.emplace_back("The input may be a layout file from \\fBraptor layout\\fP, a list of "
                                          "minimiser files produced from \\fBraptor prepare\\fP, or a file with a list "
                                          "of files to process.");
-    parser.info.examples.emplace_back("raptor build --kmer 19 --window 23 --fpr 0.05 --output raptor.index bins.list");
-    parser.info.examples.emplace_back("raptor build --shape 11011 --window 8 --output raptor.index bins.list");
-    parser.info.examples.emplace_back(
-        "raptor build --kmer 32 --window 32 --hash 3 --parts 4 --output raptor.index bins.list");
-    parser.info.examples.emplace_back("raptor build --fpr 0.05 --output raptor.index minimiser.list");
-    parser.info.examples.emplace_back("raptor build --output raptor.index raptor.layout");
-    parser.info.examples.emplace_back("raptor build --fpr 0.05 --output raptor.index raptor.layout");
-    parser.info.synopsis.emplace_back("raptor build --output <file> [--threads <number>] [--verbose] [--kmer <number>"
-                                      "|--shape <01-pattern>] [--window <number>] [--fpr <number>] [--hash <number>] "
-                                      "[--parts <number>] [--compressed] [--] <INPUT>");
-
-    parser.add_positional_option(
-        arguments.bin_file,
-        sharg::config{.description = "A layout file from \\fBraptor layout\\fP, or a file containing file names. "
-                                   + bin_validator{}.get_help_page_message(),
-                      .validator = sharg::input_file_validator{}});
+    parser.info.examples.emplace_back("raptor build --input bins.list --kmer 19 --window 23 --fpr 0.05 --output "
+                                      "raptor.index");
+    parser.info.examples.emplace_back("raptor build --input bins.list --shape 11011 --window 8 --output raptor.index");
+    parser.info.examples.emplace_back("raptor build --input bins.list --kmer 32 --window 32 --hash 3 --parts 4 "
+                                      "--output raptor.index");
+    parser.info.examples.emplace_back("raptor build --input minimiser.list --fpr 0.05 --output raptor.index");
+    parser.info.examples.emplace_back("raptor build --input raptor.layout --output raptor.index");
+    parser.info.examples.emplace_back("raptor build --input raptor.layout --fpr 0.05 --output raptor.index");
+    parser.info.synopsis.emplace_back("raptor build --input <file> --output <file> [--threads <number>] [--verbose] "
+                                      "[--kmer <number>|--shape <01-pattern>] [--window <number>] [--fpr <number>] "
+                                      "[--hash <number>] [--parts <number>] [--compressed]");
 
     parser.add_subsection("General options");
+    parser.add_option(
+        arguments.bin_file,
+        sharg::config{.short_id = '\0',
+                      .long_id = "input",
+                      .description = "A layout file from \\fBraptor layout\\fP, or a file containing file names. "
+                                   + bin_validator{}.get_help_page_message(),
+                      .required = true,
+                      .validator = sharg::input_file_validator{}});
     parser.add_option(arguments.out_path,
                       sharg::config{.short_id = '\0',
                                     .long_id = "output",

@@ -38,6 +38,7 @@ TEST_P(build_ibf_partitioned, pipeline)
                                                 compressed ? "--compressed" : "--threads 1",
                                                 "--parts ",
                                                 std::to_string(parts),
+                                                "--input",
                                                 "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
@@ -84,6 +85,7 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
                                                 "--kmer 19",
                                                 "--window 23",
                                                 "--output precomputed_minimisers",
+                                                "--input",
                                                 "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
@@ -94,6 +96,7 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
                                                 "--fpr 0.016",
                                                 "--output raptor.index",
                                                 "--parts 4",
+                                                "--input",
                                                 "raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});

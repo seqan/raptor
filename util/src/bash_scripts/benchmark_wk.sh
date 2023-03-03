@@ -54,7 +54,7 @@ do_task () {
             --size $SIZE \
             --threads $THREADS \
             --hash $HASH \
-            $working_directory/bins.list
+            --input $working_directory/bins.list
 
     query_log=$working_directory/$w\_$k\_$SIZE\_query.log # Does not contain HASH
     query_out=$working_directory/$w\_$k\_$SIZE.out

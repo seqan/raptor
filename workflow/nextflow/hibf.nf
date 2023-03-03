@@ -126,7 +126,7 @@ process INDEX {
                  --fpr "$fpr"  \
                  --threads $task.cpus  \
                  --output hibf.index  \
-                 $layout
+                 --input $layout
     """
 }
 

@@ -53,7 +53,7 @@ TEST_F(build_hibf_layout, pipeline)
 
     { // build index
         cli_test_result const result =
-            execute_app("raptor", "build", "--threads 1", "--output", index_filename, layout_filename);
+            execute_app("raptor", "build", "--threads 1", "--output", index_filename, "--input", layout_filename);
 
         EXPECT_EQ(result.out, std::string{});
         EXPECT_EQ(result.err, std::string{});

@@ -27,20 +27,22 @@ void init_prepare_parser(sharg::parser & parser, prepare_arguments & arguments)
     parser.info.description.emplace_back(
         "Computes minimisers for the use with \\fBraptor layout\\fP and \\fBraptor build\\fP.");
     parser.info.description.emplace_back("Can continue where it left off after a crash or in multiple runs.");
-    parser.info.examples.emplace_back("raptor prepare --output some_directory --kmer 20 --window 24 bins.list");
-    parser.info.examples.emplace_back("raptor prepare --output some_directory --kmer-count-cutoff 2 bins.list");
-    parser.info.examples.emplace_back(
-        "raptor prepare --output some_directory --use-filesize-dependent-cutoff bins.list");
+    parser.info.examples.emplace_back("raptor prepare --input bins.list --output some_directory --kmer 20 --window 24");
+    parser.info.examples.emplace_back("raptor prepare --input bins.list --output some_directory --kmer-count-cutoff 2");
+    parser.info.examples.emplace_back("raptor prepare --input bins.list --output some_directory "
+                                      "--use-filesize-dependent-cutoff");
     parser.info.synopsis.emplace_back(
-        "raptor prepare --output <directory> [--threads <number>] [--verbose] [--kmer <number>|--shape <01-pattern>] "
-        "[--window <number>] [--kmer-count-cutoff <number>|--use-filesize-dependent-cutoff] [--] <INPUT>");
-
-    parser.add_positional_option(
-        arguments.bin_file,
-        sharg::config{.description = "File containing file names. " + bin_validator{}.get_help_page_message(),
-                      .validator = sharg::input_file_validator{}});
+        "raptor prepare --input <file> --output <directory> [--threads <number>] [--verbose] [--kmer <number>|--shape "
+        "<01-pattern>] [--window <number>] [--kmer-count-cutoff <number>|--use-filesize-dependent-cutoff]");
 
     parser.add_subsection("General options");
+    parser.add_option(
+        arguments.bin_file,
+        sharg::config{.short_id = '\0',
+                      .long_id = "input",
+                      .description = "File containing file names. " + bin_validator{}.get_help_page_message(),
+                      .required = true,
+                      .validator = sharg::input_file_validator{}});
     parser.add_option(arguments.out_dir,
                       sharg::config{.short_id = '\0',
                                     .long_id = "output",
