@@ -54,11 +54,6 @@ void compute_minimiser(prepare_arguments const & arguments)
         timer<concurrent::no> local_write_minimiser_timer{};
         timer<concurrent::no> local_write_header_timer{};
 
-        // The hash table stores how often a minimiser appears. It does not matter whether a minimiser appears
-        // 50 times or 2000 times, it is stored regardless because the biggest cutoff value is 50. Hence,
-        // the hash table stores only values up to 254 to save memory.
-        robin_hood::unordered_map<uint64_t, uint8_t> minimiser_table{};
-
         for (auto && [file_names, bin_number] : zipped_view)
         {
             std::filesystem::path const file_name{file_names[0]};
@@ -82,6 +77,14 @@ void compute_minimiser(prepare_arguments const & arguments)
                 continue;
             else
                 std::ofstream outfile{progress_file, std::ios::binary};
+
+            // The hash table stores how often a minimiser appears. It does not matter whether a minimiser appears
+            // 50 times or 2000 times, it is stored regardless because the biggest cutoff value is 50. Hence,
+            // the hash table stores only values up to 254 to save memory.
+            robin_hood::unordered_map<uint64_t, uint8_t> minimiser_table{};
+            // The map is (re-)constructed for each file. The alternative is to construct it once for each thread
+            // and clear+reuse it for every file that a thread works on. However, this dramatically increases
+            // memory consumption because the map will stay as big as needed for the biggest encountered file.
 
             local_compute_minimiser_timer.start();
             reader.for_each_hash(file_names,
@@ -117,7 +120,6 @@ void compute_minimiser(prepare_arguments const & arguments)
             local_write_header_timer.stop();
 
             std::filesystem::remove(progress_file);
-            minimiser_table.clear();
         }
 
         arguments.compute_minimiser_timer += local_compute_minimiser_timer;
