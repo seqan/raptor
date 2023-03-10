@@ -11,3 +11,6 @@ target_link_libraries ("normalise_raptor_output" "utility_common")
 
 add_executable ("fasta_to_fastq" fasta_to_fastq.cpp)
 target_link_libraries ("fasta_to_fastq" "utility_common")
+
+add_executable ("normalise_yara_truth_file" normalise_yara_truth_file.cpp)
+target_link_libraries ("normalise_yara_truth_file" "utility_common")
