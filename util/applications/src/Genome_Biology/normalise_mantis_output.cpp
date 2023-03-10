@@ -16,8 +16,8 @@
 
 #include <raptor/argument_parsing/validators.hpp>
 
-#include "check_output_file.hpp"
-#include "parse_user_bin_ids.hpp"
+#include <Genome_Biology/check_output_file.hpp>
+#include <Genome_Biology/parse_user_bin_ids.hpp>
 
 struct config
 {

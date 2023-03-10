@@ -11,7 +11,7 @@ on:
 
 concurrency:
   group: misc-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'push' }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 
 env:
   SHARG_NO_VERSION_CHECK: 1

@@ -24,7 +24,7 @@ to use `$(BIN_NUMBER=64; seq -f "some/path/bin_%0${#BIN_NUMBER}.0f.fasta" 0 1 $(
 
 ## Compiling Applications
 
-From within the `util` directory:
+From within the `util/iScience` directory:
 ```bash
 mkdir build
 cd build
@@ -69,10 +69,10 @@ bin/
 
 ### Included bash scripts
 
-`src/bash_scripts` contains a variety of bash scripts:
+`bash_scripts` contains a variety of bash scripts:
 ```console
-$ tree src/bash_scripts/
-src/bash_scripts/
+$ tree bash_scripts/
+bash_scripts/
 ├── benchmark.sh           # Runs benchmarks for Raptor
 ├── benchmark_wk.sh        # Runs different w/k combinations for Raptor
 ├── count_minimisers.sh    # Counts a variety of different minimizers for a data set
@@ -89,10 +89,10 @@ as part of the included applications.
 
 ### Included evaluation scripts
 
-`src/evaluation_scripts` hosts various python scripts used to generate tables in the CSV format:
+`evaluation_scripts` hosts various python scripts used to generate tables in the CSV format:
 ```console
-$ tree src/evaluation_scripts/
-src/evaluation_scripts/
+$ tree evaluation_scripts/
+evaluation_scripts/
 ├── eval_benchmark.py  # Gathers information from Raptor benchmarks
 ├── eval_yara.py       # Gathers information from DREAM-Yara benchmarks
 ├── get_counts.py      # Consolidates multiple count_minimiser runs
@@ -104,7 +104,7 @@ src/evaluation_scripts/
 
 ### Generate artificial data set
 
-`src/bash_scripts/simulate.sh` can be used to simulate an artificial data set. Variables in upper case are user-provided
+`bash_scripts/simulate.sh` can be used to simulate an artificial data set. Variables in upper case are user-provided
 and may be changed.
 
 #### Notes
@@ -367,7 +367,7 @@ reads of length `READ_LENGTH`. In above example, we search for `2` errors in rea
 
 ### Automation
 
-The bash script `src/bash_scripts/dream_yara.sh` can be used to automate the building of indices and
+The bash script `bash_scripts/dream_yara.sh` can be used to automate the building of indices and
 mapping reads in DREAM-Yara. Adjustable parameters are found in the beginning and end of the script.
 
 ## Mantis and COBS
@@ -396,7 +396,7 @@ cobs query -i <cobs_output_name>.cobs_compact -f <query_file>
 Mantis is based on squeakr files. Therefore, they need to be constructed beforehand. The squeakr files contain all
 k-mers which have count values greater than or equal to a given cutoff. For the artificial data set, the default cutoff
 of 1 was used. For the real data set, the cutoffs according to the Mantis paper were used. These cutoffs depend on the
-file sizes, so the cutoffs differed between files. The bash script at `src/bash_scripts/run_squeakr.sh` adapts the
+file sizes, so the cutoffs differed between files. The bash script at `bash_scripts/run_squeakr.sh` adapts the
 cutoff for each file individually.
 
 Run squeakr on the artificial data set:
