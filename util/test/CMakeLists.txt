@@ -11,11 +11,11 @@ project (raptor_utility_test)
 
 get_filename_component (RAPTOR_UTIL_ROOT "${CMAKE_CURRENT_LIST_DIR}/../dummy" DIRECTORY)
 
-message (STATUS "Adding util...")
-add_subdirectory ("${RAPTOR_UTIL_ROOT}" "${CMAKE_CURRENT_BINARY_DIR}/util")
-message (STATUS "Adding new...")
-add_subdirectory ("${RAPTOR_UTIL_ROOT}/new" "${CMAKE_CURRENT_BINARY_DIR}/new")
+option (RAPTOR_UTILITY_BUILD_iScience_APPS "" OFF)
+
+message (STATUS "Adding applications...")
+add_subdirectory ("${RAPTOR_UTIL_ROOT}/applications/src" "${CMAKE_CURRENT_BINARY_DIR}/applications")
+message (STATUS "Adding iScience...")
+add_subdirectory ("${RAPTOR_UTIL_ROOT}/iScience" "${CMAKE_CURRENT_BINARY_DIR}/iScience")
 message (STATUS "Adding thresholding...")
-add_subdirectory ("${RAPTOR_UTIL_ROOT}/thresholding" "${CMAKE_CURRENT_BINARY_DIR}/thresholding")
-message (STATUS "Adding helper...")
-add_subdirectory ("${RAPTOR_UTIL_ROOT}/hibf/misc/helper" "${CMAKE_CURRENT_BINARY_DIR}/hibf/misc/helper")
+add_subdirectory ("${RAPTOR_UTIL_ROOT}/iScience/thresholding" "${CMAKE_CURRENT_BINARY_DIR}/thresholding")

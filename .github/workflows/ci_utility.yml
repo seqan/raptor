@@ -4,11 +4,14 @@ on:
   push:
     branches:
       - 'main'
+  pull_request:
+    types:
+      - unlabeled
   workflow_dispatch:
 
 concurrency:
   group: util-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'push' }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 
 env:
   CMAKE_VERSION: 3.18.4
@@ -24,7 +27,7 @@ jobs:
     name: ${{ matrix.name }}
     runs-on: ubuntu-22.04
     timeout-minutes: 120
-    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
       fail-fast: false
       matrix:
@@ -91,10 +94,7 @@ jobs:
           mkdir build
           cd build
           cmake ../raptor/util/test -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                    -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size" \
-                                    -DRAPTOR_NATIVE_BUILD=OFF \
-                                    -DRAPTOR_UTILITY_BUILD_MASON=1 \
-                                    -DRAPTOR_UTILITY_BUILD_DREAM_YARA=1
+                                    -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size"
 
       - name: Build tests
         env:
@@ -107,6 +107,6 @@ jobs:
         run: |
           ccache -z
           cd build
-          make -k -j2 install
+          make -k -j2
           ccache -sv
 
