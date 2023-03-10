@@ -76,4 +76,7 @@ target_link_libraries ("compare_mantis_raptor_output" "new_common")
 add_executable ("normalise_raptor_output" applications/normalise_raptor_output.cpp)
 target_link_libraries ("normalise_raptor_output" "new_common")
 
+add_executable ("compare_to_truth" applications/compare_to_truth.cpp)
+target_link_libraries ("compare_to_truth" "new_common")
+
 message (STATUS "${FontBold}You can run `make install` to build the application.${FontReset}")
