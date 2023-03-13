@@ -53,7 +53,7 @@ struct search_arguments
     bool write_time{false};
     bool is_hibf{false};
     bool cache_thresholds{false};
-    bool verbose{false};
+    bool quiet{false};
 
     // Timers do not copy the stored duration upon copy construction/assignment
     mutable timer<concurrent::yes> wall_clock_timer{};
@@ -66,7 +66,7 @@ struct search_arguments
 
     void print_timings() const
     {
-        if (!verbose)
+        if (quiet)
             return;
         std::cerr << std::fixed << std::setprecision(2) << "============= Timings =============\n";
         std::cerr << "Wall clock time [s]: " << wall_clock_timer.in_seconds() << '\n';

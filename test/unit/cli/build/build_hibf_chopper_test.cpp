@@ -52,8 +52,14 @@ TEST_F(build_hibf_layout, pipeline)
     ASSERT_TRUE(std::filesystem::exists(layout_filename));
 
     { // build index
-        cli_test_result const result =
-            execute_app("raptor", "build", "--threads 1", "--output", index_filename, "--input", layout_filename);
+        cli_test_result const result = execute_app("raptor",
+                                                   "build",
+                                                   "--threads 1",
+                                                   "--output",
+                                                   index_filename,
+                                                   "--quiet",
+                                                   "--input",
+                                                   layout_filename);
 
         EXPECT_EQ(result.out, std::string{});
         EXPECT_EQ(result.err, std::string{});
@@ -69,6 +75,7 @@ TEST_F(build_hibf_layout, pipeline)
                                                    std::to_string(number_of_errors),
                                                    "--index",
                                                    index_filename,
+                                                   "--quiet",
                                                    "--query",
                                                    data("query.fq"));
         EXPECT_EQ(result.out, std::string{});

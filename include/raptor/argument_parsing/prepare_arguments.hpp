@@ -38,7 +38,7 @@ struct prepare_arguments
     std::vector<std::vector<std::string>> bin_path{};
     std::filesystem::path bin_file{};
     uint8_t threads{1u};
-    bool verbose{false};
+    bool quiet{false};
 
     // Timers do not copy the stored duration upon copy construction/assignment
     mutable timer<concurrent::yes> wall_clock_timer{};
@@ -48,7 +48,7 @@ struct prepare_arguments
 
     void print_timings() const
     {
-        if (!verbose)
+        if (quiet)
             return;
         std::cerr << std::fixed << std::setprecision(2) << "============= Timings =============\n";
         std::cerr << "Wall clock time [s]: " << wall_clock_timer.in_seconds() << '\n';

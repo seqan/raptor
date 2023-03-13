@@ -56,8 +56,8 @@ TEST_F(argparse_build, no_options)
         "sequences.\n=================================================================================================="
         "===============\n    "));
     EXPECT_TRUE(result.out.ends_with(
-        " build --input <file> --output <file> [--threads <number>]\n    [--verbose] [--kmer <number>|--shape "
-        "<01-pattern>] [--window <number>]\n    [--fpr <number>] [--hash <number>] [--parts <number>] [--compressed]\n"
+        " build --input <file> --output <file> [--threads <number>] [--quiet]\n    [--kmer <number>|--shape"
+        " <01-pattern>] [--window <number>] [--fpr\n    <number>] [--hash <number>] [--parts <number>] [--compressed]\n"
         "    Try -h or --help for more information.\n"));
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
@@ -72,7 +72,7 @@ TEST_F(argparse_search, no_options)
         "================\n    "));
     EXPECT_TRUE(result.out.ends_with(
         " search --index <file> --query <file> --output <file> [--threads\n  "
-        "  <number>] [--verbose] [--error <number>|--threshold <number>]\n    [--query_length <number>] [--tau "
+        "  <number>] [--quiet] [--error <number>|--threshold <number>]\n    [--query_length <number>] [--tau "
         "<number>] [--pmax <number>]\n    [--cache-thresholds]\n    Try -h or --help for more information.\n"));
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
@@ -262,6 +262,7 @@ TEST_F(argparse_build, layout_config_and_options)
                                                "--hash 3",
                                                "--fpr 0.01",
                                                "--output index.raptor",
+                                               "--quiet",
                                                "--input",
                                                data("test.layout"));
     EXPECT_EQ(result.out, std::string{});
@@ -437,6 +438,7 @@ TEST_F(argparse_search, queries_have_variance)
                                                data("query_variance.fq"),
                                                "--index ",
                                                data("1bins23window.index"),
+                                               "--quiet",
                                                "--output search.out");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(
@@ -542,7 +544,7 @@ TEST_F(argparse_prepare, no_options)
         "sequences.\n=================================================================================================="
         "=================\n    "));
     EXPECT_TRUE(result.out.ends_with(
-        " prepare --input <file> --output <directory> [--threads <number>]\n    [--verbose] [--kmer <number>|--shape "
+        " prepare --input <file> --output <directory> [--threads <number>]\n    [--quiet] [--kmer <number>|--shape "
         "<01-pattern>] [--window <number>]\n    [--kmer-count-cutoff <number>|--use-filesize-dependent-cutoff]\n    "
         "Try -h or --help for more information.\n"));
     EXPECT_EQ(result.err, std::string{});

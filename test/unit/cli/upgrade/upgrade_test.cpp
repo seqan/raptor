@@ -95,6 +95,7 @@ TEST_F(upgrade, partitioned_ibf_via_fpr)
                                                 "--output search.out",
                                                 "--error 1",
                                                 "--index raptor.index",
+                                                "--quiet",
                                                 "--query ",
                                                 data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});
@@ -124,6 +125,7 @@ TEST_F(upgrade, partitioned_ibf_via_bin_path)
                                                 "--output search.out",
                                                 "--error 1",
                                                 "--index raptor.index",
+                                                "--quiet",
                                                 "--query ",
                                                 data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});
