@@ -50,6 +50,7 @@ TEST_P(search_hibf_preprocessing, pipeline)
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output precomputed_minimisers",
+                                                "--quiet",
                                                 "--input",
                                                 "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
@@ -63,6 +64,7 @@ TEST_P(search_hibf_preprocessing, pipeline)
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output raptor.index",
+                                                "--quiet",
                                                 "--input raptor_cli_test.layout");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
@@ -80,6 +82,7 @@ TEST_P(search_hibf_preprocessing, pipeline)
                                                 std::to_string(number_of_errors),
                                                 "--index ",
                                                 "raptor.index",
+                                                "--quiet",
                                                 "--query ",
                                                 data("query.fq"));
     EXPECT_EQ(result3.out, std::string{});
@@ -144,6 +147,7 @@ TEST_F(search_hibf_preprocessing, pipeline_with_continuation)
                                                     std::to_string(window_size),
                                                     "--threads 2",
                                                     "--output precomputed_minimisers",
+                                                    "--quiet",
                                                     "--input raptor_cli_test1.txt");
         EXPECT_EQ(result1.out, std::string{});
         EXPECT_EQ(result1.err, std::string{});
@@ -157,10 +161,9 @@ TEST_F(search_hibf_preprocessing, pipeline_with_continuation)
                                                     std::to_string(window_size),
                                                     "--threads 2",
                                                     "--output precomputed_minimisers",
-                                                    "--verbose",
                                                     "--input raptor_cli_test2.txt");
         EXPECT_EQ(result1.out, std::string{});
-        EXPECT_NE(result1.err, std::string{});
+        EXPECT_NE(result1.err, std::string{}); // verbose
         RAPTOR_ASSERT_ZERO_EXIT(result1);
     }
     {
@@ -171,6 +174,7 @@ TEST_F(search_hibf_preprocessing, pipeline_with_continuation)
                                                     std::to_string(window_size),
                                                     "--threads 2",
                                                     "--output precomputed_minimisers",
+                                                    "--quiet",
                                                     "--input raptor_cli_test3.txt");
         EXPECT_EQ(result1.out, std::string{});
         EXPECT_EQ(result1.err, std::string{});
@@ -183,6 +187,7 @@ TEST_F(search_hibf_preprocessing, pipeline_with_continuation)
                                                 "--hash 2",
                                                 "--fpr 0.05",
                                                 "--output raptor.index",
+                                                "--quiet",
                                                 "--input raptor_cli_test.layout");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
@@ -200,6 +205,7 @@ TEST_F(search_hibf_preprocessing, pipeline_with_continuation)
                                                 std::to_string(number_of_errors),
                                                 "--index ",
                                                 "raptor.index",
+                                                "--quiet",
                                                 "--query ",
                                                 data("query.fq"));
     EXPECT_EQ(result3.out, std::string{});
@@ -247,6 +253,7 @@ TEST_P(search_hibf_preprocessing, pipeline_compressed_index)
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output precomputed_minimisers",
+                                                "--quiet",
                                                 "--input raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
@@ -260,6 +267,7 @@ TEST_P(search_hibf_preprocessing, pipeline_compressed_index)
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output raptor.index",
+                                                "--quiet",
                                                 "--input raptor_cli_test.layout");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
@@ -272,6 +280,7 @@ TEST_P(search_hibf_preprocessing, pipeline_compressed_index)
                                                 std::to_string(number_of_errors),
                                                 "--index ",
                                                 "raptor.index",
+                                                "--quiet",
                                                 "--query ",
                                                 data("query.fq"));
     EXPECT_EQ(result3.out, std::string{});

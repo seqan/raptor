@@ -38,6 +38,7 @@ TEST_P(build_ibf_partitioned, pipeline)
                                                 compressed ? "--compressed" : "--threads 1",
                                                 "--parts ",
                                                 std::to_string(parts),
+                                                "--quiet",
                                                 "--input",
                                                 "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
@@ -51,6 +52,7 @@ TEST_P(build_ibf_partitioned, pipeline)
                                                 std::to_string(number_of_errors),
                                                 "--index ",
                                                 "raptor.index",
+                                                "--quiet",
                                                 "--query ",
                                                 data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});
@@ -85,6 +87,7 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
                                                 "--kmer 19",
                                                 "--window 23",
                                                 "--output precomputed_minimisers",
+                                                "--quiet",
                                                 "--input",
                                                 "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
@@ -96,6 +99,7 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
                                                 "--fpr 0.016",
                                                 "--output raptor.index",
                                                 "--parts 4",
+                                                "--quiet",
                                                 "--input",
                                                 "raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
@@ -108,6 +112,7 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
                                                 "--threshold 0.5",
                                                 "--index ",
                                                 "raptor.index",
+                                                "--quiet",
                                                 "--query ",
                                                 data("query.fq"));
     EXPECT_EQ(result3.out, std::string{});
@@ -122,6 +127,7 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
                                                 "--error 1",
                                                 "--index ",
                                                 "raptor.index",
+                                                "--quiet",
                                                 "--query ",
                                                 data("query_empty.fq"));
     EXPECT_EQ(result4.out, std::string{});

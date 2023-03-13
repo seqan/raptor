@@ -25,6 +25,7 @@ TEST_P(build_hibf, with_file)
                                                "--threads",
                                                run_parallel ? "2" : "1",
                                                "--output raptor.index",
+                                               "--quiet",
                                                "--input",
                                                pack_path(number_of_repeated_bins));
     EXPECT_EQ(result.out, std::string{});
@@ -51,6 +52,7 @@ TEST_P(build_hibf, with_shape)
                                                "--threads",
                                                run_parallel ? "2" : "1",
                                                "--output raptor.index",
+                                               "--quiet",
                                                "--input",
                                                pack_path(number_of_repeated_bins));
     EXPECT_EQ(result.out, std::string{});
@@ -85,6 +87,7 @@ TEST_F(build_hibf, three_levels)
                                                "--fpr 0.05",
                                                "--threads 1",
                                                "--output raptor.index",
+                                               "--quiet",
                                                "--input",
                                                data("three_levels.pack"));
     EXPECT_EQ(result.out, std::string{});
@@ -104,7 +107,6 @@ TEST_F(build_hibf, verbose)
                                                "--fpr 0.05",
                                                "--threads 1",
                                                "--output raptor.index",
-                                               "--verbose",
                                                "--input",
                                                data("three_levels.pack"));
     EXPECT_EQ(result.out, std::string{});

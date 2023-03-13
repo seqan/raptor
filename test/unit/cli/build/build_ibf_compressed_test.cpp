@@ -39,6 +39,7 @@ TEST_P(build_ibf_compressed, pipeline)
                                                 run_parallel ? "2" : "1",
                                                 "--output raptor.index",
                                                 "--compressed",
+                                                "--quiet",
                                                 "--input",
                                                 "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
@@ -52,6 +53,7 @@ TEST_P(build_ibf_compressed, pipeline)
                                                 std::to_string(number_of_errors),
                                                 "--index ",
                                                 "raptor.index",
+                                                "--quiet",
                                                 "--query ",
                                                 data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});

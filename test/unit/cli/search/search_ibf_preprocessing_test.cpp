@@ -43,6 +43,7 @@ TEST_P(search_ibf_preprocessing, pipeline)
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output precomputed_minimisers",
+                                                "--quiet",
                                                 "--input raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
@@ -53,6 +54,7 @@ TEST_P(search_ibf_preprocessing, pipeline)
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output raptor.index",
+                                                "--quiet",
                                                 "--input raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
@@ -68,6 +70,7 @@ TEST_P(search_ibf_preprocessing, pipeline)
                                                 "--p_max 0.4",
                                                 "--index ",
                                                 "raptor.index",
+                                                "--quiet",
                                                 "--query ",
                                                 data("query.fq"));
     EXPECT_EQ(result3.out, std::string{});
@@ -109,6 +112,7 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output precomputed_minimisers",
+                                                "--quiet",
                                                 "--input raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
@@ -119,6 +123,7 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
                                                 "--threads ",
                                                 run_parallel ? "2" : "1",
                                                 "--output raptor.index",
+                                                "--quiet",
                                                 "--input raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
@@ -133,6 +138,7 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
                                                 std::to_string(number_of_errors),
                                                 "--index ",
                                                 "raptor.index",
+                                                "--quiet",
                                                 "--query ",
                                                 data("query.fq"));
     EXPECT_EQ(result3.out, std::string{});
@@ -162,13 +168,18 @@ TEST_F(search_ibf_preprocessing, pipeline_compressed_index)
                                                 "--kmer 19",
                                                 "--window 23",
                                                 "--output precomputed_minimisers",
+                                                "--quiet",
                                                 "--input raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
     EXPECT_EQ(result1.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result1);
 
-    cli_test_result const result2 =
-        execute_app("raptor", "build", "--output raptor.index", "--compressed", "--input raptor_cli_test.minimiser");
+    cli_test_result const result2 = execute_app("raptor",
+                                                "build",
+                                                "--output raptor.index",
+                                                "--compressed",
+                                                "--quiet",
+                                                "--input raptor_cli_test.minimiser");
     EXPECT_EQ(result2.out, std::string{});
     EXPECT_EQ(result2.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result2);

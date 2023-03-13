@@ -32,7 +32,7 @@ void init_prepare_parser(sharg::parser & parser, prepare_arguments & arguments)
     parser.info.examples.emplace_back("raptor prepare --input bins.list --output some_directory "
                                       "--use-filesize-dependent-cutoff");
     parser.info.synopsis.emplace_back(
-        "raptor prepare --input <file> --output <directory> [--threads <number>] [--verbose] [--kmer <number>|--shape "
+        "raptor prepare --input <file> --output <directory> [--threads <number>] [--quiet] [--kmer <number>|--shape "
         "<01-pattern>] [--window <number>] [--kmer-count-cutoff <number>|--use-filesize-dependent-cutoff]");
 
     parser.add_subsection("General options");
@@ -67,8 +67,8 @@ void init_prepare_parser(sharg::parser & parser, prepare_arguments & arguments)
                                     .description = "The number of threads to use.",
                                     .validator = positive_integer_validator{}});
     parser.add_flag(
-        arguments.verbose,
-        sharg::config{.short_id = '\0', .long_id = "verbose", .description = "Print time and memory usage."});
+        arguments.quiet,
+        sharg::config{.short_id = '\0', .long_id = "quiet", .description = "Do not print time and memory usage."});
 
     parser.add_subsection("k-mer options");
     parser.add_option(arguments.kmer_size,

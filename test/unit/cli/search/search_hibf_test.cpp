@@ -23,6 +23,7 @@ TEST_P(search_hibf, with_error)
                     "--p_max 0.4",
                     "--index ",
                     ibf_path(number_of_repeated_bins, window_size, is_compressed::no, is_hibf::yes),
+                    "--quiet",
                     "--query ",
                     data("query.fq"));
     EXPECT_EQ(result.out, std::string{});
@@ -43,6 +44,7 @@ TEST_P(search_hibf, with_threshold)
                     "--threshold 0.50",
                     "--index ",
                     ibf_path(number_of_repeated_bins, window_size, is_compressed::no, is_hibf::yes),
+                    "--quiet",
                     "--query ",
                     data("query.fq"));
     EXPECT_EQ(result.out, std::string{});
@@ -65,6 +67,7 @@ TEST_P(search_hibf, no_hits)
                     "--tau 0.99",
                     "--index ",
                     ibf_path(number_of_repeated_bins, window_size, is_compressed::no, is_hibf::yes),
+                    "--quiet",
                     "--query ",
                     data("query_empty.fq"));
     EXPECT_EQ(result.out, std::string{});
@@ -93,6 +96,7 @@ TEST_F(search_hibf, three_levels)
                                                "--error 0",
                                                "--index ",
                                                data("three_levels.hibf"),
+                                               "--quiet",
                                                "--query ",
                                                data("query.fq"));
     EXPECT_EQ(result.out, std::string{});

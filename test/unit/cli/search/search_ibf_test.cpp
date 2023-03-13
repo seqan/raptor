@@ -22,6 +22,7 @@ TEST_P(search_ibf, with_error)
                                                "--p_max 0.4",
                                                "--index ",
                                                ibf_path(number_of_repeated_bins, window_size),
+                                               "--quiet",
                                                "--query ",
                                                data("query.fq"));
     EXPECT_EQ(result.out, std::string{});
@@ -41,6 +42,7 @@ TEST_P(search_ibf, threshold)
                                                "--threshold 0.50",
                                                "--index ",
                                                ibf_path(number_of_repeated_bins, window_size),
+                                               "--quiet",
                                                "--query ",
                                                data("query.fq"));
     EXPECT_EQ(result.out, std::string{});
@@ -61,6 +63,7 @@ TEST_P(search_ibf, no_hits)
                                                std::to_string(number_of_errors),
                                                "--index ",
                                                ibf_path(number_of_repeated_bins, window_size),
+                                               "--quiet",
                                                "--query ",
                                                data("query_empty.fq"));
     EXPECT_EQ(result.out, std::string{});
@@ -86,6 +89,7 @@ TEST_F(search_ibf, cache_thresholds)
                                                    "--p_max 0.4",
                                                    "--index ",
                                                    ibf_path(number_of_repeated_bins, window_size),
+                                                   "--quiet",
                                                    "--query ",
                                                    data("query.fq"));
         EXPECT_EQ(result.out, std::string{});
@@ -102,6 +106,7 @@ TEST_F(search_ibf, cache_thresholds)
                                                "--p_max 0.4",
                                                "--index ",
                                                ibf_path(number_of_repeated_bins, window_size),
+                                               "--quiet",
                                                "--query ",
                                                data("query.fq"));
     EXPECT_EQ(result.out, std::string{});
@@ -129,7 +134,6 @@ TEST_F(search_ibf, verbose)
                                                "--output search.out",
                                                "--error 1",
                                                "--p_max 0.4",
-                                               "--verbose",
                                                "--index ",
                                                ibf_path(16, 19),
                                                "--query ",

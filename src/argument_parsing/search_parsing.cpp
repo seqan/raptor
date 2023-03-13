@@ -35,7 +35,7 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
     parser.info.examples.emplace_back(
         "raptor search --index raptor.index --query queries.fastq --output search.output --error 2 --query_length 250");
     parser.info.synopsis.emplace_back("raptor search --index <file> --query <file> --output <file> [--threads "
-                                      "<number>] [--verbose] [--error <number>|--threshold <number>] [--query_length "
+                                      "<number>] [--quiet] [--error <number>|--threshold <number>] [--query_length "
                                       "<number>] [--tau <number>] [--pmax <number>] [--cache-thresholds]");
     parser.add_subsection("General options");
     parser.add_option(arguments.index_file,
@@ -61,8 +61,8 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                                     .description = "The number of threads to use.",
                                     .validator = positive_integer_validator{}});
     parser.add_flag(
-        arguments.verbose,
-        sharg::config{.short_id = '\0', .long_id = "verbose", .description = "Print time and memory usage."});
+        arguments.quiet,
+        sharg::config{.short_id = '\0', .long_id = "quiet", .description = "Do not print time and memory usage."});
 
     parser.add_subsection("Threshold method options");
     parser.add_line("\\fBIf no option is set, --error " + std::to_string(arguments.errors)

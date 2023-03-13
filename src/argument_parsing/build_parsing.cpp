@@ -154,7 +154,7 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
     parser.info.examples.emplace_back("raptor build --input minimiser.list --fpr 0.05 --output raptor.index");
     parser.info.examples.emplace_back("raptor build --input raptor.layout --output raptor.index");
     parser.info.examples.emplace_back("raptor build --input raptor.layout --fpr 0.05 --output raptor.index");
-    parser.info.synopsis.emplace_back("raptor build --input <file> --output <file> [--threads <number>] [--verbose] "
+    parser.info.synopsis.emplace_back("raptor build --input <file> --output <file> [--threads <number>] [--quiet] "
                                       "[--kmer <number>|--shape <01-pattern>] [--window <number>] [--fpr <number>] "
                                       "[--hash <number>] [--parts <number>] [--compressed]");
 
@@ -179,8 +179,8 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
                                     .description = "The number of threads to use.",
                                     .validator = positive_integer_validator{}});
     parser.add_flag(
-        arguments.verbose,
-        sharg::config{.short_id = '\0', .long_id = "verbose", .description = "Print time and memory usage."});
+        arguments.quiet,
+        sharg::config{.short_id = '\0', .long_id = "quiet", .description = "Do not print time and memory usage."});
 
     parser.add_subsection("k-mer options");
     parser.add_option(

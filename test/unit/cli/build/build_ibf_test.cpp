@@ -30,6 +30,7 @@ TEST_P(build_ibf, with_file)
                                                "--threads ",
                                                run_parallel ? "2" : "1",
                                                "--output raptor.index",
+                                               "--quiet",
                                                "--input",
                                                "raptor_cli_test.txt");
     EXPECT_EQ(result.out, std::string{});
@@ -59,6 +60,7 @@ TEST_P(build_ibf, with_shape)
                                                "--threads ",
                                                run_parallel ? "2" : "1",
                                                "--output raptor.index",
+                                               "--quiet",
                                                "--input",
                                                "raptor_cli_test.txt");
     EXPECT_EQ(result.out, std::string{});
@@ -95,7 +97,6 @@ TEST_F(build_ibf, verbose)
                                                "--kmer 19",
                                                "--window 19",
                                                "--threads 1",
-                                               "--verbose",
                                                "--output raptor.index",
                                                "--input",
                                                "raptor_cli_test.txt");
