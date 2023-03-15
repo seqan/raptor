@@ -11,9 +11,9 @@
 #include <iostream>
 #include <ranges>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
-#include <string_view>
 
 #include <robin_hood.h>
 
@@ -44,20 +44,24 @@ void init_parser(sharg::parser & parser, parser_options & options)
                                     .description = "The ground truth to compare against.",
                                     .required = true,
                                     .validator = sharg::input_file_validator{}});
-    parser.add_option(options.result_format,
-                      sharg::config{.short_id = '\0',
-                                    .long_id = "result-format",
-                                    .description = "The format of the result file.",
-                                    .required = true,
-                                    .validator = sharg::value_list_validator{"raptor", "mantis", "bifrost", "metagraph", "cobs"}});
+    parser.add_option(
+        options.result_format,
+        sharg::config{.short_id = '\0',
+                      .long_id = "result-format",
+                      .description = "The format of the result file.",
+                      .required = true,
+                      .validator = sharg::value_list_validator{"raptor", "mantis", "bifrost", "metagraph", "cobs"}});
     parser.add_option(options.mantis_query_names,
                       sharg::config{.short_id = '\0',
                                     .long_id = "mantis-query-names",
-                                    .description = "If the format is mantis, the query ids are needed, in the same order as the query file given to mantis when querying."});
-    parser.add_option(options.mantis_threshold,
-                      sharg::config{.short_id = '\0',
-                                    .long_id = "mantis-threshold",
-                                    .description = "If the format is mantis, the threshold given to all others tools when querying needed."});
+                                    .description = "If the format is mantis, the query ids are needed, in the same "
+                                                   "order as the query file given to mantis when querying."});
+    parser.add_option(
+        options.mantis_threshold,
+        sharg::config{.short_id = '\0',
+                      .long_id = "mantis-threshold",
+                      .description =
+                          "If the format is mantis, the threshold given to all others tools when querying needed."});
 }
 
 auto create_truth_maps(std::filesystem::path const truth_file)
@@ -73,9 +77,8 @@ auto create_truth_maps(std::filesystem::path const truth_file)
 
     // Header contains lines: "some_number <tab> reference_name"
     std::cout << "[Truth] Parse header ..." << std::endl;
-    while (std::getline(truth_file_in, line_buffer)  &&
-           line_buffer.starts_with("#") &&
-           !line_buffer.starts_with("#QUERY_NAME"))
+    while (std::getline(truth_file_in, line_buffer) && line_buffer.starts_with("#")
+           && !line_buffer.starts_with("#QUERY_NAME"))
     {
         auto tab_it{line_buffer.begin() + line_buffer.find('\t')};
         std::string_view const id_value{line_buffer.begin() + 1 /* skip # */, tab_it};
@@ -183,7 +186,7 @@ void print_result(size_t const FPS, size_t const FNS)
     double const sensitivity = TP / ALL_P;
     double const precision = TP / PP; // FPS / (All hits recorded as true by tool)
     double const specificity = TN / ALL_N;
-    double const f1s = (2 * TP) / (2* TP + FPS + FNS);
+    double const f1s = (2 * TP) / (2 * TP + FPS + FNS);
 
     std::cout << "Accuracy " << accuracy << std::endl;
     std::cout << "FPR " << fpr << std::endl;
@@ -203,9 +206,12 @@ void print_progress(double const query_count, double const number_of_querries)
     int const pos = barWidth * progress;
     for (int i = 0; i < barWidth; ++i)
     {
-        if (i < pos) std::cout << "=";
-        else if (i == pos) std::cout << ">";
-        else std::cout << " ";
+        if (i < pos)
+            std::cout << "=";
+        else if (i == pos)
+            std::cout << ">";
+        else
+            std::cout << " ";
     }
     std::cout << "] " << int(progress * 100.0) << " %\r";
     std::cout.flush();
@@ -231,7 +237,8 @@ void compare_raptor_to_truth(std::filesystem::path const raptor_file_name,
 
     std::cout << "[Raptor] Parse header ..." << std::endl;
     // Header first contains parameters starting with "##"
-    while (std::getline(raptor_file_in, raptor_line) && raptor_line.starts_with("##")); // skip
+    while (std::getline(raptor_file_in, raptor_line) && raptor_line.starts_with("##"))
+        ; // skip
 
     // Header contains lines: "some_number <tab> reference_name"
     do
@@ -240,9 +247,9 @@ void compare_raptor_to_truth(std::filesystem::path const raptor_file_name,
         std::string_view const id_value{raptor_line.begin() + 1 /* skip # */, tab_it};
         std::string_view const name{++tab_it, raptor_line.end()};
         idx_to_id.emplace(id_value, name);
-    } while (std::getline(raptor_file_in, raptor_line) &&
-             raptor_line.starts_with("#") &&
-             !raptor_line.starts_with("#QUERY_NAME"));
+    }
+    while (std::getline(raptor_file_in, raptor_line) && raptor_line.starts_with("#")
+           && !raptor_line.starts_with("#QUERY_NAME"));
 
     assert(raptor_line == "#QUERY_NAME\tUSER_BINS");
 
@@ -285,9 +292,8 @@ void compare_raptor_to_truth(std::filesystem::path const raptor_file_name,
     }
 
     if (query_count != hit_map.size())
-        throw std::runtime_error{"The result file did only contain " +
-                                 std::to_string(query_count) + "/" + std::to_string(hit_map.size()) +
-                                 " queries."};
+        throw std::runtime_error{"The result file did only contain " + std::to_string(query_count) + "/"
+                                 + std::to_string(hit_map.size()) + " queries."};
 
     print_result(FPS, FNS);
 }
@@ -367,9 +373,9 @@ void compare_mantis_to_truth(std::filesystem::path const mantis_file_name,
 {
     std::ifstream mantis_file_in{mantis_file_name};
     std::string mantis_line;
-    size_t query_count{}; // in the end we will check if all queries are in the file
+    size_t query_count{};                             // in the end we will check if all queries are in the file
     thresholder const threshold{the_given_threshold}; // Helper for computing the threshold.
-    size_t mantis_threshold{};        // Needs to be set for each query.
+    size_t mantis_threshold{};                        // Needs to be set for each query.
     size_t current_query_number{};
     std::vector<uint64_t> results;
     std::string ub_name_buffer;
@@ -478,9 +484,8 @@ void compare_mantis_to_truth(std::filesystem::path const mantis_file_name,
     process_results();
 
     if (query_count != hit_map.size())
-        throw std::runtime_error{"The result file did only contain " +
-                                 std::to_string(query_count) + "/" + std::to_string(hit_map.size()) +
-                                 " queries."};
+        throw std::runtime_error{"The result file did only contain " + std::to_string(query_count) + "/"
+                                 + std::to_string(hit_map.size()) + " queries."};
 
     print_result(FPS, FNS);
 }
@@ -503,7 +508,7 @@ void compare_bifrost_to_truth(std::filesystem::path const bifrost_file_name,
 
     // ## Bifrost results ##
     // Bifrost outputs a matrix. Column names = user bin id. Row names = query names
-    auto split_line_by_tab_and = [] (std::string_view bifrost_line, auto do_me)
+    auto split_line_by_tab_and = [](std::string_view bifrost_line, auto do_me)
     {
         std::string_view::size_type current_pos = 0;
         std::string_view::size_type tab_pos{bifrost_line.find('\t')};
@@ -522,7 +527,7 @@ void compare_bifrost_to_truth(std::filesystem::path const bifrost_file_name,
         do_me(last, column_idx);
     };
 
-    auto parse_header_user_bin_id = [&bifrost_user_bins, &truth_id_map] (std::string const & sv, size_t idx)
+    auto parse_header_user_bin_id = [&bifrost_user_bins, &truth_id_map](std::string const & sv, size_t idx)
     {
         if (idx != 0)
         {
@@ -542,7 +547,7 @@ void compare_bifrost_to_truth(std::filesystem::path const bifrost_file_name,
         }
     };
 
-    auto insert_if_one = [&results, &bifrost_user_bins] (std::string_view sv, size_t idx)
+    auto insert_if_one = [&results, &bifrost_user_bins](std::string_view sv, size_t idx)
     {
         if (sv == std::string_view{"1"}) // excludes 0 and the first column which is alywas the query name
         {
@@ -578,9 +583,8 @@ void compare_bifrost_to_truth(std::filesystem::path const bifrost_file_name,
     }
 
     if (query_count != hit_map.size())
-        throw std::runtime_error{"The result file did only contain " +
-                                 std::to_string(query_count) + "/" + std::to_string(hit_map.size()) +
-                                 " queries."};
+        throw std::runtime_error{"The result file did only contain " + std::to_string(query_count) + "/"
+                                 + std::to_string(hit_map.size()) + " queries."};
 
     print_result(FPS, FNS);
 }
@@ -638,9 +642,8 @@ void compare_metagraph_to_truth(std::filesystem::path const metagraph_file_name,
     }
 
     if (query_count != hit_map.size())
-        throw std::runtime_error{"The result file did only contain " +
-                                 std::to_string(query_count) + "/" + std::to_string(hit_map.size()) +
-                                 " queries."};
+        throw std::runtime_error{"The result file did only contain " + std::to_string(query_count) + "/"
+                                 + std::to_string(hit_map.size()) + " queries."};
 
     print_result(FPS, FNS);
 }
@@ -666,7 +669,7 @@ void compare_cobs_to_truth(std::filesystem::path const cobs_file_name,
     std::string cobs_line{};
     std::string current_query_name;
 
-    auto parse_query_name = [&current_query_name] (std::string_view const line)
+    auto parse_query_name = [&current_query_name](std::string_view const line)
     {
         current_query_name = std::string{line.begin() + 1 /* skip * */, line.begin() + line.find('\t')};
     };
@@ -738,9 +741,8 @@ void compare_cobs_to_truth(std::filesystem::path const cobs_file_name,
     ++query_count;
 
     if (query_count != hit_map.size())
-        throw std::runtime_error{"The result file did only contain " +
-                                 std::to_string(query_count) + "/" + std::to_string(hit_map.size()) +
-                                 " queries."};
+        throw std::runtime_error{"The result file did only contain " + std::to_string(query_count) + "/"
+                                 + std::to_string(hit_map.size()) + " queries."};
 
     print_result(FPS, FNS);
 }
@@ -767,7 +769,6 @@ int main(int argc, char ** argv)
 
         if (options.result_format == "mantis" && options.mantis_threshold == -1.0)
             throw sharg::parser_error{"For mantis results you need to pass the threshold."};
-
     }
     catch (sharg::parser_error const & ext)
     {
@@ -783,7 +784,11 @@ int main(int argc, char ** argv)
     if (options.result_format == "raptor")
         compare_raptor_to_truth(options.result_file, id_map, hit_map);
     else if (options.result_format == "mantis")
-        compare_mantis_to_truth(options.result_file, options.mantis_query_names, options.mantis_threshold, id_map, hit_map);
+        compare_mantis_to_truth(options.result_file,
+                                options.mantis_query_names,
+                                options.mantis_threshold,
+                                id_map,
+                                hit_map);
     else if (options.result_format == "bifrost")
         compare_bifrost_to_truth(options.result_file, id_map, hit_map);
     else if (options.result_format == "metagraph")
