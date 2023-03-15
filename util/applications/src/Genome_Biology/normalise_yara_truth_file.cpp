@@ -23,8 +23,8 @@ inline void check_output_file(std::filesystem::path const & output_file)
     std::filesystem::create_directories(output_directory, ec);
 
     if (!output_directory.empty() && ec)
-         sharg::parser_error{
-             seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
+        sharg::parser_error{
+            seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
 }
 
 struct config
