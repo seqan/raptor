@@ -1,0 +1,15 @@
+set -eEuo pipefail
+
+DATA_DIR="/path/to/individual/files/"
+DATA_FILENAMES="/path/to/file/with/all/filenames.txt"
+
+QUERY_FILE="path/to/query.fastq"
+QUERY_FILE_FASTA="/path/to/query-no-multiline.fa"
+
+# WORKDIR must contain e.g. hibf_bench with the scripts hibf_build.sh and hibf_query.sh
+WORKDIR="/path/where/the/benchmark/directories/with/scripts/are/"
+
+KMER_SIZE=32
+NUM_THREADS=32
+QUERY_THRESHOLD=0.7
+FPR=0.05
