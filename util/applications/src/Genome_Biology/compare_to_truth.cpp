@@ -19,6 +19,12 @@
 
 #include <sharg/parser.hpp>
 
+#if defined(__GNUC__) && !defined(__llvm__) && !defined(__INTEL_COMPILER) && (__GNUC__ < 12)
+#    define RAPTOR_IS_GCC12 0
+#else
+#    define RAPTOR_IS_GCC12 1
+#endif
+
 struct parser_options
 {
     std::filesystem::path result_file{};
@@ -99,10 +105,13 @@ auto create_truth_maps(std::filesystem::path const truth_file)
 
         for (auto && user_bin : bins | std::views::split(','))
         {
-            std::string_view ub(user_bin.begin(), user_bin.end()); // doesn't work??
-            // std::string ub;
-            // for (char const chr : user_bin)
-            //     ub.push_back(chr);
+#if RAPTOR_IS_GCC12
+            std::string_view ub(user_bin.begin(), user_bin.end());
+#else
+            std::string ub;
+            for (char const chr : user_bin)
+                ub.push_back(chr);
+#endif
 
             std::from_chars(ub.data(), ub.data() + ub.size(), buffer);
             result_user_bins.push_back(buffer);
@@ -268,7 +277,13 @@ void compare_raptor_to_truth(std::filesystem::path const & raptor_file_name,
 
         for (auto && user_bin : bins | std::views::split(','))
         {
+#if RAPTOR_IS_GCC12
             ub.assign(user_bin.begin(), user_bin.end());
+#else
+            ub.clear();
+            for (char const chr : user_bin)
+                ub.push_back(chr);
+#endif
 
             // -----------------------------------------------------------------
             // DEBUG OUTPUT
@@ -607,7 +622,13 @@ void compare_metagraph_to_truth(std::filesystem::path const & metagraph_file_nam
 
         for (auto && user_bin : bins | std::views::split(':'))
         {
+#if RAPTOR_IS_GCC12
             ub.assign(user_bin.begin(), user_bin.end());
+#else
+            ub.clear();
+            for (char const chr : user_bin)
+                ub.push_back(chr);
+#endif
 
             // -----------------------------------------------------------------
             // DEBUG OUTPUT
