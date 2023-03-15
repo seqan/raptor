@@ -23,8 +23,8 @@ inline void check_output_file(std::filesystem::path const & output_file)
     std::filesystem::create_directories(output_directory, ec);
 
     if (!output_directory.empty() && ec)
-        throw seqan3::argument_parser_error{
-            seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
+         sharg::parser_error{
+             seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
 }
 
 struct config
@@ -158,27 +158,27 @@ void normalise_output(config const & cfg)
 void init_parser(seqan3::argument_parser & parser, config & cfg)
 {
     parser.add_option(cfg.yara_result_file,
-                      '\0',
-                      "yara_results",
-                      "The yara result file, e.g., \"yara.results\".",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "yara_results",
+                                    .desc = "The yara result file, e.g., \"yara.results\".",
+                                    .required = true,
+                                    .validator = sharg::input_file_validator{}});
     parser.add_option(cfg.query_names_file,
-                      '\0',
-                      "query_names",
-                      "The file containing query names, e.g., \"query.names\".",
-                      seqan3::option_spec::required,
-                      seqan3::input_file_validator{});
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "query_names",
+                                    .desc = "The file containing query names, e.g., \"query.names\".",
+                                    .required = true,
+                                    .validator = seqan3::input_file_validator{}});
     parser.add_option(cfg.output_file,
-                      '\0',
-                      "output_file",
-                      "Provide a path to the output.",
-                      seqan3::option_spec::required);
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "output_file",
+                                    .desc = "Provide a path to the output.",
+                                    .required = true});
 }
 
 int main(int argc, char ** argv)
 {
-    seqan3::argument_parser parser{"normalise_yara_output", argc, argv, seqan3::update_notifications::off};
+    sharg::parser parser{"normalise_yara_output", argc, argv, sharg::update_notifications::off};
     parser.info.author = "Svenja Mehringer, Enrico Seiler";
     parser.info.email = "enrico.seiler@fu-berlin.de";
     parser.info.short_description = "Converts yara results into raptor-like results.";
@@ -192,7 +192,7 @@ int main(int argc, char ** argv)
         parser.parse();
         check_output_file(cfg.output_file);
     }
-    catch (seqan3::argument_parser_error const & ext)
+    catch (sharg::parser_error const & ext)
     {
         std::cerr << "[Error] " << ext.what() << '\n';
         std::exit(-1);
