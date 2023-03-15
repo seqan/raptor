@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------------------------------
-// Copyright (c) 2006-2022, Knut Reinert & Freie Universität Berlin
-// Copyright (c) 2016-2022, Knut Reinert & MPI für molekulare Genetik
+// Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin
+// Copyright (c) 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
@@ -14,7 +14,7 @@
 
 #include <robin_hood.h>
 
-#include <raptor/argument_parsing/validators.hpp>
+#include <sharg/parser.hpp>
 
 inline void check_output_file(std::filesystem::path const & output_file)
 {
@@ -24,7 +24,7 @@ inline void check_output_file(std::filesystem::path const & output_file)
 
     if (!output_directory.empty() && ec)
         sharg::parser_error{
-            seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
+            sharg::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
 }
 
 struct options
@@ -44,14 +44,14 @@ std::vector<std::string> parse_query_names(std::filesystem::path const & query_n
     // Contains lines: "query_name"
     while (std::getline(query_names_in, line_buffer))
         query_names.push_back(line_buffer);
-    std::cerr << "Done" << std::endl;
+    std::cerr << "Done" << '\n';
     return query_names;
 }
 
 void normalise_output(options const & cfg)
 {
     std::vector<std::string> const query_names{parse_query_names(cfg.query_names_file)};
-    std::cerr << "Read " << query_names.size() << "query names" << std::endl;
+    std::cerr << "Read " << query_names.size() << "query names" << '\n';
 
     // Process yara results
     std::ifstream yara_result_in{cfg.yara_result_file};
@@ -66,7 +66,7 @@ void normalise_output(options const & cfg)
     auto parse_query_name_and_user_bin = [](std::string const & line)
     {
         uint64_t idx{};
-        std::string const qname{line.begin(), line.begin() + line.find(':')};
+        std::string_view const qname{line.begin(), line.begin() + line.find(':')};
         std::string_view const idx_str{line.begin() + qname.size() + 1, line.end()};
         std::from_chars(idx_str.data(), idx_str.data() + idx_str.size(), idx);
 
@@ -77,7 +77,7 @@ void normalise_output(options const & cfg)
     {
         if (!results.empty())
         {
-            std::sort(results.begin(), results.end());
+            std::ranges::sort(results);
             for (size_t const ub : results)
                 result_buffer += std::to_string(ub) + ',';
             result_buffer.back() = '\n';
@@ -102,7 +102,7 @@ void normalise_output(options const & cfg)
 
         while (qname_it != query_names.end() && *qname_it != last_seen_query_name)
         {
-            std::cerr << "Note: " << *qname_it << " not found in validation file." << std::endl;
+            std::cerr << "Note: " << *qname_it << " not found in validation file." << '\n';
             yara_result_out << *qname_it << '\t' << '\n';
             ++qname_it;
         }
@@ -152,7 +152,7 @@ void normalise_output(options const & cfg)
         throw std::runtime_error{"query_names not fully consumed although processing has ended. last qname: "
                                  + (*qname_it)};
 
-    std::cerr << "Done" << std::endl;
+    std::cerr << "Done" << '\n';
 }
 
 void init_parser(sharg::parser & parser, options & cfg)
@@ -160,17 +160,17 @@ void init_parser(sharg::parser & parser, options & cfg)
     parser.add_option(cfg.yara_result_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "yara_results",
-                                    .desc = "The yara result file, e.g., \"yara.results\".",
+                                    .description = "The yara result file, e.g., \"yara.results\".",
                                     .required = true});
     parser.add_option(cfg.query_names_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "query_names",
-                                    .desc = "The file containing query names, e.g., \"query.names\".",
+                                    .description = "The file containing query names, e.g., \"query.names\".",
                                     .required = true});
     parser.add_option(cfg.output_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "output_file",
-                                    .desc = "Provide a path to the output.",
+                                    .description = "Provide a path to the output.",
                                     .required = true});
 }
 
