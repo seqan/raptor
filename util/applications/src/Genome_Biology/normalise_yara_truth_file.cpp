@@ -27,7 +27,7 @@ inline void check_output_file(std::filesystem::path const & output_file)
             seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
 }
 
-struct config
+struct options
 {
     std::filesystem::path yara_result_file{};
     std::filesystem::path output_file{};
@@ -48,7 +48,7 @@ std::vector<std::string> parse_query_names(std::filesystem::path const & query_n
     return query_names;
 }
 
-void normalise_output(config const & cfg)
+void normalise_output(options const & cfg)
 {
     std::vector<std::string> const query_names{parse_query_names(cfg.query_names_file)};
     std::cerr << "Read " << query_names.size() << "query names" << std::endl;
@@ -155,20 +155,18 @@ void normalise_output(config const & cfg)
     std::cerr << "Done" << std::endl;
 }
 
-void init_parser(seqan3::argument_parser & parser, config & cfg)
+void init_parser(sharg::parser & parser, options & cfg)
 {
     parser.add_option(cfg.yara_result_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "yara_results",
                                     .desc = "The yara result file, e.g., \"yara.results\".",
-                                    .required = true,
-                                    .validator = sharg::input_file_validator{}});
+                                    .required = true});
     parser.add_option(cfg.query_names_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "query_names",
                                     .desc = "The file containing query names, e.g., \"query.names\".",
-                                    .required = true,
-                                    .validator = seqan3::input_file_validator{}});
+                                    .required = true});
     parser.add_option(cfg.output_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "output_file",
@@ -184,7 +182,7 @@ int main(int argc, char ** argv)
     parser.info.short_description = "Converts yara results into raptor-like results.";
     parser.info.version = "0.0.1";
 
-    config cfg{};
+    options cfg{};
     init_parser(parser, cfg);
 
     try
