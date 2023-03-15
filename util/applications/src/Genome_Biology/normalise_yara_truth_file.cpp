@@ -23,10 +23,8 @@ inline void check_output_file(std::filesystem::path const & output_file)
     std::filesystem::create_directories(output_directory, ec);
 
     if (!output_directory.empty() && ec)
-        throw seqan3::argument_parser_error{seqan3::detail::to_string("Failed to create directory\"",
-                                                                      output_directory.c_str(),
-                                                                      "\": ",
-                                                                      ec.message())};
+        throw seqan3::argument_parser_error{
+            seqan3::detail::to_string("Failed to create directory\"", output_directory.c_str(), "\": ", ec.message())};
 }
 
 struct config
@@ -65,17 +63,17 @@ void normalise_output(config const & cfg)
     std::string result_buffer{};
     std::string line_buffer{};
 
-    auto parse_query_name_and_user_bin = [] (std::string const & line)
+    auto parse_query_name_and_user_bin = [](std::string const & line)
     {
         uint64_t idx{};
-        std::string const qname{line.begin(),  line.begin() + line.find(':')};
+        std::string const qname{line.begin(), line.begin() + line.find(':')};
         std::string_view const idx_str{line.begin() + qname.size() + 1, line.end()};
         std::from_chars(idx_str.data(), idx_str.data() + idx_str.size(), idx);
 
         return std::make_pair(qname, idx);
     };
 
-    auto process_results = [&results, &result_buffer, &yara_result_out] ()
+    auto process_results = [&results, &result_buffer, &yara_result_out]()
     {
         if (!results.empty())
         {
@@ -96,10 +94,11 @@ void normalise_output(config const & cfg)
 
     auto qname_it = query_names.begin();
 
-    auto check_qname_against_reference = [&qname_it, &query_names, &last_seen_query_name, &yara_result_out] ()
+    auto check_qname_against_reference = [&qname_it, &query_names, &last_seen_query_name, &yara_result_out]()
     {
         if (qname_it == query_names.end())
-            throw std::runtime_error{"query_names consumed although processing has not ended. last_seen: " + last_seen_query_name};
+            throw std::runtime_error{"query_names consumed although processing has not ended. last_seen: "
+                                     + last_seen_query_name};
 
         while (qname_it != query_names.end() && *qname_it != last_seen_query_name)
         {
@@ -113,7 +112,6 @@ void normalise_output(config const & cfg)
     };
 
     std::cerr << "Processing " << cfg.yara_result_file << " ... " << std::flush;
-
 
     // First line.
     if (std::getline(yara_result_in, line_buffer))
@@ -151,7 +149,8 @@ void normalise_output(config const & cfg)
     check_qname_against_reference();
 
     if (qname_it != query_names.end())
-        throw std::runtime_error{"query_names not fully consumed although processing has ended. last qname: " + (*qname_it)};
+        throw std::runtime_error{"query_names not fully consumed although processing has ended. last qname: "
+                                 + (*qname_it)};
 
     std::cerr << "Done" << std::endl;
 }
