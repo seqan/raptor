@@ -154,7 +154,7 @@ declare_internal_datasource (FILE 1bins.pack
 )
 declare_internal_datasource (FILE test.layout
                              URL ${CMAKE_CURRENT_LIST_DIR}/test.layout
-                             URL_HASH SHA256=28b1f1e62814aa3fa389704111b6c50eac04b97d4ebbde920fc1db7f84b93aef
+                             URL_HASH SHA256=5257d00075cd2ba7320fc748e0f13f3679150a0ebbe846101c35775d05b78ef3
                              CONFIGURE true
 )
 declare_internal_datasource (FILE test_nocfg.layout

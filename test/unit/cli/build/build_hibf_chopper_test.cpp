@@ -5,9 +5,6 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include <chopper/count/execute.hpp>
-#include <chopper/layout/execute.hpp>
-
 #include <raptor/test/cli_test.hpp>
 
 struct build_hibf_layout : public raptor_base
@@ -24,7 +21,7 @@ TEST_F(build_hibf_layout, pipeline)
 
     { // generate sequence (data) input file
         std::ofstream file{data_filename};
-        size_t dummy_group{}; // to avoid clustering by filenames in chopper count
+        size_t dummy_group{}; // to avoid clustering by filenames in chopper sketch
         for (auto && file_path : get_repeated_bins(number_of_repeated_bins))
             file << file_path << '\t' << ++dummy_group << '\n';
     }
