@@ -11,11 +11,11 @@
  */
 
 #include <chopper/configuration.hpp>
-#include <chopper/count/execute.hpp>
 #include <chopper/data_store.hpp>
 #include <chopper/layout/execute.hpp>
 #include <chopper/set_up_parser.hpp>
 #include <chopper/sketch/estimate_kmer_counts.hpp>
+#include <chopper/sketch/execute.hpp>
 
 #include <raptor/argument_parsing/init_shared_meta.hpp>
 #include <raptor/layout/raptor_layout.hpp>
@@ -34,17 +34,12 @@ void chopper_layout(sharg::parser & parser)
     parser.parse();
     config.disable_sketch_output = !parser.is_option_set("output-sketches-to");
 
-    // The output streams facilitate writing the layout file in hierarchical structure.
-    // chopper::layout::execute currently writes the filled buffers to the output file.
-    std::stringstream output_buffer;
-    std::stringstream header_buffer;
+    chopper::layout::layout hibf_layout{};
 
-    chopper::data_store store{.false_positive_rate = config.false_positive_rate,
-                              .output_buffer = &output_buffer,
-                              .header_buffer = &header_buffer};
+    chopper::data_store store{.false_positive_rate = config.false_positive_rate, .hibf_layout = &hibf_layout};
 
-    chopper::count::execute(config, store);
-    chopper::sketch::estimate_kmer_counts(store);
+    chopper::sketch::execute(config, store);
+    chopper::sketch::estimate_kmer_counts(store.sketches, store.kmer_counts);
     chopper::layout::execute(config, store);
 }
 

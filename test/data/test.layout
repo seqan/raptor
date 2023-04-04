@@ -22,8 +22,8 @@
 ##        "alpha": 1.2,
 ##        "max_rearrangement_ratio": 0.5,
 ##        "threads": 1,
-##        "estimate_union": false,
-##        "rearrange_user_bins": false,
+##        "disable_estimate_union": true,
+##        "disable_rearrangement": true,
 ##        "determine_best_tmax": false,
 ##        "force_all_binnings": false
 ##    }

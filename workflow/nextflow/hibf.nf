@@ -100,8 +100,7 @@ process LAYOUT {
                   --tmax $tmax \
                   --num-hash-functions 3 \
                   --false-positive-rate "$fpr" \
-                  --output-filename hibf.layout \
-                  --rearrange-user-bins
+                  --output-filename hibf.layout
     """
 }
 
