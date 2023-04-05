@@ -5,7 +5,8 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include <raptor/build/hibf/bin_prefixes.hpp>
+#include <chopper/prefixes.hpp>
+
 #include <raptor/test/cli_test.hpp>
 #include <raptor/test/tmp_test_file.hpp>
 
@@ -27,7 +28,7 @@ std::filesystem::path const
     dummy_sequence_file    = test_files.create("dummy.fasta",   ">ID\nACGTCACGATCGTACGATCGATCGATCG"),
     tmp_bin_list_file      = test_files.create("all_bins.txt",   dummy_sequence_file.c_str()),
     tmp_bin_list_empty     = test_files.create("empty.txt"),
-    tmp_bin_list_corrupted = test_files.create("corrupted.txt",  raptor::hibf::pack_file_first_line_prefix),
+    tmp_bin_list_corrupted = test_files.create("corrupted.txt",  chopper::prefix::first_header_line),
     empty_sequence_file    = test_files.create("empty.fasta"),
     tmp_empty_bin_file     = test_files.create("empty_bin.txt",  empty_sequence_file.c_str()),
     header_file            = test_files.create("bin1.header",    "1111111111111111111\t19\t0\t1\n"),

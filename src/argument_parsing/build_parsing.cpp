@@ -13,6 +13,7 @@
 #include <cereal/archives/json.hpp>
 
 #include <chopper/configuration.hpp>
+#include <chopper/prefixes.hpp>
 
 #include <raptor/argument_parsing/build_parsing.hpp>
 #include <raptor/argument_parsing/compute_bin_size.hpp>
@@ -20,7 +21,6 @@
 #include <raptor/argument_parsing/parse_bin_path.hpp>
 #include <raptor/argument_parsing/shared.hpp>
 #include <raptor/argument_parsing/validators.hpp>
-#include <raptor/build/hibf/bin_prefixes.hpp>
 #include <raptor/build/raptor_build.hpp>
 
 namespace raptor
@@ -234,7 +234,7 @@ bool input_is_pack_file(std::filesystem::path const & path)
     std::string line{};
     while (std::getline(file, line) && line.starts_with("##")) // Skip parameter information
     {}
-    return line.starts_with(raptor::hibf::pack_file_first_line_prefix);
+    return line.starts_with(chopper::prefix::first_header_line);
 }
 
 void build_parsing(sharg::parser & parser)
