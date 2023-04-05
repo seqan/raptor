@@ -122,8 +122,17 @@ jobs:
         with:
           args: --config-files .cmake-format.yaml --in-place
 
+      - name: Check git status
+        id: git_status
+        run: |
+          if [[ -z $(git status -uno --porcelain) ]]; then
+            echo "commit_required=" >> $GITHUB_OUTPUT
+          else
+            echo "commit_required=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Import GPG key
-        if: ${{ steps.changed_files.outputs.cpp_list }} || ${{ steps.changed_files.outputs.cmake_list }}
+        if: ${{ steps.git_status.outputs.commit_required }}
         uses: crazy-max/ghaction-import-gpg@v5
         with:
           gpg_private_key: ${{ secrets.SEQAN_ACTIONS_GPG_KEY }}
@@ -132,20 +141,16 @@ jobs:
           git_commit_gpgsign: true
 
       - name: Commit changes
-        if: ${{ steps.changed_files.outputs.cpp_list }} || ${{ steps.changed_files.outputs.cmake_list }}
+        if: ${{ steps.git_status.outputs.commit_required }}
         run: |
           git config user.name "seqan-actions[bot]"
           git config user.email "seqan-actions@users.noreply.github.com"
           git add .
-          git commit -m '[MISC] automatic linting' || true
+          git commit -m '[MISC] automatic linting'
           git push fork ${{ github.event.pull_request.head.ref }}
 
-      # Wait for 5 seconds such that workflows triggered by adding the label run on the newest commit.
-      - name: Defer workflow
-        if: ${{ steps.changed_files.outputs.cpp_list }} || ${{ steps.changed_files.outputs.cmake_list }}
-        run: sleep 5
-
       - name: Remove label
+        if: ${{ !steps.git_status.outputs.commit_required }}
         env:
             GITHUB_TOKEN: ${{ secrets.SEQAN_ACTIONS_PAT }}
             PR_URL: ${{ github.event.pull_request.html_url }}
