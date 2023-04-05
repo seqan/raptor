@@ -60,7 +60,7 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
            && std::string_view{line}.substr(1, 1) == chopper::prefix::header_config)
         ; // skip config in header
 
-    assert(line[0] == '#');                                    // we are reading header lines
+    assert(line[0] == '#'); // we are reading header lines
     assert(line.substr(1, chopper::prefix::high_level.size()) == chopper::prefix::high_level);
 
     // parse High Level max bin index
@@ -78,8 +78,9 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
         assert(line.substr(1, chopper::prefix::merged_bin.size()) == chopper::prefix::merged_bin);
 
         // parse header line
-        std::string_view const indices_str{line.begin() + 1 /*#*/ + chopper::prefix::merged_bin.size() + 1 /*_*/,
-                                           std::find(line.begin() + chopper::prefix::merged_bin.size() + 2, line.end(), ' ')};
+        std::string_view const indices_str{
+            line.begin() + 1 /*#*/ + chopper::prefix::merged_bin.size() + 1 /*_*/,
+            std::find(line.begin() + chopper::prefix::merged_bin.size() + 2, line.end(), ' ')};
 
         assert(line.substr(chopper::prefix::merged_bin.size() + indices_str.size() + 3, 11) == "max_bin_id:");
         std::string_view const max_id_str{line.begin() + chopper::prefix::merged_bin.size() + indices_str.size() + 14,

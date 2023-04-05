@@ -37,13 +37,12 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
     std::vector<int64_t> filename_indices(current_node_data.number_of_technical_bins, -1);
     robin_hood::unordered_flat_set<size_t> kmers{};
 
-    auto initialise_max_bin_kmers = [] (robin_hood::unordered_flat_set<size_t> & kmers,
-                                        std::vector<int64_t> & ibf_positions,
-                                        std::vector<int64_t> & filename_indices,
-                                        lemon::ListDigraph::Node const & node,
-                                        build_data<data_layout_mode> & data,
-                                        build_arguments const & arguments)
-        -> size_t
+    auto initialise_max_bin_kmers = [](robin_hood::unordered_flat_set<size_t> & kmers,
+                                       std::vector<int64_t> & ibf_positions,
+                                       std::vector<int64_t> & filename_indices,
+                                       lemon::ListDigraph::Node const & node,
+                                       build_data<data_layout_mode> & data,
+                                       build_arguments const & arguments) -> size_t
     {
         auto & node_data = data.node_map[node];
 
