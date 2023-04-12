@@ -15,6 +15,7 @@
 #include <raptor/build/hibf/bin_size_in_bits.hpp>
 #include <raptor/build/hibf/construct_ibf.hpp>
 #include <raptor/build/hibf/insert_into_ibf.hpp>
+#include <raptor/build/hibf/update_parent_kmers.hpp>
 
 namespace raptor::hibf
 {
@@ -41,14 +42,9 @@ seqan3::interleaved_bloom_filter<> construct_ibf(robin_hood::unordered_flat_set<
     local_index_allocation_timer.stop();
     arguments.index_allocation_timer += local_index_allocation_timer;
 
-    insert_into_ibf(parent_kmers,
-                    kmers,
-                    number_of_bins,
-                    node_data.max_bin_index,
-                    ibf,
-                    is_root,
-                    arguments.fill_ibf_timer,
-                    arguments.merge_kmers_timer);
+    insert_into_ibf(kmers, number_of_bins, node_data.max_bin_index, ibf, arguments.fill_ibf_timer);
+    if (!is_root)
+        update_parent_kmers(parent_kmers, kmers, arguments.merge_kmers_timer);
 
     return ibf;
 }

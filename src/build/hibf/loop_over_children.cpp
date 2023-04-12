@@ -17,6 +17,7 @@
 #include <raptor/build/hibf/hierarchical_build.hpp>
 #include <raptor/build/hibf/insert_into_ibf.hpp>
 #include <raptor/build/hibf/loop_over_children.hpp>
+#include <raptor/build/hibf/update_parent_kmers.hpp>
 
 namespace raptor::hibf
 {
@@ -55,14 +56,9 @@ void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                 size_t const mutex_id{parent_bin_index / 64};
                 std::lock_guard<std::mutex> guard{local_ibf_mutex[mutex_id]};
                 ibf_positions[parent_bin_index] = ibf_pos;
-                insert_into_ibf(parent_kmers,
-                                kmers,
-                                1,
-                                parent_bin_index,
-                                ibf,
-                                is_root,
-                                arguments.fill_ibf_timer,
-                                arguments.merge_kmers_timer);
+                insert_into_ibf(kmers, 1, parent_bin_index, ibf, arguments.fill_ibf_timer);
+                if (!is_root)
+                    update_parent_kmers(parent_kmers, kmers, arguments.merge_kmers_timer);
             }
         }
     };
