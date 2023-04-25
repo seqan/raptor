@@ -20,14 +20,11 @@ namespace raptor::hibf
 {
 
 // automatically does naive splitting if number_of_bins > 1
-void insert_into_ibf(robin_hood::unordered_flat_set<size_t> & parent_kmers,
-                     robin_hood::unordered_flat_set<size_t> const & kmers,
+void insert_into_ibf(robin_hood::unordered_flat_set<size_t> const & kmers,
                      size_t const number_of_bins,
                      size_t const bin_index,
                      seqan3::interleaved_bloom_filter<> & ibf,
-                     bool is_root,
-                     timer<concurrent::yes> & fill_ibf_timer,
-                     timer<concurrent::yes> & merge_kmers_timer)
+                     timer<concurrent::yes> & fill_ibf_timer)
 {
     size_t const chunk_size = kmers.size() / number_of_bins + 1;
     size_t chunk_number{};
@@ -44,13 +41,6 @@ void insert_into_ibf(robin_hood::unordered_flat_set<size_t> & parent_kmers,
     }
     local_fill_ibf_timer.stop();
     fill_ibf_timer += local_fill_ibf_timer;
-
-    timer<concurrent::no> local_merge_kmers_timer{};
-    local_merge_kmers_timer.start();
-    if (!is_root)
-        parent_kmers.insert(kmers.begin(), kmers.end());
-    local_merge_kmers_timer.stop();
-    merge_kmers_timer += local_merge_kmers_timer;
 }
 
 void insert_into_ibf(build_arguments const & arguments,

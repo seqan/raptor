@@ -17,6 +17,7 @@
 #include <raptor/build/hibf/hierarchical_build.hpp>
 #include <raptor/build/hibf/insert_into_ibf.hpp>
 #include <raptor/build/hibf/loop_over_children.hpp>
+#include <raptor/build/hibf/update_parent_kmers.hpp>
 #include <raptor/build/hibf/update_user_bins.hpp>
 
 namespace raptor::hibf
@@ -86,14 +87,13 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
         else
         {
             compute_kmers(kmers, arguments, record);
-            insert_into_ibf(parent_kmers,
-                            kmers,
+            insert_into_ibf(kmers,
                             record.number_of_bins.back(),
                             record.bin_indices.back(),
                             ibf,
-                            is_root,
-                            arguments.fill_ibf_timer,
-                            arguments.merge_kmers_timer);
+                            arguments.fill_ibf_timer);
+            if (!is_root)
+                update_parent_kmers(parent_kmers, kmers, arguments.merge_kmers_timer);
         }
 
         update_user_bins(data, filename_indices, record);
