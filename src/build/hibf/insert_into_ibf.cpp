@@ -26,13 +26,14 @@ void insert_into_ibf(robin_hood::unordered_flat_set<size_t> const & kmers,
                      seqan3::interleaved_bloom_filter<> & ibf,
                      timer<concurrent::yes> & fill_ibf_timer)
 {
+    size_t const chunk_size = kmers.size() / number_of_bins + 1;
     size_t count{};
 
     timer<concurrent::no> local_fill_ibf_timer{};
     local_fill_ibf_timer.start();
     for (size_t const kmer : kmers)
     {
-        seqan3::bin_index const bin_idx{bin_index + (count % number_of_bins)}; // distribute kmers evenly
+        seqan3::bin_index const bin_idx{bin_index + (count / chunk_size)}; // distribute kmers evenly
         ibf.emplace(kmer, bin_idx);
         ++count;
     }
