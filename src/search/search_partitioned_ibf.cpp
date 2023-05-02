@@ -82,7 +82,7 @@ void search_partitioned_ibf(search_arguments const & arguments)
                                                            seqan3::window_size{arguments.window_size},
                                                            seqan3::seed{adjust_seed(arguments.shape_weight)});
 
-            for (auto && [id, seq] : records | seqan3::views::slice(start, end))
+            for (auto && [id, seq] : seqan3::views::slice(records, start, end))
             {
                 auto minimiser_view = seq | hash_view | std::views::common;
                 local_compute_minimiser_timer.start();
@@ -135,7 +135,7 @@ void search_partitioned_ibf(search_arguments const & arguments)
                                                               seqan3::window_size{arguments.window_size},
                                                               seqan3::seed{adjust_seed(arguments.shape_weight)});
 
-            for (auto && [id, seq] : records | seqan3::views::slice(start, end))
+            for (auto && [id, seq] : seqan3::views::slice(records, start, end))
             {
                 result_string.clear();
                 result_string += id;

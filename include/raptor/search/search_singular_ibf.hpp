@@ -51,7 +51,7 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
         timer<concurrent::no> local_query_ibf_timer{};
         timer<concurrent::no> local_generate_results_timer{};
 
-        auto counter = [&index]()
+        auto counter = [&index, is_ibf]()
         {
             if constexpr (is_ibf)
                 return index.ibf().template counting_agent<uint16_t>();
@@ -65,7 +65,7 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
                                                           seqan3::window_size{arguments.window_size},
                                                           seqan3::seed{adjust_seed(arguments.shape_weight)});
 
-        for (auto && [id, seq] : records | seqan3::views::slice(start, end))
+        for (auto && [id, seq] : seqan3::views::slice(records, start, end))
         {
             result_string.clear();
             result_string += id;

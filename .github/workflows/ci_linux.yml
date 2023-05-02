@@ -46,13 +46,6 @@ jobs:
             build_type: Release
             cxx_flags: "-std=c++23"
 
-          - name: "gcc10"
-            cxx: "g++-10"
-            cc: "gcc-10"
-            build: unit
-            build_type: Release
-            cxx_flags: "-std=c++20"
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3

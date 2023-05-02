@@ -51,7 +51,7 @@ void threshold_info(raptor::search_arguments const & arguments, std::string cons
                                                           seqan3::window_size{arguments.window_size},
                                                           seqan3::seed{raptor::adjust_seed(kmer_size)});
 
-        for (auto && [seq] : records | seqan3::views::slice(start, end))
+        for (auto && [seq] : seqan3::views::slice(records, start, end))
         {
             size_t const minimiser_count{static_cast<size_t>(std::ranges::distance(seq | hash_adaptor))};
 

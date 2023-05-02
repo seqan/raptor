@@ -98,20 +98,6 @@ jobs:
             skip_build_tests: false
             skip_run_tests: true
 
-          - name: "Header gcc10"
-            cxx: "g++-10"
-            cc: "gcc-10"
-            cxx_flags: "-std=c++20"
-            build_type: Release
-            build: header
-            build_threads: 2
-            test_threads: 2
-            cmake: 3.18.4
-            requires_toolchain: true
-            requires_ccache: true
-            skip_build_tests: false
-            skip_run_tests: true
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
