@@ -75,7 +75,7 @@ void run_program(config const & cfg)
                  ++current_read_number, ++read_counter, ++reads_per_bin_counter)
             {
                 size_t const read_start_pos = read_start_dis(rng);
-                auto read_slice = seq | seqan3::views::slice(read_start_pos, read_start_pos + cfg.read_length);
+                auto read_slice = seqan3::views::slice(seq, read_start_pos, read_start_pos + cfg.read_length);
                 read.assign(read_slice.begin(), read_slice.end());
 
                 introduce_errors();
