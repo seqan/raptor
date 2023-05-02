@@ -35,12 +35,21 @@ void chopper_layout(sharg::parser & parser)
     config.disable_sketch_output = !parser.is_option_set("output-sketches-to");
 
     chopper::layout::layout hibf_layout{};
+    std::vector<std::string> filenames{};
+    std::vector<size_t> kmer_counts{};
+    std::vector<chopper::sketch::hyperloglog> sketches{};
 
-    chopper::data_store store{.false_positive_rate = config.false_positive_rate, .hibf_layout = &hibf_layout};
+    chopper::sketch::read_data_file(config, filenames);
 
-    chopper::sketch::execute(config, store);
-    chopper::sketch::estimate_kmer_counts(store.sketches, store.kmer_counts);
-    chopper::layout::execute(config, store);
+    chopper::sketch::execute(config, filenames, sketches);
+    chopper::sketch::estimate_kmer_counts(sketches, kmer_counts);
+
+    chopper::data_store store{.false_positive_rate = config.false_positive_rate,
+                              .hibf_layout = &hibf_layout,
+                              .kmer_counts = kmer_counts,
+                              .sketches = sketches};
+
+    chopper::layout::execute(config, filenames, store);
 }
 
 } // namespace raptor
