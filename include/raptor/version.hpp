@@ -21,7 +21,7 @@
 //!\brief The patch version as MACRO.
 #define RAPTOR_VERSION_PATCH 0
 //!\brief The release candidate number. 0 means stable release, >= 1 means release candidate.
-#define RAPTOR_RELEASE_CANDIDATE 1
+#define RAPTOR_RELEASE_CANDIDATE 0
 
 //!\brief The full version as MACRO (number).
 #define RAPTOR_VERSION (RAPTOR_VERSION_MAJOR * 10000 + RAPTOR_VERSION_MINOR * 100 + RAPTOR_VERSION_PATCH)
