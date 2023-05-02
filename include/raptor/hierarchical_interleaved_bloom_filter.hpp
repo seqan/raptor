@@ -91,7 +91,7 @@ public:
     class user_bins;
 
     // Forward declaration
-    class membership_agent;
+    class membership_agent_type;
 
 #if RAPTOR_HIBF_HAS_COUNT
     // Forward declaration
@@ -135,9 +135,9 @@ public:
     user_bins user_bins;
 
     //!\brief Returns a membership_agent to be used for counting.
-    membership_agent membership_agent() const
+    membership_agent_type membership_agent() const
     {
-        return typename hierarchical_interleaved_bloom_filter<data_layout_mode>::membership_agent{*this};
+        return typename hierarchical_interleaved_bloom_filter<data_layout_mode>::membership_agent_type{*this};
     }
 
 #if RAPTOR_HIBF_HAS_COUNT
@@ -307,7 +307,7 @@ public:
  * In contrast to the [seqan3::interleaved_bloom_filter][1], the result will consist of indices of user bins.
  */
 template <seqan3::data_layout data_layout_mode> // TODO: value_t as template?
-class hierarchical_interleaved_bloom_filter<data_layout_mode>::membership_agent
+class hierarchical_interleaved_bloom_filter<data_layout_mode>::membership_agent_type
 {
 private:
     //!\brief The type of the augmented hierarchical_interleaved_bloom_filter.
@@ -351,18 +351,18 @@ public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    membership_agent() = default;                                     //!< Defaulted.
-    membership_agent(membership_agent const &) = default;             //!< Defaulted.
-    membership_agent & operator=(membership_agent const &) = default; //!< Defaulted.
-    membership_agent(membership_agent &&) = default;                  //!< Defaulted.
-    membership_agent & operator=(membership_agent &&) = default;      //!< Defaulted.
-    ~membership_agent() = default;                                    //!< Defaulted.
+    membership_agent_type() = default;                                          //!< Defaulted.
+    membership_agent_type(membership_agent_type const &) = default;             //!< Defaulted.
+    membership_agent_type & operator=(membership_agent_type const &) = default; //!< Defaulted.
+    membership_agent_type(membership_agent_type &&) = default;                  //!< Defaulted.
+    membership_agent_type & operator=(membership_agent_type &&) = default;      //!< Defaulted.
+    ~membership_agent_type() = default;                                         //!< Defaulted.
 
-    /*!\brief Construct a membership_agent for an existing hierarchical_interleaved_bloom_filter.
+    /*!\brief Construct a membership_agent_type for an existing hierarchical_interleaved_bloom_filter.
      * \private
      * \param hibf The hierarchical_interleaved_bloom_filter.
      */
-    explicit membership_agent(hibf_t const & hibf) : hibf_ptr(std::addressof(hibf))
+    explicit membership_agent_type(hibf_t const & hibf) : hibf_ptr(std::addressof(hibf))
     {}
     //!\}
 
@@ -384,7 +384,7 @@ public:
      * ### Thread safety
      *
      * Concurrent invocations of this function are not thread safe, please create a
-     * raptor::hierarchical_interleaved_bloom_filter::membership_agent for each thread.
+     * raptor::hierarchical_interleaved_bloom_filter::membership_agent_type for each thread.
      */
     template <std::ranges::forward_range value_range_t>
     [[nodiscard]] std::vector<int64_t> const & bulk_contains(value_range_t && values, size_t const threshold) & noexcept
