@@ -62,7 +62,7 @@ static std::vector<std::vector<seqan3::dna4>> const reads{
         for (auto && read_start :
              seqan3::test::generate_numeric_sequence<size_t>(read_count, 0, genome_size - read_size - 1, 0))
         {
-            auto v = genome | seqan3::views::slice(read_start, read_start + read_size);
+            auto v = seqan3::views::slice(genome, read_start, read_start + read_size);
             result[i++].assign(v.begin(), v.end());
         }
         return result;
