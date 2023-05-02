@@ -51,7 +51,7 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
         timer<concurrent::no> local_query_ibf_timer{};
         timer<concurrent::no> local_generate_results_timer{};
 
-        auto counter = [&index]()
+        auto counter = [&index, is_ibf]()
         {
             if constexpr (is_ibf)
                 return index.ibf().template counting_agent<uint16_t>();
