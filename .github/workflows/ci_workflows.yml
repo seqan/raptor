@@ -115,12 +115,13 @@ jobs:
         run: |
           ccache -z
           cd build
-          sudo make -k -j2 install
+          make -k -j2
           ccache -sv
 
       - name: Run Nextflow
         if: matrix.name == 'Nextflow'
         run: |
+          export PATH=${PATH}:${{ github.workspace }}/build/bin
           cd raptor/workflow/nextflow
           nextflow hibf.nf
 
