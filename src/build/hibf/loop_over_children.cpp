@@ -22,12 +22,11 @@
 namespace raptor::hibf
 {
 
-template <seqan3::data_layout data_layout_mode>
 void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                         seqan3::interleaved_bloom_filter<> & ibf,
                         std::vector<int64_t> & ibf_positions,
                         lemon::ListDigraph::Node const & current_node,
-                        build_data<data_layout_mode> & data,
+                        build_data & data,
                         build_arguments const & arguments,
                         bool is_root)
 {
@@ -81,21 +80,5 @@ void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
     seqan3::detail::execution_handler_parallel executioner{number_of_threads};
     executioner.bulk_execute(std::move(worker), std::move(indices), []() {});
 }
-
-template void loop_over_children<seqan3::data_layout::uncompressed>(robin_hood::unordered_flat_set<size_t> &,
-                                                                    seqan3::interleaved_bloom_filter<> &,
-                                                                    std::vector<int64_t> &,
-                                                                    lemon::ListDigraph::Node const &,
-                                                                    build_data<seqan3::data_layout::uncompressed> &,
-                                                                    build_arguments const &,
-                                                                    bool);
-
-template void loop_over_children<seqan3::data_layout::compressed>(robin_hood::unordered_flat_set<size_t> &,
-                                                                  seqan3::interleaved_bloom_filter<> &,
-                                                                  std::vector<int64_t> &,
-                                                                  lemon::ListDigraph::Node const &,
-                                                                  build_data<seqan3::data_layout::compressed> &,
-                                                                  build_arguments const &,
-                                                                  bool);
 
 } // namespace raptor::hibf

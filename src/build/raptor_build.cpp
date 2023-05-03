@@ -20,10 +20,7 @@ namespace raptor
 void raptor_build(build_arguments const & arguments)
 {
     if (arguments.is_hibf)
-        if (arguments.compressed)
-            hibf::chopper_build<seqan3::data_layout::compressed>(arguments);
-        else
-            hibf::chopper_build<seqan3::data_layout::uncompressed>(arguments);
+        hibf::chopper_build(arguments);
     else
         build_ibf(arguments);
 }

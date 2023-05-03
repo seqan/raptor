@@ -26,23 +26,19 @@ namespace index_structure
 
 using ibf = seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed>;
 using ibf_compressed = seqan3::interleaved_bloom_filter<seqan3::data_layout::compressed>;
-using hibf = hierarchical_interleaved_bloom_filter<seqan3::data_layout::uncompressed>;
-using hibf_compressed = hierarchical_interleaved_bloom_filter<seqan3::data_layout::compressed>;
+using hibf = hierarchical_interleaved_bloom_filter;
 
 template <typename return_t, typename input_t>
-concept compressible_from = (std::same_as<return_t, ibf_compressed> && std::same_as<input_t, ibf>)
-                         || (std::same_as<return_t, hibf_compressed> && std::same_as<input_t, hibf>);
+concept compressible_from = (std::same_as<return_t, ibf_compressed> && std::same_as<input_t, ibf>);
 
 template <typename index_t>
 concept is_ibf = std::same_as<index_t, index_structure::ibf> || std::same_as<index_t, index_structure::ibf_compressed>;
 
 template <typename index_t>
-concept is_hibf =
-    std::same_as<index_t, index_structure::hibf> || std::same_as<index_t, index_structure::hibf_compressed>;
+concept is_hibf = std::same_as<index_t, index_structure::hibf>;
 
 template <typename index_t>
-concept is_compressed =
-    std::same_as<index_t, index_structure::ibf_compressed> || std::same_as<index_t, index_structure::hibf_compressed>;
+concept is_compressed = std::same_as<index_t, index_structure::ibf_compressed>;
 
 } // namespace index_structure
 

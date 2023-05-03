@@ -18,9 +18,6 @@
 namespace raptor::hibf
 {
 
-template <seqan3::data_layout data_layout_mode>
-void update_user_bins(build_data<data_layout_mode> & data,
-                      std::vector<int64_t> & filename_indices,
-                      chopper_pack_record const & record);
+void update_user_bins(build_data & data, std::vector<int64_t> & filename_indices, chopper_pack_record const & record);
 
 } // namespace raptor::hibf

@@ -21,7 +21,6 @@
 namespace raptor::hibf
 {
 
-template <seqan3::data_layout data_layout_mode>
 struct build_data
 {
     alignas(std::hardware_destructive_interference_size) std::atomic<size_t> ibf_number{};
@@ -33,7 +32,7 @@ struct build_data
     lemon::ListDigraph ibf_graph{};
     lemon::ListDigraph::NodeMap<node_data> node_map{ibf_graph};
 
-    hierarchical_interleaved_bloom_filter<data_layout_mode> hibf{};
+    hierarchical_interleaved_bloom_filter hibf{};
     std::vector<double> fp_correction{};
 
     size_t request_ibf_idx()
