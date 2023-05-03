@@ -32,7 +32,6 @@ TEST_F(build_hibf_layout, pipeline)
         cli_test_result const result = execute_app("raptor",
                                                    "layout",
                                                    "--kmer-size 19",
-                                                   "--column-index 2",
                                                    "--threads 1",
                                                    "--input-file",
                                                    data_filename,
