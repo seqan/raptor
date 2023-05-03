@@ -21,10 +21,7 @@ void raptor_search(search_arguments const & arguments)
 {
     if (arguments.is_hibf)
     {
-        if (arguments.compressed)
-            search_hibf<true>(arguments);
-        else
-            search_hibf<false>(arguments);
+        search_hibf(arguments);
     }
     else if (arguments.parts == 1)
     {

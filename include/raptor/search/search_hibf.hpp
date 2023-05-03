@@ -17,7 +17,6 @@
 namespace raptor
 {
 
-template <bool compressed>
 void search_hibf(search_arguments const & arguments);
 
 } // namespace raptor

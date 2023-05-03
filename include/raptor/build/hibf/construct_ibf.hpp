@@ -20,12 +20,11 @@
 namespace raptor::hibf
 {
 
-template <seqan3::data_layout data_layout_mode>
 seqan3::interleaved_bloom_filter<> construct_ibf(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                                                  robin_hood::unordered_flat_set<size_t> & kmers,
                                                  size_t const number_of_bins,
                                                  lemon::ListDigraph::Node const & node,
-                                                 build_data<data_layout_mode> & data,
+                                                 build_data & data,
                                                  build_arguments const & arguments,
                                                  bool is_root);
 

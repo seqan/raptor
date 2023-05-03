@@ -266,8 +266,7 @@ struct raptor_base : public cli_test
     {
         constexpr bool is_ibf = std::same_as<data_t, raptor::index_structure::ibf>
                              || std::same_as<data_t, raptor::index_structure::ibf_compressed>;
-        constexpr bool is_hibf = std::same_as<data_t, raptor::index_structure::hibf>
-                              || std::same_as<data_t, raptor::index_structure::hibf_compressed>;
+        constexpr bool is_hibf = std::same_as<data_t, raptor::index_structure::hibf>;
 
         static_assert(is_ibf || is_hibf);
 

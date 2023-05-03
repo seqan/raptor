@@ -12,14 +12,11 @@
 
 #pragma once
 
-#include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
-
 #include <raptor/argument_parsing/build_arguments.hpp>
 
 namespace raptor::hibf
 {
 
-template <seqan3::data_layout data_layout_mode>
 void chopper_build(build_arguments const & arguments);
 
 } // namespace raptor::hibf
