@@ -18,7 +18,8 @@
 namespace raptor::hibf
 {
 
-chopper_pack_record parse_chopper_pack_line(std::string const & current_line)
+chopper_pack_record parse_chopper_pack_line(std::string const & current_line,
+                                            std::vector<std::vector<std::string>> & user_bin_filenames)
 {
     chopper_pack_record result{};
 
@@ -30,12 +31,17 @@ chopper_pack_record parse_chopper_pack_line(std::string const & current_line)
         ++field_end;
 
     // parse filenames
-    std::string_view const filenames{buffer.begin(), field_end};
-    for (auto const && filename : filenames | std::views::split(';'))
+    std::string_view const filenames_str{buffer.begin(), field_end};
+    std::vector<std::string> filename_list;
+    for (auto const && filename : filenames_str | std::views::split(';'))
     {
         auto const common_view = filename | std::views::common;
-        result.filenames.emplace_back(common_view.begin(), common_view.end());
+        filename_list.emplace_back(common_view.begin(), common_view.end());
     }
+
+    // update input idx and append filesnames to build_data
+    result.user_bin_info.idx = user_bin_filenames.size();
+    user_bin_filenames.push_back(std::move(filename_list));
 
     size_t tmp{};
 

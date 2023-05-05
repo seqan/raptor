@@ -37,7 +37,7 @@ void read_chopper_pack_file(build_data & data, std::string const & chopper_pack_
     while (std::getline(chopper_pack_file, current_line))
     {
         ++user_bins;
-        chopper_pack_record const && record = parse_chopper_pack_line(current_line);
+        chopper_pack_record const && record = parse_chopper_pack_line(current_line, data.filenames);
 
         // go down the tree until you find the matching parent
         lemon::ListDigraph::Node current_node = data.ibf_graph.nodeFromId(0); // start at root

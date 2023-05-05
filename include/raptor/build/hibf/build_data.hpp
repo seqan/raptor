@@ -29,6 +29,8 @@ struct build_data
     size_t number_of_user_bins{};
     size_t number_of_ibfs{};
 
+    std::vector<std::vector<std::string>> filenames{};
+
     lemon::ListDigraph ibf_graph{};
     lemon::ListDigraph::NodeMap<node_data> node_map{ibf_graph};
 

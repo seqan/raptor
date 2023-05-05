@@ -22,7 +22,7 @@ void update_user_bins(build_data & data, std::vector<int64_t> & filename_indices
     size_t const idx = data.request_user_bin_idx();
 
     std::string & user_bin_filenames = data.hibf.user_bins.filename_of_user_bin(idx);
-    for (auto const & filename : record.filenames)
+    for (auto const & filename : data.filenames[record.user_bin_info.idx])
     {
         user_bin_filenames += filename;
         user_bin_filenames += ';';

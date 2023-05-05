@@ -23,18 +23,9 @@ namespace raptor::hibf
 
 struct chopper_pack_record
 {
-    std::vector<std::string> filenames{};
     chopper::layout::layout::user_bin user_bin_info{};
 
-    bool operator==(chopper_pack_record const & other) const
-    {
-        return std::tie(filenames, user_bin_info) == std::tie(other.filenames, other.user_bin_info);
-    }
-
-    bool operator!=(chopper_pack_record const & other) const
-    {
-        return std::tie(filenames, user_bin_info) != std::tie(other.filenames, other.user_bin_info);
-    }
+    friend auto operator<=>(chopper_pack_record const &, chopper_pack_record const &) = default;
 };
 
 } // namespace raptor::hibf

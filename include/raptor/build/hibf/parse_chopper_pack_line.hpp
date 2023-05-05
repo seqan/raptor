@@ -13,12 +13,14 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include <raptor/build/hibf/chopper_pack_record.hpp>
 
 namespace raptor::hibf
 {
 
-chopper_pack_record parse_chopper_pack_line(std::string const & current_line);
+chopper_pack_record parse_chopper_pack_line(std::string const & current_line,
+                                            std::vector<std::vector<std::string>> & user_bin_filenames);
 
 } // namespace raptor::hibf

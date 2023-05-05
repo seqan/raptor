@@ -44,6 +44,7 @@ void insert_into_ibf(robin_hood::unordered_flat_set<size_t> const & kmers,
 }
 
 void insert_into_ibf(build_arguments const & arguments,
+                     build_data const & data,
                      chopper_pack_record const & record,
                      seqan3::interleaved_bloom_filter<> & ibf)
 {
@@ -55,12 +56,12 @@ void insert_into_ibf(build_arguments const & arguments,
     if (arguments.input_is_minimiser)
     {
         file_reader<file_types::minimiser> const reader{};
-        reader.hash_into(record.filenames, std::back_inserter(values));
+        reader.hash_into(data.filenames[record.user_bin_info.idx], std::back_inserter(values));
     }
     else
     {
         file_reader<file_types::sequence> const reader{arguments.shape, arguments.window_size};
-        reader.hash_into(record.filenames, std::back_inserter(values));
+        reader.hash_into(data.filenames[record.user_bin_info.idx], std::back_inserter(values));
     }
     local_user_bin_io_timer.stop();
     arguments.user_bin_io_timer += local_user_bin_io_timer;
