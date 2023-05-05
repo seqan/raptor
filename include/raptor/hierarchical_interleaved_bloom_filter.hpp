@@ -147,55 +147,10 @@ public:
             return user_bin_filenames[idx];
         }
 
-        //!\brief For a pair `(a,b)`, returns a const reference to the filename of the user bin at IBF `a`, bin `b`.
-        std::string const & operator[](std::pair<size_t, size_t> const & index_pair) const
-        {
-            return user_bin_filenames[ibf_bin_to_filename_position[index_pair.first][index_pair.second]];
-        }
-
-        /*!\brief Returns a view over the user bin filenames for the `ibf_idx`th IBF.
-        *        An empty string is returned for merged bins.
-        */
-        auto operator[](size_t const ibf_idx) const
-        {
-            return ibf_bin_to_filename_position[ibf_idx]
-                 | std::views::transform(
-                       [this](int64_t i)
-                       {
-                           if (i == -1)
-                               return std::string{};
-                           else
-                               return user_bin_filenames[i];
-                       });
-        }
-
         //!\brief Returns the filename index of the `ibf_idx`th IBF for bin `bin_idx`.
         int64_t filename_index(size_t const ibf_idx, size_t const bin_idx) const
         {
             return ibf_bin_to_filename_position[ibf_idx][bin_idx];
-        }
-
-        /*!\brief Writes all filenames to a stream. Index and filename are tab-separated.
-        * \details
-        * 0	\<path_to_user_bin_0\>
-        * 1	\<path_to_user_bin_1\>
-        */
-        template <typename stream_t>
-        void write_filenames(stream_t & out_stream) const
-        {
-            size_t position{};
-            std::string line{};
-            for (auto const & filename : user_bin_filenames)
-            {
-                line.clear();
-                line = '#';
-                line += std::to_string(position);
-                line += '\t';
-                line += filename;
-                line += '\n';
-                out_stream << line;
-                ++position;
-            }
         }
 
         /*!\cond DEV
