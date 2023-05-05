@@ -175,29 +175,6 @@ public:
             return ibf_bin_to_filename_position[ibf_idx][bin_idx];
         }
 
-        /*!\brief Writes all filenames to a stream. Index and filename are tab-separated.
-        * \details
-        * 0	\<path_to_user_bin_0\>
-        * 1	\<path_to_user_bin_1\>
-        */
-        template <typename stream_t>
-        void write_filenames(stream_t & out_stream) const
-        {
-            size_t position{};
-            std::string line{};
-            for (auto const & filename : user_bin_filenames)
-            {
-                line.clear();
-                line = '#';
-                line += std::to_string(position);
-                line += '\t';
-                line += filename;
-                line += '\n';
-                out_stream << line;
-                ++position;
-            }
-        }
-
         /*!\cond DEV
         * \brief Serialisation support function.
         * \tparam archive_t Type of `archive`; must satisfy seqan3::cereal_archive.
