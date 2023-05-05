@@ -16,9 +16,10 @@
 
 #include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
 
+#include <chopper/layout/layout.hpp>
+
 #include <raptor/argument_parsing/build_arguments.hpp>
 #include <raptor/build/hibf/build_data.hpp>
-#include <raptor/build/hibf/chopper_pack_record.hpp>
 
 namespace raptor::hibf
 {
@@ -32,7 +33,7 @@ void insert_into_ibf(robin_hood::unordered_flat_set<size_t> const & kmers,
 
 void insert_into_ibf(build_arguments const & arguments,
                      build_data const & data,
-                     chopper_pack_record const & record,
+                     chopper::layout::layout::user_bin const & record,
                      seqan3::interleaved_bloom_filter<> & ibf);
 
 } // namespace raptor::hibf
