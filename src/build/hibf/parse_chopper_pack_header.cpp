@@ -16,8 +16,8 @@
 
 #include <lemon/list_graph.h> /// Must be first include.
 
-#include <chopper/prefixes.hpp>
 #include <chopper/layout/layout.hpp>
+#include <chopper/prefixes.hpp>
 
 #include <raptor/build/hibf/parse_chopper_pack_header.hpp>
 
