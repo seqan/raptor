@@ -101,7 +101,6 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
 
     data.hibf.ibf_vector[ibf_pos] = std::move(ibf);
     data.hibf.next_ibf_id[ibf_pos] = std::move(ibf_positions);
-    data.hibf.user_bins.bin_indices_of_ibf(ibf_pos) = std::move(filename_indices);
 
     return ibf_pos;
 }
