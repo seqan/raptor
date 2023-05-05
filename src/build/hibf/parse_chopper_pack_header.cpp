@@ -16,6 +16,7 @@
 
 #include <lemon/list_graph.h> /// Must be first include.
 
+#include <chopper/layout/layout.hpp>
 #include <chopper/prefixes.hpp>
 
 #include <raptor/build/hibf/parse_chopper_pack_header.hpp>
@@ -70,7 +71,7 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
     auto high_level_node = ibf_graph.addNode(); // high-level node = root node
     node_map.set(high_level_node, {0, parse_first_bin(hibf_max_bin_str), 0, lemon::INVALID, {}});
 
-    std::vector<std::pair<std::vector<size_t>, size_t>> header_records{};
+    std::vector<chopper::layout::layout::max_bin> header_max_bins{};
 
     // first read and parse header records, in order to sort them before adding them to the graph
     while (std::getline(chopper_pack_file, line) && line.substr(0, 6) != "#FILES")
@@ -86,17 +87,17 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
         std::string_view const max_id_str{line.begin() + chopper::prefix::merged_bin.size() + indices_str.size() + 14,
                                           line.end()};
 
-        header_records.emplace_back(parse_bin_indices(indices_str), parse_first_bin(max_id_str));
+        header_max_bins.emplace_back(parse_bin_indices(indices_str), parse_first_bin(max_id_str));
     }
 
     // sort records ascending by the number of bin indices (corresponds to the IBF levels)
-    std::ranges::sort(header_records,
+    std::ranges::sort(header_max_bins,
                       [](auto const & r, auto const & l)
                       {
-                          return r.first.size() < l.first.size();
+                          return r.previous_TB_indices.size() < l.previous_TB_indices.size();
                       });
 
-    for (auto const & [bin_indices, max_id] : header_records)
+    for (auto const & [bin_indices, max_id] : header_max_bins)
     {
         // we assume that the header lines are in the correct order
         // go down the tree until you find the matching parent
@@ -125,7 +126,7 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
             node_map[current_node].favourite_child = new_node;
     }
 
-    return header_records.size();
+    return header_max_bins.size();
 }
 
 } // namespace raptor::hibf
