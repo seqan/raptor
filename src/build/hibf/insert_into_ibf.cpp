@@ -47,7 +47,7 @@ void insert_into_ibf(build_arguments const & arguments,
                      chopper_pack_record const & record,
                      seqan3::interleaved_bloom_filter<> & ibf)
 {
-    auto const bin_index = seqan3::bin_index{static_cast<size_t>(record.bin_indices.back())};
+    auto const bin_index = seqan3::bin_index{static_cast<size_t>(record.user_bin_info.storage_TB_id)};
     std::vector<uint64_t> values;
 
     timer<concurrent::no> local_user_bin_io_timer{};

@@ -16,26 +16,24 @@
 #include <tuple>
 #include <vector>
 
+#include <chopper/layout/layout.hpp>
+
 namespace raptor::hibf
 {
 
 struct chopper_pack_record
 {
     std::vector<std::string> filenames{};
-    std::vector<size_t> bin_indices{};
-    std::vector<size_t> number_of_bins{};
-    std::vector<size_t> estimated_sizes{};
+    chopper::layout::layout::user_bin user_bin_info{};
 
     bool operator==(chopper_pack_record const & other) const
     {
-        return std::tie(filenames, bin_indices, number_of_bins, estimated_sizes)
-            == std::tie(other.filenames, other.bin_indices, other.number_of_bins, other.estimated_sizes);
+        return std::tie(filenames, user_bin_info) == std::tie(other.filenames, other.user_bin_info);
     }
 
     bool operator!=(chopper_pack_record const & other) const
     {
-        return std::tie(filenames, bin_indices, number_of_bins, estimated_sizes)
-            != std::tie(other.filenames, other.bin_indices, other.number_of_bins, other.estimated_sizes);
+        return std::tie(filenames, user_bin_info) != std::tie(other.filenames, other.user_bin_info);
     }
 };
 
