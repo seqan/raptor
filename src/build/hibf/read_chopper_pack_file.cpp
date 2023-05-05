@@ -42,10 +42,10 @@ void read_chopper_pack_file(build_data & data, std::string const & chopper_pack_
         // go down the tree until you find the matching parent
         lemon::ListDigraph::Node current_node = data.ibf_graph.nodeFromId(0); // start at root
 
-        for (size_t i = 0; i < record.bin_indices.size() - 1; ++i)
+        for (size_t i = 0; i < record.user_bin_info.previous_TB_indices.size(); ++i)
         {
-            size_t const bin = record.bin_indices[i];
-            size_t const num_tbs = record.number_of_bins[i];
+            size_t const bin = record.user_bin_info.previous_TB_indices[i];
+            size_t const num_tbs = 1;
             auto & current_data = data.node_map[current_node];
 
             // update number of technical bins in current_node-IBF
@@ -69,14 +69,14 @@ void read_chopper_pack_file(build_data & data, std::string const & chopper_pack_
             assert(found_next_node);
         }
 
-        size_t const bin = record.bin_indices.back();
-        size_t const num_tbs = record.number_of_bins.back();
+        size_t const bin = record.user_bin_info.storage_TB_id;
+        size_t const num_tbs = record.user_bin_info.number_of_technical_bins;
         auto & current_data = data.node_map[current_node];
 
         // update number of technical bins in current_node-IBF
         current_data.number_of_technical_bins = std::max(current_data.number_of_technical_bins, bin + num_tbs);
 
-        if (record.bin_indices.back() == current_data.max_bin_index)
+        if (record.user_bin_info.storage_TB_id == current_data.max_bin_index)
             current_data.remaining_records.insert(current_data.remaining_records.begin(), record);
         else
             current_data.remaining_records.push_back(record);

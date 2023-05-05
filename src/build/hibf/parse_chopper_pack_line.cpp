@@ -43,15 +43,18 @@ chopper_pack_record parse_chopper_pack_line(std::string const & current_line)
     {
         ++field_end; // skip tab or ;
         field_end = std::from_chars(field_end, buffer_end, tmp).ptr;
-        result.bin_indices.push_back(tmp);
+        result.user_bin_info.previous_TB_indices.push_back(tmp);
     }
     while (field_end != buffer_end && *field_end != '\t');
+
+    result.user_bin_info.storage_TB_id = result.user_bin_info.previous_TB_indices.back();
+    result.user_bin_info.previous_TB_indices.pop_back();
 
     do // read number of technical bins
     {
         ++field_end; // skip tab or ;
         field_end = std::from_chars(field_end, buffer_end, tmp).ptr;
-        result.number_of_bins.push_back(tmp);
+        result.user_bin_info.number_of_technical_bins = tmp; // only the last number really counts
     }
     while (field_end != buffer_end && *field_end != '\t');
 
