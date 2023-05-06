@@ -12,12 +12,15 @@
 
 #pragma once
 
+#include <chopper/layout/layout.hpp>
+
 #include <raptor/build/hibf/build_data.hpp>
-#include <raptor/build/hibf/chopper_pack_record.hpp>
 
 namespace raptor::hibf
 {
 
-void update_user_bins(build_data & data, std::vector<int64_t> & filename_indices, chopper_pack_record const & record);
+void update_user_bins(build_data & data,
+                      std::vector<int64_t> & filename_indices,
+                      chopper::layout::layout::user_bin const & record);
 
 } // namespace raptor::hibf

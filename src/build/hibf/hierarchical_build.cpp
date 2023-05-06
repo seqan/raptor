@@ -57,10 +57,10 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
         {
             // we assume that the max record is at the beginning of the list of remaining records.
             auto const & record = node_data.remaining_records[0];
-            compute_kmers(kmers, arguments, record);
+            compute_kmers(kmers, arguments, data, record);
             update_user_bins(data, filename_indices, record);
 
-            return record.user_bin_info.number_of_technical_bins;
+            return record.number_of_technical_bins;
         }
     };
 
@@ -79,16 +79,16 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
     {
         auto const & record = current_node_data.remaining_records[i];
 
-        if (is_root && record.user_bin_info.number_of_technical_bins == 1) // no splitting needed
+        if (is_root && record.number_of_technical_bins == 1) // no splitting needed
         {
-            insert_into_ibf(arguments, record, ibf);
+            insert_into_ibf(arguments, data, record, ibf);
         }
         else
         {
-            compute_kmers(kmers, arguments, record);
+            compute_kmers(kmers, arguments, data, record);
             insert_into_ibf(kmers,
-                            record.user_bin_info.number_of_technical_bins,
-                            record.user_bin_info.storage_TB_id,
+                            record.number_of_technical_bins,
+                            record.storage_TB_id,
                             ibf,
                             arguments.fill_ibf_timer);
             if (!is_root)
