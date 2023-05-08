@@ -106,7 +106,7 @@ void upgrade_parsing(sharg::parser & parser)
         arguments.shape = tmp.shape();
         arguments.window_size = tmp.window_size();
         arguments.parts = tmp.parts();
-        arguments.compressed = tmp.compressed();
+        arguments.compressed = false; /*tmp.compressed();*/
         if (arguments.bin_path.empty() && !parser.is_option_set("fpr"))
         {
             arguments.bin_path = tmp.bin_path();

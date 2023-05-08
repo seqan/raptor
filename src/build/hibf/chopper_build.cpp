@@ -30,7 +30,6 @@ void chopper_build(build_arguments const & arguments)
     raptor_index<hierarchical_interleaved_bloom_filter> index{window{arguments.window_size},
                                                               arguments.shape,
                                                               arguments.parts,
-                                                              arguments.compressed,
                                                               data.filenames,
                                                               arguments.fpr,
                                                               std::move(data.hibf)};

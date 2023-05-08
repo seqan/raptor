@@ -56,8 +56,8 @@ TEST_F(argparse_build, no_options)
         "Raptor-build - A fast and space-efficient pre-filter for querying very large collections of nucleotide sequen"
         "ces.\n======================================================================================================="
         "==========\n    raptor build --input <file> --output <file> [--threads <number>] [--quiet]\n    [--kmer <numb"
-        "er>|--shape <01-pattern>] [--window <number>] [--fpr\n    <number>] [--hash <number>] [--parts <number>] [--c"
-        "ompressed]\n    Try -h or --help for more information.\n"};
+        "er>|--shape <01-pattern>] [--window <number>] [--fpr\n    <number>] [--hash <number>] [--parts <number>]\n   "
+        " Try -h or --help for more information.\n"};
     EXPECT_EQ(result.out, expected);
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
@@ -226,15 +226,6 @@ TEST_F(argparse_build, partitioned_parts)
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
-TEST_F(argparse_build, compressed_HIBF)
-{
-    cli_test_result const result =
-        execute_app("raptor", "build", "--compressed", "--output index.raptor", "--input", data("three_levels.pack"));
-    EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] The HIBF cannot be compressed.\n"});
-    RAPTOR_ASSERT_FAIL_EXIT(result);
-}
-
 TEST_F(argparse_build, minimiser_and_shape)
 {
     cli_test_result const result =
@@ -390,6 +381,21 @@ TEST_F(argparse_search, ambiguous_index)
     EXPECT_EQ(result.err,
               std::string{"[Error] Ambiguous index. Both monolithic (raptor.index) and partitioned index "
                           "(raptor.index_0) exist. Please rename the monolithic index.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
+TEST_F(argparse_search, compressed_index)
+{
+
+    cli_test_result const result = execute_app("raptor",
+                                               "search",
+                                               "--query ",
+                                               data("query.fq"),
+                                               "--index",
+                                               cli_test::data("64bins23windowc.index"),
+                                               "--output search.out");
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] Cannot read index: Index cannot be compressed.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 

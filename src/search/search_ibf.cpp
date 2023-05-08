@@ -16,16 +16,10 @@
 namespace raptor
 {
 
-template <bool compressed>
 void search_ibf(search_arguments const & arguments)
 {
-    using index_structure_t = std::conditional_t<compressed, index_structure::ibf_compressed, index_structure::ibf>;
-    auto index = raptor_index<index_structure_t>{};
+    auto index = raptor_index<index_structure::ibf>{};
     search_singular_ibf(arguments, std::move(index));
 }
-
-template void search_ibf<false>(search_arguments const & arguments);
-
-template void search_ibf<true>(search_arguments const & arguments);
 
 } // namespace raptor

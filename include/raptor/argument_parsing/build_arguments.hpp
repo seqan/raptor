@@ -39,7 +39,6 @@ struct build_arguments
     uint64_t hash{2};
     uint8_t parts{1u};
     double fpr{0.05};
-    bool compressed{false};
 
     // General arguments
     std::vector<std::vector<std::string>> bin_path{};

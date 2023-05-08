@@ -29,7 +29,7 @@ void raptor_upgrade(upgrade_arguments & arguments)
         size_t const max_count = std::isnan(arguments.fpr) ? max_bin_count(arguments) : 0u;
 
         if (arguments.compressed)
-            upgrader = index_upgrader<seqan3::data_layout::compressed>{arguments, max_count};
+            upgrader = index_upgrader<seqan3::data_layout::compressed>{arguments, max_count}; // GCOVR_EXCL_LINE
         else
             upgrader = index_upgrader<seqan3::data_layout::uncompressed>{arguments, max_count};
 

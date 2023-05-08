@@ -129,12 +129,6 @@ struct raptor_base : public cli_test
         }
     };
 
-    struct is_compressed : strong_bool
-    {
-        using strong_bool::strong_bool;
-        using strong_bool::value;
-    };
-
     struct is_hibf : strong_bool
     {
         using strong_bool::strong_bool;
@@ -174,16 +168,14 @@ struct raptor_base : public cli_test
              | std::views::join;
     }
 
-    static inline std::filesystem::path const ibf_path(size_t const number_of_repetitions,
-                                                       size_t const window_size,
-                                                       is_compressed const compressed = is_compressed::no,
-                                                       is_hibf const hibf = is_hibf::no) noexcept
+    static inline std::filesystem::path const
+    ibf_path(size_t const number_of_repetitions, size_t const window_size, is_hibf const hibf = is_hibf::no) noexcept
     {
         std::string name{};
         name += std::to_string(std::max<int>(1, number_of_repetitions * 4));
         name += "bins";
         name += std::to_string(window_size);
-        name += compressed ? "windowc." : "window.";
+        name += "window.";
         name += hibf ? "hibf" : "index";
         return cli_test::data(name);
     }
@@ -208,9 +200,9 @@ struct raptor_base : public cli_test
     }
 
     // Good example for printing tables: https://en.cppreference.com/w/cpp/io/ios_base/width
-    template <seqan3::data_layout layout = seqan3::data_layout::uncompressed>
-    static inline std::string const debug_ibfs(seqan3::interleaved_bloom_filter<layout> const & expected_ibf,
-                                               seqan3::interleaved_bloom_filter<layout> const & actual_ibf)
+    static inline std::string const
+    debug_ibfs(seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed> const & expected_ibf,
+               seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed> const & actual_ibf)
     {
         std::stringstream result{};
         result << ">>>IBFs differ<<<\n";
@@ -264,8 +256,7 @@ struct raptor_base : public cli_test
                                      std::filesystem::path const & actual_result,
                                      compare_extension const compare_ext = compare_extension::yes)
     {
-        constexpr bool is_ibf = std::same_as<data_t, raptor::index_structure::ibf>
-                             || std::same_as<data_t, raptor::index_structure::ibf_compressed>;
+        constexpr bool is_ibf = std::same_as<data_t, raptor::index_structure::ibf>;
         constexpr bool is_hibf = std::same_as<data_t, raptor::index_structure::hibf>;
 
         static_assert(is_ibf || is_hibf);
@@ -286,12 +277,11 @@ struct raptor_base : public cli_test
         EXPECT_EQ(expected_index.window_size(), actual_index.window_size());
         EXPECT_EQ(expected_index.shape(), actual_index.shape());
         EXPECT_EQ(expected_index.parts(), actual_index.parts());
-        EXPECT_EQ(expected_index.compressed(), actual_index.compressed());
 
         if constexpr (is_ibf)
         {
             auto const &expected_ibf{expected_index.ibf()}, actual_ibf{actual_index.ibf()};
-            EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs<data_t::data_layout_mode>(expected_ibf, actual_ibf);
+            EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs(expected_ibf, actual_ibf);
         }
         else
         {

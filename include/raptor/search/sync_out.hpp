@@ -65,7 +65,6 @@ public:
         file << "## Index hashes = " << hash_function_count << '\n';
         file << "## Index parts = " << static_cast<uint16_t>(arguments.parts) << '\n';
         file << "## False positive rate = " << arguments.fpr << '\n';
-        file << "## Index is compressed = " << std::boolalpha << arguments.compressed << '\n';
         file << "## Index is HIBF = " << std::boolalpha << arguments.is_hibf << '\n';
 
         size_t user_bin_id{};

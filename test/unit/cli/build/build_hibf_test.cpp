@@ -32,9 +32,8 @@ TEST_P(build_hibf, with_file)
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
 
-    compare_index<raptor::index_structure::hibf>(
-        ibf_path(number_of_repeated_bins, window_size, is_compressed::no, is_hibf::yes),
-        "raptor.index");
+    compare_index<raptor::index_structure::hibf>(ibf_path(number_of_repeated_bins, window_size, is_hibf::yes),
+                                                 "raptor.index");
 }
 
 TEST_P(build_hibf, with_shape)
@@ -59,9 +58,8 @@ TEST_P(build_hibf, with_shape)
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
 
-    compare_index<raptor::index_structure::hibf>(
-        ibf_path(number_of_repeated_bins, window_size, is_compressed::no, is_hibf::yes),
-        "raptor.index");
+    compare_index<raptor::index_structure::hibf>(ibf_path(number_of_repeated_bins, window_size, is_hibf::yes),
+                                                 "raptor.index");
 }
 
 INSTANTIATE_TEST_SUITE_P(build_hibf_suite,

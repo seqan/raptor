@@ -20,23 +20,11 @@ namespace raptor
 void raptor_search(search_arguments const & arguments)
 {
     if (arguments.is_hibf)
-    {
         search_hibf(arguments);
-    }
-    else if (arguments.parts == 1)
-    {
-        if (arguments.compressed)
-            search_ibf<true>(arguments);
-        else
-            search_ibf<false>(arguments);
-    }
+    else if (arguments.parts == 1u)
+        search_ibf(arguments);
     else
-    {
-        if (arguments.compressed)
-            search_partitioned_ibf<true>(arguments);
-        else
-            search_partitioned_ibf<false>(arguments);
-    }
+        search_partitioned_ibf(arguments);
 
     return;
 }

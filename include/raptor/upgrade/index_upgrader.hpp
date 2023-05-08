@@ -29,7 +29,7 @@ public:
 
     index_upgrader() = default;
     index_upgrader(index_upgrader const &) = default;
-    index_upgrader(index_upgrader &&) = default;
+    index_upgrader(index_upgrader &&) = default; // GCOVR_EXCL_LINE
     index_upgrader & operator=(index_upgrader const &) = default;
     index_upgrader & operator=(index_upgrader &&) = default;
     ~index_upgrader() = default;

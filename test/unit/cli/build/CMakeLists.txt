@@ -9,6 +9,5 @@ cmake_minimum_required (VERSION 3.18)
 
 raptor_add_unit_test (build_hibf_chopper_test.cpp)
 raptor_add_unit_test (build_hibf_test.cpp)
-raptor_add_unit_test (build_ibf_compressed_test.cpp)
 raptor_add_unit_test (build_ibf_partitioned_test.cpp)
 raptor_add_unit_test (build_ibf_test.cpp)

@@ -148,47 +148,6 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
     compare_search(number_of_repeated_bins, number_of_errors, "search.out", is_empty::no, is_preprocessed::yes);
 }
 
-TEST_F(search_ibf_preprocessing, pipeline_compressed_index)
-{
-    { // generate input files
-        std::ofstream file{"raptor_cli_test.txt"};
-        std::ofstream file2{"raptor_cli_test.minimiser"};
-        for (auto && file_path : get_repeated_bins(16))
-        {
-            file << file_path << '\n';
-            file2 << seqan3::detail::to_string("precomputed_minimisers/",
-                                               std::filesystem::path{file_path}.stem().c_str(),
-                                               ".minimiser\n");
-        }
-        file << '\n';
-    }
-
-    cli_test_result const result1 = execute_app("raptor",
-                                                "prepare",
-                                                "--kmer 19",
-                                                "--window 23",
-                                                "--output precomputed_minimisers",
-                                                "--quiet",
-                                                "--input raptor_cli_test.txt");
-    EXPECT_EQ(result1.out, std::string{});
-    EXPECT_EQ(result1.err, std::string{});
-    RAPTOR_ASSERT_ZERO_EXIT(result1);
-
-    cli_test_result const result2 = execute_app("raptor",
-                                                "build",
-                                                "--output raptor.index",
-                                                "--compressed",
-                                                "--quiet",
-                                                "--input raptor_cli_test.minimiser");
-    EXPECT_EQ(result2.out, std::string{});
-    EXPECT_EQ(result2.err, std::string{});
-    RAPTOR_ASSERT_ZERO_EXIT(result2);
-
-    compare_index<raptor::index_structure::ibf_compressed>(ibf_path(16, 23, is_compressed::yes),
-                                                           "raptor.index",
-                                                           compare_extension::no);
-}
-
 INSTANTIATE_TEST_SUITE_P(search_ibf_preprocessing_suite,
                          search_ibf_preprocessing,
                          testing::Combine(testing::Values(0, 16, 32),

@@ -33,7 +33,7 @@ void do_parallel(algorithm_t && worker, size_t const num_records, size_t const t
     }
 
     for (auto && task : tasks)
-        task.wait();
+        task.get();
 }
 
 } // namespace raptor
