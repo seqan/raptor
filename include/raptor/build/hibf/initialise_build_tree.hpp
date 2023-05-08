@@ -14,12 +14,15 @@
 
 #include <iosfwd>
 
+#include <chopper/layout/layout.hpp>
+
 #include <raptor/build/hibf/node_data.hpp>
 
 namespace raptor::hibf
 {
 
-std::pair<size_t, std::vector<chopper::layout::layout::max_bin>>
-parse_chopper_pack_header(std::istream & chopper_pack_file);
+void update_header_node_data(std::vector<chopper::layout::layout::max_bin> & header_max_bins,
+                             lemon::ListDigraph & ibf_graph,
+                             lemon::ListDigraph::NodeMap<node_data> & node_map);
 
 } // namespace raptor::hibf

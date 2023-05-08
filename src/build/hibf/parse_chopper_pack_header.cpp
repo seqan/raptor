@@ -24,9 +24,8 @@
 namespace raptor::hibf
 {
 
-size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
-                                 lemon::ListDigraph::NodeMap<node_data> & node_map,
-                                 std::istream & chopper_pack_file)
+std::pair<size_t, std::vector<chopper::layout::layout::max_bin>>
+parse_chopper_pack_header(std::istream & chopper_pack_file)
 {
     auto parse_bin_indices = [](std::string_view const & buffer)
     {
@@ -67,9 +66,7 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
     // parse High Level max bin index
     assert(line.substr(chopper::prefix::high_level.size() + 2, 11) == "max_bin_id:");
     std::string_view const hibf_max_bin_str{line.begin() + 27, line.end()};
-
-    auto high_level_node = ibf_graph.addNode(); // high-level node = root node
-    node_map.set(high_level_node, {0, parse_first_bin(hibf_max_bin_str), 0, lemon::INVALID, {}});
+    size_t const hibf_max_bin = parse_first_bin(hibf_max_bin_str);
 
     std::vector<chopper::layout::layout::max_bin> header_max_bins{};
 
@@ -90,43 +87,7 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
         header_max_bins.emplace_back(parse_bin_indices(indices_str), parse_first_bin(max_id_str));
     }
 
-    // sort records ascending by the number of bin indices (corresponds to the IBF levels)
-    std::ranges::sort(header_max_bins,
-                      [](auto const & r, auto const & l)
-                      {
-                          return r.previous_TB_indices.size() < l.previous_TB_indices.size();
-                      });
-
-    for (auto const & [bin_indices, max_id] : header_max_bins)
-    {
-        // we assume that the header lines are in the correct order
-        // go down the tree until you find the matching parent
-        auto it = bin_indices.begin();
-        lemon::ListDigraph::Node current_node = high_level_node; // start at root
-
-        while (it != (bin_indices.end() - 1))
-        {
-            for (lemon::ListDigraph::OutArcIt arc_it(ibf_graph, current_node); arc_it != lemon::INVALID; ++arc_it)
-            {
-                auto target = ibf_graph.target(arc_it);
-                if (node_map[target].parent_bin_index == *it)
-                {
-                    current_node = target;
-                    break;
-                }
-            }
-            ++it;
-        }
-
-        auto new_node = ibf_graph.addNode();
-        ibf_graph.addArc(current_node, new_node);
-        node_map.set(new_node, {bin_indices.back(), max_id, 0, lemon::INVALID, {}});
-
-        if (node_map[current_node].max_bin_index == bin_indices.back())
-            node_map[current_node].favourite_child = new_node;
-    }
-
-    return header_max_bins.size();
+    return {hibf_max_bin, header_max_bins};
 }
 
 } // namespace raptor::hibf

@@ -12,6 +12,7 @@
 
 #include <lemon/list_graph.h> /// Must be first include.
 
+#include <raptor/build/hibf/initialise_build_tree.hpp>
 #include <raptor/build/hibf/parse_chopper_pack_header.hpp>
 #include <raptor/build/hibf/parse_chopper_pack_line.hpp>
 #include <raptor/build/hibf/read_chopper_pack_file.hpp>
@@ -28,7 +29,13 @@ void read_chopper_pack_file(build_data & data, std::string const & chopper_pack_
 
     // parse header
     // -------------------------------------------------------------------------
-    data.number_of_ibfs = parse_chopper_pack_header(data.ibf_graph, data.node_map, chopper_pack_file) + 1;
+    auto [top_level_max_bin_idx, header_max_bins] = parse_chopper_pack_header(chopper_pack_file);
+    data.number_of_ibfs = header_max_bins.size() + 1;
+    // Add high level node
+    auto high_level_node = data.ibf_graph.addNode(); // high-level node = root node
+    data.node_map.set(high_level_node, {0, top_level_max_bin_idx, 0, lemon::INVALID, {}});
+
+    update_header_node_data(header_max_bins, data.ibf_graph, data.node_map);
 
     // parse lines
     // -------------------------------------------------------------------------
