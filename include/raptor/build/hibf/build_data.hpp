@@ -54,25 +54,6 @@ struct build_data
         hibf.user_bins.set_user_bin_count(number_of_user_bins);
         hibf.next_ibf_id.resize(number_of_ibfs);
     }
-
-    /*!\brief Precompute f_h factors that adjust the split bin size to prevent FPR inflation due to multiple testing.
-     * \sa https://godbolt.org/z/zTj1v9W94
-     */
-    void compute_fp_correction(size_t const requested_max_tb, size_t const num_hash_functions, double const desired_fpr)
-    {
-        fp_correction.resize(requested_max_tb + 1, 0.0);
-        fp_correction[1] = 1.0;
-
-        // std::log1p(arg) = std::log(1 + arg). More precise than std::log(1 + arg) if arg is close to zero.
-        double const numerator = std::log1p(-std::exp(std::log(desired_fpr) / num_hash_functions));
-
-        for (size_t split = 2u; split <= requested_max_tb; ++split)
-        {
-            double const log_target_fpr = std::log1p(-std::exp(std::log1p(-desired_fpr) / split));
-            fp_correction[split] = numerator / std::log1p(-std::exp(log_target_fpr / num_hash_functions));
-            assert(fp_correction[split] >= 1.0);
-        }
-    }
 };
 
 } // namespace raptor::hibf
