@@ -12,6 +12,8 @@
 
 #include <lemon/list_graph.h> /// Must be first include.
 
+#include <chopper/layout/compute_fp_correction.hpp>
+
 #include <raptor/build/hibf/create_ibfs_from_chopper_pack.hpp>
 #include <raptor/build/hibf/hierarchical_build.hpp>
 #include <raptor/build/hibf/read_chopper_pack_file.hpp>
@@ -26,7 +28,7 @@ void create_ibfs_from_chopper_pack(build_data & data, build_arguments const & ar
     robin_hood::unordered_flat_set<size_t> root_kmers{};
 
     size_t const t_max{data.node_map[root].number_of_technical_bins};
-    data.compute_fp_correction(t_max, arguments.hash, arguments.fpr);
+    data.fp_correction = chopper::layout::compute_fp_correction(t_max, arguments.hash, arguments.fpr);
 
     hierarchical_build(root_kmers, root, data, arguments, true);
 }
