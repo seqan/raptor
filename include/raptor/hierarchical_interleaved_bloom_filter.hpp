@@ -133,20 +133,6 @@ public:
             return ibf_bin_to_filename_position[idx];
         }
 
-        /*!\brief Returns the filename of the `idx`th user bin.
-        * \param idx The id of the x-th user bin.
-        *
-        * \details
-        *
-        * ### Example
-        *
-        * \include test/snippet/hibf/filename_of_user_bin.cpp
-        */
-        std::string & filename_of_user_bin(size_t const idx)
-        {
-            return user_bin_filenames[idx];
-        }
-
         //!\brief Returns the filename index of the `ibf_idx`th IBF for bin `bin_idx`.
         int64_t filename_index(size_t const ibf_idx, size_t const bin_idx) const
         {
@@ -171,7 +157,6 @@ public:
     };
 
     /*!\brief Manages membership queries for the raptor::hierarchical_interleaved_bloom_filter.
-    * \see raptor::hierarchical_interleaved_bloom_filter::user_bins::filename_of_user_bin
     * \details
     * In contrast to the [seqan3::interleaved_bloom_filter][1], the result will consist of indices of user bins.
     */

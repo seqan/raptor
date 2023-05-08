@@ -17,22 +17,9 @@
 namespace raptor::hibf
 {
 
-void update_user_bins(build_data & data,
-                      std::vector<int64_t> & filename_indices,
-                      chopper::layout::layout::user_bin const & record)
+void update_user_bins(std::vector<int64_t> & filename_indices, chopper::layout::layout::user_bin const & record)
 {
-    size_t const idx = data.request_user_bin_idx();
-
-    std::string & user_bin_filenames = data.hibf.user_bins.filename_of_user_bin(idx);
-    for (auto const & filename : data.filenames[record.idx])
-    {
-        user_bin_filenames += filename;
-        user_bin_filenames += ';';
-    }
-    assert(!user_bin_filenames.empty());
-    user_bin_filenames.pop_back();
-
-    std::fill_n(filename_indices.begin() + record.storage_TB_id, record.number_of_technical_bins, idx);
+    std::fill_n(filename_indices.begin() + record.storage_TB_id, record.number_of_technical_bins, record.idx);
 }
 
 } // namespace raptor::hibf
