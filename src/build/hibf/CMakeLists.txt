@@ -13,6 +13,7 @@ if (NOT TARGET raptor_build_hibf)
                  parse_chopper_pack_header.cpp
                  parse_chopper_pack_line.cpp
                  read_chopper_pack_file.cpp
+                 update_content_node_data.cpp
                  update_header_node_data.cpp
                  update_parent_kmers.cpp
                  update_user_bins.cpp

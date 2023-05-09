@@ -15,6 +15,7 @@
 #include <raptor/build/hibf/parse_chopper_pack_header.hpp>
 #include <raptor/build/hibf/parse_chopper_pack_line.hpp>
 #include <raptor/build/hibf/read_chopper_pack_file.hpp>
+#include <raptor/build/hibf/update_content_node_data.hpp>
 #include <raptor/build/hibf/update_header_node_data.hpp>
 
 namespace raptor::hibf
@@ -37,59 +38,14 @@ void read_chopper_pack_file(build_data & data, std::string const & chopper_pack_
 
     update_header_node_data(header_max_bins, data.ibf_graph, data.node_map);
 
-    // parse lines
-    // -------------------------------------------------------------------------
+    std::vector<chopper::layout::layout::user_bin> layout_user_bins{};
     std::string current_line;
-    size_t user_bins{};
     while (std::getline(chopper_pack_file, current_line))
-    {
-        ++user_bins;
-        chopper::layout::layout::user_bin const && record = parse_chopper_pack_line(current_line, data.filenames);
+        layout_user_bins.push_back(parse_chopper_pack_line(current_line, data.filenames));
 
-        // go down the tree until you find the matching parent
-        lemon::ListDigraph::Node current_node = data.ibf_graph.nodeFromId(0); // start at root
+    update_content_node_data(layout_user_bins, data.ibf_graph, data.node_map);
 
-        for (size_t i = 0; i < record.previous_TB_indices.size(); ++i)
-        {
-            size_t const bin = record.previous_TB_indices[i];
-            size_t const num_tbs = 1;
-            auto & current_data = data.node_map[current_node];
-
-            // update number of technical bins in current_node-IBF
-            current_data.number_of_technical_bins = std::max(current_data.number_of_technical_bins, bin + num_tbs);
-
-#ifndef NDEBUG
-            bool found_next_node{false}; // sanity check
-#endif
-            for (lemon::ListDigraph::OutArcIt arc_it(data.ibf_graph, current_node); arc_it != lemon::INVALID; ++arc_it)
-            {
-                auto target = data.ibf_graph.target(arc_it);
-                if (data.node_map[target].parent_bin_index == bin)
-                {
-                    current_node = target;
-#ifndef NDEBUG
-                    found_next_node = true;
-#endif
-                    break;
-                }
-            }
-            assert(found_next_node);
-        }
-
-        size_t const bin = record.storage_TB_id;
-        size_t const num_tbs = record.number_of_technical_bins;
-        auto & current_data = data.node_map[current_node];
-
-        // update number of technical bins in current_node-IBF
-        current_data.number_of_technical_bins = std::max(current_data.number_of_technical_bins, bin + num_tbs);
-
-        if (record.storage_TB_id == current_data.max_bin_index)
-            current_data.remaining_records.insert(current_data.remaining_records.begin(), record);
-        else
-            current_data.remaining_records.push_back(record);
-    }
-
-    data.number_of_user_bins = user_bins;
+    data.number_of_user_bins = layout_user_bins.size();
     data.resize();
 }
 
