@@ -14,7 +14,7 @@
 
 #include <iosfwd>
 
-#include <raptor/build/hibf/node_data.hpp>
+#include <chopper/layout/layout.hpp>
 
 namespace raptor::hibf
 {

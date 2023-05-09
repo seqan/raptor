@@ -12,10 +12,10 @@
 
 #include <lemon/list_graph.h> /// Must be first include.
 
-#include <raptor/build/hibf/initialise_build_tree.hpp>
 #include <raptor/build/hibf/parse_chopper_pack_header.hpp>
 #include <raptor/build/hibf/parse_chopper_pack_line.hpp>
 #include <raptor/build/hibf/read_chopper_pack_file.hpp>
+#include <raptor/build/hibf/update_header_node_data.hpp>
 
 namespace raptor::hibf
 {

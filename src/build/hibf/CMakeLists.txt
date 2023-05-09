@@ -8,12 +8,12 @@ if (NOT TARGET raptor_build_hibf)
                  construct_ibf.cpp
                  create_ibfs_from_chopper_pack.cpp
                  hierarchical_build.cpp
-                 initialise_build_tree.cpp
                  insert_into_ibf.cpp
                  loop_over_children.cpp
                  parse_chopper_pack_header.cpp
                  parse_chopper_pack_line.cpp
                  read_chopper_pack_file.cpp
+                 update_header_node_data.cpp
                  update_parent_kmers.cpp
                  update_user_bins.cpp
     )

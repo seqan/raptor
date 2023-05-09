@@ -6,13 +6,11 @@
 // --------------------------------------------------------------------------------------------------
 
 /*!\file
- * \brief Provides raptor::hibf::parse_chopper_pack_header.
- * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
+ * \brief Provides raptor::hibf::update_header_node_data.
+ * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  */
 
 #pragma once
-
-#include <iosfwd>
 
 #include <chopper/layout/layout.hpp>
 
