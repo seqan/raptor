@@ -85,9 +85,9 @@ IncludeCategories:
   - Regex:           '<robin_hood'
     Priority:        6
   - Regex:           '(<[[:alnum:]._]+>|<seqan3/std/.*>)'
-    Priority:        2
-  - Regex:           '<lemon/'
     Priority:        3
+  - Regex:           '<lemon/'
+    Priority:        2
   - Regex:           '<cereal/'
     Priority:        4
   - Regex:           '<sdsl/'
