@@ -33,21 +33,21 @@ void update_header_node_data(std::vector<chopper::layout::layout::max_bin> & hea
     {
         // we assume that the header lines are in the correct order
         // go down the tree until you find the matching parent
-        auto it = bin_indices.begin();
         lemon::ListDigraph::Node current_node = ibf_graph.nodeFromId(0); // start at root
 
-        while (it != (bin_indices.end() - 1))
+        assert(!bin_indices.empty());
+        auto bin_indices_sentinel = std::ranges::prev(bin_indices.end());
+        for (auto it = bin_indices.begin(); it != bin_indices_sentinel; ++it)
         {
             for (lemon::ListDigraph::OutArcIt arc_it(ibf_graph, current_node); arc_it != lemon::INVALID; ++arc_it)
             {
                 auto target = ibf_graph.target(arc_it);
                 if (node_map[target].parent_bin_index == *it)
                 {
-                    current_node = target;
+                    current_node = std::move(target);
                     break;
                 }
             }
-            ++it;
         }
 
         auto new_node = ibf_graph.addNode();
@@ -55,7 +55,7 @@ void update_header_node_data(std::vector<chopper::layout::layout::max_bin> & hea
         node_map.set(new_node, {bin_indices.back(), max_id, 0, lemon::INVALID, {}});
 
         if (node_map[current_node].max_bin_index == bin_indices.back())
-            node_map[current_node].favourite_child = new_node;
+            node_map[current_node].favourite_child = std::move(new_node);
     }
 }
 
