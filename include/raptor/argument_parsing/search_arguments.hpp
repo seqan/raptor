@@ -44,7 +44,6 @@ struct search_arguments
 
     // Related to IBF
     std::filesystem::path index_file{};
-    bool compressed{false};
 
     // General arguments
     std::vector<std::vector<std::string>> bin_path{};

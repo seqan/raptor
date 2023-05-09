@@ -9,12 +9,12 @@
 
 struct build_ibf_partitioned :
     public raptor_base,
-    public testing::WithParamInterface<std::tuple<size_t, size_t, size_t, size_t, bool>>
+    public testing::WithParamInterface<std::tuple<size_t, size_t, size_t, size_t>>
 {};
 
 TEST_P(build_ibf_partitioned, pipeline)
 {
-    auto const [number_of_repeated_bins, window_size, number_of_errors, parts, compressed] = GetParam();
+    auto const [number_of_repeated_bins, window_size, number_of_errors, parts] = GetParam();
 
     std::stringstream header{};
     { // generate input file
@@ -35,7 +35,7 @@ TEST_P(build_ibf_partitioned, pipeline)
                                                 "--window ",
                                                 std::to_string(window_size),
                                                 "--output raptor.index",
-                                                compressed ? "--compressed" : "--threads 1",
+                                                "--threads 2",
                                                 "--parts ",
                                                 std::to_string(parts),
                                                 "--quiet",
@@ -137,19 +137,15 @@ TEST_F(build_ibf_partitioned, pipeline_misc)
     compare_search(16, 1, "search2.out", is_empty::yes);
 }
 
-INSTANTIATE_TEST_SUITE_P(build_ibf_partitioned_suite,
-                         build_ibf_partitioned,
-                         testing::Combine(testing::Values(32),
-                                          testing::Values(19, 23),
-                                          testing::Values(0, 1),
-                                          testing::Values(2, 4, 8),
-                                          testing::Values(true, false)),
-                         [](testing::TestParamInfo<build_ibf_partitioned::ParamType> const & info)
-                         {
-                             std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_"
-                                              + std::to_string(std::get<1>(info.param)) + "_window_"
-                                              + std::to_string(std::get<2>(info.param)) + "_error"
-                                              + std::to_string(std::get<3>(info.param)) + "_parts"
-                                              + (std::get<4>(info.param) ? "compressed" : "uncompressed");
-                             return name;
-                         });
+INSTANTIATE_TEST_SUITE_P(
+    build_ibf_partitioned_suite,
+    build_ibf_partitioned,
+    testing::Combine(testing::Values(32), testing::Values(19, 23), testing::Values(0, 1), testing::Values(2, 4, 8)),
+    [](testing::TestParamInfo<build_ibf_partitioned::ParamType> const & info)
+    {
+        std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_"
+                         + std::to_string(std::get<1>(info.param)) + "_window_"
+                         + std::to_string(std::get<2>(info.param)) + "_error" + std::to_string(std::get<3>(info.param))
+                         + "_parts";
+        return name;
+    });

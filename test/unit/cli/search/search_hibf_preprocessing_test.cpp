@@ -70,10 +70,9 @@ TEST_P(search_hibf_preprocessing, pipeline)
     EXPECT_EQ(result2.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result2);
 
-    compare_index<raptor::index_structure::hibf>(
-        ibf_path(number_of_repeated_bins, window_size, is_compressed::no, is_hibf::yes),
-        "raptor.index",
-        compare_extension::no);
+    compare_index<raptor::index_structure::hibf>(ibf_path(number_of_repeated_bins, window_size, is_hibf::yes),
+                                                 "raptor.index",
+                                                 compare_extension::no);
 
     cli_test_result const result3 = execute_app("raptor",
                                                 "search",
@@ -193,10 +192,9 @@ TEST_F(search_hibf_preprocessing, pipeline_with_continuation)
     EXPECT_EQ(result2.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result2);
 
-    compare_index<raptor::index_structure::hibf>(
-        ibf_path(number_of_repeated_bins, window_size, is_compressed::no, is_hibf::yes),
-        "raptor.index",
-        compare_extension::no);
+    compare_index<raptor::index_structure::hibf>(ibf_path(number_of_repeated_bins, window_size, is_hibf::yes),
+                                                 "raptor.index",
+                                                 compare_extension::no);
 
     cli_test_result const result3 = execute_app("raptor",
                                                 "search",

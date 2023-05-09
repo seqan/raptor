@@ -14,18 +14,17 @@ TEST_P(search_hibf, with_error)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
-    cli_test_result const result =
-        execute_app("raptor",
-                    "search",
-                    "--output search.out",
-                    "--error ",
-                    std::to_string(number_of_errors),
-                    "--p_max 0.4",
-                    "--index ",
-                    ibf_path(number_of_repeated_bins, window_size, is_compressed::no, is_hibf::yes),
-                    "--quiet",
-                    "--query ",
-                    data("query.fq"));
+    cli_test_result const result = execute_app("raptor",
+                                               "search",
+                                               "--output search.out",
+                                               "--error ",
+                                               std::to_string(number_of_errors),
+                                               "--p_max 0.4",
+                                               "--index ",
+                                               ibf_path(number_of_repeated_bins, window_size, is_hibf::yes),
+                                               "--quiet",
+                                               "--query ",
+                                               data("query.fq"));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
@@ -37,16 +36,15 @@ TEST_P(search_hibf, with_threshold)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
-    cli_test_result const result =
-        execute_app("raptor",
-                    "search",
-                    "--output search.out",
-                    "--threshold 0.50",
-                    "--index ",
-                    ibf_path(number_of_repeated_bins, window_size, is_compressed::no, is_hibf::yes),
-                    "--quiet",
-                    "--query ",
-                    data("query.fq"));
+    cli_test_result const result = execute_app("raptor",
+                                               "search",
+                                               "--output search.out",
+                                               "--threshold 0.50",
+                                               "--index ",
+                                               ibf_path(number_of_repeated_bins, window_size, is_hibf::yes),
+                                               "--quiet",
+                                               "--query ",
+                                               data("query.fq"));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
@@ -58,18 +56,17 @@ TEST_P(search_hibf, no_hits)
 {
     auto const [number_of_repeated_bins, window_size, number_of_errors] = GetParam();
 
-    cli_test_result const result =
-        execute_app("raptor",
-                    "search",
-                    "--output search.out",
-                    "--error ",
-                    std::to_string(number_of_errors),
-                    "--tau 0.99",
-                    "--index ",
-                    ibf_path(number_of_repeated_bins, window_size, is_compressed::no, is_hibf::yes),
-                    "--quiet",
-                    "--query ",
-                    data("query_empty.fq"));
+    cli_test_result const result = execute_app("raptor",
+                                               "search",
+                                               "--output search.out",
+                                               "--error ",
+                                               std::to_string(number_of_errors),
+                                               "--tau 0.99",
+                                               "--index ",
+                                               ibf_path(number_of_repeated_bins, window_size, is_hibf::yes),
+                                               "--quiet",
+                                               "--query ",
+                                               data("query_empty.fq"));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);

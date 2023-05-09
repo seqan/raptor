@@ -27,14 +27,13 @@ namespace raptor
 template <typename index_t>
 void search_singular_ibf(search_arguments const & arguments, index_t && index)
 {
-    constexpr bool is_ibf = std::same_as<index_t, raptor_index<index_structure::ibf>>
-                         || std::same_as<index_t, raptor_index<index_structure::ibf_compressed>>;
+    constexpr bool is_ibf = std::same_as<index_t, raptor_index<index_structure::ibf>>;
 
-    auto cereal_worker = [&]()
-    {
-        load_index(index, arguments);
-    };
-    auto cereal_handle = std::async(std::launch::async, cereal_worker);
+    auto cereal_future = std::async(std::launch::async,
+                                    [&]()
+                                    {
+                                        load_index(index, arguments);
+                                    });
 
     seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::id, seqan3::field::seq>> fin{
         arguments.query_file};
@@ -138,7 +137,7 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
         std::ranges::move(chunked_records, std::back_inserter(records));
         arguments.query_file_io_timer.stop();
 
-        cereal_handle.wait();
+        cereal_future.get();
         [[maybe_unused]] static bool header_written = write_header(); // called exactly once
 
         do_parallel(worker, records.size(), arguments.threads);

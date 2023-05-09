@@ -156,7 +156,7 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
     parser.info.examples.emplace_back("raptor build --input raptor.layout --fpr 0.05 --output raptor.index");
     parser.info.synopsis.emplace_back("raptor build --input <file> --output <file> [--threads <number>] [--quiet] "
                                       "[--kmer <number>|--shape <01-pattern>] [--window <number>] [--fpr <number>] "
-                                      "[--hash <number>] [--parts <number>] [--compressed]");
+                                      "[--hash <number>] [--parts <number>]");
 
     parser.add_subsection("General options");
     parser.add_option(
@@ -223,10 +223,6 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
                                     .long_id = "parts",
                                     .description = "Splits the index in this many parts. Not available for the HIBF.",
                                     .validator = power_of_two_validator{}});
-    parser.add_flag(arguments.compressed,
-                    sharg::config{.short_id = '\0',
-                                  .long_id = "compressed",
-                                  .description = "Build a compressed index. Not available for the HIBF."});
 
     // GCOVR_EXCL_START
     // Adding additional cwl information that currently aren't supported by sharg and tdl.
@@ -309,9 +305,6 @@ void build_parsing(sharg::parser & parser)
 
     if (arguments.is_hibf && arguments.parts != 1u)
         throw sharg::parser_error{"The HIBF cannot yet be partitioned."};
-
-    if (arguments.is_hibf && arguments.compressed)
-        throw sharg::parser_error{"The HIBF cannot be compressed."};
 
     parse_bin_path(arguments);
 

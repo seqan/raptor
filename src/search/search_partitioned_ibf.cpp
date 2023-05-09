@@ -24,22 +24,15 @@
 namespace raptor
 {
 
-template <bool compressed>
 void search_partitioned_ibf(search_arguments const & arguments)
 {
-    using index_structure_t = std::conditional_t<compressed, index_structure::ibf_compressed, index_structure::ibf>;
-    auto index = raptor_index<index_structure_t>{};
+    auto index = raptor_index<index_structure::ibf>{};
     partition_config const cfg{arguments.parts};
 
     seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::id, seqan3::field::seq>> fin{
         arguments.query_file};
     using record_type = typename decltype(fin)::record_type;
     std::vector<record_type> records{};
-
-    auto cereal_worker = [&]()
-    {
-        load_index(index, arguments, 0);
-    };
 
     sync_out synced_out{arguments};
 
@@ -52,14 +45,18 @@ void search_partitioned_ibf(search_arguments const & arguments)
 
     for (auto && chunked_records : fin | seqan3::views::chunk((1ULL << 20) * 10))
     {
-        auto cereal_handle = std::async(std::launch::async, cereal_worker);
+        auto cereal_future = std::async(std::launch::async,
+                                        [&]() // GCOVR_EXCL_LINE
+                                        {
+                                            load_index(index, arguments, 0);
+                                        });
 
         records.clear();
         arguments.query_file_io_timer.start();
         std::ranges::move(chunked_records, std::back_inserter(records));
         arguments.query_file_io_timer.stop();
 
-        cereal_handle.wait();
+        cereal_future.get();
         [[maybe_unused]] static bool header_written = write_header(); // called exactly once
 
         std::vector<seqan3::counting_vector<uint16_t>> counts(
@@ -189,9 +186,5 @@ void search_partitioned_ibf(search_arguments const & arguments)
         do_parallel(output_task, records.size(), arguments.threads);
     }
 }
-
-template void search_partitioned_ibf<false>(search_arguments const & arguments);
-
-template void search_partitioned_ibf<true>(search_arguments const & arguments);
 
 } // namespace raptor

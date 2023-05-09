@@ -209,7 +209,6 @@ void search_parsing(sharg::parser & parser)
         arguments.shape_weight = arguments.shape.count();
         arguments.window_size = tmp.window_size();
         arguments.parts = tmp.parts();
-        arguments.compressed = tmp.compressed();
         arguments.bin_path = tmp.bin_path();
         arguments.fpr = tmp.fpr();
         arguments.is_hibf = tmp.is_hibf();
