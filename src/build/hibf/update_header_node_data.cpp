@@ -18,7 +18,7 @@
 namespace raptor::hibf
 {
 
-void update_header_node_data(std::vector<chopper::layout::layout::max_bin> & header_max_bins,
+void update_header_node_data(std::vector<chopper::layout::layout::max_bin> && header_max_bins,
                              lemon::ListDigraph & ibf_graph,
                              lemon::ListDigraph::NodeMap<node_data> & node_map)
 {
