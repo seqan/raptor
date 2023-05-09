@@ -12,9 +12,9 @@
 
 #pragma once
 
-#include <vector>
-
 #include <lemon/list_graph.h>
+
+#include <vector>
 
 #include <chopper/layout/layout.hpp>
 

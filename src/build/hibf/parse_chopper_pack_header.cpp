@@ -10,11 +10,11 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
+#include <lemon/list_graph.h> /// Must be first include.
+
 #include <algorithm>
 #include <cassert>
 #include <seqan3/std/charconv>
-
-#include <lemon/list_graph.h> /// Must be first include.
 
 #include <chopper/layout/layout.hpp>
 #include <chopper/prefixes.hpp>
