@@ -19,7 +19,7 @@
 namespace raptor::hibf
 {
 
-void update_content_node_data(std::vector<chopper::layout::layout::user_bin> & layout_user_bins,
+void update_content_node_data(std::vector<chopper::layout::layout::user_bin> && layout_user_bins,
                               lemon::ListDigraph & ibf_graph,
                               lemon::ListDigraph::NodeMap<node_data> & node_map);
 

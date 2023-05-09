@@ -36,16 +36,16 @@ void read_chopper_pack_file(build_data & data, std::string const & chopper_pack_
     auto high_level_node = data.ibf_graph.addNode(); // high-level node = root node
     data.node_map.set(high_level_node, {0, top_level_max_bin_idx, 0, lemon::INVALID, {}});
 
-    update_header_node_data(header_max_bins, data.ibf_graph, data.node_map);
+    update_header_node_data(std::move(header_max_bins), data.ibf_graph, data.node_map);
 
     std::vector<chopper::layout::layout::user_bin> layout_user_bins{};
     std::string current_line;
     while (std::getline(chopper_pack_file, current_line))
-        layout_user_bins.push_back(parse_chopper_pack_line(current_line, data.filenames));
-
-    update_content_node_data(layout_user_bins, data.ibf_graph, data.node_map);
+        layout_user_bins.emplace_back(parse_chopper_pack_line(current_line, data.filenames));
 
     data.number_of_user_bins = layout_user_bins.size();
+    update_content_node_data(std::move(layout_user_bins), data.ibf_graph, data.node_map);
+
     data.resize();
 }
 

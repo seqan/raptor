@@ -17,7 +17,7 @@
 namespace raptor::hibf
 {
 
-void update_content_node_data(std::vector<chopper::layout::layout::user_bin> & layout_user_bins,
+void update_content_node_data(std::vector<chopper::layout::layout::user_bin> && layout_user_bins,
                               lemon::ListDigraph & ibf_graph,
                               lemon::ListDigraph::NodeMap<node_data> & node_map)
 {
@@ -25,7 +25,7 @@ void update_content_node_data(std::vector<chopper::layout::layout::user_bin> & l
     // -------------------------------------------------------------------------
     for (size_t user_bin = 0; user_bin < layout_user_bins.size(); ++user_bin)
     {
-        auto const & record = layout_user_bins[user_bin];
+        auto & record = layout_user_bins[user_bin]; // Not const because std::move(const&) will copy, not move
 
         // go down the tree until you find the matching parent
         lemon::ListDigraph::Node current_node = ibf_graph.nodeFromId(0); // start at root
@@ -65,9 +65,9 @@ void update_content_node_data(std::vector<chopper::layout::layout::user_bin> & l
         current_data.number_of_technical_bins = std::max(current_data.number_of_technical_bins, bin + num_tbs);
 
         if (record.storage_TB_id == current_data.max_bin_index)
-            current_data.remaining_records.insert(current_data.remaining_records.begin(), record);
+            current_data.remaining_records.insert(current_data.remaining_records.begin(), std::move(record));
         else
-            current_data.remaining_records.push_back(record);
+            current_data.remaining_records.emplace_back(std::move(record));
     }
 }
 
