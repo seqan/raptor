@@ -13,7 +13,6 @@
 #pragma once
 
 #include <atomic>
-#include <seqan3/std/new>
 
 #include <raptor/build/hibf/node_data.hpp>
 #include <raptor/hierarchical_interleaved_bloom_filter.hpp>
@@ -23,8 +22,7 @@ namespace raptor::hibf
 
 struct build_data
 {
-    alignas(std::hardware_destructive_interference_size) std::atomic<size_t> ibf_number{};
-    alignas(std::hardware_destructive_interference_size) std::atomic<size_t> user_bin_number{};
+    std::atomic<size_t> ibf_number{};
 
     size_t number_of_user_bins{};
     size_t number_of_ibfs{};
@@ -40,11 +38,6 @@ struct build_data
     size_t request_ibf_idx()
     {
         return std::atomic_fetch_add(&ibf_number, 1u);
-    }
-
-    size_t request_user_bin_idx()
-    {
-        return std::atomic_fetch_add(&user_bin_number, 1u);
     }
 
     void resize()

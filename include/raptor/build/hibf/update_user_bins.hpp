@@ -19,8 +19,6 @@
 namespace raptor::hibf
 {
 
-void update_user_bins(build_data & data,
-                      std::vector<int64_t> & filename_indices,
-                      chopper::layout::layout::user_bin const & record);
+void update_user_bins(std::vector<int64_t> & filename_indices, chopper::layout::layout::user_bin const & record);
 
 } // namespace raptor::hibf

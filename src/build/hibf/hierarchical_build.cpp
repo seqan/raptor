@@ -58,7 +58,7 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
             // we assume that the max record is at the beginning of the list of remaining records.
             auto const & record = node_data.remaining_records[0];
             compute_kmers(kmers, arguments, data, record);
-            update_user_bins(data, filename_indices, record);
+            update_user_bins(filename_indices, record);
 
             return record.number_of_technical_bins;
         }
@@ -95,7 +95,7 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                 update_parent_kmers(parent_kmers, kmers, arguments.merge_kmers_timer);
         }
 
-        update_user_bins(data, filename_indices, record);
+        update_user_bins(filename_indices, record);
         kmers.clear();
     }
 
