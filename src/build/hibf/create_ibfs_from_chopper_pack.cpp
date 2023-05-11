@@ -26,9 +26,12 @@ void create_ibfs_from_chopper_pack(build_data & data, build_arguments const & ar
 {
     chopper::layout::layout hibf_layout = read_chopper_pack_file(data.filenames, arguments.bin_file);
 
-    data.number_of_user_bins = hibf_layout.user_bins.size();
-    data.number_of_ibfs = hibf_layout.max_bins.size() + 1;
-    data.resize();
+    size_t const number_of_ibfs = hibf_layout.max_bins.size() + 1;
+
+    data.hibf.ibf_vector.resize(number_of_ibfs);
+    data.hibf.user_bins.set_ibf_count(number_of_ibfs);
+    data.hibf.user_bins.set_user_bin_count(hibf_layout.user_bins.size());
+    data.hibf.next_ibf_id.resize(number_of_ibfs);
 
     initialise_build_tree(hibf_layout, data.ibf_graph, data.node_map);
 
