@@ -22,9 +22,9 @@ namespace raptor::hibf
 
 void chopper_build(build_arguments const & arguments)
 {
-    build_data data{};
+    build_data data{.arguments = arguments};
 
-    create_ibfs_from_chopper_pack(data, arguments);
+    create_ibfs_from_chopper_pack(data);
 
     arguments.index_allocation_timer.start();
     raptor_index<hierarchical_interleaved_bloom_filter> index{window{arguments.window_size},

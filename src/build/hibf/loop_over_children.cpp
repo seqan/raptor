@@ -27,7 +27,6 @@ void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                         std::vector<int64_t> & ibf_positions,
                         lemon::ListDigraph::Node const & current_node,
                         build_data & data,
-                        build_arguments const & arguments,
                         bool is_root)
 {
     auto & current_node_data = data.node_map[current_node];
@@ -49,15 +48,15 @@ void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
         if (child != current_node_data.favourite_child)
         {
             robin_hood::unordered_flat_set<size_t> kmers{};
-            size_t const ibf_pos = hierarchical_build(kmers, child, data, arguments, false);
+            size_t const ibf_pos = hierarchical_build(kmers, child, data, false);
             auto parent_bin_index = data.node_map[child].parent_bin_index;
             {
                 size_t const mutex_id{parent_bin_index / 64};
                 std::lock_guard<std::mutex> guard{local_ibf_mutex[mutex_id]};
                 ibf_positions[parent_bin_index] = ibf_pos;
-                insert_into_ibf(kmers, 1, parent_bin_index, ibf, arguments.fill_ibf_timer);
+                insert_into_ibf(kmers, 1, parent_bin_index, ibf, data.arguments.fill_ibf_timer);
                 if (!is_root)
-                    update_parent_kmers(parent_kmers, kmers, arguments.merge_kmers_timer);
+                    update_parent_kmers(parent_kmers, kmers, data.arguments.merge_kmers_timer);
             }
         }
     };
@@ -70,7 +69,7 @@ void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
     {
         // Shuffle indices: More likely to not block each other. Optimal: Interleave
         std::shuffle(indices.begin(), indices.end(), std::mt19937_64{std::random_device{}()});
-        number_of_threads = arguments.threads;
+        number_of_threads = data.arguments.threads;
     }
     else
     {

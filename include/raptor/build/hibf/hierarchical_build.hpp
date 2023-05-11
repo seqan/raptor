@@ -14,7 +14,6 @@
 
 #include <robin_hood.h>
 
-#include <raptor/argument_parsing/build_arguments.hpp>
 #include <raptor/build/hibf/build_data.hpp>
 
 namespace raptor::hibf
@@ -23,7 +22,6 @@ namespace raptor::hibf
 size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                           lemon::ListDigraph::Node const & current_node,
                           build_data & data,
-                          build_arguments const & arguments,
                           bool is_root);
 
 } // namespace raptor::hibf
