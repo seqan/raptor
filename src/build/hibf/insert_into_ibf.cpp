@@ -13,8 +13,8 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <raptor/adjust_seed.hpp>
-#include <raptor/build/hibf/insert_into_ibf.hpp>
 #include <raptor/build/hibf/compute_kmers.hpp>
+#include <raptor/build/hibf/insert_into_ibf.hpp>
 #include <raptor/file_reader.hpp>
 
 namespace raptor::hibf
