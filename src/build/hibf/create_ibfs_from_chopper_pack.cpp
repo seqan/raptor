@@ -16,6 +16,7 @@
 
 #include <raptor/build/hibf/create_ibfs_from_chopper_pack.hpp>
 #include <raptor/build/hibf/hierarchical_build.hpp>
+#include <raptor/build/hibf/initialise_build_tree.hpp>
 #include <raptor/build/hibf/read_chopper_pack_file.hpp>
 
 namespace raptor::hibf
@@ -23,7 +24,17 @@ namespace raptor::hibf
 
 void create_ibfs_from_chopper_pack(build_data & data, build_arguments const & arguments)
 {
-    read_chopper_pack_file(data, arguments.bin_file);
+    chopper::layout::layout hibf_layout = read_chopper_pack_file(data.filenames, arguments.bin_file);
+
+    size_t const number_of_ibfs = hibf_layout.max_bins.size() + 1;
+
+    data.hibf.ibf_vector.resize(number_of_ibfs);
+    data.hibf.user_bins.set_ibf_count(number_of_ibfs);
+    data.hibf.user_bins.set_user_bin_count(hibf_layout.user_bins.size());
+    data.hibf.next_ibf_id.resize(number_of_ibfs);
+
+    initialise_build_tree(hibf_layout, data.ibf_graph, data.node_map);
+
     lemon::ListDigraph::Node root = data.ibf_graph.nodeFromId(0); // root node = high level IBF node
     robin_hood::unordered_flat_set<size_t> root_kmers{};
 

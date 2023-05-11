@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <lemon/list_graph.h> /// Must be first include.
+
 #include <atomic>
 
 #include <raptor/build/hibf/node_data.hpp>
@@ -24,9 +26,6 @@ struct build_data
 {
     std::atomic<size_t> ibf_number{};
 
-    size_t number_of_user_bins{};
-    size_t number_of_ibfs{};
-
     std::vector<std::vector<std::string>> filenames{};
 
     lemon::ListDigraph ibf_graph{};
@@ -38,14 +37,6 @@ struct build_data
     size_t request_ibf_idx()
     {
         return std::atomic_fetch_add(&ibf_number, 1u);
-    }
-
-    void resize()
-    {
-        hibf.ibf_vector.resize(number_of_ibfs);
-        hibf.user_bins.set_ibf_count(number_of_ibfs);
-        hibf.user_bins.set_user_bin_count(number_of_user_bins);
-        hibf.next_ibf_id.resize(number_of_ibfs);
     }
 };
 
