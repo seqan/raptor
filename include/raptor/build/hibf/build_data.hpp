@@ -43,4 +43,6 @@ struct build_data
     }
 };
 
+void test_inserter(build_data const &, size_t const user_bin_number, std::vector<uint64_t> &);
+
 } // namespace raptor::hibf

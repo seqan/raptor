@@ -52,16 +52,7 @@ void insert_into_ibf(build_data const & data,
 
     timer<concurrent::no> local_user_bin_io_timer{};
     local_user_bin_io_timer.start();
-    if (data.arguments.input_is_minimiser)
-    {
-        file_reader<file_types::minimiser> const reader{};
-        reader.hash_into(data.filenames[record.idx], std::back_inserter(values));
-    }
-    else
-    {
-        file_reader<file_types::sequence> const reader{data.arguments.shape, data.arguments.window_size};
-        reader.hash_into(data.filenames[record.idx], std::back_inserter(values));
-    }
+    raptor::hibf::test_inserter(data, record.idx, values);
     local_user_bin_io_timer.stop();
     data.arguments.user_bin_io_timer += local_user_bin_io_timer;
 
