@@ -42,13 +42,12 @@ void read_chopper_pack_file(build_data & data, std::string const & chopper_pack_
 
     update_header_node_data(std::move(hibf_layout.max_bins), data.ibf_graph, data.node_map);
 
-    std::vector<chopper::layout::layout::user_bin> layout_user_bins{};
     std::string current_line;
     while (std::getline(chopper_pack_file, current_line))
-        layout_user_bins.emplace_back(parse_chopper_pack_line(current_line, data.filenames));
+        hibf_layout.user_bins.emplace_back(parse_chopper_pack_line(current_line, data.filenames));
 
-    data.number_of_user_bins = layout_user_bins.size();
-    update_content_node_data(std::move(layout_user_bins), data.ibf_graph, data.node_map);
+    data.number_of_user_bins = hibf_layout.user_bins.size();
+    update_content_node_data(std::move(hibf_layout.user_bins), data.ibf_graph, data.node_map);
 
     data.resize();
 }
