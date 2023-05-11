@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <lemon/list_graph.h> /// Must be first include.
+
 #include <atomic>
 
 #include <raptor/build/hibf/node_data.hpp>

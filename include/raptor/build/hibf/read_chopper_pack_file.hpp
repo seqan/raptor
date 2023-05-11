@@ -13,14 +13,14 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include <chopper/layout/layout.hpp>
-
-#include <raptor/build/hibf/build_data.hpp>
 
 namespace raptor::hibf
 {
 
-chopper::layout::layout read_chopper_pack_file(build_data & data, std::string const & chopper_pack_filename);
+chopper::layout::layout read_chopper_pack_file(std::vector<std::vector<std::string>> & filenames,
+                                               std::string const & chopper_pack_filename);
 
 } // namespace raptor::hibf

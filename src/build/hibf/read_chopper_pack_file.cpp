@@ -10,7 +10,7 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <lemon/list_graph.h> /// Must be first include.
+#include <fstream>
 
 #include <raptor/build/hibf/parse_chopper_pack_header.hpp>
 #include <raptor/build/hibf/parse_chopper_pack_line.hpp>
@@ -19,7 +19,8 @@
 namespace raptor::hibf
 {
 
-chopper::layout::layout read_chopper_pack_file(build_data & data, std::string const & chopper_pack_filename)
+chopper::layout::layout read_chopper_pack_file(std::vector<std::vector<std::string>> & filenames,
+                                               std::string const & chopper_pack_filename)
 {
     chopper::layout::layout hibf_layout{};
 
@@ -34,11 +35,7 @@ chopper::layout::layout read_chopper_pack_file(build_data & data, std::string co
 
     std::string current_line;
     while (std::getline(chopper_pack_file, current_line))
-        hibf_layout.user_bins.emplace_back(parse_chopper_pack_line(current_line, data.filenames));
-
-    data.number_of_user_bins = hibf_layout.user_bins.size();
-    data.number_of_ibfs = hibf_layout.max_bins.size() + 1;
-    data.resize();
+        hibf_layout.user_bins.emplace_back(parse_chopper_pack_line(current_line, filenames));
 
     return hibf_layout;
 }
