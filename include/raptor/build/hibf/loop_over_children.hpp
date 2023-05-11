@@ -14,7 +14,6 @@
 
 #include <robin_hood.h>
 
-
 #include <raptor/build/hibf/build_data.hpp>
 
 namespace raptor::hibf

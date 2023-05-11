@@ -47,8 +47,7 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
         if (node_data.favourite_child != lemon::INVALID) // max bin is a merged bin
         {
             // recursively initialize favourite child first
-            ibf_positions[node_data.max_bin_index] =
-                hierarchical_build(kmers, node_data.favourite_child, data, false);
+            ibf_positions[node_data.max_bin_index] = hierarchical_build(kmers, node_data.favourite_child, data, false);
             return 1;
         }
         else // max bin is not a merged bin
@@ -63,8 +62,7 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
     };
 
     // initialize lower level IBF
-    size_t const max_bin_tbs =
-        initialise_max_bin_kmers(kmers, ibf_positions, filename_indices, current_node, data);
+    size_t const max_bin_tbs = initialise_max_bin_kmers(kmers, ibf_positions, filename_indices, current_node, data);
     auto && ibf = construct_ibf(parent_kmers, kmers, max_bin_tbs, current_node, data, is_root);
     kmers.clear(); // reduce memory peak
 
