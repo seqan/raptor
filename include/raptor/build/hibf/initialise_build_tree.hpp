@@ -6,21 +6,21 @@
 // --------------------------------------------------------------------------------------------------
 
 /*!\file
- * \brief Provides raptor::hibf::read_chopper_pack_file.
- * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
+ * \brief Provides raptor::hibf::initialise_build_tree.
+ * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  */
 
 #pragma once
 
-#include <string>
-
 #include <chopper/layout/layout.hpp>
 
-#include <raptor/build/hibf/build_data.hpp>
+#include <raptor/build/hibf/node_data.hpp>
 
 namespace raptor::hibf
 {
 
-chopper::layout::layout read_chopper_pack_file(build_data & data, std::string const & chopper_pack_filename);
+void initialise_build_tree(chopper::layout::layout & hibf_layout,
+                           lemon::ListDigraph & ibf_graph,
+                           lemon::ListDigraph::NodeMap<node_data> & node_map);
 
 } // namespace raptor::hibf
