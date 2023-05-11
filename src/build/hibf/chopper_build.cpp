@@ -12,9 +12,15 @@
 
 #include <lemon/list_graph.h> /// Must be first include.
 
+#include <chopper/layout/compute_fp_correction.hpp>
+
+#include <raptor/build/hibf/build_data.hpp>
 #include <raptor/build/hibf/chopper_build.hpp>
-#include <raptor/build/hibf/create_ibfs_from_chopper_pack.hpp>
+#include <raptor/build/hibf/hierarchical_build.hpp>
+#include <raptor/build/hibf/initialise_build_tree.hpp>
+#include <raptor/build/hibf/read_chopper_pack_file.hpp>
 #include <raptor/build/store_index.hpp>
+#include <raptor/file_reader.hpp>
 #include <raptor/index.hpp>
 
 namespace raptor::hibf
@@ -22,15 +28,45 @@ namespace raptor::hibf
 
 void chopper_build(build_arguments const & arguments)
 {
-    build_data data{.arguments = arguments};
+    std::vector<std::vector<std::string>> filenames{};
 
-    create_ibfs_from_chopper_pack(data);
+    chopper::layout::layout hibf_layout = read_chopper_pack_file(filenames, arguments.bin_file);
+
+    build_data data{.arguments = arguments,
+                    .input_fn = [&](size_t const user_bin_id, raptor::hibf::insert_iterator && it) // GCOVR_EXCL_LINE
+                    {
+                        if (arguments.input_is_minimiser)
+                        {
+                            file_reader<file_types::minimiser> const reader{};
+                            reader.hash_into(filenames[user_bin_id], it);
+                        }
+                        else
+                        {
+                            file_reader<file_types::sequence> const reader{arguments.shape, arguments.window_size};
+                            reader.hash_into(filenames[user_bin_id], it);
+                        }
+                    }};
+
+    size_t const number_of_ibfs = hibf_layout.max_bins.size() + 1;
+    data.hibf.ibf_vector.resize(number_of_ibfs);
+    data.hibf.user_bins.set_ibf_count(number_of_ibfs);
+    data.hibf.user_bins.set_user_bin_count(hibf_layout.user_bins.size());
+    data.hibf.next_ibf_id.resize(number_of_ibfs);
+
+    initialise_build_tree(hibf_layout, data.ibf_graph, data.node_map);
+    lemon::ListDigraph::Node root_node = data.ibf_graph.nodeFromId(0); // root node = top-level IBF node
+
+    size_t const t_max{data.node_map[root_node].number_of_technical_bins};
+    data.fp_correction = chopper::layout::compute_fp_correction(arguments.fpr, arguments.hash, t_max);
+
+    robin_hood::unordered_flat_set<size_t> root_kmers{};
+    hierarchical_build(root_kmers, root_node, data, true);
 
     arguments.index_allocation_timer.start();
     raptor_index<hierarchical_interleaved_bloom_filter> index{window{arguments.window_size},
                                                               arguments.shape,
                                                               arguments.parts,
-                                                              data.filenames,
+                                                              filenames,
                                                               arguments.fpr,
                                                               std::move(data.hibf)};
     arguments.index_allocation_timer.stop();

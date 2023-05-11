@@ -10,11 +10,7 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <seqan3/search/views/minimiser_hash.hpp>
-
-#include <raptor/adjust_seed.hpp>
 #include <raptor/build/hibf/compute_kmers.hpp>
-#include <raptor/file_reader.hpp>
 
 namespace raptor::hibf
 {
@@ -25,16 +21,7 @@ void compute_kmers(robin_hood::unordered_flat_set<size_t> & kmers,
 {
     timer<concurrent::no> local_user_bin_io_timer{};
     local_user_bin_io_timer.start();
-    if (data.arguments.input_is_minimiser)
-    {
-        file_reader<file_types::minimiser> const reader{};
-        reader.hash_into(data.filenames[record.idx], std::inserter(kmers, kmers.begin()));
-    }
-    else
-    {
-        file_reader<file_types::sequence> const reader{data.arguments.shape, data.arguments.window_size};
-        reader.hash_into(data.filenames[record.idx], std::inserter(kmers, kmers.begin()));
-    }
+    data.input_fn(record.idx, std::inserter(kmers, kmers.begin()));
     local_user_bin_io_timer.stop();
     data.arguments.user_bin_io_timer += local_user_bin_io_timer;
 }

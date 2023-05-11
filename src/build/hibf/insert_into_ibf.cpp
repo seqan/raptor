@@ -10,12 +10,8 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <seqan3/search/views/minimiser_hash.hpp>
-
-#include <raptor/adjust_seed.hpp>
 #include <raptor/build/hibf/insert_into_ibf.hpp>
 #include <raptor/contrib/std/chunk_view.hpp>
-#include <raptor/file_reader.hpp>
 
 namespace raptor::hibf
 {
@@ -49,20 +45,11 @@ void insert_into_ibf(build_data const & data,
                      seqan3::interleaved_bloom_filter<> & ibf)
 {
     auto const bin_index = seqan3::bin_index{static_cast<size_t>(record.storage_TB_id)};
-    std::vector<uint64_t> values;
+    robin_hood::unordered_flat_set<size_t> values;
 
     timer<concurrent::no> local_user_bin_io_timer{};
     local_user_bin_io_timer.start();
-    if (data.arguments.input_is_minimiser)
-    {
-        file_reader<file_types::minimiser> const reader{};
-        reader.hash_into(data.filenames[record.idx], std::back_inserter(values));
-    }
-    else
-    {
-        file_reader<file_types::sequence> const reader{data.arguments.shape, data.arguments.window_size};
-        reader.hash_into(data.filenames[record.idx], std::back_inserter(values));
-    }
+    data.input_fn(record.idx, std::inserter(values, values.begin()));
     local_user_bin_io_timer.stop();
     data.arguments.user_bin_io_timer += local_user_bin_io_timer;
 
