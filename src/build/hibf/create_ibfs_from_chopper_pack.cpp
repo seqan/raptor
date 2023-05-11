@@ -22,9 +22,9 @@
 namespace raptor::hibf
 {
 
-void create_ibfs_from_chopper_pack(build_data & data, build_arguments const & arguments)
+void create_ibfs_from_chopper_pack(build_data & data)
 {
-    chopper::layout::layout hibf_layout = read_chopper_pack_file(data.filenames, arguments.bin_file);
+    chopper::layout::layout hibf_layout = read_chopper_pack_file(data.filenames, data.arguments.bin_file);
 
     size_t const number_of_ibfs = hibf_layout.max_bins.size() + 1;
 
@@ -39,9 +39,9 @@ void create_ibfs_from_chopper_pack(build_data & data, build_arguments const & ar
     robin_hood::unordered_flat_set<size_t> root_kmers{};
 
     size_t const t_max{data.node_map[root].number_of_technical_bins};
-    data.fp_correction = chopper::layout::compute_fp_correction(arguments.fpr, arguments.hash, t_max);
+    data.fp_correction = chopper::layout::compute_fp_correction(data.arguments.fpr, data.arguments.hash, t_max);
 
-    hierarchical_build(root_kmers, root, data, arguments, true);
+    hierarchical_build(root_kmers, root, data, true);
 }
 
 } // namespace raptor::hibf

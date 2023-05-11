@@ -16,14 +16,12 @@
 
 #include <chopper/layout/layout.hpp>
 
-#include <raptor/argument_parsing/build_arguments.hpp>
 #include <raptor/build/hibf/build_data.hpp>
 
 namespace raptor::hibf
 {
 
 void compute_kmers(robin_hood::unordered_flat_set<size_t> & kmers,
-                   build_arguments const & arguments,
                    build_data const & data,
                    chopper::layout::layout::user_bin const & record);
 

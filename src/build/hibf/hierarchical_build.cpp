@@ -26,7 +26,6 @@ namespace raptor::hibf
 size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                           lemon::ListDigraph::Node const & current_node,
                           build_data & data,
-                          build_arguments const & arguments,
                           bool is_root)
 {
     auto & current_node_data = data.node_map[current_node];
@@ -41,8 +40,7 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                                        std::vector<int64_t> & ibf_positions,
                                        std::vector<int64_t> & filename_indices,
                                        lemon::ListDigraph::Node const & node,
-                                       build_data & data,
-                                       build_arguments const & arguments) -> size_t
+                                       build_data & data) -> size_t
     {
         auto & node_data = data.node_map[node];
 
@@ -50,14 +48,14 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
         {
             // recursively initialize favourite child first
             ibf_positions[node_data.max_bin_index] =
-                hierarchical_build(kmers, node_data.favourite_child, data, arguments, false);
+                hierarchical_build(kmers, node_data.favourite_child, data, false);
             return 1;
         }
         else // max bin is not a merged bin
         {
             // we assume that the max record is at the beginning of the list of remaining records.
             auto const & record = node_data.remaining_records[0];
-            compute_kmers(kmers, arguments, data, record);
+            compute_kmers(kmers, data, record);
             update_user_bins(filename_indices, record);
 
             return record.number_of_technical_bins;
@@ -66,12 +64,12 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
 
     // initialize lower level IBF
     size_t const max_bin_tbs =
-        initialise_max_bin_kmers(kmers, ibf_positions, filename_indices, current_node, data, arguments);
-    auto && ibf = construct_ibf(parent_kmers, kmers, max_bin_tbs, current_node, data, arguments, is_root);
+        initialise_max_bin_kmers(kmers, ibf_positions, filename_indices, current_node, data);
+    auto && ibf = construct_ibf(parent_kmers, kmers, max_bin_tbs, current_node, data, is_root);
     kmers.clear(); // reduce memory peak
 
     // parse all other children (merged bins) of the current ibf
-    loop_over_children(parent_kmers, ibf, ibf_positions, current_node, data, arguments, is_root);
+    loop_over_children(parent_kmers, ibf, ibf_positions, current_node, data, is_root);
 
     // If max bin was a merged bin, process all remaining records, otherwise the first one has already been processed
     size_t const start{(current_node_data.favourite_child != lemon::INVALID) ? 0u : 1u};
@@ -81,18 +79,18 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
 
         if (is_root && record.number_of_technical_bins == 1) // no splitting needed
         {
-            insert_into_ibf(arguments, data, record, ibf);
+            insert_into_ibf(data, record, ibf);
         }
         else
         {
-            compute_kmers(kmers, arguments, data, record);
+            compute_kmers(kmers, data, record);
             insert_into_ibf(kmers,
                             record.number_of_technical_bins,
                             record.storage_TB_id,
                             ibf,
-                            arguments.fill_ibf_timer);
+                            data.arguments.fill_ibf_timer);
             if (!is_root)
-                update_parent_kmers(parent_kmers, kmers, arguments.merge_kmers_timer);
+                update_parent_kmers(parent_kmers, kmers, data.arguments.merge_kmers_timer);
         }
 
         update_user_bins(filename_indices, record);

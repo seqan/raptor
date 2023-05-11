@@ -43,8 +43,7 @@ void insert_into_ibf(robin_hood::unordered_flat_set<size_t> const & kmers,
     fill_ibf_timer += local_fill_ibf_timer;
 }
 
-void insert_into_ibf(build_arguments const & arguments,
-                     build_data const & data,
+void insert_into_ibf(build_data const & data,
                      chopper::layout::layout::user_bin const & record,
                      seqan3::interleaved_bloom_filter<> & ibf)
 {
@@ -53,25 +52,25 @@ void insert_into_ibf(build_arguments const & arguments,
 
     timer<concurrent::no> local_user_bin_io_timer{};
     local_user_bin_io_timer.start();
-    if (arguments.input_is_minimiser)
+    if (data.arguments.input_is_minimiser)
     {
         file_reader<file_types::minimiser> const reader{};
         reader.hash_into(data.filenames[record.idx], std::back_inserter(values));
     }
     else
     {
-        file_reader<file_types::sequence> const reader{arguments.shape, arguments.window_size};
+        file_reader<file_types::sequence> const reader{data.arguments.shape, data.arguments.window_size};
         reader.hash_into(data.filenames[record.idx], std::back_inserter(values));
     }
     local_user_bin_io_timer.stop();
-    arguments.user_bin_io_timer += local_user_bin_io_timer;
+    data.arguments.user_bin_io_timer += local_user_bin_io_timer;
 
     timer<concurrent::no> local_fill_ibf_timer{};
     local_fill_ibf_timer.start();
     for (auto && value : values)
         ibf.emplace(value, bin_index);
     local_fill_ibf_timer.stop();
-    arguments.fill_ibf_timer += local_fill_ibf_timer;
+    data.arguments.fill_ibf_timer += local_fill_ibf_timer;
 }
 
 } // namespace raptor::hibf

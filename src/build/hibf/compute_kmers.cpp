@@ -20,24 +20,23 @@ namespace raptor::hibf
 {
 
 void compute_kmers(robin_hood::unordered_flat_set<size_t> & kmers,
-                   build_arguments const & arguments,
                    build_data const & data,
                    chopper::layout::layout::user_bin const & record)
 {
     timer<concurrent::no> local_user_bin_io_timer{};
     local_user_bin_io_timer.start();
-    if (arguments.input_is_minimiser)
+    if (data.arguments.input_is_minimiser)
     {
         file_reader<file_types::minimiser> const reader{};
         reader.hash_into(data.filenames[record.idx], std::inserter(kmers, kmers.begin()));
     }
     else
     {
-        file_reader<file_types::sequence> const reader{arguments.shape, arguments.window_size};
+        file_reader<file_types::sequence> const reader{data.arguments.shape, data.arguments.window_size};
         reader.hash_into(data.filenames[record.idx], std::inserter(kmers, kmers.begin()));
     }
     local_user_bin_io_timer.stop();
-    arguments.user_bin_io_timer += local_user_bin_io_timer;
+    data.arguments.user_bin_io_timer += local_user_bin_io_timer;
 }
 
 } // namespace raptor::hibf

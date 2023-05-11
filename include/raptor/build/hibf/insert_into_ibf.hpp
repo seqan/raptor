@@ -18,7 +18,6 @@
 
 #include <chopper/layout/layout.hpp>
 
-#include <raptor/argument_parsing/build_arguments.hpp>
 #include <raptor/build/hibf/build_data.hpp>
 
 namespace raptor::hibf
@@ -31,8 +30,7 @@ void insert_into_ibf(robin_hood::unordered_flat_set<size_t> const & kmers,
                      seqan3::interleaved_bloom_filter<> & ibf,
                      timer<concurrent::yes> & fill_ibf_timer);
 
-void insert_into_ibf(build_arguments const & arguments,
-                     build_data const & data,
+void insert_into_ibf(build_data const & data,
                      chopper::layout::layout::user_bin const & record,
                      seqan3::interleaved_bloom_filter<> & ibf);
 

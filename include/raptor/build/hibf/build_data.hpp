@@ -16,6 +16,7 @@
 
 #include <atomic>
 
+#include <raptor/argument_parsing/build_arguments.hpp>
 #include <raptor/build/hibf/node_data.hpp>
 #include <raptor/hierarchical_interleaved_bloom_filter.hpp>
 
@@ -24,6 +25,8 @@ namespace raptor::hibf
 
 struct build_data
 {
+    build_arguments const & arguments;
+
     std::atomic<size_t> ibf_number{};
 
     std::vector<std::vector<std::string>> filenames{};
