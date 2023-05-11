@@ -17,6 +17,7 @@
 #include <atomic>
 
 #include <raptor/argument_parsing/build_arguments.hpp>
+#include <raptor/build/hibf/input_base.hpp>
 #include <raptor/build/hibf/node_data.hpp>
 #include <raptor/hierarchical_interleaved_bloom_filter.hpp>
 
@@ -29,7 +30,7 @@ struct build_data
 
     std::atomic<size_t> ibf_number{};
 
-    std::vector<std::vector<std::string>> filenames{};
+    input_base const & input;
 
     lemon::ListDigraph ibf_graph{};
     lemon::ListDigraph::NodeMap<node_data> node_map{ibf_graph};

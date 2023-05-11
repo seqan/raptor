@@ -6,7 +6,6 @@ if (NOT TARGET raptor_build_hibf)
                  chopper_build.cpp
                  compute_kmers.cpp
                  construct_ibf.cpp
-                 create_ibfs_from_chopper_pack.cpp
                  hierarchical_build.cpp
                  initialise_build_tree.cpp
                  insert_into_ibf.cpp
