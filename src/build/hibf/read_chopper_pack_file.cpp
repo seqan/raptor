@@ -12,6 +12,8 @@
 
 #include <lemon/list_graph.h> /// Must be first include.
 
+#include <chopper/layout/layout.hpp>
+
 #include <raptor/build/hibf/parse_chopper_pack_header.hpp>
 #include <raptor/build/hibf/parse_chopper_pack_line.hpp>
 #include <raptor/build/hibf/read_chopper_pack_file.hpp>
@@ -23,6 +25,8 @@ namespace raptor::hibf
 
 void read_chopper_pack_file(build_data & data, std::string const & chopper_pack_filename)
 {
+    chopper::layout::layout hibf_layout{};
+
     std::ifstream chopper_pack_file{chopper_pack_filename};
 
     if (!chopper_pack_file.good() || !chopper_pack_file.is_open())
@@ -30,13 +34,13 @@ void read_chopper_pack_file(build_data & data, std::string const & chopper_pack_
 
     // parse header
     // -------------------------------------------------------------------------
-    auto [top_level_max_bin_idx, header_max_bins] = parse_chopper_pack_header(chopper_pack_file);
-    data.number_of_ibfs = header_max_bins.size() + 1;
+    parse_chopper_pack_header(chopper_pack_file, hibf_layout);
+    data.number_of_ibfs = hibf_layout.max_bins.size() + 1;
     // Add high level node
     auto high_level_node = data.ibf_graph.addNode(); // high-level node = root node
-    data.node_map.set(high_level_node, {0, top_level_max_bin_idx, 0, lemon::INVALID, {}});
+    data.node_map.set(high_level_node, {0, hibf_layout.top_level_max_bin_id, 0, lemon::INVALID, {}});
 
-    update_header_node_data(std::move(header_max_bins), data.ibf_graph, data.node_map);
+    update_header_node_data(std::move(hibf_layout.max_bins), data.ibf_graph, data.node_map);
 
     std::vector<chopper::layout::layout::user_bin> layout_user_bins{};
     std::string current_line;

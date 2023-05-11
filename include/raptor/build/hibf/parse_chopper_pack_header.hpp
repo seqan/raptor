@@ -19,7 +19,6 @@
 namespace raptor::hibf
 {
 
-std::pair<size_t, std::vector<chopper::layout::layout::max_bin>>
-parse_chopper_pack_header(std::istream & chopper_pack_file);
+void parse_chopper_pack_header(std::istream & chopper_pack_file, chopper::layout::layout & hibf_layout);
 
 } // namespace raptor::hibf
