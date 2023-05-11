@@ -35,21 +35,21 @@ void read_chopper_pack_file(build_data & data, std::string const & chopper_pack_
     // parse header
     // -------------------------------------------------------------------------
     parse_chopper_pack_header(chopper_pack_file, hibf_layout);
-    data.number_of_ibfs = hibf_layout.max_bins.size() + 1;
-    // Add high level node
-    auto high_level_node = data.ibf_graph.addNode(); // high-level node = root node
-    data.node_map.set(high_level_node, {0, hibf_layout.top_level_max_bin_id, 0, lemon::INVALID, {}});
-
-    update_header_node_data(std::move(hibf_layout.max_bins), data.ibf_graph, data.node_map);
 
     std::string current_line;
     while (std::getline(chopper_pack_file, current_line))
         hibf_layout.user_bins.emplace_back(parse_chopper_pack_line(current_line, data.filenames));
 
     data.number_of_user_bins = hibf_layout.user_bins.size();
-    update_content_node_data(std::move(hibf_layout.user_bins), data.ibf_graph, data.node_map);
-
+    data.number_of_ibfs = hibf_layout.max_bins.size() + 1;
     data.resize();
+
+    // Add high level node
+    auto high_level_node = data.ibf_graph.addNode(); // high-level node = root node
+    data.node_map.set(high_level_node, {0, hibf_layout.top_level_max_bin_id, 0, lemon::INVALID, {}});
+
+    update_header_node_data(std::move(hibf_layout.max_bins), data.ibf_graph, data.node_map);
+    update_content_node_data(std::move(hibf_layout.user_bins), data.ibf_graph, data.node_map);
 }
 
 } // namespace raptor::hibf
