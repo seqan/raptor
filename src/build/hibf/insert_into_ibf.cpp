@@ -14,6 +14,7 @@
 
 #include <raptor/adjust_seed.hpp>
 #include <raptor/build/hibf/insert_into_ibf.hpp>
+#include <raptor/build/hibf/compute_kmers.hpp>
 #include <raptor/file_reader.hpp>
 
 namespace raptor::hibf
@@ -49,22 +50,9 @@ void insert_into_ibf(build_arguments const & arguments,
                      seqan3::interleaved_bloom_filter<> & ibf)
 {
     auto const bin_index = seqan3::bin_index{static_cast<size_t>(record.storage_TB_id)};
-    std::vector<uint64_t> values;
+    robin_hood::unordered_flat_set<size_t> kmers;
 
-    timer<concurrent::no> local_user_bin_io_timer{};
-    local_user_bin_io_timer.start();
-    if (arguments.input_is_minimiser)
-    {
-        file_reader<file_types::minimiser> const reader{};
-        reader.hash_into(data.filenames[record.idx], std::back_inserter(values));
-    }
-    else
-    {
-        file_reader<file_types::sequence> const reader{arguments.shape, arguments.window_size};
-        reader.hash_into(data.filenames[record.idx], std::back_inserter(values));
-    }
-    local_user_bin_io_timer.stop();
-    arguments.user_bin_io_timer += local_user_bin_io_timer;
+    compute_kmers(kmers, arguments, data, record);
 
     timer<concurrent::no> local_fill_ibf_timer{};
     local_fill_ibf_timer.start();
