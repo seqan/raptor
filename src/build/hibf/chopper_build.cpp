@@ -34,7 +34,27 @@ void chopper_build(build_arguments const & arguments)
 
     chopper::layout::layout hibf_layout = read_chopper_pack_file(filenames, arguments.bin_file);
 
-    build_data data{.arguments = arguments, .filenames = filenames};
+    auto file_range =
+        filenames
+        | std::views::transform(
+            [&arguments](auto const & user_bin_filenames)
+            {
+                std::vector<uint64_t> kmers{};
+                if (arguments.input_is_minimiser)
+                {
+                    file_reader<file_types::minimiser> const reader{};
+                    reader.hash_into(user_bin_filenames, std::inserter(kmers, kmers.begin()));
+                }
+                else
+                {
+                    file_reader<file_types::sequence> const reader{arguments.shape, arguments.window_size};
+                    reader.hash_into(user_bin_filenames, std::inserter(kmers, kmers.begin()));
+                }
+
+                return kmers;
+            });
+
+    build_data data{.arguments = arguments, .input = file_range};
 
     size_t const number_of_ibfs = hibf_layout.max_bins.size() + 1;
     data.hibf.ibf_vector.resize(number_of_ibfs);

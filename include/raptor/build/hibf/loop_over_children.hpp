@@ -25,11 +25,12 @@
 namespace raptor::hibf
 {
 
+template <typename input_range_type>
 void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                         seqan3::interleaved_bloom_filter<> & ibf,
                         std::vector<int64_t> & ibf_positions,
                         lemon::ListDigraph::Node const & current_node,
-                        build_data & data,
+                        build_data<input_range_type> & data,
                         bool is_root)
 {
     auto & current_node_data = data.node_map[current_node];

@@ -23,13 +23,14 @@
 namespace raptor::hibf
 {
 
+template <typename input_range_type>
 struct build_data
 {
     build_arguments const & arguments;
 
-    std::atomic<size_t> ibf_number{};
+    input_range_type input;
 
-    std::vector<std::vector<std::string>> filenames{};
+    std::atomic<size_t> ibf_number{};
 
     lemon::ListDigraph ibf_graph{};
     lemon::ListDigraph::NodeMap<node_data> node_map{ibf_graph};

@@ -17,7 +17,6 @@
 #include <robin_hood.h>
 
 #include <raptor/build/hibf/build_data.hpp>
-#include <raptor/build/hibf/compute_kmers.hpp>
 #include <raptor/build/hibf/construct_ibf.hpp>
 #include <raptor/build/hibf/hierarchical_build.hpp>
 #include <raptor/build/hibf/insert_into_ibf.hpp>
@@ -28,9 +27,10 @@
 namespace raptor::hibf
 {
 
+template <typename input_range_type>
 size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                           lemon::ListDigraph::Node const & current_node,
-                          build_data & data,
+                          build_data<input_range_type> & data,
                           bool is_root)
 {
     auto & current_node_data = data.node_map[current_node];
@@ -59,7 +59,7 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
         {
             // we assume that the max record is at the beginning of the list of remaining records.
             auto const & record = node_data.remaining_records[0];
-            compute_kmers(kmers, data, record);
+            kmers.insert((data.input[record.idx]).begin(), (data.input[record.idx]).end()); // add user bin hashes
             update_user_bins(filename_indices, record);
 
             return record.number_of_technical_bins;
@@ -86,7 +86,7 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
         }
         else
         {
-            compute_kmers(kmers, data, record);
+            kmers.insert((data.input[record.idx]).begin(), (data.input[record.idx]).end()); // add user bin hashes
             insert_into_ibf(kmers,
                             record.number_of_technical_bins,
                             record.storage_TB_id,

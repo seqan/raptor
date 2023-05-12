@@ -58,22 +58,7 @@ void insert_into_ibf(build_data<input_range_type> const & data,
 {
     auto const bin_index = seqan3::bin_index{static_cast<size_t>(record.storage_TB_id)};
 
-    std::vector<uint64_t> values;
-
-    timer<concurrent::no> local_user_bin_io_timer{};
-    local_user_bin_io_timer.start();
-    if (data.arguments.input_is_minimiser)
-    {
-        file_reader<file_types::minimiser> const reader{};
-        reader.hash_into(data.filenames[record.idx], std::back_inserter(values));
-    }
-    else
-    {
-        file_reader<file_types::sequence> const reader{data.arguments.shape, data.arguments.window_size};
-        reader.hash_into(data.filenames[record.idx], std::back_inserter(values));
-    }
-    local_user_bin_io_timer.stop();
-    data.arguments.user_bin_io_timer += local_user_bin_io_timer;
+    std::vector<uint64_t> const & values = data.input[record.idx];
 
     timer<concurrent::no> local_fill_ibf_timer{};
     local_fill_ibf_timer.start();
