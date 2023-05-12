@@ -66,7 +66,7 @@ void search_partitioned_ibf(search_arguments const & arguments)
 
         size_t part{};
 
-        auto count_task = [&](size_t const start, size_t const end)
+        auto count_task = [&](size_t const start, size_t const extent)
         {
             timer<concurrent::no> local_compute_minimiser_timer{};
             timer<concurrent::no> local_query_ibf_timer{};
@@ -80,7 +80,7 @@ void search_partitioned_ibf(search_arguments const & arguments)
                                                            seqan3::window_size{arguments.window_size},
                                                            seqan3::seed{adjust_seed(arguments.shape_weight)});
 
-            for (auto && [id, seq] : seqan3::views::slice(records, start, end))
+            for (auto && [id, seq] : std::span{records.data() + start, extent})
             {
                 auto minimiser_view = seq | hash_view | std::views::common;
                 local_compute_minimiser_timer.start();
@@ -117,7 +117,7 @@ void search_partitioned_ibf(search_arguments const & arguments)
         assert(part == arguments.parts - 1u);
         load_index(index, arguments, part);
 
-        auto output_task = [&](size_t const start, size_t const end)
+        auto output_task = [&](size_t const start, size_t const extent)
         {
             timer<concurrent::no> local_compute_minimiser_timer{};
             timer<concurrent::no> local_query_ibf_timer{};
@@ -133,7 +133,7 @@ void search_partitioned_ibf(search_arguments const & arguments)
                                                               seqan3::window_size{arguments.window_size},
                                                               seqan3::seed{adjust_seed(arguments.shape_weight)});
 
-            for (auto && [id, seq] : seqan3::views::slice(records, start, end))
+            for (auto && [id, seq] : std::span{records.data() + start, extent})
             {
                 result_string.clear();
                 result_string += id;

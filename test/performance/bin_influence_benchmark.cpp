@@ -14,7 +14,6 @@
 #include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
 #include <seqan3/search/views/minimiser_hash.hpp>
 #include <seqan3/test/performance/sequence_generator.hpp>
-#include <seqan3/utility/views/slice.hpp>
 
 #include <raptor/adjust_seed.hpp>
 #include <raptor/contrib/std/chunk_view.hpp>
@@ -61,9 +60,9 @@ static std::vector<std::vector<seqan3::dna4>> const reads{
         std::vector<std::vector<seqan3::dna4>> result(read_count);
         size_t i{};
         for (auto && read_start :
-             seqan3::test::generate_numeric_sequence<size_t>(read_count, 0, genome_size - read_size - 1, 0))
+             seqan3::test::generate_numeric_sequence<size_t>(read_count, 0, genome_size - read_size, 0))
         {
-            auto v = seqan3::views::slice(genome, read_start, read_start + read_size);
+            auto v = std::span{genome.data() + read_start, read_size};
             result[i++].assign(v.begin(), v.end());
         }
         return result;

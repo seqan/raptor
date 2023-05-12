@@ -45,13 +45,13 @@ void threshold_info(raptor::search_arguments const & arguments, std::string cons
     std::vector<size_t> minimiser_frequencies(maximal_number_of_minimizers + 1);
     std::mutex min_freq_mutex;
 
-    auto worker = [&](size_t const start, size_t const end)
+    auto worker = [&](size_t const start, size_t const extent)
     {
         auto hash_adaptor = seqan3::views::minimiser_hash(seqan3::ungapped{kmer_size},
                                                           seqan3::window_size{arguments.window_size},
                                                           seqan3::seed{raptor::adjust_seed(kmer_size)});
 
-        for (auto && [seq] : seqan3::views::slice(records, start, end))
+        for (auto && [seq] : std::span{records.data() + start, extent})
         {
             size_t const minimiser_count{static_cast<size_t>(std::ranges::distance(seq | hash_adaptor))};
 

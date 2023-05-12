@@ -119,8 +119,8 @@ void run_program(cmd_arguments const & arguments)
                      ++current_read_number, ++read_counter, ++bin_read_counter)
                 {
                     uint64_t const read_start_pos = read_start_dis(rng);
-                    auto read_slice = seqan3::views::slice(seq, read_start_pos, read_start_pos + arguments.read_length);
-                    read.assign(read_slice.begin(), read_slice.end());
+                    auto read_span = std::span{seq.data() + read_start_pos, arguments.read_length};
+                    read.assign(read_span.begin(), read_span.end());
 
                     for (uint8_t error_count = 0; error_count < arguments.errors; ++error_count)
                     {
