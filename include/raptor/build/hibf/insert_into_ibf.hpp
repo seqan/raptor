@@ -15,10 +15,14 @@
 #include <robin_hood.h>
 
 #include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
+#include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <chopper/layout/layout.hpp>
 
+#include <raptor/adjust_seed.hpp>
 #include <raptor/build/hibf/build_data.hpp>
+#include <raptor/build/hibf/insert_into_ibf.hpp>
+#include <raptor/file_reader.hpp>
 
 namespace raptor::hibf
 {
@@ -28,10 +32,55 @@ void insert_into_ibf(robin_hood::unordered_flat_set<size_t> const & kmers,
                      size_t const number_of_bins,
                      size_t const bin_index,
                      seqan3::interleaved_bloom_filter<> & ibf,
-                     timer<concurrent::yes> & fill_ibf_timer);
+                     timer<concurrent::yes> & fill_ibf_timer)
+{
+    size_t const chunk_size = kmers.size() / number_of_bins + 1;
+    size_t chunk_number{};
 
-void insert_into_ibf(build_data const & data,
+    timer<concurrent::no> local_fill_ibf_timer{};
+    local_fill_ibf_timer.start();
+    for (auto chunk : kmers | seqan3::views::chunk(chunk_size))
+    {
+        assert(chunk_number < number_of_bins);
+        seqan3::bin_index const bin_idx{bin_index + chunk_number};
+        ++chunk_number;
+        for (size_t const value : chunk)
+            ibf.emplace(value, bin_idx);
+    }
+    local_fill_ibf_timer.stop();
+    fill_ibf_timer += local_fill_ibf_timer;
+}
+
+template <typename input_range_type>
+void insert_into_ibf(build_data<input_range_type> const & data,
                      chopper::layout::layout::user_bin const & record,
-                     seqan3::interleaved_bloom_filter<> & ibf);
+                     seqan3::interleaved_bloom_filter<> & ibf)
+{
+    auto const bin_index = seqan3::bin_index{static_cast<size_t>(record.storage_TB_id)};
+
+    std::vector<uint64_t> values;
+
+    timer<concurrent::no> local_user_bin_io_timer{};
+    local_user_bin_io_timer.start();
+    if (data.arguments.input_is_minimiser)
+    {
+        file_reader<file_types::minimiser> const reader{};
+        reader.hash_into(data.filenames[record.idx], std::back_inserter(values));
+    }
+    else
+    {
+        file_reader<file_types::sequence> const reader{data.arguments.shape, data.arguments.window_size};
+        reader.hash_into(data.filenames[record.idx], std::back_inserter(values));
+    }
+    local_user_bin_io_timer.stop();
+    data.arguments.user_bin_io_timer += local_user_bin_io_timer;
+
+    timer<concurrent::no> local_fill_ibf_timer{};
+    local_fill_ibf_timer.start();
+    for (auto && value : values)
+        ibf.emplace(value, bin_index);
+    local_fill_ibf_timer.stop();
+    data.arguments.fill_ibf_timer += local_fill_ibf_timer;
+}
 
 } // namespace raptor::hibf
