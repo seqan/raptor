@@ -28,7 +28,8 @@ namespace raptor::hibf
 {
 
 // automatically does naive splitting if number_of_bins > 1
-void insert_into_ibf(robin_hood::unordered_flat_set<size_t> const & kmers,
+template <typename hashes_type>
+void insert_into_ibf(hashes_type && kmers,
                      size_t const number_of_bins,
                      size_t const bin_index,
                      seqan3::interleaved_bloom_filter<> & ibf,

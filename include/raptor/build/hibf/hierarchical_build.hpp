@@ -39,37 +39,29 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
 
     std::vector<int64_t> ibf_positions(current_node_data.number_of_technical_bins, ibf_pos);
     std::vector<int64_t> filename_indices(current_node_data.number_of_technical_bins, -1);
-    robin_hood::unordered_flat_set<size_t> kmers{};
-
-    auto initialise_max_bin_kmers = [](robin_hood::unordered_flat_set<size_t> & kmers,
-                                       std::vector<int64_t> & ibf_positions,
-                                       std::vector<int64_t> & filename_indices,
-                                       lemon::ListDigraph::Node const & node,
-                                       build_data<input_range_type> & data) -> size_t
-    {
-        auto & node_data = data.node_map[node];
-
-        if (node_data.favourite_child != lemon::INVALID) // max bin is a merged bin
-        {
-            // recursively initialize favourite child first
-            ibf_positions[node_data.max_bin_index] = hierarchical_build(kmers, node_data.favourite_child, data, false);
-            return 1;
-        }
-        else // max bin is not a merged bin
-        {
-            // we assume that the max record is at the beginning of the list of remaining records.
-            auto const & record = node_data.remaining_records[0];
-            kmers.insert((data.input[record.idx]).begin(), (data.input[record.idx]).end()); // add user bin hashes
-            update_user_bins(filename_indices, record);
-
-            return record.number_of_technical_bins;
-        }
-    };
 
     // initialize lower level IBF
-    size_t const max_bin_tbs = initialise_max_bin_kmers(kmers, ibf_positions, filename_indices, current_node, data);
-    auto && ibf = construct_ibf(parent_kmers, kmers, max_bin_tbs, current_node, data, is_root);
-    kmers.clear(); // reduce memory peak
+    size_t max_bin_tbs;
+    seqan3::interleaved_bloom_filter ibf;
+
+    if (auto & node_data = data.node_map[node]; node_data.favourite_child != lemon::INVALID) // max bin is a merged bin
+    {
+        // recursively initialize favourite child first
+        robin_hood::unordered_flat_set<size_t> kmers{};
+        ibf_positions[node_data.max_bin_index] = hierarchical_build(kmers, node_data.favourite_child, data, false);
+
+        ibf = construct_ibf(parent_kmers, kmers, max_bin_tbs, current_node, data, is_root);
+        max_bin_tbs = 1;
+    }
+    else // max bin is not a merged bin
+    {
+        // we assume that the max record is at the beginning of the list of remaining records.
+        auto const & record = node_data.remaining_records[0];
+        update_user_bins(filename_indices, record);
+
+        ibf = construct_ibf(parent_kmers, data.input[record.idx], max_bin_tbs, current_node, data, is_root);
+        max_bin_tbs = record.number_of_technical_bins;
+    }
 
     // parse all other children (merged bins) of the current ibf
     loop_over_children(parent_kmers, ibf, ibf_positions, current_node, data, is_root);
@@ -86,8 +78,7 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
         }
         else
         {
-            kmers.insert((data.input[record.idx]).begin(), (data.input[record.idx]).end()); // add user bin hashes
-            insert_into_ibf(kmers,
+            insert_into_ibf(data.input[record.idx],
                             record.number_of_technical_bins,
                             record.storage_TB_id,
                             ibf,
