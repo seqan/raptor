@@ -16,11 +16,11 @@
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
 #include <seqan3/io/views/async_input_buffer.hpp>
 #include <seqan3/search/views/minimiser_hash.hpp>
-#include <seqan3/utility/views/chunk.hpp>
 
 #include <raptor/adjust_seed.hpp>
 #include <raptor/argument_parsing/search_arguments.hpp>
 #include <raptor/argument_parsing/validators.hpp>
+#include <raptor/contrib/std/chunk_view.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/search/do_parallel.hpp>
 #include <raptor/threshold/precompute_correction.hpp>
@@ -62,7 +62,7 @@ void threshold_info(raptor::search_arguments const & arguments, std::string cons
         }
     };
 
-    for (auto && record_batch : fin | seqan3::views::chunk((1ULL << 20)))
+    for (auto && record_batch : fin | seqan::std::views::chunk((1ULL << 20)))
     {
         records.clear();
         std::ranges::move(record_batch, std::back_inserter(records));

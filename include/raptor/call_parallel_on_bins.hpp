@@ -13,8 +13,9 @@
 #pragma once
 
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
-#include <seqan3/utility/views/chunk.hpp>
-#include <seqan3/utility/views/zip.hpp>
+
+#include <raptor/contrib/std/chunk_view.hpp>
+#include <raptor/contrib/std/zip_view.hpp>
 
 namespace raptor
 {
@@ -27,7 +28,7 @@ void call_parallel_on_bins(algorithm_t && worker,
     // GCOVR_EXCL_START
     size_t const chunk_size = std::clamp<size_t>(std::bit_ceil(bin_paths.size() / threads), 8u, 64u);
     // GCOVR_EXCL_STOP
-    auto chunked_view = seqan3::views::zip(bin_paths, std::views::iota(0u)) | seqan3::views::chunk(chunk_size);
+    auto chunked_view = seqan::std::views::zip(bin_paths, std::views::iota(0u)) | seqan::std::views::chunk(chunk_size);
     seqan3::detail::execution_handler_parallel executioner{threads};
     executioner.bulk_execute(std::move(worker), std::move(chunked_view), []() {});
 }

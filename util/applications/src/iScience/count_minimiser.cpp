@@ -20,6 +20,7 @@
 #include <raptor/adjust_seed.hpp>
 #include <raptor/argument_parsing/parse_bin_path.hpp>
 #include <raptor/argument_parsing/validators.hpp>
+#include <raptor/contrib/std/chunk_view.hpp>
 #include <raptor/dna4_traits.hpp>
 
 struct config
@@ -75,7 +76,7 @@ void compute_minimisers(config const & cfg)
     };
 
     size_t const chunk_size = std::ceil<size_t>(cfg.bin_path.size() / cfg.threads);
-    auto chunked_view = cfg.bin_path | seqan3::views::chunk(chunk_size);
+    auto chunked_view = cfg.bin_path | seqan::std::views::chunk(chunk_size);
     seqan3::detail::execution_handler_parallel executioner{cfg.threads};
     executioner.bulk_execute(worker, std::move(chunked_view), []() {});
 

@@ -15,9 +15,10 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 #include <seqan3/test/performance/sequence_generator.hpp>
 #include <seqan3/utility/views/slice.hpp>
-#include <seqan3/utility/views/zip.hpp>
 
 #include <raptor/adjust_seed.hpp>
+#include <raptor/contrib/std/chunk_view.hpp>
+#include <raptor/contrib/std/zip_view.hpp>
 
 #define USE_UNIT_TEST_PARAMETERS 1
 
@@ -83,10 +84,11 @@ static std::vector<size_t> cardinality(size_t const bin_count, auto && hash_adap
     std::vector<size_t> cardinalities(bin_count);
 
     size_t const chunked_genome_size{(genome_size + bin_count - 1) / bin_count};
-    auto chunked_genomes = genome | seqan3::views::chunk(chunked_genome_size);
+    auto chunked_genomes = genome | seqan::std::views::chunk(chunked_genome_size);
 
     size_t const workload_size = std::clamp<size_t>(std::bit_ceil(bin_count / construct_threads), 8u, 64u);
-    auto workload = seqan3::views::zip(chunked_genomes, std::views::iota(0u)) | seqan3::views::chunk(workload_size);
+    auto workload =
+        seqan::std::views::zip(chunked_genomes, std::views::iota(0u)) | seqan::std::views::chunk(workload_size);
 
     auto worker = [&cardinalities, &hash_adaptor](auto && payload, auto &&)
     {
@@ -110,10 +112,11 @@ static ibf_t construct_ibf(size_t const bin_count, auto && hash_adaptor, double 
     ibf_t ibf{seqan3::bin_count{bin_count}, seqan3::bin_size{bin_size}, seqan3::hash_function_count{hash_num}};
 
     size_t const chunked_genome_size{(genome_size + bin_count - 1) / bin_count};
-    auto chunked_genomes = genome | seqan3::views::chunk(chunked_genome_size);
+    auto chunked_genomes = genome | seqan::std::views::chunk(chunked_genome_size);
 
     size_t const workload_size = std::clamp<size_t>(std::bit_ceil(bin_count / construct_threads), 8u, 64u);
-    auto workload = seqan3::views::zip(chunked_genomes, std::views::iota(0u)) | seqan3::views::chunk(workload_size);
+    auto workload =
+        seqan::std::views::zip(chunked_genomes, std::views::iota(0u)) | seqan::std::views::chunk(workload_size);
 
     auto worker = [&ibf, &hash_adaptor](auto && payload, auto &&)
     {

@@ -49,3 +49,6 @@
 [submodule "lib/tool_description_lib"]
 	path = lib/tool_description_lib
 	url = https://github.com/deNBI-cibi/tool_description_lib.git
+[submodule "include/raptor/contrib/std"]
+	path = include/raptor/contrib/std
+	url = https://github.com/seqan/seqan-std.git
