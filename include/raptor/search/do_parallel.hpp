@@ -28,8 +28,8 @@ void do_parallel(algorithm_t && worker, size_t const num_records, size_t const t
     for (size_t i = 0; i < threads; ++i)
     {
         size_t const start = records_per_thread * i;
-        size_t const end = i == (threads - 1) ? num_records : records_per_thread * (i + 1);
-        tasks.emplace_back(std::async(std::launch::async, worker, start, end));
+        size_t const extent = i == (threads - 1) ? num_records - i * records_per_thread : records_per_thread;
+        tasks.emplace_back(std::async(std::launch::async, worker, start, extent));
     }
 
     for (auto && task : tasks)

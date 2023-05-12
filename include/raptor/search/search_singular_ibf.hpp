@@ -45,7 +45,7 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
 
     raptor::threshold::threshold const thresholder{arguments.make_threshold_parameters()};
 
-    auto worker = [&](size_t const start, size_t const end)
+    auto worker = [&](size_t const start, size_t const extent)
     {
         timer<concurrent::no> local_compute_minimiser_timer{};
         timer<concurrent::no> local_query_ibf_timer{};
@@ -65,7 +65,7 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
                                                           seqan3::window_size{arguments.window_size},
                                                           seqan3::seed{adjust_seed(arguments.shape_weight)});
 
-        for (auto && [id, seq] : seqan3::views::slice(records, start, end))
+        for (auto && [id, seq] : std::span{records.data() + start, extent})
         {
             result_string.clear();
             result_string += id;
