@@ -79,8 +79,7 @@ void chopper_build(build_arguments const & arguments)
     size_t const t_max{data.node_map[root_node].number_of_technical_bins};
     data.fp_correction = chopper::layout::compute_fp_correction(arguments.fpr, arguments.hash, t_max);
 
-    robin_hood::unordered_flat_set<size_t> root_kmers{};
-    hierarchical_build(root_kmers, root_node, data, true);
+    hierarchical_build(root_node, data);
 
     arguments.index_allocation_timer.start();
     raptor_index<hierarchical_interleaved_bloom_filter> index{window{arguments.window_size},

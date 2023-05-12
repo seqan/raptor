@@ -19,6 +19,8 @@
 namespace raptor::hibf
 {
 
+size_t hierarchical_build(lemon::ListDigraph::Node const & root_node, build_data & data);
+
 size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                           lemon::ListDigraph::Node const & current_node,
                           build_data & data,
