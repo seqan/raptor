@@ -30,7 +30,7 @@ namespace raptor
 class input_derived : public raptor::hibf::input_base
 {
 public:
-    void hash_into(size_t const user_bin_number, robin_hood::unordered_flat_set<size_t> & to) const override
+    void hash_into(size_t const user_bin_number, robin_hood::unordered_flat_set<uint64_t> & to) const override
     {
         if (arguments.input_is_minimiser)
         {

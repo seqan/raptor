@@ -17,7 +17,7 @@ namespace raptor::hibf
 {
 
 // automatically does naive splitting if number_of_bins > 1
-void insert_into_ibf(robin_hood::unordered_flat_set<size_t> const & kmers,
+void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
                      size_t const number_of_bins,
                      size_t const bin_index,
                      seqan3::interleaved_bloom_filter<> & ibf,
@@ -45,7 +45,7 @@ void insert_into_ibf(build_data const & data,
                      seqan3::interleaved_bloom_filter<> & ibf)
 {
     auto const bin_index = seqan3::bin_index{static_cast<size_t>(record.storage_TB_id)};
-    robin_hood::unordered_flat_set<size_t> values;
+    robin_hood::unordered_flat_set<uint64_t> values;
 
     timer<concurrent::no> local_user_bin_io_timer{};
     local_user_bin_io_timer.start();

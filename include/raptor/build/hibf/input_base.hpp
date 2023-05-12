@@ -21,7 +21,7 @@ namespace raptor::hibf
 class input_base
 {
 public:
-    virtual void hash_into(size_t const, robin_hood::unordered_flat_set<size_t> &) const
+    virtual void hash_into(size_t const, robin_hood::unordered_flat_set<uint64_t> &) const
     {
         throw std::runtime_error{"Access raptor::hibf::input_base::hash_into"};
     }
