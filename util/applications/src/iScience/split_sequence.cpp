@@ -12,7 +12,8 @@
 #include <seqan3/alphabet/nucleotide/dna4.hpp>
 #include <seqan3/io/sequence_file/input.hpp>
 #include <seqan3/io/sequence_file/output.hpp>
-#include <seqan3/utility/views/chunk.hpp>
+
+#include <raptor/contrib/std/chunk_view.hpp>
 
 static inline std::vector<std::string> sequence_extensions{
     seqan3::detail::valid_file_extensions<typename seqan3::sequence_file_input<>::valid_formats>()};
@@ -97,7 +98,7 @@ inline void split_sequence(config const & cfg)
     size_t part{};
     size_t const n_zero = std::to_string(cfg.parts).length();
 
-    for (auto && split_sequence : (*input_sequence.begin()).sequence() | seqan3::views::chunk(cfg.length))
+    for (auto && split_sequence : (*input_sequence.begin()).sequence() | seqan::std::views::chunk(cfg.length))
     {
         std::string part_as_string = std::to_string(part);
         std::string padded_parts = std::string(n_zero - part_as_string.length(), '0') + part_as_string;

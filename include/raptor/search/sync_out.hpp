@@ -16,9 +16,8 @@
 #include <fstream>
 #include <mutex>
 
-#include <seqan3/utility/views/join_with.hpp>
-
 #include <raptor/argument_parsing/search_arguments.hpp>
+#include <raptor/contrib/std/join_with_view.hpp>
 
 namespace raptor
 {
@@ -71,7 +70,7 @@ public:
         for (auto const & file_list : arguments.bin_path)
         {
             file << '#' << user_bin_id << '\t';
-            for (auto const elem : seqan3::views::join_with(file_list, ','))
+            for (auto const elem : seqan::std::views::join_with(file_list, ','))
                 file << elem;
             file << '\n';
             ++user_bin_id;

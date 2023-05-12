@@ -14,6 +14,7 @@
 
 #include <raptor/adjust_seed.hpp>
 #include <raptor/build/hibf/insert_into_ibf.hpp>
+#include <raptor/contrib/std/chunk_view.hpp>
 #include <raptor/file_reader.hpp>
 
 namespace raptor::hibf
@@ -31,7 +32,7 @@ void insert_into_ibf(robin_hood::unordered_flat_set<size_t> const & kmers,
 
     timer<concurrent::no> local_fill_ibf_timer{};
     local_fill_ibf_timer.start();
-    for (auto chunk : kmers | seqan3::views::chunk(chunk_size))
+    for (auto chunk : kmers | seqan::std::views::chunk(chunk_size))
     {
         assert(chunk_number < number_of_bins);
         seqan3::bin_index const bin_idx{bin_index + chunk_number};
