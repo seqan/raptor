@@ -25,7 +25,7 @@
 namespace raptor::hibf
 {
 
-using insert_iterator = std::insert_iterator<robin_hood::unordered_flat_set<size_t>>;
+using insert_iterator = std::insert_iterator<robin_hood::unordered_flat_set<uint64_t>>;
 
 struct build_data
 {
