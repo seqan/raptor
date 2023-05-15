@@ -16,6 +16,8 @@
 
 #include <atomic>
 
+#include <robin_hood.h>
+
 #include <raptor/argument_parsing/build_arguments.hpp>
 #include <raptor/build/hibf/node_data.hpp>
 #include <raptor/hierarchical_interleaved_bloom_filter.hpp>
@@ -23,13 +25,15 @@
 namespace raptor::hibf
 {
 
+using insert_iterator = std::insert_iterator<robin_hood::unordered_flat_set<uint64_t>>;
+
 struct build_data
 {
     build_arguments const & arguments;
 
     std::atomic<size_t> ibf_number{};
 
-    std::vector<std::vector<std::string>> filenames{};
+    std::function<void(size_t const, insert_iterator &&)> input_fn;
 
     lemon::ListDigraph ibf_graph{};
     lemon::ListDigraph::NodeMap<node_data> node_map{ibf_graph};

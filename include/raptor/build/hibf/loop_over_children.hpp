@@ -19,7 +19,7 @@
 namespace raptor::hibf
 {
 
-void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
+void loop_over_children(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
                         seqan3::interleaved_bloom_filter<> & ibf,
                         std::vector<int64_t> & ibf_positions,
                         lemon::ListDigraph::Node const & current_node,

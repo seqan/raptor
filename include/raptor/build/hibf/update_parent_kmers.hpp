@@ -19,8 +19,8 @@
 namespace raptor::hibf
 {
 
-void update_parent_kmers(robin_hood::unordered_flat_set<size_t> & parent_kmers,
-                         robin_hood::unordered_flat_set<size_t> const & kmers,
+void update_parent_kmers(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
+                         robin_hood::unordered_flat_set<uint64_t> const & kmers,
                          timer<concurrent::yes> & merge_kmers_timer);
 
 } // namespace raptor::hibf

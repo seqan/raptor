@@ -23,7 +23,13 @@
 namespace raptor::hibf
 {
 
-size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
+size_t hierarchical_build(lemon::ListDigraph::Node const & root_node, build_data & data)
+{
+    robin_hood::unordered_flat_set<uint64_t> root_kmers{};
+    return hierarchical_build(root_kmers, root_node, data, true);
+}
+
+size_t hierarchical_build(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
                           lemon::ListDigraph::Node const & current_node,
                           build_data & data,
                           bool is_root)
@@ -34,9 +40,9 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
 
     std::vector<int64_t> ibf_positions(current_node_data.number_of_technical_bins, ibf_pos);
     std::vector<int64_t> filename_indices(current_node_data.number_of_technical_bins, -1);
-    robin_hood::unordered_flat_set<size_t> kmers{};
+    robin_hood::unordered_flat_set<uint64_t> kmers{};
 
-    auto initialise_max_bin_kmers = [](robin_hood::unordered_flat_set<size_t> & kmers,
+    auto initialise_max_bin_kmers = [](robin_hood::unordered_flat_set<uint64_t> & kmers,
                                        std::vector<int64_t> & ibf_positions,
                                        std::vector<int64_t> & filename_indices,
                                        lemon::ListDigraph::Node const & node,
