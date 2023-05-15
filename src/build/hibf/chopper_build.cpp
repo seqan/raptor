@@ -24,38 +24,6 @@
 #include <raptor/file_reader.hpp>
 #include <raptor/index.hpp>
 
-namespace raptor
-{
-
-class input_derived : public raptor::hibf::input_base
-{
-public:
-    void hash_into(size_t const user_bin_number, robin_hood::unordered_flat_set<uint64_t> & to) const override
-    {
-        if (arguments.input_is_minimiser)
-        {
-            file_reader<file_types::minimiser> const reader{};
-            reader.hash_into(filenames[user_bin_number], std::inserter(to, to.begin()));
-        }
-        else
-        {
-            file_reader<file_types::sequence> const reader{arguments.shape, arguments.window_size};
-            reader.hash_into(filenames[user_bin_number], std::inserter(to, to.begin()));
-        }
-    }
-
-    build_arguments const & arguments{};
-
-    std::vector<std::vector<std::string>> const & filenames{};
-
-    input_derived(build_arguments const & args, std::vector<std::vector<std::string>> const & filenames_) :
-        arguments{args},
-        filenames{filenames_}
-    {}
-};
-
-} // namespace raptor
-
 namespace raptor::hibf
 {
 
@@ -65,7 +33,22 @@ void chopper_build(build_arguments const & arguments)
 
     chopper::layout::layout hibf_layout = read_chopper_pack_file(filenames, arguments.bin_file);
 
-    build_data data{.arguments = arguments, .input = input_derived{arguments, filenames}};
+    build_data data{
+        .arguments = arguments,
+        .input_fn = [&](size_t const user_bin_number, robin_hood::unordered_flat_set<uint64_t> & to)
+        {
+            if (arguments.input_is_minimiser)
+            {
+                file_reader<file_types::minimiser> const reader{};
+                reader.hash_into(filenames[user_bin_number], std::inserter(to, to.begin()));
+            }
+            else
+            {
+                file_reader<file_types::sequence> const reader{arguments.shape, arguments.window_size};
+                reader.hash_into(filenames[user_bin_number], std::inserter(to, to.begin()));
+            }
+        }
+    };
 
     size_t const number_of_ibfs = hibf_layout.max_bins.size() + 1;
     data.hibf.ibf_vector.resize(number_of_ibfs);

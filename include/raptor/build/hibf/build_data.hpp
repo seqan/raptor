@@ -16,8 +16,9 @@
 
 #include <atomic>
 
+#include <robin_hood.h>
+
 #include <raptor/argument_parsing/build_arguments.hpp>
-#include <raptor/build/hibf/input_base.hpp>
 #include <raptor/build/hibf/node_data.hpp>
 #include <raptor/hierarchical_interleaved_bloom_filter.hpp>
 
@@ -30,7 +31,7 @@ struct build_data
 
     std::atomic<size_t> ibf_number{};
 
-    input_base const & input;
+    std::function<void(size_t const, robin_hood::unordered_flat_set<uint64_t> &)> input_fn;
 
     lemon::ListDigraph ibf_graph{};
     lemon::ListDigraph::NodeMap<node_data> node_map{ibf_graph};

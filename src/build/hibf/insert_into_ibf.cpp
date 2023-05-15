@@ -49,7 +49,7 @@ void insert_into_ibf(build_data const & data,
 
     timer<concurrent::no> local_user_bin_io_timer{};
     local_user_bin_io_timer.start();
-    data.input.hash_into(record.idx, values);
+    data.input_fn(record.idx, values);
     local_user_bin_io_timer.stop();
     data.arguments.user_bin_io_timer += local_user_bin_io_timer;
 

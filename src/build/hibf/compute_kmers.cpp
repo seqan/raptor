@@ -21,7 +21,7 @@ void compute_kmers(robin_hood::unordered_flat_set<uint64_t> & kmers,
 {
     timer<concurrent::no> local_user_bin_io_timer{};
     local_user_bin_io_timer.start();
-    data.input.hash_into(record.idx, kmers);
+    data.input_fn(record.idx, kmers);
     local_user_bin_io_timer.stop();
     data.arguments.user_bin_io_timer += local_user_bin_io_timer;
 }
