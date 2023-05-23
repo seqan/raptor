@@ -2,23 +2,23 @@ library(lubridate)
 
 timings <- data.frame(
   c("COBS", "00:01:15", "1", "1T"),
-  c("metagraph", "00:09:30", "1", "1T"),
+  c("metagraph", "00:03:46", "1", "1T"),
   c("SeqOthello", "00:29:34", "1", "1T"),
   c("raptor", "00:01:01", "1", "1T"),
   c("mantis", "00:07:27", "1", "1T"),
   c("COBS", "00:11:34", "2", "1M"),
-  c("metagraph", "00:55:30", "2", "1M"),
+  c("metagraph", "00:13:24", "2", "1M"),
   c("SeqOthello", "01:43:48", "2", "1M"),
   c("mantis", "00:18:47", "2", "1M"),
   c("raptor", "00:01:15", "2", "1M"),
   c("COBS", "00:57:13", "3", "5Mio"),
-  c("metagraph", "04:27:43", "3", "5Mio"),
-  c("SeqOthello", "99:99:99", "3", "5Mio"),
+  c("metagraph", "00:52:09", "3", "5Mio"),
+  c("SeqOthello", NA, "3", "5Mio"),
   c("raptor", "00:02:29", "3", "5Mio"),
   c("mantis", "01:05:47", "3", "5Mio"),
   c("COBS", "01:50:02", "4", "10Mio"),
-  c("metagraph", "08:00:44", "4", "10Mio"),
-  c("SeqOthello", "99:99:99", "4", "10Mio"),
+  c("metagraph", "01:37:50", "4", "10Mio"),
+  c("SeqOthello", NA, "4", "10Mio"),
   c("mantis", "02:18:33", "4", "10Mio"),
   c("raptor", "00:04:11", "4", "10Mio"),
   c("ibf", "00:02:31", "1", "1T"),
@@ -34,27 +34,27 @@ timings <- data.frame(
 timings <- data.frame(t(timings))
 colnames(timings) <- c("Method", "Time (HH:)MM:SS", "Point", "Label")
 
-timings$`Time (HH:)MM:SS` <- period_to_seconds(hms(as.character(timings$`Time (HH:)MM:SS`)))
+timings$`Time (HH:)MM:SS` <- period_to_seconds(hms(as.character(timings$`Time (HH:)MM:SS`, quiet=TRUE)))
 timings$Point <- as.numeric(timings$Point )
 
 memory <- data.frame(
   c("COBS", 127.47, 2),
-  c("metagraph", 336.31, 2),
+  c("metagraph", 249.02, 2),
   c("SeqOthello", 287.71, 2),
   c("mantis", 470.67, 2),
   c("raptor", 132.70, 2),
   c("COBS", 106.02, 1),
-  c("metagraph", 321.57, 1),
+  c("metagraph", 231.42, 1),
   c("SeqOthello", 30.70, 1),
   c("raptor", 133.05, 1),
   c("mantis", 468.55, 1),
   c("COBS", 222.91, 3),
-  c("metagraph", 334.96, 3),
+  c("metagraph", 249.56, 3),
   c("SeqOthello", NA, 3),
   c("raptor", 134.57, 3),
   c("mantis", 472.93, 3),
   c("SeqOthello", NA, 4),
-  c("metagraph", 342.08, 4),
+  c("metagraph", 254.97, 4),
   c("COBS",  342.51, 4),
   c("raptor", 136.47, 4),
   c("mantis", 496.40, 4),
@@ -112,58 +112,62 @@ g1<- ggplot(timings, aes(x = Point, y = `Time (HH:)MM:SS`)) +
   geom_line(aes(color = Method), size=1) +
   geom_point(aes(color = Method), size =2) +
   scale_color_manual(values = my.colors) +
-  scale_y_continuous(limits = c(0, 30000)) +
+  scale_y_continuous(breaks=c(0, 1800, 3600, 5400, 7200), labels=c("0"="0.0", "1800"="0.5", "3600"="1.0", "5400"="1.5", "7200"="2.0")) +
+  scale_x_continuous(labels=c("1" = "1K", "2" = "1Mio", "3" = "5Mio", "4" = "10Mio")) +
   theme_classic() +
-  ggtitle("Query Time") +
+  ggtitle("a") +
+  ylab("Query time in hours") +
+  xlab("Number of transcripts") +
   theme(axis.line = element_line(colour = "black", size = 0.8),
-        axis.ticks = element_line(colour = "black", size = 1))
+        axis.ticks = element_line(colour = "black", size = 1),
+        axis.title.x = element_text(margin = margin(t = -25)), 
+        axis.text.x = element_text(colour="black", size=11),
+        axis.text.y = element_text(colour = "black", size=11),
+        text=element_text(colour="black", size=13))
 
-g1.2<- ggplot(timings, aes(x = Point, y = `Time (HH:)MM:SS`)) +
-  geom_line(aes(color = Method), size=1) +
-  geom_point(aes(color = Method), size =2) +
-  scale_color_manual(values = my.colors) +
-  scale_y_continuous(trans='log10') +
+g2<- ggplot(index.time, aes(x=Method, y=Time, fill=Method)) +
+  geom_bar(stat="identity", position=position_dodge2(width = 2, preserve = "single"), color="black", show.legend = FALSE) +
   theme_classic() +
-  ggtitle("Log(Query Time)") +
-  theme(axis.line = element_line(colour = "black", size = 0.8),
-        axis.ticks = element_line(colour = "black", size = 1))
-
-g1.3<- ggplot(timings, aes(x = Point, y = `Time (HH:)MM:SS`)) +
-  geom_line(aes(color = Method), size=1) +
-  geom_point(aes(color = Method), size =2) +
-  scale_color_manual(values = my.colors) +
-  scale_y_continuous(limits=c(0, 7000)) +
-  scale_x_continuous(limits=c(0, 2)) +
-  theme_classic() +
-  ggtitle("Log(Query Time)") +
-  theme(axis.line = element_line(colour = "black", size = 0.8),
-        axis.ticks = element_line(colour = "black", size = 1))
-
-g2<- ggplot(memory, aes(x = Point, y = Memory)) +
-  geom_line(aes(color = Method), size=1) +
-  geom_point(aes(color = Method), size =2) +
-  scale_color_manual(values = my.colors) +
-  theme_classic() +
-  ggtitle("Query RAM") +
-  theme(axis.line = element_line(colour = "black", size = 0.8),
-        axis.ticks = element_line(colour = "black", size = 1))
-
-g3<- ggplot(index.size, aes(x=Method, y=Size, fill=Method)) +
-  geom_bar(stat="identity", position=position_dodge2(width = 2, preserve = "single"), color="black") +
-  theme_classic() +
-  ggtitle("Final Index Size") +
+  ggtitle("b") +
+  ylab("Build time in hours") +
+  labs (x = NULL) +
+  scale_y_continuous(breaks=c(0, 72000, 144000), labels=c("0"="0", "72000"="20", "144000"="40")) +
   scale_fill_manual(values = my.colors) +
   theme(axis.line = element_line(colour = "black", size = 0.8),
-        axis.ticks = element_line(colour = "black", size = 1))
+        axis.ticks = element_line(colour = "black", size = 1),
+        axis.text.x = element_text(angle=45, hjust=1, colour="black", size=11),
+        axis.text.y = element_text(colour = "black", size=11),
+        text=element_text(colour="black", size=13))
 
-g4<- ggplot(index.time, aes(x=Method, y=Time, fill=Method)) +
-  geom_bar(stat="identity", position=position_dodge2(width = 2, preserve = "single"), color="black") +
+g3<- ggplot(memory, aes(x = Point, y = Memory)) +
+  geom_line(aes(color = Method), size=1, show.legend = FALSE) +
+  geom_point(aes(color = Method), size =2, show.legend = FALSE) +
+  scale_color_manual(values = my.colors) +
+  scale_x_continuous(labels=c("1" = "1K", "2" = "1Mio", "3" = "5Mio", "4" = "10Mio")) +
   theme_classic() +
-  ggtitle("Build Time") +
+  ggtitle("c") +
+  ylab("Query RAM in GiB") +
+  xlab("Number of transcripts") +
+  theme(axis.line = element_line(colour = "black", size = 0.8),
+        axis.ticks = element_line(colour = "black", size = 1), 
+        axis.text.x = element_text(colour="black", size=11),
+        axis.text.y = element_text(colour = "black", size=11),
+        text=element_text(colour="black", size=13))
+
+g4<- ggplot(index.size, aes(x=Method, y=Size, fill=Method)) +
+  geom_bar(stat="identity", position=position_dodge2(width = 2, preserve = "single"), color="black", show.legend = FALSE) +
+  theme_classic() +
+  ggtitle("d") +
+  ylab("Index size in GiB") +
+  labs (x = NULL) +
   scale_fill_manual(values = my.colors) +
   theme(axis.line = element_line(colour = "black", size = 0.8),
-        axis.ticks = element_line(colour = "black", size = 1))
+        axis.ticks = element_line(colour = "black", size = 1),
+        axis.text.x = element_text(angle=45, hjust=1, colour="black", size=11),
+        axis.text.y = element_text(colour = "black", size=11),
+        text=element_text(colour="black", size=13))
 
+# g4
 library(patchwork)
 
 layout <- "
@@ -171,16 +175,22 @@ AAAB
 AAAC
 AAAD
 "
-g1  +
-  inset_element(
-    g1.2,
-    left = 0.1,
-    bottom = 0.6,
-    right = 0.5,
-    top = 0.95,
-    align_to = "full"
-  ) +
-    g4 + g2 + g3 +
+gg<- g1  +
+  # inset_element(
+  #   g1.2,
+  #   left = 0.1,
+  #   bottom = 0.6,
+  #   right = 0.5,
+  #   top = 0.95,
+  #   align_to = "full"
+  # ) +
+    g2 + g3 + g4 +
   plot_layout(design = layout, guides = "collect") &
-  theme(legend.position = "bottom", legend.direction = "horizontal")
+  theme(legend.position = "bottom", legend.direction = "horizontal", legend.title = element_blank(), legend.text=element_text(colour="black", size=13)) 
+gg
+library(grid)
+library(gridSVG)
+gridsvg("C:\\Users\\enric\\Desktop\\HIBF_PROOF\\size.svg", res=300, width=10, height=7)
+grid.draw(gg)
+dev.off()
 
