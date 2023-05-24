@@ -35,42 +35,25 @@ raptor. So you can simply call it up with `raptor layout` without having to inst
 
 The figure above shows the storage of the user bins in the technical bins. The resulting tree represents the layout.
 The first step is to estimate the number of (representative) k-mers per user bin by computing
-[HyperLogLog (HLL) sketches](http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf) of the input data. These HLL
-sketches are stored in a directory and will be used in computing an HIBF layout. We will go into more detail later
-\ref HLL. The HIBF layout tries to minimize the disk space consumption of the resulting index. The space is estimated
+[HyperLogLog (HLL) sketches](https://dx.doi.org/10.46298/dmtcs.3545) of the input data. These HLL
+sketches are used for computing an HIBF layout. We will go into more detail later \ref HLL.
+The HIBF layout tries to minimize the disk space consumption of the resulting index. The space is estimated
 using a k-mer count per user bin which represents the potential density in a technical bin in an Interleaved Bloom
 filter.
 
 \note
 The term representative indicates that the k-mer content could be transformed by a function which reduces its size and
-distribution, e.g. by using minimizers.
+distribution, e.g. by using minimizers. Raptor currently offers canonical k-mers (e.g., k=20, w=20) and
+minimisers (e.g., k=20, w=24).
 
 Using all default values a first call will look like:
 
-```bash
-raptor layout --input-file all_bin_path.txt --tmax 64
-```
+\snippet script.sh 02_layout_snippet_1
 
 The `input-file` looks exactly as in our previous calls of `raptor index`; it contains all the paths of our database
 files.
 
-The parameter `--tmax` limits the number of technical bins on each level of the HIBF. Choosing a good \f$t_{max}\f$ is
-not trivial. The smaller \f$t_{max}\f$, the more levels the layout needs to represent the data. This results in a higher
-space consumption of the index. While querying each individual level is cheap, querying many levels might also lead to
-an increased runtime. A good \f$t_{max}\f$ is usually the square root of the number of user bins rounded to the next
-multiple of `64`. Note that your \f$t_{max}\f$ will be rounded to the next multiple of 64 anyway.
-
-\note
-At the expense of a longer runtime, you can enable the statistic mode that determines the best \f$t_{max}\f$ using the
-option `--determine-best-tmax`.
-When this flag is set, the program will compute multiple layouts for \f$t_{max}\f$ in `[64 , 128, 256, ... , tmax]` as
-well as `tmax = sqrt(number of user bins)`. The layout algorithm itself only optimizes the space consumption. When
-determining the best layout, we additionally keep track of the average number of queries needed to traverse each layout.
-This query cost is taken into account when determining the best \f$t_{max}\f$ for your data.
-Note that the option `--tmax` serves as upper bound. Once the layout quality starts dropping, the computation is
-stopped. To run all layout computations, pass the flag `--force-all-binnings`.
-The flag `--force-all-binnings` forces all layouts up to `--tmax` to be computed, regardless of the layout quality. If
-the flag `--determine-best-tmax` is not set, this flag is ignored and has no effect.
+`raptor layout` chooses sensible defaults that showed to work well for the average use case.
 
 We then get the resulting layout (default: `binning.out`) as an output file, which we then pass to Raptor to create the
 index. You can change this default with `--output-filename`.
@@ -94,9 +77,9 @@ And use the data of the `1024` Folder.
 
 \hint
 First we need a file with all paths to the fasta files. For this use the command:
-```bash
-seq -f "1024/bins/bin_%04g.fasta" 0 1 1023 > all_bin_paths.txt
-```
+
+\snippet script.sh 02_layout_snippet_2
+
 \endhint
 
 Then first determine the best tmax value and calculate a layout with default values and this tmax.
@@ -118,10 +101,8 @@ Your `all_bin_paths.txt` should look like:
 Sometimes it would be better to use the absolute paths instead.
 
 And you should have run:
-```bash
-raptor layout --input-file all_bin_paths.txt --determine-best-tmax --tmax 64
-```
-With the output:
+\snippet script.sh 02_layout_snippet_3
+With the resulting `binning.out`:
 ```bash
 ## ### Parameters ###
 ## number of user bins = 1023
@@ -139,12 +120,8 @@ With the output:
 ## size : The expected total size of an tmax-HIBF
 # tmax	c_tmax	l_tmax	m_tmax	(l*m)_tmax	size
 64	1.00	2.00	1.00	2.00	12.8MiB
-# Best t_max (regarding expected query runtime): 64
 ```
-And afterwards:
-```bash
-raptor layout --input-file all_bin_paths.txt --tmax 64
-```
+
 Your directory should look like this:
 ```bash
 $ ls
@@ -153,7 +130,7 @@ $ ls
 ```
 
 \note
-We will use this mini-example in the following, both with further parameters and then for `raptor index --hibf`.
+We will use this mini-example in the following.
 Therefore, we recommend not deleting the files including the built indexes.
 
 \endsolution
@@ -195,19 +172,11 @@ possible to specify a size here. But we can offer the option to name the desired
 \note These parameters must be set identically for `raptor index`.
 
 A call could then look like this:
-```bash
-raptor layout --input-file all_bin_path.txt \
-              --tmax 64 \
-              --kmer-size 17 \
-              --num-hash-functions 4 \
-              --false-positive-rate 0.25 \
-              --output-filename binning.layout
-```
+\snippet script.sh 02_layout_snippet_4
 
 ### Parallelization
 
 Raptor supports parallelization. By specifying `--threads`, for example, the k-mer hashes are processed simultaneously.
-
 
 \assignment{Assignment 2: Create a more specific layout}
 Now lets run the above example with more parameters.
@@ -218,15 +187,7 @@ positive rate of `0.1` and use `2` threads.
 
 \solution
 And you should have run:
-```bash
-raptor layout --input-file all_bin_paths.txt \
-              --tmax 64 \
-              --kmer-size 16 \
-              --num-hash-functions 3 \
-              --false-positive-rate 0.1 \
-              --threads 2 \
-              --output-filename binning2.layout
-```
+\snippet script.sh 02_layout_snippet_5
 Your directory should look like this:
 ```bash
 $ ls
@@ -254,8 +215,6 @@ So, to find this out, we form (binary) 64 bit hash values of the data. These are
 hash values. If you go through this hashed data, you can then estimate how many different elements you have seen so far
 only by reading leading zeros. (For the i'th element with `p` leading zeros, it is estimated that you have seen
 \f$2^p\f$ different elements). You then simply save the maximum of these (\f$2^{p_{max}}\f$ different elements).
-
-<!-- bei p (at least) leading zeros ist die wahrscheinlichkeit dieses vorkommens genau 1/(2^p) -->
 
 However, if we are unlucky and come across a hash value that consists of only `0`'s, then \f$p_{max}\f$ is of course
 maximum of all possible hash values, no matter how many different elements are actually present.
@@ -288,7 +247,26 @@ large influence.
 One last observation about these advanced options: If you expect hardly any similarity in the data set, then the
 similarity preprocessing makes very little difference.
 
-### Another advanced Option: alpha
+### Advanced option: tmax
+
+The parameter `--tmax` limits the number of technical bins on each level of the HIBF. Choosing a good \f$t_{max}\f$ is
+not trivial. The smaller \f$t_{max}\f$, the more levels the layout needs to represent the data. This results in a higher
+space consumption of the index. While querying each individual level is cheap, querying many levels might also lead to
+an increased runtime. A good (and current default) \f$t_{max}\f$ is usually the square root of the number of user bins
+rounded to the next multiple of `64`. Note that your \f$t_{max}\f$ will be rounded to the next multiple of 64.
+
+At the expense of a longer runtime, you can enable the statistic mode that determines the best \f$t_{max}\f$ using the
+option `--determine-best-tmax`.
+When this flag is set, the program will compute multiple layouts for \f$t_{max}\f$ in `[64 , 128, 256, ... , tmax]` as
+well as `tmax = sqrt(number of user bins)`. The layout algorithm itself only optimizes the space consumption. When
+determining the best layout, we additionally keep track of the average number of queries needed to traverse each layout.
+This query cost is taken into account when determining the best \f$t_{max}\f$ for your data.
+Note that the option `--tmax` serves as upper bound. Once the layout quality starts dropping, the computation is
+stopped. To run all layout computations, pass the flag `--force-all-binnings`.
+The flag `--force-all-binnings` forces all layouts up to `--tmax` to be computed, regardless of the layout quality. If
+the flag `--determine-best-tmax` is not set, this flag is ignored and has no effect.
+
+### Advanced Option: alpha
 
 You should only touch the parameter `--alpha` if you have understood very well how the layout works and you are
 dissatisfied with the resulting index, e.g. there is still a lot of space in RAM but the index is very slow.
