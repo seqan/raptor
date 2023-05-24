@@ -148,7 +148,8 @@ EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = */doc/*.cpp \
                          */contrib/std/*.hpp
 EXCLUDE_SYMBOLS        = ${RAPTOR_DOXYGEN_EXCLUDE_SYMBOLS}
-EXAMPLE_PATH           = ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/snippet
+EXAMPLE_PATH           = ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/snippet \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/tutorial
 EXAMPLE_PATTERNS       = *
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc \
@@ -230,7 +231,7 @@ OBFUSCATE_EMAILS       = YES
 HTML_FORMULA_FORMAT    = png
 FORMULA_FONTSIZE       = 14
 FORMULA_MACROFILE      =
-USE_MATHJAX            = ${RAPTOR_DOXYGEN_USE_MATHJAX}
+USE_MATHJAX            = YES #${RAPTOR_DOXYGEN_USE_MATHJAX}
 MATHJAX_VERSION        = MathJax_3
 MATHJAX_FORMAT         = HTML-CSS
 MATHJAX_RELPATH        = https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/

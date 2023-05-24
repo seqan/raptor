@@ -21,10 +21,10 @@ in read mapping you might want to compare your genome to the genome of 100'000 o
 It can also be used for metagenomic classification, i.e., which microbes are in a single sample.
 
 \see Related tools:
-- RNA-seq expression analysis: [Needle](https://www.seqan.de/apps/needle.html), a tool for storing sequencing
-experiments in such a way that approximate quantification of large sequencing data sets is possible.
 - Metagenomics: [Ganon/Ganon2](https://github.com/pirovc/ganon), a tool for comparative metagenomics analysis in short
 time using the whole of the quickly growing number of assembled sequences openly available.
+- RNA-seq expression analysis: [Needle](https://www.seqan.de/apps/needle.html), a tool for storing sequencing
+experiments in such a way that approximate quantification of large sequencing data sets is possible.
 
 Regardless of the application, we start with a data set of different nucleotide sequences over which we want to build an
 index.
@@ -36,29 +36,12 @@ format supported by
 [`seqan3::sequence_file_input`](https://docs.seqan.de/seqan/3-master-user/tutorial_sequence_file.html).
 
 We summarise these in a list of paths and can then create a first index using the default values of raptor:
-```bash
-raptor build --size 1k --output raptor.index all_bin_paths.txt
-```
+\snippet script.sh 03_index_snippet_1
 
 \assignment{Assignment 1: Create example files and index them}
-Copy and paste the following FASTA files to some location, e.g. a tmp directory:
-
-mini_1.fasta:
-```fasta
->chr1
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACGCGTTCATTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-```
-mini_2.fasta:
-```fasta
->chr2
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACGCGTCATTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-```
-mini_3.fasta:
-```fasta
->chr3
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-```
-and then create an all_paths.txt and run raptor build.
+Use this script to create FASTA files.
+\snippet script.sh 03_index_snippet_2
+Then create an all_paths.txt and run raptor build.
 
 \note
 Check the help page to read what the expected content of `all_paths.txt` looks like, which can be accessed as usual by
@@ -78,9 +61,7 @@ mini_3.fasta
 Sometimes it would be better to use the absolute paths instead.
 
 And you should have run:
-```bash
-raptor build --size 1k --output raptor.index all_paths.txt
-```
+\snippet script.sh 03_index_snippet_3
 Your directory should look like this:
 ```bash
 tmp$ ls
@@ -93,7 +74,7 @@ recommend not deleting the files including the built indexes.
 
 \endsolution
 
-## General Idea & main parameters
+## General idea & main parameters
 
 \image html ibf.svg width=90%
 
@@ -122,23 +103,19 @@ To use this calculator the number of inserted elements is the number of kmers in
 biggest bin to be sure.
 
 Each Bloom Filter has a bit vector length, which over all Bloom Filters gives the size of the Interleaved Bloom Filter,
-which we specify with `--size`. We can therefore specify how much space the bins take up in total, whereby the following
-also applies here: the larger the bins, the fewer false positives.
+which is automatically inferred. The lower the false positive rate, the bigger the index.
 
-```bash
-raptor build --kmer 19 --hash 3 --size 8m --output raptor.index all_bin_paths.txt
-```
+\snippet script.sh 03_index_snippet_4
 
 \assignment{Assignment 2: Using parameters}
-As our example is really tiny, lets run this with a k-mer size 4, three hash functions and a size of 1m. Call the new
-index raptor2.index.
+As our example is really tiny, lets run this with a k-mer size 4, three hash functions and a false positive rate of
+0.01. Name the new index `raptor2.index`.
 \endassignment
 
 \solution
 You should have run
-```bash
-raptor build --kmer 4 --hash 3 --size 1m --output raptor2.index all_paths.txt
-```
+\snippet script.sh 03_index_snippet_5
+
 Your directory should look like this:
 ```bash
 tmp$ ls -la
@@ -154,21 +131,14 @@ tmp$ ls -la
 ## Using minimisers
 
 The k-mers can also be saved as [minimisers](https://docs.seqan.de/seqan/3-master-user/group__views.html#ga191fcd1360fc430441567f3ed0f371d1),
-which saves space. To do this, first call `raptor build` with `--compute-minimiser` and then with the minimiser paths. A
-minimiser works with windows, which means that you also have to define their size `--window`. A window is always larger
-than a k-mer because it combines several k-mers.
+which saves space. To do this, first use `raptor prepare`. A minimiser works with windows, which means that you also
+have to define their size `--window`. A window is always larger than a k-mer because it combines several k-mers.
 
-```bash
-raptor build --kmer 19 --window 23 --compute-minimiser --output precomputed_minimisers all_paths.txt
-raptor build --size 8m --output minimiser_raptor.index all_minimiser_paths.txt
-```
-
-To save additional space, a cutoff discards all minimisers that do not occur frequently enough. This can be disabled
-with `--disable-cutoffs` to reduce the false positive rate.
+\snippet script.sh 03_index_snippet_6
 
 \assignment{Assignment 3: Minimisers}
-Lets use a minimiser for our small example. Use for this a window size of 6 and a k-mer size of 4 and call the new
-index minimiser.index with a size of 1m again.
+Lets use a minimiser for our small example. Use for this a window size of 6 and a k-mer size of 4 and name the new
+index minimiser.index.
 \hint
 For the all_minimiser_paths.txt you just need to add the `*.minimiser` files.
 \endhint
@@ -176,20 +146,11 @@ For the all_minimiser_paths.txt you just need to add the `*.minimiser` files.
 
 \solution
 You should have run:
-```bash
-raptor build --kmer 4 --window 6 --compute-minimiser --output precomputed_minimisers all_paths.txt
-raptor build --size 1m --output minimiser.index all_minimiser_paths.txt
-```
-Whereby your all_minimiser_paths.txt should look like:
-```txt
-precomputed_minimisers/mini_1.minimiser
-precomputed_minimisers/mini_2.minimiser
-precomputed_minimisers/mini_3.minimiser
-```
+\snippet script.sh 03_index_snippet_7
+
 Your directory should look like this:
 ```bash
 tmp$ ls -la
-... 120B 14 Nov 16:06 all_minimiser_paths.txt
 ...  39B 10 Nov 16:42 all_paths.txt
 ... 107B 14 Nov 16:11 mini_1.fasta
 ... 107B 14 Nov 16:11 mini_2.fasta
@@ -218,11 +179,6 @@ Raptor also has an advanced help page for the experimental content, which can be
 
 ## Others
 
-### Compressed index
-
-The raptor index can also be stored in a compressed form (`--compressed`). This is only worthwhile if you want a very
-low false positive rate, because then you have many bits equal 0 that can be compressed well.
-
 ### Parallelization
 
 Raptor supports parallelization. By specifying `--threads`, for example, the fastq-records are processed simultaneously.
@@ -232,15 +188,15 @@ Raptor supports parallelization. By specifying `--threads`, for example, the fas
 To reduce the overall memory consumption of the search, the index can be divided into multiple (a power of two) parts.
 This can be done by passing `--parts n`, where n is the number of parts you want to create. This will create `n` files,
 each representing one part of the index.
-The `--size` parameter describes the overall size of the index. For example, `--size 8g --parts 4` will create four
-2 GiB indices. This will reduce the memory consumption of `raptor build` and `raptor search` by approximately 6 GiB,
-since there will only be one part in memory at any given time. `raptor search` will automatically detect the parts, and
-does not need any special parameters.
+This will reduce the memory consumption of `raptor build` and `raptor search` by roughly `n`, since there will
+only be one part in memory at any given time.
+`raptor search` will automatically detect the parts, and does not need any special parameters.
 
 ## IBF vs HIBF {#hibf}
 
 Raptor works with the Interleaved Bloom Filter by default. A new feature is the Hierarchical Interleaved Bloom Filter
-(HIBF) (raptor::hierarchical_interleaved_bloom_filter), which can be used with `--hibf`. This uses a more
+(HIBF) (raptor::hierarchical_interleaved_bloom_filter), which is enabled when a layout file from `raptor layout` is used
+as input. This uses a more
 space-saving method of storing the bins. It distinguishes between the user bins, which reflect the individual samples as
 before, and the so-called technical bins, which throw some bins together. This is especially useful when there are
 samples of very different sizes.
@@ -250,20 +206,11 @@ To use the HIBF, a layout must be created before creating an index. We have writ
 
 ### HIBF indexing with the use of the layout
 
-The layout replaces the `all_bin_path.txt` and is given instead with the HIBF parameter: `--hibf binning.out`.
+The layout replaces the `--input all_bin_path.txt` and is given instead with the layout: `--input binning.out`.
 
-Since the HIBF calculates the size of the index itself, it is no longer possible to specify a size here. But we can
-offer the option to name the desired false positive rate with `--fpr`. Thus, for example, a call looks like this:
+We can set the desired false positive rate with `--fpr`. Thus, for example, a call looks like this:
 
-```bash
-raptor build --hibf binning.layout \
-             --kmer 16  \
-             --window 20  \
-             --hash 3 \
-             --fpr 0.25  \
-             --threads 2 \
-             --output hibf.index
-```
+\snippet script.sh 03_index_snippet_8
 
 \assignment{Assignment 4: A default HIBF}
 Since we cannot see the advantages of the hibf with our small example. And certainly not the differences when we change
@@ -293,10 +240,7 @@ For the second layout we took a kmer size of `16`, `3` hash functions and a fals
 
 \solution
 You should have run:
-```bash
-raptor build --hibf binning.out --output hibf.index
-raptor build --hibf binning2.layout --kmer 16 --hash 3 --fpr 0.1 --output hibf2.index
-```
+\snippet script.sh 03_index_snippet_9
 
 Your directory should look like this:
 ```bash

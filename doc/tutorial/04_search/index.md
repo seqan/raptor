@@ -18,7 +18,7 @@ But before that, we delve deeper into the various possibilities and parameters. 
 indexes we have already created.
 
 For this we just need the index and a query to run
-`raptor search --index raptor.index --query query.fasta --output search.output`.
+\snippet script.sh 04_search_snippet_1
 
 A result from such a call can look as follows:
 ```text
@@ -52,8 +52,7 @@ From the first assignment in the last tutorial your directory should look like t
 tmp$ ls
 all_paths.txt   mini_1.fasta    mini_2.fasta    mini_3.fasta    raptor.index    raptor2.index    ...
 ```
-Lets search for the queries `CGCGTTCATT` amd `CGCGTCATT` with the first two indexes, with creating a `search.output` and
-a `search2.output`.
+Lets search for the queries `CGCGTTCATT` amd `CGCGTCATTA` in `raptor2.index`, using `search.output` as output name.
 \endassignment
 
 \solution
@@ -62,49 +61,34 @@ Your `query.fasta` should look like:
 >query1
 CGCGTTCATT
 >query2
-CGCGTCATT
+CGCGTCATTA
 ```
 And you should have run
-```bash
-raptor search --index raptor.index --query query.fasta --output search.output
-raptor search --index raptor2.index --query query.fasta --output search2.output
-```
+\snippet script.sh 04_search_snippet_2
 Your `search.output` should look like:
 ```text
 #0      mini_1.fasta
 #1      mini_2.fasta
 #2      mini_3.fasta
 #QUERY_NAME     USER_BINS
-query1  0,1,2
-query2  0,1,2
-```
-and the other `search2.output` like this:
-```text
-#0      mini_1.fasta
-#1      mini_2.fasta
-#2      mini_3.fasta
-#QUERY_NAME     USER_BINS
 query1  0
-query2
+query2  1
 ```
-For the `search.output` Raptor will not output usefull results, as the index was build by the default kmer size `20`,
-which is smaller than the length of the queries. This should not happen in normal cases.
-For `search2.output` lets have a look again on the indexed sequences and the queries:
+Lets have a look again on the indexed sequences and the queries:
 ```fasta
 >chr1
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACGCGTTCATTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
->query2                              ||||||||||
+>query1                              ||||||||||
                                      CGCGTTCATT
 >chr2
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACGCGTCATTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
->query2                              |||||||||
-                                     CGCGTCATT
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACGCGTCATTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+>query2                              ||||||||||
+                                     CGCGTCATTA
 >chr3
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 ```
-So, with no errors allowed, we would expect a match from query1 to the first sequence and from query2 to the second
-sequence. Actually, this should also appear in the output, we assume that due to the smallness of the example, the
-second match does not appear.
+So, with no errors allowed, we would expect a match from query1 in the first sequence and from query2 in the second
+sequence.
 \endsolution
 
 \note
@@ -158,16 +142,13 @@ Alternative: Given a threshold of `50%` \f$0.5 \cdot 4 = 2\f$ k-mers have to exi
 \assignment{Assignment 2: Search with an error or a threshold.}
 From the first assignment in the last tutorial we want to use the more usefull `raptor2.index` and do two searches on it.
 
-Lets search again for the queries `CGCGTTCATT` and `CGCGTCATT` one time with an error of `1` and one time with the
+Lets search again for the queries `CGCGTTCATT` and `CGCGTCATTA` one time with an error of `1` and one time with the
 threshold of `0.9`, with creating a `search3.output` and a `search4.output`.
 \endassignment
 
 \solution
 You should have run
-```bash
-raptor search --index raptor2.index --query query.fasta --error 1 --output search3.output
-raptor search --index raptor2.index --query query.fasta --threshold 0.9 --output search4.output
-```
+\snippet script.sh 04_search_snippet_3
 Your `search3.output` should look like:
 ```text
 #0      mini_1.fasta
@@ -194,14 +175,13 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACGCGTTCATTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                                      CGCGTTCATT
 >chr2                                |||| |||||
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACGCG-TCATTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
->query2                              |||| |||||
-                                     CGCG-TCATT
->chr1                                |||| |||||
+>query2                              |||| ||||||
+                                     CGCG-TCATTA
+>chr1                                |||| ||||||
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACGCGTTCATTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 A
 ```
-As you can see, the queries now also match with an error the other sequence, which means that our search result makes
-sense.
+As you can see, the queries now also match with an error the other sequence.
 For the `search4.output` we lose these matches again, because the threshold throws out these results.
 \endsolution
 
@@ -303,16 +283,14 @@ Two files are stored:
 
 \assignment{Assignment 3: Search with minimizers.}
 We want to use the `minimiser.index` from the index tutorial assignment (\ref tutorial_index ) again and use the same
-queries `CGCGTTCATT` and `CGCGTCATT` to search in it.
+queries `CGCGTTCATT` and `CGCGTCATTA` to search in it.
 
 Lets search now with a tau of `0.9` and a pmax of `0.9`, with creating a `search5.output`.
 \endassignment
 
 \solution
 You should have run
-```bash
-raptor search --index minimiser.index --query query.fasta --tau 0.9 --p_max 0.9 --output search5.output
-```
+\snippet script.sh 04_search_snippet_4
 Your `search5.output` should look like:
 ```text
 #0      mini_1.fasta
@@ -320,7 +298,7 @@ Your `search5.output` should look like:
 #2      mini_3.fasta
 #QUERY_NAME     USER_BINS
 query1  0
-query2
+query2  1
 ```
 \endsolution
 
@@ -333,8 +311,7 @@ simultaneously.
 
 ### Time
 
-If you want to know the duration of raptor search including *time for reading the index*, *time for reading reads* and
-*the computation time* for benchmarking, you can use `--time` to write a timing file.
+By default, some statistics are printed at the end of `raptor search`. You can pass `--quiet` to disable this.
 
 ### HIBF
 
@@ -349,23 +326,21 @@ If no minimizers are used, our thresholding ensures that the (H)IBF gives no fal
 there are few false negatives, because the minimizer compression is not lossless.
 
 \assignment{Assignment 4: Search with hibf.}
-We want to use the `hibf.index` from the index tutorial assignment again. <!-- and use X as X-parameter. -->
+We want to use the `hibf.index` from the index tutorial assignment again.
 
-Lets search now for the `1024/reads/mini.fastq` querries with creating a `search6.output`.
+Lets search now for the `example_data/1024/reads/mini.fastq` querries with creating a `search6.output`.
 \endassignment
 
 \solution
 You should have run
-```bash
-raptor search --hibf --index hibf.index --query 1024/reads/mini.fastq --output search6.output
-```
+\snippet script.sh 04_search_snippet_5
 Your `search6.output` should look like:
 ```text
-#0      1024/bins/bin_0712.fasta
-#1      1024/bins/bin_0406.fasta
+#0      example_data/1024/bins/bin_0712.fasta
+#1      example_data/1024/bins/bin_0406.fasta
 ...
-#1021   1024/bins/bin_0533.fasta
-#1022   1024/bins/bin_0624.fasta
+#1021   example_data/1024/bins/bin_0533.fasta
+#1022   example_data/1024/bins/bin_0624.fasta
 #QUERY_NAME     USER_BINS
 0
 1
