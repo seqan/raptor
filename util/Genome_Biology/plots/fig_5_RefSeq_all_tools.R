@@ -108,7 +108,7 @@ index.time$Time <- period_to_seconds(hms(as.character(index.time$Time)))
 # index.time$Time <- index.time$Time / 3600
 
 #               bifrost    COBS       HIBF       IBF        mantis     metagraph    SeqOthello
-my.colors <- c("#e29b03", "#3017b0", "#8fbf5f", "#826546", "#9e4dc9", "darkgreen", "#43a5f0")
+my.colors <- c("#e29b03", "#3017b0", "darkgreen", "#8fbf5f", "#826546", "#9e4dc9", "#43a5f0")
 
 common_theme<-  theme_classic(base_size=7) +
   theme(axis.line = element_line(colour = "black", linewidth = 0.8/.pt),
@@ -147,6 +147,7 @@ g3<- ggplot(memory, aes(x = Point, y = Memory)) +
   scale_color_manual(values = my.colors) +
   scale_x_continuous(labels=c("1" = "1K", "2" = "1Mio", "3" = "5Mio", "4" = "10Mio")) +
   ggtitle("c") +
+  expand_limits(y = 0) +
   ylab("Query RAM in GiB") +
   xlab("Number of transcripts") +
   common_theme
