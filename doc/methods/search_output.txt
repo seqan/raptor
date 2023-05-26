@@ -1,0 +1,29 @@
+### Minimiser parameters
+## Window size = 19
+## Shape = 1111111111111111111
+## Shape size (length) = 19
+## Shape count (number of 1s) = 19
+### Search parameters
+## Query file = "/data/query.fq"
+## Pattern size = 65
+## Output file = "search.out"
+## Threads = 1
+## tau = 0.9999
+## p_max = 0.4
+## Percentage threshold = nan
+## Errors = 0
+## Cache thresholds = false
+### Index parameters
+## Index = "/data/index.hibf"
+## Index hashes = 2
+## Index parts = 1
+## False positive rate = 0.05
+## Index is HIBF = true
+#0	/data/bin1.fa
+#1	/data/bin2.fa
+#2	/data/bin3.fa
+#3	/data/bin4.fa
+#QUERY_NAME	USER_BINS
+query1	
+query2	1
+query3	0,1,2
