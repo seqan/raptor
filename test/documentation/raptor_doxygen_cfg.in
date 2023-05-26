@@ -6,7 +6,7 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = Raptor
 PROJECT_NUMBER         = ${PACKAGE_VERSION}
-PROJECT_BRIEF          = "A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences"
+PROJECT_BRIEF          = "A fast and space-efficient pre-filter"
 PROJECT_LOGO           =
 ## PATHS
 OUTPUT_DIRECTORY       = ${RAPTOR_DOXYGEN_OUTPUT_DIR}
@@ -183,14 +183,18 @@ IGNORE_PREFIX          =
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 HTML_FILE_EXTENSION    = .html
-HTML_HEADER            =
+HTML_HEADER            = ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/raptor_header.html
 HTML_FOOTER            = ${RAPTOR_DOXYGEN_OUTPUT_DIR}/raptor_footer.html
 HTML_STYLESHEET        =
-HTML_EXTRA_STYLESHEET  = ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/raptor.css \
-                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/raptor_dark.css
+HTML_EXTRA_STYLESHEET  = ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome.css \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-sidebar-only.css \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-sidebar-only-darkmode-toggle.css
 ### Extra files that we can link to
-HTML_EXTRA_FILES       =
-HTML_COLORSTYLE        = AUTO_LIGHT
+HTML_EXTRA_FILES       = ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-darkmode-toggle.js \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-fragment-copy-button.js \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-paragraph-link.js \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-interactive-toc.js
+HTML_COLORSTYLE        = LIGHT
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 100
 HTML_COLORSTYLE_GAMMA  = 80
@@ -221,11 +225,11 @@ QHP_SECT_FILTER_ATTRS  =
 QHG_LOCATION           =
 GENERATE_ECLIPSEHELP   = NO
 ECLIPSE_DOC_ID         = org.doxygen.Project
-DISABLE_INDEX          = YES
+DISABLE_INDEX          = NO
 GENERATE_TREEVIEW      = YES
 FULL_SIDEBAR           = NO
 ENUM_VALUES_PER_LINE   = 4
-TREEVIEW_WIDTH         = 250
+TREEVIEW_WIDTH         = 265
 EXT_LINKS_IN_WINDOW    = YES
 OBFUSCATE_EMAILS       = YES
 HTML_FORMULA_FORMAT    = png
