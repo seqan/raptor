@@ -194,7 +194,9 @@ HTML_EXTRA_FILES       = ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen
                          ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-fragment-copy-button.js \
                          ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-paragraph-link.js \
                          ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-interactive-toc.js \
-                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-tabs.js
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-tabs.js \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/figures/fig_4_many_user_bins.svg \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/figures/fig_6_acc.svg
 HTML_COLORSTYLE        = LIGHT
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 100
