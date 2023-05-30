@@ -12,7 +12,7 @@
 
 * Approximate Membership Query (AMQ) based on k-mers
 * Input are sequences. Also called samples/references/genomes/color. We use the term bin or user bin.
-* Given a query sequence: Show all bins that possible contain that sequence.
+* Given a query sequence: Show all bins that possibly contain that sequence.
   * Either given a number of errors
   * Or given a percentage (e.g., 0.7 -> 70% of queried k-mers must be present in a bin)
 * Does not model a colored de Bruijn graph:
@@ -57,9 +57,9 @@ Cases in which to consider the IBF:
 The used data set is the **worst case** for the HIBF. In reality, the index size is usually smaller than the
 corresponding IBF, and build times of the HIBF are much closer to IBF build times.
 
-## Choosing window and kmer size {#usage_w_vs_k}
+## Choosing window and k-mer size {#usage_w_vs_k}
 
-### (w,k) minimiser vs (k,k) canonical k-mers
+### (w,k) minimisers vs (k,k) canonical k-mers
 
 |               | (k,k) |   (w,k)   |
 |---------------|:-----:|:---------:|
@@ -69,9 +69,9 @@ corresponding IBF, and build times of the HIBF are much closer to IBF build time
 | Thresholding¹ | Exact | Heuristic |
 <small>¹ When searching with a given number of errors.</small><br>
 
-* (w,k) minimiser reduces the number of values to process by roughly \f$\frac{w - k + 2}{2}\f$.
-* (w,k) minimiser have a slightly lower accuracy than (k,k). However, the loss of accuracy mainly stems from false
-  positves, not false negatives.
+* (w,k) minimisers reduce the number of values to process by roughly \f$\frac{w - k + 2}{2}\f$.
+* (w,k) minimisers have a slightly lower accuracy than (k,k). However, the loss of accuracy mainly stems from false
+  positives, not false negatives.
 
 Recommendation: (w,k) with gentle compression (w-k=4)
 
@@ -84,7 +84,7 @@ Recommendation: (w,k) with gentle compression (w-k=4)
 \endhtmlonly
 </details>
 
-### (w,k) minimiser
+### (w,k) minimisers
 Requirements:
   * `w > k`
   * `w ≤ query length`

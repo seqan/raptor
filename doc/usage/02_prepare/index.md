@@ -28,7 +28,7 @@ Created output files for each input file:
   * `*.in_progress`: Temporary file to track process. Deleted after finishing computation.
 
 \attention
-The window and kmer sized used for preprocessing are propagated to `raptor layout` and `raptor build` and cannot be
+The window and k-mer sized used for preprocessing are propagated to `raptor layout` and `raptor build` and cannot be
 overwritten there.
 
 \note
@@ -79,7 +79,7 @@ Apply cutoffs from Mantis(Pandey et al., 2018).
 | ≤ 3 GiB   | 20     |
 | > 3 GiB   | 50     |
 
-File sizes are based of gzipped FASTQ files. Compression reduces the filesize by around factor `3`. FASTA files are
+File sizes are based of gzipped FASTQ files. Compression reduces the file size by around factor `3`. FASTA files are
 approximately `2` times smaller than FASTQ.
 
 \note
