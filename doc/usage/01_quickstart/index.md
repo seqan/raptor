@@ -63,9 +63,9 @@ corresponding IBF, and build times of the HIBF are much closer to IBF build time
 
 |               | (k,k) | (w,k) |
 |---------------|-------|-------|
-| Index size    | ❌   | ✔️   |
-| Runtime       | ❌   | ✔️   |
-| RAM usage     | ❌   | ✔️   |
+| Index size    | 📈   | 📉   |
+| Runtime       | 📈   | 📉   |
+| RAM usage     | 📈   | 📉   |
 | Thresholding¹ | Exact | Heuristic |
 <small>¹ When searching with a given number of errors.</small><br>
 
