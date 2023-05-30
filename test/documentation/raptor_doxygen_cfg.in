@@ -149,7 +149,8 @@ EXCLUDE_PATTERNS       = */doc/*.cpp \
                          */contrib/std/*.hpp
 EXCLUDE_SYMBOLS        = ${RAPTOR_DOXYGEN_EXCLUDE_SYMBOLS}
 EXAMPLE_PATH           = ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/snippet \
-                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/methods
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/methods \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/fragments
 EXAMPLE_PATTERNS       = *
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc \

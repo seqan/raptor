@@ -10,6 +10,7 @@ The path to the index. For partitioned indices, the suffix `_x`, where `x` is a 
 ### -​-query
 File containing query sequences.
 
+<details><summary>Many file types and compressions are supported. Click to show a list.</summary>
 Supported file extensions are (possibly followed by bz2, gz, or bgzf):
   * embl
   * fasta
@@ -25,6 +26,7 @@ Supported file extensions are (possibly followed by bz2, gz, or bgzf):
   * gb
   * gbk
   * sam
+</details>
 
 ### -​-output
 The output file name.

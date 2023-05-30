@@ -8,16 +8,30 @@
 * present workflow ibf/hibf
 * present (w,k) minimiser, (k,k) canonical k-mers -->
 
-## What problems can be solved
+# What problems can be solved
 
-* Approximate Membership Query (AMQ)
-* Input sequences = bins
+* Approximate Membership Query (AMQ) based on k-mers
+* Input are sequences. Also called samples/references/genomes/color. We use the term bin or user bin.
 * Given a query sequence: Show all bins that possible contain that sequence.
   * Either given a number of errors
-  * Or given a percentage (e.g., 0.7 -> 70% of minimiser/k-mers of query must be present in bin)
+  * Or given a percentage (e.g., 0.7 -> 70% of queried k-mers must be present in a bin)
 * Does not model a colored de Bruijn graph:
   * ✔️ Given a k-mer: Tell to which color (bin) it belongs to
   * ❌ Given a color (bin): Show all k-mers that belong to this color (bin)
+
+# Workflow
+
+<div class="tabbed">
+
+- <b class="tab-title">HIBF</b>
+[`raptor prepare`] -> `raptor layout` -> `raptor build` -> `raptor search`
+
+- <b class="tab-title">IBF</b>
+[`raptor prepare`] -> `raptor build` -> `raptor search`
+
+</div>
+
+# General decisions
 
 ## HIBF vs IBF
 Recommendation: HIBF
@@ -43,70 +57,7 @@ Cases in which to consider the IBF:
 The used data set is the **worst case** for the HIBF. In reality, the index size is usually smaller than the
 corresponding IBF, and build times of the HIBF are much closer to IBF build times.
 
-## Workflow
-
-<div class="tabbed">
-
-- <b class="tab-title">HIBF</b>
-[`raptor prepare`] -> `raptor layout` -> `raptor build` -> `raptor search`
-
-- <b class="tab-title">IBF</b>
-[`raptor prepare`] -> `raptor build` -> `raptor search`
-
-</div>
-
-## Input files
-
-### List of sequence files
-Applies to:
-  * `raptor prepare`
-  * `raptor layout` (without running `raptor prepare` beforehand)
-  * `raptor build` (without running `raptor prepare` beforehand)
-
-The input file contains paths to the sequence data. Each line may contain multiple paths (separated by a whitespace).
-
-\attention
-`raptor layout` currently does not accept multiple paths, see \ref usage_layout_input for a workaround.
-
-```
-/absolute/path/to/file1.fasta /absolute/path/to/file2.fasta
-/absolute/path/to/file3.fa.gz
-```
-
-<details><summary>Many file types and compressions are supported. Click to show a list.</summary>
-Supported file extensions are (possibly followed by bz2, gz, or bgzf):
-  * embl
-  * fasta
-  * fa
-  * fna
-  * ffn
-  * faa
-  * frn
-  * fas
-  * fastq
-  * fq
-  * genbank
-  * gb
-  * gbk
-  * sam
-</details>
-
-### List of preprocessed files
-Applies to:
-  * `raptor layout`
-  * `raptor build`
-
-See \ref usage_prepare_output.
-
-\note
-As a convenience, `raptor prepare` creates a `minimiser.list` file in the output directory. This file can be used as
-input for `raptor layout` and `raptor build`.
-
-\attention
-The window and kmer sized used for preprocessing are propagated to `raptor layout` and `raptor build` and cannot be
-overwritten there.
-
-## Choosing window and kmer size
+## Choosing window and kmer size {#usage_w_vs_k}
 
 ### (w,k) minimiser vs (k,k) canonical k-mers
 
@@ -122,9 +73,9 @@ overwritten there.
 * (w,k) minimiser have a slightly lower accuracy than (k,k). However, the loss of accuracy mainly stems from false
   positves, not false negatives.
 
-#### Recommendation {#usage_w_vs_k_figure}
-* (w,k) with gentle compression (w-k=4)
+Recommendation: (w,k) with gentle compression (w-k=4)
 
+\anchor usage_w_vs_k_figure
 <details><summary>Click to see the differences of (w,k) and (k,k) on different aspects.</summary>
 \htmlonly
 <svg style="height: auto; width: 100%;" viewBox="0 0 307.29294 196.59375">
@@ -133,7 +84,7 @@ overwritten there.
 \endhtmlonly
 </details>
 
-### (w,k)
+### (w,k) minimiser
 Requirements:
   * `w > k`
   * `w ≤ query length`
@@ -148,7 +99,7 @@ Examples:
 
 Also see the figure in \ref usage_w_vs_k_figure.
 
-### (k,k)
+### (k,k) canonical k-mers
 Requirements:
   * `k ≤ query length`
   * k-mer counting lemma satisfied, when searching with a given number of errors.
@@ -173,15 +124,3 @@ Furthermore, k shall be such that a random k-mer match in the database is unlike
 For example, we chose k = 32 for the RefSeq data set. In general, there is no drawback in
 choosing the (currently supported) maximum k of 32, as long as the aforementioned
 requirements are fulfilled.
-
-## Choosing IBF parameters
-
-### h
-Recommendation: default value (`2`)
-
-### fpr
-Recommendation: default value (`0.05`)
-
-* A lower `fpr` limits the number of false-positive results, but increases index size.
-* A higher `fpr` can help to reduce memory consumption in cases where false-positive k-mers have little effect.
-
