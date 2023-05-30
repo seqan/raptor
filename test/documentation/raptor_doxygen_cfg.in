@@ -59,7 +59,7 @@ OPTIMIZE_OUTPUT_SLICE  = NO
 ## detect headers without extensions (in std module)
 EXTENSION_MAPPING      = .no_extension=C++
 MARKDOWN_SUPPORT       = YES
-TOC_INCLUDE_HEADINGS   = 2
+TOC_INCLUDE_HEADINGS   = 3
 AUTOLINK_SUPPORT       = YES
 BUILTIN_STL_SUPPORT    = NO
 CPP_CLI_SUPPORT        = NO
@@ -149,7 +149,8 @@ EXCLUDE_PATTERNS       = */doc/*.cpp \
                          */contrib/std/*.hpp
 EXCLUDE_SYMBOLS        = ${RAPTOR_DOXYGEN_EXCLUDE_SYMBOLS}
 EXAMPLE_PATH           = ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/snippet \
-                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/tutorial
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/methods \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/fragments
 EXAMPLE_PATTERNS       = *
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc \
@@ -193,7 +194,10 @@ HTML_EXTRA_STYLESHEET  = ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen
 HTML_EXTRA_FILES       = ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-darkmode-toggle.js \
                          ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-fragment-copy-button.js \
                          ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-paragraph-link.js \
-                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-interactive-toc.js
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-interactive-toc.js \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-tabs.js \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/figures/fig_4_many_user_bins.svg \
+                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/figures/fig_6_acc.svg
 HTML_COLORSTYLE        = LIGHT
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 100

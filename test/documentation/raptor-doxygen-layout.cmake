@@ -69,7 +69,7 @@ endfunction ()
 # Note: variable name DOXYGEN_LAYOUT must not be changed because it is directly used within `replace_in_doxygen_layout`
 file (READ "${RAPTOR_LAYOUT_IN}" DOXYGEN_LAYOUT)
 
-replace_in_doxygen_layout ("${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/setup/" "Setup")
-replace_in_doxygen_layout ("${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/tutorial/" "Tutorial")
+replace_in_doxygen_layout ("${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/usage/" "Usage")
+replace_in_doxygen_layout ("${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/methods/" "Methods")
 
 file (WRITE "${RAPTOR_DOXYGEN_OUTPUT_DIR}/DoxygenLayout.xml" ${DOXYGEN_LAYOUT})
