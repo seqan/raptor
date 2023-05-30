@@ -2,13 +2,13 @@
 
 [TOC]
 
-* reference usage sections
+<!-- * reference usage sections
 * copy/paste examples with many/all options
 * present subcommands
 * present workflow ibf/hibf
-* present (w,k) minimiser, (k,k) canonical k-mers
+* present (w,k) minimiser, (k,k) canonical k-mers -->
 
-## What problems can be solved (short 5 sentences)
+## What problems can be solved
 
 * Approximate Membership Query (AMQ)
 * Input sequences = bins
@@ -20,9 +20,13 @@
   * ❌ Given a color (bin): Show all k-mers that belong to this color (bin)
 
 ## HIBF vs IBF
+Recommendation: HIBF
 
-* comparison table
+Cases in which to consider the IBF:
+  * Evenly sized bins
+  * Small number of bins (≤ 128)
 
+<details><summary>Click to see an HIBF / IBF comparison.</summary>
 \htmlonly
 <!--
     Including an SVG like this allows using CSS variables inside the SVG, e.g.,
@@ -35,6 +39,9 @@
   <use href="/fig_4_many_user_bins.svg#svg" width="100%" height="100%"></use>
 </svg>
 \endhtmlonly
+\note
+The used data set is the **worst case** for the HIBF. In reality, the index size is usually smaller than the
+corresponding IBF, and build times of the HIBF are much closer to IBF build times.
 
 ## Workflow
 
@@ -111,9 +118,9 @@ overwritten there.
 | Thresholding¹ | Exact | Heuristic |
 <small>¹ When searching with a given number of errors.</small><br>
 
-(w,k) minimiser reduces number of values to process by roughly \f$\frac{w - k + 2}{2}\f$.
-(w,k) minimiser have a slightly lower accuracy than (k,k). However, the loss of accuracy mainly stems from false positves,
-not false negatives.
+* (w,k) minimiser reduces the number of values to process by roughly \f$\frac{w - k + 2}{2}\f$.
+* (w,k) minimiser have a slightly lower accuracy than (k,k). However, the loss of accuracy mainly stems from false
+  positves, not false negatives.
 
 #### Recommendation {#usage_w_vs_k_figure}
 * (w,k) with gentle compression (w-k=4)
@@ -130,9 +137,11 @@ not false negatives.
 Requirements:
   * `w > k`
   * `w ≤ query length`
+
 Recommendation:
   * `w - k = 4`
   * `w << query length`
+
 Examples:
   * query length 100: `w = 24`, `k = 20`
   * query length 250: `w = 28`, `k = 24`
@@ -142,9 +151,11 @@ Also see the figure in \ref usage_w_vs_k_figure.
 ### (k,k)
 Requirements:
   * `k ≤ query length`
-  * K-mer counting lemma satisfied
+  * k-mer counting lemma satisfied, when searching with a given number of errors.
+
 Recommendation:
   * `k << query length`
+
 Examples (for two errors):
   * query length 100: `k = 20`
   * query length 250: `k = 32`
@@ -166,6 +177,11 @@ requirements are fulfilled.
 ## Choosing IBF parameters
 
 ### h
+Recommendation: default value (`2`)
 
 ### fpr
+Recommendation: default value (`0.05`)
+
+* A lower `fpr` limits the number of false-positive results, but increases index size.
+* A higher `fpr` can help to reduce memory consumption in cases where false-positive k-mers have little effect.
 
