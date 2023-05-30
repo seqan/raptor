@@ -28,6 +28,7 @@ information.
 ### Download current main branch
 ```bash
 git clone https://github.com/seqan/raptor
+cd raptor
 git submodule update --init
 ```
 

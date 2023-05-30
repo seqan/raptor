@@ -23,7 +23,7 @@
 The output file name.
 
 ## -​-threads
-The number of threads to use. Both IBF and HIBF construction can heavily benefit from parallisation.
+The number of threads to use. Both IBF and HIBF construction can heavily benefit from parallelisation.
 
 ## -​-quiet
 By default, runtime and memory statistics are printed to stderr at the end.

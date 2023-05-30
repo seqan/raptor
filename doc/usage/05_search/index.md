@@ -49,7 +49,7 @@ The output file name.
 
 ### -​-threads
 The number of threads to use. Sequences in the query file will be processed in parallel.
-Neglecible effect on RAM usage for unpartitioned indices. Moderate effect for partitioned indices.
+Negligible effect on RAM usage for unpartitioned indices. Moderate effect for partitioned indices.
 
 ### -​-quiet
 By default, runtime and memory statistics are printed to stderr at the end.
@@ -72,7 +72,7 @@ Mutually exclusive with --error.
 The sequence length of a query. Used to determine thresholds. The sequence lengths should have little to no variance.
 
 If not provided:
-  * the median of sequence lengths in query file is used.
+  * the median of sequence lengths in the query file is used.
   * a warning is emitted if there is a high variance in sequence lengths.
   * an error occurs if any sequence is shorter than the window size.
 
@@ -89,7 +89,7 @@ The higher p_max, the higher the threshold.
 Has no effect when using `--threshold` or `w` == `k`.
 
 ### -​-cache-thresholds
-Stores the computed thresholds with an unique name next to the index. In the next search call using this
+Stores the computed thresholds with a unique name next to the index. In the next search call using this
 option, the stored thresholds are re-used.
 Two files are stored:
   * threshold_*.bin: Depends on query_length, window, kmer/shape, errors, and tau.
