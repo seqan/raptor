@@ -61,11 +61,11 @@ corresponding IBF, and build times of the HIBF are much closer to IBF build time
 
 ### (w,k) minimiser vs (k,k) canonical k-mers
 
-|               | (k,k) | (w,k) |
-|---------------|-------|-------|
-| Index size    | 📈   | 📉   |
-| Runtime       | 📈   | 📉   |
-| RAM usage     | 📈   | 📉   |
+|               | (k,k) |   (w,k)   |
+|---------------|:-----:|:---------:|
+| Index size    |   ⬆️  |    ⬇️    |
+| Runtime       |   ⬆️  |    ⬇️    |
+| RAM usage     |   ⬆️  |    ⬇️    |
 | Thresholding¹ | Exact | Heuristic |
 <small>¹ When searching with a given number of errors.</small><br>
 
