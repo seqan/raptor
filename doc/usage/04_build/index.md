@@ -46,7 +46,7 @@ The output file name.
 The number of threads to use. Both IBF and HIBF construction can heavily benefit from parallisation.
 
 ### -​-quiet
-By default, runtime and memory statistics are printed at the end.
+By default, runtime and memory statistics are printed to stderr at the end.
 
 This flag disables this behaviour.
 
@@ -59,19 +59,7 @@ This flag disables this behaviour.
   accidentally overwriting `k`.
 
 - <b class="tab-title">IBF</b>
-  Depending on the number of errors that should be accounted for when searching, the `kmer-size` (`k`) has to be chosen
-  such that the k-mer lemma still has a positive threshold.
-
-  **K-mer counting lemma**: For a given `k` and number of errors `e`, there are \f$k_p = |p| - k + 1\f$ many k-mers in the
-  pattern `p` and an approximate occurrence of `p` in text `T` has to share at least \f$t = (k_p - k \cdot e)\f$ k-mers.
-
-  For example, when searching reads of length 100 and allowing 4 errors, k has to be at most 20
-  (100 − 20 + 1 − 4 · 20 = 1).
-
-  Furthermore, k shall be such that a random k-mer match in the database is unlikely.
-  For example, we chose k = 32 for the RefSeq data set. In general, there is no drawback in
-  choosing the (currently supported) maximum k of 32, as long as the aforementioned
-  requirements are fulfilled.
+  blah
 
 </div>
 
@@ -84,13 +72,7 @@ This flag disables this behaviour.
   accidentally overwriting `w`.
 
 - <b class="tab-title">IBF</b>
-  In the case that minimizers should be used, w has to be bigger than k.
-  Canonical k-mers are achieved with w = k. Depending on the choice of k, the choice
-  of w has to be made such that we obtain positive thresholds with our probabilistic
-  threshold. In general, we aim at having a minimum threshold of 3 for the (w, k) minimizers. Hence, we choose w as large as possible, such that the minimum threshold is 3.
-  For example, this is obtained for 2 errors and read length 150 for (29, 20) minimizers, for read length 100 for (24, 20)-minimizers and for read length 250 for (40, 20)
-  minimizers, which in turn reduces the amount of k-mers by factors of 5.5, 3, and 11,
-  respectively
+  Blah
 
 </div>
 

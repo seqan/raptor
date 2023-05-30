@@ -8,7 +8,7 @@
 The path to the index. For partitioned indices, the suffix `_x`, where `x` is a number, must be omitted.
 
 ### -​-query
-File containing queries.
+File containing query sequences.
 
 Supported file extensions are (possibly followed by bz2, gz, or bgzf):
   * embl
@@ -50,7 +50,7 @@ The number of threads to use. Sequences in the query file will be processed in p
 Neglecible effect on RAM usage for unpartitioned indices. Moderate effect for partitioned indices.
 
 ### -​-quiet
-By default, runtime and memory statistics are printed at the end.
+By default, runtime and memory statistics are printed to stderr at the end.
 
 This flag disables this behaviour.
 

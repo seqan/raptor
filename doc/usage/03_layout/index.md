@@ -7,7 +7,7 @@ A layout is only needed when you want to build an HIBF ("HIBFvsIBF").
 
 ## Main Parameters
 
-### -​-input-file
+### -​-input-file {#usage_layout_input}
 The input file contains paths to the sequence data. Each line may contain one path.
 
 ```
