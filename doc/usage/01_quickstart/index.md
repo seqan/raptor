@@ -33,7 +33,7 @@
 
 # General decisions
 
-## HIBF vs IBF
+## HIBF vs IBF {#hibf_vs_ibf}
 Recommendation: HIBF
 
 Cases in which to consider the IBF:

@@ -3,7 +3,7 @@
 [TOC]
 
 \attention
-A layout is only needed when you want to build an HIBF ("HIBFvsIBF").
+A layout is only needed if you want to build an HIBF (\ref hibf_vs_ibf).
 
 # Main Parameters
 
