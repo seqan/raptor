@@ -10,11 +10,6 @@ There may be performance benefits when compiling from source as the build can be
 conda install -c bioconda -c conda-forge raptor
 ```
 
-## Install with Homebrew (Linux, macOS)
-```bash
-brew install brewsci/bio/raptor
-```
-
 ## Compile from source
 
 ### Prerequisites
