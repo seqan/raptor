@@ -30,7 +30,7 @@ brew install brewsci/bio/raptor
 ```
 
 ## Example Data and Usage
-See the [documentation](https://seqan-raptor.vercel.app/tutorial_first_steps.html) for examples and usage.
+See the [documentation](https://seqan-raptor.vercel.app/usage_quickstart.html) for usage.
 
 `raptor --help` will show available commands. Each command will have a respective help page that can be shown via, e.g.,
 `raptor build --help`.
@@ -44,6 +44,9 @@ In your academic works (also comparisons and pipelines) please cite:
   * *Raptor: A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences*;
     Enrico Seiler, Svenja Mehringer, Mitra Darvish, Etienne Turc, and Knut Reinert; iScience 2021 24 (7): 102782.
     doi: https://doi.org/10.1016/j.isci.2021.102782
+  * *Hierarchical Interleaved Bloom Filter: enabling ultrafast, approximate sequence queries*;
+    Svenja Mehringer, Enrico Seiler, Felix Droop, Mitra Darvish, René Rahn, Martin Vingron, and Knut Reinert;
+    Genome Biol 24, 131 (2023). doi: https://doi.org/10.1186/s13059-023-02971-4
 
 ### RECOMB 2021
 Raptor was presented at the [25th International Conference on Research in Computational Molecular Biology][recomb_url]:
