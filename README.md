@@ -23,12 +23,6 @@ There may be performance benefits when compiling from source, as Raptor can be o
 conda install -c bioconda -c conda-forge raptor
 ```
 
-### Install with [brew](https://brew.sh/) (Linux, macOS)
-
-```bash
-brew install brewsci/bio/raptor
-```
-
 ## Example Data and Usage
 See the [documentation](https://seqan-raptor.vercel.app/usage_quickstart.html) for usage.
 
