@@ -1,4 +1,4 @@
-# Raptor [![build status][1]][2] [![codecov][3]][4] [![install with bioconda][5]][6] [![install with brew][7]][8]
+# Raptor [![build status][1]][2] [![codecov][3]][4] [![install with bioconda][5]][6]
 
 [1]: https://img.shields.io/github/actions/workflow/status/seqan/raptor/ci_linux.yml?branch=main&style=flat&logo=github&label=Raptor%20CI
 [2]: https://github.com/seqan/raptor/actions?query=branch%3Amain
@@ -6,8 +6,6 @@
 [4]: https://codecov.io/gh/seqan/raptor
 [5]: https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat
 [6]: #install-with-bioconda-linux
-[7]: https://img.shields.io/badge/install%20with-brew-brightgreen.svg?style=flat
-[8]: #install-with-brew-linux-macos
 
 ### A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences
 
