@@ -32,6 +32,10 @@ set (CHOPPER_BUILD_TEST
      OFF
      CACHE BOOL "Build chopper tests."
 )
+set (CHOPPER_INSTALL
+     OFF
+     CACHE BOOL "Install Chopper."
+)
 
 FetchContent_MakeAvailable (raptor_chopper_project)
 
@@ -40,7 +44,7 @@ FetchContent_Declare (raptor_xxhash_project URL "${RAPTOR_SUBMODULES_DIR}/xxHash
 
 set (XXHASH_BUILD_ENABLE_INLINE_API ON)
 set (XXHASH_BUILD_XXHSUM OFF)
-set (XXHASH_BUNDLED_MODE OFF)
+set (XXHASH_BUNDLED_MODE ON)
 set (BUILD_SHARED_LIBS OFF)
 
 FetchContent_MakeAvailable (raptor_xxhash_project)
@@ -73,7 +77,7 @@ if (NOT TARGET raptor)
     target_link_libraries ("raptor" PUBLIC "raptor_lib")
 endif ()
 
-install (TARGETS raptor DESTINATION "${CMAKE_INSTALL_BINDIR}")
+install (TARGETS raptor RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 add_subdirectory (argument_parsing)
 add_subdirectory (build)
