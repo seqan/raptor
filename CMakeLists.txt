@@ -20,8 +20,7 @@ project (raptor
 )
 
 #test
-find_package (Raptor REQUIRED
-HINTS ${RAPTOR_MODULE_PATH})
+find_package (Raptor REQUIRED HINTS ${RAPTOR_MODULE_PATH})
 
 option (BUILD_RAPTOR "Enable building of Raptor." ON)
 
