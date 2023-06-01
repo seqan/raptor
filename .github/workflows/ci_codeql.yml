@@ -10,7 +10,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CMAKE_VERSION: 3.18.4
   SHARG_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
 
@@ -33,7 +32,9 @@ jobs:
         submodules: true
 
     - name: Install CMake
-      run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_cmake.sh
+      uses: seqan/actions/setup-cmake@main
+      with:
+        cmake: 3.18.4
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2

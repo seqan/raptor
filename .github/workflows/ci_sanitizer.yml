@@ -10,7 +10,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CMAKE_VERSION: 3.18.4
   SHARG_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
   ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1
@@ -49,8 +48,8 @@ jobs:
           fetch-depth: 1
           submodules: true
 
-      - name: Add package source
-        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/configure_apt.sh
+      - name: Setup apt
+        uses: seqan/actions/setup-package-manager@main
 
       - name: Configure OS
         run: |
@@ -58,15 +57,17 @@ jobs:
           sudo bash -c "echo 2 >/proc/sys/kernel/randomize_va_space"
 
       - name: Install CMake
-        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_cmake.sh
+        uses: seqan/actions/setup-cmake@main
+        with:
+          cmake: 3.18.4
 
       - name: Install compiler g++-12
-        run: sudo apt-get install --yes g++-12
+        run: |
+          install g++-12
+          echo "CC=gcc-12" >> "$GITHUB_ENV"
+          echo "CXX=g++-12" >> "$GITHUB_ENV"
 
       - name: Configure tests
-        env:
-          CXX: g++-12
-          CC: gcc-12
         run: |
           mkdir build
           cd build
