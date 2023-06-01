@@ -22,8 +22,7 @@ int main(int argc, char ** argv)
 {
     try
     {
-        sharg::parser top_level_parser{"Raptor",
-                                       argc,
+        sharg::parser top_level_parser{"Raptor", argc,
                                        argv,
                                        sharg::update_notifications::on,
                                        {"build", "layout", "prepare", "search", "upgrade"}};

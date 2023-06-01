@@ -19,7 +19,9 @@ project (raptor
          HOMEPAGE_URL "https://github.com/seqan/raptor"
 )
 
-find_package (Raptor REQUIRED HINTS ${RAPTOR_MODULE_PATH})
+#test
+find_package (Raptor REQUIRED
+HINTS ${RAPTOR_MODULE_PATH})
 
 option (BUILD_RAPTOR "Enable building of Raptor." ON)
 
