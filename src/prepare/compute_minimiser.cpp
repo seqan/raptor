@@ -12,11 +12,13 @@
 
 #include <robin_hood.h>
 
+#include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
 #include <seqan3/io/sequence_file/input.hpp>
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <raptor/adjust_seed.hpp>
-#include <raptor/call_parallel_on_bins.hpp>
+#include <raptor/contrib/std/chunk_view.hpp>
+#include <raptor/contrib/std/zip_view.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/file_reader.hpp>
 #include <raptor/prepare/compute_minimiser.hpp>
@@ -127,7 +129,11 @@ void compute_minimiser(prepare_arguments const & arguments)
         arguments.write_header_timer += local_write_header_timer;
     };
 
-    call_parallel_on_bins(worker, arguments.bin_path, arguments.threads);
+    size_t const chunk_size = std::ceil(arguments.bin_path.size() / static_cast<double>(arguments.threads));
+    auto chunked_view =
+        seqan::std::views::zip(arguments.bin_path, std::views::iota(0u)) | seqan::std::views::chunk(chunk_size);
+    seqan3::detail::execution_handler_parallel executioner{arguments.threads};
+    executioner.bulk_execute(std::move(worker), std::move(chunked_view), []() {});
 
     write_list_file(arguments);
 }
