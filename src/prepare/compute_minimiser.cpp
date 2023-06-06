@@ -129,7 +129,8 @@ void compute_minimiser(prepare_arguments const & arguments)
         arguments.write_header_timer += local_write_header_timer;
     };
 
-    size_t const chunk_size = std::ceil(arguments.bin_path.size() / static_cast<double>(arguments.threads));
+    size_t const chunk_size =
+        std::max<size_t>(1, std::floor(arguments.bin_path.size() / static_cast<double>(arguments.threads)));
     auto chunked_view =
         seqan::std::views::zip(arguments.bin_path, std::views::iota(0u)) | seqan::std::views::chunk(chunk_size);
     seqan3::detail::execution_handler_parallel executioner{arguments.threads};
