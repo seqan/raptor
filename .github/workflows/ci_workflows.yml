@@ -48,16 +48,16 @@ jobs:
           fetch-depth: 2
           submodules: true
 
-      - name: Install CMake
-        uses: seqan/actions/setup-cmake@main
-        with:
-          cmake: 3.18.4
-
       - name: Setup toolchain
         uses: seqan/actions/setup-toolchain@main
         with:
           compiler: ${{ matrix.compiler }}
           ccache_size: 150M
+
+      - name: Install CMake
+        uses: seqan/actions/setup-cmake@main
+        with:
+          cmake: 3.18.4
 
       - name: Install Nextflow
         if: matrix.name == 'Nextflow'
