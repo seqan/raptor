@@ -48,7 +48,7 @@ jobs:
           fetch-depth: 1
           submodules: true
 
-      - name: Setup apt
+      - name: Setup Package Manager
         uses: seqan/actions/setup-package-manager@main
 
       - name: Configure OS
