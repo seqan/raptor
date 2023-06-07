@@ -259,12 +259,42 @@ else ()
     endif ()
 endif ()
 
-option (RAPTOR_LTO_BUILD "Enable link-time optimization." ON)
-if (RAPTOR_IS_DEBUG OR NOT RAPTOR_LTO_BUILD)
-    raptor_config_print ("Link-time optimization:     disabled")
+if (RAPTOR_IS_DEBUG)
+    raptor_config_print ("Link Time Optimization:     disabled")
 else ()
-    set (RAPTOR_CXX_FLAGS "${RAPTOR_CXX_FLAGS} -flto=auto")
-    raptor_config_print ("Link-time optimization:     via -flto=auto")
+    if ("${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
+        set (RAPTOR_LTO_FLAGS "-flto=auto")
+    else ()
+        set (RAPTOR_LTO_FLAGS "-flto=auto -fno-fat-lto-objects")
+    endif ()
+
+    set (LTO_CMAKE_SOURCE
+         "cmake_minimum_required(VERSION ${CMAKE_VERSION})\nproject(lto-test LANGUAGES CXX)
+          cmake_policy(SET CMP0069 NEW)\nadd_library(foo foo.cpp)\nadd_executable(boo main.cpp)
+          target_link_libraries(boo PUBLIC foo)"
+    )
+    set (LTO_FOO_CPP "int foo(){return 0x42;}")
+    set (LTO_MAIN_CPP "int foo();int main(){return foo();}")
+    set (testdir "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/_CMakeLTOTest-CXX")
+    set (bindir "${testdir}/bin")
+    set (srcdir "${testdir}/src")
+    file (MAKE_DIRECTORY "${bindir}")
+    file (MAKE_DIRECTORY "${srcdir}")
+    file (WRITE "${srcdir}/foo.cpp" "${LTO_FOO_CPP}")
+    file (WRITE "${srcdir}/main.cpp" "${LTO_MAIN_CPP}")
+    file (WRITE "${srcdir}/CMakeLists.txt" "${LTO_CMAKE_SOURCE}")
+    try_compile (RAPTOR_HAS_LTO "${bindir}"
+                 "${srcdir}" "lto-test"
+                 CMAKE_FLAGS "-DCMAKE_VERBOSE_MAKEFILE=ON" "-DCMAKE_CXX_FLAGS:STRING=${RAPTOR_LTO_FLAGS}"
+                 OUTPUT_VARIABLE output
+    )
+
+    if (RAPTOR_HAS_LTO)
+        raptor_config_print ("Link Time Optimization:     enabled")
+        set (RAPTOR_CXX_FLAGS "${RAPTOR_CXX_FLAGS} ${RAPTOR_LTO_FLAGS}")
+    else ()
+        raptor_config_print ("Link Time Optimization:     not available")
+    endif ()
 endif ()
 
 option (RAPTOR_STRIP_BINARY "Enable binary-stripping. Not supported on macOS." ON)
