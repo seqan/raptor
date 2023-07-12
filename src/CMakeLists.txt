@@ -13,7 +13,7 @@ raptor_require_ccache ()
 # Dependency: Chopper
 include (FetchContent)
 
-FetchContent_Declare (raptor_chopper_project URL "${RAPTOR_SUBMODULES_DIR}/chopper")
+FetchContent_Declare (raptor_chopper_project SOURCE_DIR "${RAPTOR_SUBMODULES_DIR}/chopper")
 
 set (SEQAN3_SUBMODULES_DIR "${RAPTOR_SUBMODULES_DIR}")
 set (CHOPPER_SUBMODULES_DIR
@@ -40,7 +40,9 @@ set (CHOPPER_INSTALL
 FetchContent_MakeAvailable (raptor_chopper_project)
 
 # Dependency: xxHash
-FetchContent_Declare (raptor_xxhash_project URL "${RAPTOR_SUBMODULES_DIR}/xxHash" SOURCE_SUBDIR "cmake_unofficial")
+FetchContent_Declare (raptor_xxhash_project SOURCE_DIR "${RAPTOR_SUBMODULES_DIR}/xxHash" SOURCE_SUBDIR
+                                            "cmake_unofficial"
+)
 
 set (XXHASH_BUILD_ENABLE_INLINE_API ON)
 set (XXHASH_BUILD_XXHSUM OFF)
