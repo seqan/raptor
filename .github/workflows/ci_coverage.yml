@@ -31,8 +31,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "gcc12"
-            compiler: "gcc-12"
+          - name: "gcc13"
+            compiler: "gcc-13"
             build: coverage
             build_type: Coverage
             cxx_flags: "-std=c++23"
@@ -66,7 +66,7 @@ jobs:
           CC: ${{ matrix.compiler }}
         run: |
           sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/${CC/gcc/gcov} 100
-          pip install gcovr==5.2
+          pip install gcovr==6.0
 
       - name: Configure tests
         run: |
@@ -78,8 +78,6 @@ jobs:
           make -j2 gtest_build
 
       - name: Build tests
-        env:
-          CCACHE_IGNOREOPTIONS: "-fprofile-abs-path"
         run: |
           ccache -z
           cd build
@@ -103,6 +101,7 @@ jobs:
                 --exclude-lines-by-pattern '^.*GCOVR_EXCL_LINE.*$' \
                 --exclude-unreachable-branches \
                 --exclude-throw-branches \
+                --exclude-noncode-lines \
                 -j 2 \
                 --xml \
                 --output ${{ github.workspace }}/build/coverage_report.xml

@@ -31,20 +31,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "Snippet gcc12"
-            compiler: "gcc-12"
+          - name: "Snippet gcc13"
+            compiler: "gcc-13"
             cxx_flags: "-std=c++23"
             build_type: Release
             build: snippet
 
-          - name: "Performance gcc12"
-            compiler: "gcc-12"
+          - name: "Performance gcc13"
+            compiler: "gcc-13"
             cxx_flags: "-std=c++23"
             build_type: Release
             build: performance
 
-          - name: "Header gcc12"
-            compiler: "gcc-12"
+          - name: "Header gcc13"
+            compiler: "gcc-13"
             cxx_flags: "-std=c++23"
             build_type: Release
             build: header

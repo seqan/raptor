@@ -32,12 +32,12 @@ jobs:
       matrix:
         include:
           - name: "Nextflow"
-            compiler: "gcc-12"
+            compiler: "gcc-13"
             build_type: Release
             cxx_flags: "-std=c++23"
 
           - name: "CWL"
-            compiler: "gcc-12"
+            compiler: "gcc-13"
             build_type: Release
             cxx_flags: "-std=c++23"
     steps:
