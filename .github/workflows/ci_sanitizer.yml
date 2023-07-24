@@ -61,11 +61,11 @@ jobs:
         with:
           cmake: 3.18.4
 
-      - name: Install compiler g++-12
+      - name: Install compiler g++-13
         run: |
-          install g++-12
-          echo "CC=gcc-12" >> "$GITHUB_ENV"
-          echo "CXX=g++-12" >> "$GITHUB_ENV"
+          install g++-13
+          echo "CC=gcc-13" >> "$GITHUB_ENV"
+          echo "CXX=g++-13" >> "$GITHUB_ENV"
 
       - name: Configure tests
         run: |

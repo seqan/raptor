@@ -31,6 +31,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - name: "gcc13"
+            compiler: "gcc-13"
+            build: unit
+            build_type: Release
+            cxx_flags: "-std=c++23"
+
           - name: "gcc12"
             compiler: "gcc-12"
             build: unit
