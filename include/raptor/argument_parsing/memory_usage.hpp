@@ -13,6 +13,7 @@
 #pragma once
 
 #include <cassert>
+#include <cstdint>
 #include <string>
 
 #if __has_include(<sys/resource.h>)
