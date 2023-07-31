@@ -14,7 +14,6 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  CMAKE_VERSION: 3.18.4
   SHARG_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
 
@@ -32,9 +31,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "gcc12"
-            cxx: "g++-12"
-            cc: "gcc-12"
+          - name: "gcc13"
+            compiler: "gcc-13"
             build: coverage
             build_type: Coverage
             cxx_flags: "-std=c++23"
@@ -52,45 +50,25 @@ jobs:
           fetch-depth: ${{ steps.fetch_depth.outputs.depth }}
           submodules: true
 
-      - name: Add package source
-        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/configure_apt.sh
+      - name: Setup toolchain
+        uses: seqan/actions/setup-toolchain@main
+        with:
+          compiler: ${{ matrix.compiler }}
+          ccache_size: 525M
 
       - name: Install CMake
-        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_cmake.sh
-
-      - name: Install ccache
-        run: sudo apt-get install --yes ccache
-
-      - name: Install compiler ${{ matrix.cxx }}
-        run: sudo apt-get install --yes ${{ matrix.cxx }}
+        uses: seqan/actions/setup-cmake@main
+        with:
+          cmake: 3.18.4
 
       - name: Install gcovr
         env:
-          CC: ${{ matrix.cc }}
+          CC: ${{ matrix.compiler }}
         run: |
           sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/${CC/gcc/gcov} 100
-          pip install gcovr==5.2
-
-      - name: Load ccache
-        uses: actions/cache@v3
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.ref }}-${{ github.run_number }}
-          # Restoring: From current branch, otherwise from base branch, otherwise from any branch.
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.ref }}
-            ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.base_ref }}
-            ${{ runner.os }}-${{ matrix.name }}-ccache-
-
-      - name: Tool versions
-        run: |
-          env cmake --version
-          env ${{ matrix.cxx }} --version
+          pip install gcovr==6.0
 
       - name: Configure tests
-        env:
-          CXX: ${{ matrix.cxx }}
-          CC: ${{ matrix.cc }}
         run: |
           mkdir build
           cd build
@@ -100,13 +78,6 @@ jobs:
           make -j2 gtest_build
 
       - name: Build tests
-        env:
-          CCACHE_BASEDIR: ${{ github.workspace }}
-          CCACHE_DIR: ${{ github.workspace }}/.ccache
-          CCACHE_COMPRESS: true
-          CCACHE_COMPRESSLEVEL: 12
-          CCACHE_MAXSIZE: 525M
-          CCACHE_IGNOREOPTIONS: "-fprofile-abs-path"
         run: |
           ccache -z
           cd build
@@ -130,6 +101,7 @@ jobs:
                 --exclude-lines-by-pattern '^.*GCOVR_EXCL_LINE.*$' \
                 --exclude-unreachable-branches \
                 --exclude-throw-branches \
+                --exclude-noncode-lines \
                 -j 2 \
                 --xml \
                 --output ${{ github.workspace }}/build/coverage_report.xml
@@ -137,38 +109,8 @@ jobs:
       - name: Submit coverage report
         id: submission1
         uses: codecov/codecov-action@v3
-        continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ${{ github.workspace }}/build/coverage_report.xml
           root_dir: ${{ github.workspace }}/raptor
-          fail_ci_if_error: true
-
-      # When running on a PR, the token is not available. Because of the token-less upload, GitHub API rate limits apply
-      # and the upload may fail.
-      - name: Wait before retrying submission
-        if: steps.submission1.outcome == 'failure'
-        run: sleep 15
-
-      - name: Retry submission
-        id: submission2
-        uses: codecov/codecov-action@v3
-        if: steps.submission1.outcome == 'failure'
-        continue-on-error: true
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ${{ github.workspace }}/build/coverage_report.xml
-          root_dir: ${{ github.workspace }}/raptor
-          fail_ci_if_error: true
-
-      - name: Wait before retrying submission
-        if: steps.submission2.outcome == 'failure'
-        run: sleep 15
-
-      - name: Retry submission
-        if: steps.submission2.outcome == 'failure'
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ${{ github.workspace }}/build/coverage_report.xml
-          root_dir: ${{ github.workspace }}/raptor
+          fail_ci_if_error: false

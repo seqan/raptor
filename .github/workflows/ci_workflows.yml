@@ -14,7 +14,6 @@ concurrency:
   cancel-in-progress: ${{ github.event_name != 'push' }}
 
 env:
-  CMAKE_VERSION: 3.18.4
   SHARG_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
 
@@ -33,11 +32,14 @@ jobs:
       matrix:
         include:
           - name: "Nextflow"
-            cxx: "g++-12"
-            cc: "gcc-12"
+            compiler: "gcc-13"
             build_type: Release
             cxx_flags: "-std=c++23"
 
+          - name: "CWL"
+            compiler: "gcc-13"
+            build_type: Release
+            cxx_flags: "-std=c++23"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -46,44 +48,30 @@ jobs:
           fetch-depth: 2
           submodules: true
 
-      - name: Add package source
-        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/configure_apt.sh
+      - name: Setup toolchain
+        uses: seqan/actions/setup-toolchain@main
+        with:
+          compiler: ${{ matrix.compiler }}
+          ccache_size: 150M
 
       - name: Install CMake
-        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_cmake.sh
-
-      - name: Install ccache
-        run: sudo apt-get install --yes ccache
-
-      - name: Install compiler ${{ matrix.cxx }}
-        run: sudo apt-get install --yes ${{ matrix.cxx }}
+        uses: seqan/actions/setup-cmake@main
+        with:
+          cmake: 3.18.4
 
       - name: Install Nextflow
+        if: matrix.name == 'Nextflow'
         uses: nf-core/setup-nextflow@v1
         with:
           version: latest-stable
 
-      - name: Load ccache
-        uses: actions/cache@v3
-        with:
-          path: .ccache
-          key: ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.ref }}-${{ github.run_number }}
-          # Restoring: From current branch, otherwise from base branch, otherwise from any branch.
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.ref }}
-            ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.base_ref }}
-            ${{ runner.os }}-${{ matrix.name }}-ccache-
-
-      - name: Tool versions
+      - name: Install cwltool
+        if: matrix.name == 'CWL'
         run: |
-          env cmake --version
-          env ${{ matrix.cxx }} --version
-          env nextflow -version
+          install pipx
+          pipx install cwltool
 
       - name: Configure Raptor
-        env:
-          CXX: ${{ matrix.cxx }}
-          CC: ${{ matrix.cc }}
         run: |
           mkdir build
           cd build
@@ -92,21 +80,24 @@ jobs:
                           -DRAPTOR_NATIVE_BUILD=OFF
 
       - name: Build Raptor
-        env:
-          CCACHE_BASEDIR: ${{ github.workspace }}
-          CCACHE_DIR: ${{ github.workspace }}/.ccache
-          CCACHE_COMPRESS: true
-          CCACHE_COMPRESSLEVEL: 12
-          CCACHE_MAXSIZE: 150M
-          CCACHE_IGNOREOPTIONS: "-fprofile-abs-path"
         run: |
           ccache -z
           cd build
-          sudo make -k -j2 install
+          make -k -j2
+          make install
           ccache -sv
 
       - name: Run Nextflow
+        if: matrix.name == 'Nextflow'
         run: |
           cd raptor/workflow/nextflow
           nextflow hibf.nf
+
+      - name: Run cwltool
+        if: matrix.name == 'CWL'
+        run: |
+          raptor build --export-help cwl > raptor.cwl
+          cwltool --validate raptor.cwl
+          cwltool raptor.cwl raptor/workflow/cwl/tests/raptor-build-0_bins_window_19.yml | grep 098169f476fb949b0d08f2d1e05881049819b811
+          cwltool raptor.cwl raptor/workflow/cwl/tests/raptor-build-16_bins_window_19.yml | grep 64a4328eb3dab99bf6ecd38f84f4ae45fd01a4dd
 

@@ -31,86 +31,29 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "Snippet gcc12"
-            cxx: "g++-12"
-            cc: "gcc-12"
+          - name: "Snippet gcc13"
+            compiler: "gcc-13"
             cxx_flags: "-std=c++23"
             build_type: Release
             build: snippet
-            build_threads: 2
-            test_threads: 2
-            cmake: 3.18.4
-            requires_toolchain: true
-            requires_ccache: true
-            skip_build_tests: false
-            skip_run_tests: false
 
-          - name: "Performance gcc12"
-            cxx: "g++-12"
-            cc: "gcc-12"
+          - name: "Performance gcc13"
+            compiler: "gcc-13"
             cxx_flags: "-std=c++23"
             build_type: Release
             build: performance
-            build_threads: 2
-            test_threads: 2
-            cmake: 3.18.4
-            requires_toolchain: true
-            requires_ccache: true
-            skip_build_tests: false
-            skip_run_tests: false
 
-          - name: "Documentation"
-            build: documentation
-            build_threads: 2
-            test_threads: 2
-            cmake: 3.18.4
-            doxygen: 1.9.6
-            requires_toolchain: false
-            requires_ccache: false
-            skip_build_tests: true
-            skip_run_tests: false
-
-          - name: "Header gcc12"
-            cxx: "g++-12"
-            cc: "gcc-12"
+          - name: "Header gcc13"
+            compiler: "gcc-13"
             cxx_flags: "-std=c++23"
             build_type: Release
             build: header
-            build_threads: 2
-            test_threads: 2
-            cmake: 3.18.4
-            requires_toolchain: true
-            requires_ccache: true
-            skip_build_tests: false
-            skip_run_tests: true
 
           - name: "Header gcc11"
-            cxx: "g++-11"
-            cc: "gcc-11"
+            compiler: "gcc-11"
             cxx_flags: "-std=c++23"
             build_type: Release
             build: header
-            build_threads: 2
-            test_threads: 2
-            cmake: 3.18.4
-            requires_toolchain: true
-            requires_ccache: true
-            skip_build_tests: false
-            skip_run_tests: true
-
-          - name: "Header gcc10"
-            cxx: "g++-10"
-            cc: "gcc-10"
-            cxx_flags: "-std=c++20"
-            build_type: Release
-            build: header
-            build_threads: 2
-            test_threads: 2
-            cmake: 3.18.4
-            requires_toolchain: true
-            requires_ccache: true
-            skip_build_tests: false
-            skip_run_tests: true
 
     steps:
       - name: Checkout
@@ -120,51 +63,18 @@ jobs:
           fetch-depth: 2
           submodules: true
 
-      - name: Add package source
-        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/configure_apt.sh
+      - name: Setup toolchain
+        uses: seqan/actions/setup-toolchain@main
+        with:
+          compiler: ${{ matrix.compiler }}
+          ccache_size: 150M
 
       - name: Install CMake
-        env:
-          BUILD: ${{ matrix.build }}
-          CMAKE_VERSION: ${{ matrix.cmake }}
-        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_cmake.sh
-
-      - name: Install Doxygen
-        if: matrix.build == 'documentation'
-        env:
-          DOXYGEN_VERSION: ${{ matrix.doxygen }}
-        run: bash ./raptor/lib/seqan3/.github/workflows/scripts/install_doxygen.sh
-
-      - name: Install ccache
-        if: matrix.requires_ccache
-        run: sudo apt-get install --yes ccache
-
-      - name: Install compiler ${{ matrix.cxx }}
-        if: matrix.requires_toolchain
-        run: sudo apt-get install --yes ${{ matrix.cxx }}
-
-      - name: Load ccache
-        if: matrix.requires_ccache
-        uses: actions/cache@v3
+        uses: seqan/actions/setup-cmake@main
         with:
-          path: .ccache
-          key: ${{ matrix.name }}-ccache-${{ github.ref }}-${{ github.run_number }}
-          # Restoring: From current branch, otherwise from base branch, otherwise from any branch.
-          restore-keys: |
-            ${{ matrix.name }}-ccache-${{ github.ref }}
-            ${{ matrix.name }}-ccache-${{ github.base_ref }}
-            ${{ matrix.name }}-ccache-
-
-      - name: Tool versions
-        run: |
-          env cmake --version
-          env doxygen --version || true
-          env ${{ matrix.cxx }} --version || true
+          cmake: 3.18.4
 
       - name: Configure tests
-        env:
-          CXX: ${{ matrix.cxx }}
-          CC: ${{ matrix.cc }}
         run: |
           mkdir build
           cd build
@@ -175,27 +85,18 @@ jobs:
             snippet) make -j${{ matrix.build_threads }} gtest_build;;
             performance) make -j${{ matrix.build_threads }} gbenchmark_build;;
             header) make -j${{ matrix.build_threads }} gtest_build gbenchmark_build;;
-            documentation) make -j${{ matrix.build_threads }} download-cppreference-doxygen-web-tag;;
           esac
 
       - name: Build tests
-        if: ${{!matrix.skip_build_tests}}
         env:
-          CCACHE_BASEDIR: ${{ github.workspace }}
-          CCACHE_DIR: ${{ github.workspace }}/.ccache
-          CCACHE_COMPRESS: true
-          CCACHE_COMPRESSLEVEL: 12
-          CCACHE_MAXSIZE: 150M
-          CCACHE_IGNOREOPTIONS: "-fprofile-abs-path"
-          CMAKE_BUILD_PARALLEL_LEVEL: ${{ matrix.build_threads }}
+          CMAKE_BUILD_PARALLEL_LEVEL: 2
         run: |
-          ccache -z || true
+          ccache -z
           cd build
           make -k -j2
-          ccache -sv || true
+          ccache -sv
 
       - name: Run tests
-        if: ${{!matrix.skip_run_tests}}
         run: |
           cd build
-          ctest . -j${{ matrix.test_threads }} --output-on-failure
+          ctest . -j2 --output-on-failure
