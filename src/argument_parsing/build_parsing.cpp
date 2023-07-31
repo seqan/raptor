@@ -251,25 +251,16 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
                                                       }
                                             )-");
         auto inputs = node["inputs"];
-        for (std::size_t i = 0; i < inputs.size(); i++)
-        {
-            if (inputs[i]["id"].as<std::string>() == "input")
-            {
-                inputs.remove(i);
-            }
-            if (inputs[i]["id"].as<std::string>() == "output")
-            {
-                inputs[i]["id"] = "output_name";
-            }
-        }
-        node["inputs"].push_back(YAML::Load(R"-(
-                                                id: sequences
-                                                type:
-                                                  type: array
-                                                  items:
-                                                    type: array
-                                                    items: File
-                                               )-"));
+        inputs.remove("input");
+        inputs["output_name"] = inputs["output"];
+        inputs.remove("output");
+        inputs["sequences"] = YAML::Load(R"-(
+                                             type:
+                                               type: array
+                                               items:
+                                                 type: array
+                                                 items: File
+                                            )-");
         node["outputs"] = YAML::Load(R"-(
                                          index:
                                            type: File
