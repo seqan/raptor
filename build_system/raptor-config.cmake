@@ -209,6 +209,7 @@ endif ()
 # ----------------------------------------------------------------------------
 # Required: Sharg (with TDL for CWL/CTD support)
 # ----------------------------------------------------------------------------
+option (INSTALL_TDL "Enable installation of TDL." OFF)
 find_package (Sharg QUIET REQUIRED HINTS ${RAPTOR_SUBMODULES_DIR}/sharg-parser/build_system)
 
 # ----------------------------------------------------------------------------
