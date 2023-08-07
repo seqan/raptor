@@ -27,19 +27,24 @@
 namespace raptor
 {
 
+std::filesystem::path get_output_path(std::filesystem::path const & output_dir, std::filesystem::path const & file_name)
+{
+    std::filesystem::path result{output_dir};
+    bool const is_compressed = raptor::cutoff::file_is_compressed(file_name);
+    result /= is_compressed ? file_name.stem().stem() : file_name.stem();
+    result += ".dummy_extension"; // https://github.com/seqan/raptor/issues/355
+    return result;
+}
+
 void write_list_file(prepare_arguments const & arguments)
 {
-    std::filesystem::path const output_dir{arguments.out_dir};
-    std::filesystem::path list_file = output_dir;
+    std::filesystem::path list_file = arguments.out_dir;
     list_file /= "minimiser.list";
     std::ofstream file{list_file};
 
     for (auto && file_names : arguments.bin_path)
     {
-        std::filesystem::path const file_name{file_names[0]};
-        bool const is_compressed = raptor::cutoff::file_is_compressed(file_name);
-        std::filesystem::path file_path = output_dir;
-        file_path /= is_compressed ? file_name.stem().stem() : file_name.stem();
+        std::filesystem::path file_path = get_output_path(arguments.out_dir, file_names[0]);
         file_path.replace_extension("minimiser");
         file << file_path.c_str() << '\n';
     }
@@ -59,10 +64,7 @@ void compute_minimiser(prepare_arguments const & arguments)
         for (auto && [file_names, bin_number] : zipped_view)
         {
             std::filesystem::path const file_name{file_names[0]};
-            bool const is_compressed = raptor::cutoff::file_is_compressed(file_name);
-
-            std::filesystem::path output_path{arguments.out_dir};
-            output_path /= is_compressed ? file_name.stem().stem() : file_name.stem();
+            std::filesystem::path output_path = get_output_path(arguments.out_dir, file_name);
 
             std::filesystem::path const minimiser_file =
                 std::filesystem::path{output_path}.replace_extension("minimiser");
