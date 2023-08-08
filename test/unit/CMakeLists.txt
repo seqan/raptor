@@ -7,7 +7,7 @@
 
 cmake_minimum_required (VERSION 3.10)
 
-project (raptor_test_unit CXX)
+project (raptor_test_unit LANGUAGES CXX C)
 
 include (../raptor-test.cmake)
 include (GoogleTest OPTIONAL)
