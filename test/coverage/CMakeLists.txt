@@ -7,7 +7,7 @@
 
 cmake_minimum_required (VERSION 3.18)
 
-project (raptor_test_coverage CXX)
+project (raptor_test_coverage LANGUAGES CXX C)
 
 include (../cmake/raptor_require_ccache.cmake)
 raptor_require_ccache ()

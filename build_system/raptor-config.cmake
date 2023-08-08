@@ -113,6 +113,20 @@ macro (raptor_config_error text)
 endmacro ()
 
 # ----------------------------------------------------------------------------
+# Check CXX and C compiler versions (xxHash uses C).
+# ----------------------------------------------------------------------------
+
+string (REGEX MATCH "^[0-9]+" RAPTOR_CXX_MAJOR_VERSION "${CMAKE_CXX_COMPILER_VERSION}")
+string (REGEX MATCH "^[0-9]+" RAPTOR_C_MAJOR_VERSION "${CMAKE_C_COMPILER_VERSION}")
+if (NOT "${RAPTOR_CXX_MAJOR_VERSION}" STREQUAL "${RAPTOR_C_MAJOR_VERSION}")
+    raptor_config_error ("CXX and C compiler major versions differ (${RAPTOR_CXX_MAJOR_VERSION} and\
+                          ${RAPTOR_C_MAJOR_VERSION})! This will likely result in linker errors. Please set both\
+                          -DCMAKE_CXX_COMPILER and -DCMAKE_C_COMPILER to use the same major version, and/or set the\
+                          environment variables CXX and CC accordingly."
+    )
+endif ()
+
+# ----------------------------------------------------------------------------
 # Find RAPTOR include path
 # ----------------------------------------------------------------------------
 

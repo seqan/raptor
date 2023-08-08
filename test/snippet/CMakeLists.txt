@@ -6,7 +6,7 @@
 # --------------------------------------------------------------------------------------------------------
 
 cmake_minimum_required (VERSION 3.10...3.22)
-project (raptor_test_snippet CXX)
+project (raptor_test_snippet LANGUAGES CXX C)
 
 include (../raptor-test.cmake)
 include (raptor_test_component)
