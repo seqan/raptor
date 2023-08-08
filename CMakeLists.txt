@@ -13,7 +13,7 @@ list (APPEND CMAKE_MODULE_PATH "${RAPTOR_MODULE_PATH}")
 include (raptor-config-version)
 
 project (raptor
-         LANGUAGES CXX
+         LANGUAGES CXX C
          VERSION "${RAPTOR_PROJECT_VERSION}"
          DESCRIPTION "Raptor -- A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences"
          HOMEPAGE_URL "https://github.com/seqan/raptor"

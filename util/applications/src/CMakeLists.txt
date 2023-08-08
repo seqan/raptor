@@ -9,7 +9,7 @@ list (APPEND CMAKE_MODULE_PATH "${RAPTOR_CLONE_DIR}/build_system")
 
 include (raptor-config-version)
 
-project (raptor_utility_common LANGUAGES CXX)
+project (raptor_utility_common LANGUAGES CXX C)
 
 find_package (Raptor REQUIRED HINTS ${RAPTOR_CLONE_DIR}/build_system)
 

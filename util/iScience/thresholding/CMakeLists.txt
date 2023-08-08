@@ -8,7 +8,7 @@
 cmake_minimum_required (VERSION 3.18)
 
 # Define the application name.
-project (minimizer_thresholds CXX)
+project (minimizer_thresholds LANGUAGES CXX C)
 
 # Make Release default build type
 if (NOT CMAKE_BUILD_TYPE)

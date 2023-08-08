@@ -7,7 +7,7 @@
 
 cmake_minimum_required (VERSION 3.10)
 
-project (raptor_test_performance CXX)
+project (raptor_test_performance LANGUAGES CXX C)
 
 option (BUILD_RAPTOR_APP_FOR_TEST "" OFF)
 include (../raptor-test.cmake)
