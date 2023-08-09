@@ -49,9 +49,9 @@ if (NOT TARGET raptor_argument_parsing)
                  upgrade_parsing.cpp
     )
 
-    target_compile_definitions ("raptor_argument_parsing"
-                                PUBLIC "-DRAPTOR_VERSION=\"${PACKAGE_VERSION} (${RAPTOR_COMMIT_HASH})\""
-                                       "-DRAPTOR_DATE=\"${RAPTOR_COMMIT_DATE}\""
+    set_source_files_properties (init_shared_meta.cpp
+                                 PROPERTIES COMPILE_DEFINITIONS
+                                            "RAPTOR_VERSION=\"${PACKAGE_VERSION} (${RAPTOR_COMMIT_HASH})\";RAPTOR_DATE=\"${RAPTOR_COMMIT_DATE}\""
     )
 
     target_link_libraries ("raptor_argument_parsing" PUBLIC "raptor_interface")
