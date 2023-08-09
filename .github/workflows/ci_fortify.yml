@@ -1,19 +1,17 @@
-name: Sanitizer
+name: Fortify
 
 on:
   schedule:
-    - cron: "0 6 * * SAT"
+    - cron: "0 8 * * SAT"
   workflow_dispatch:
 
 concurrency:
-  group: sanitizer-${{ github.ref }}
+  group: fortify-${{ github.ref }}
   cancel-in-progress: true
 
 env:
   SHARG_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
-  ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1
-  UBSAN_OPTIONS: print_stacktrace=1
 
 defaults:
   run:
@@ -28,17 +26,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        name: [AddressSanitizer, ThreadSanitizer, UndefinedBehaviorSanitizer]
-        build_type: [Release, Debug]
         include:
-          - name: "AddressSanitizer"
-            cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=address"
+          - name: "Fortify"
+            build_type: Release
+            cxx_flags: "-fcf-protection=check"
 
-          - name: "ThreadSanitizer"
-            cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=thread"
-
-          - name: "UndefinedBehaviorSanitizer"
-            cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=undefined"
+          - name: "Fortify"
+            build_type: Debug
+            cxx_flags: "-fcf-protection=full"
 
     steps:
       - name: Checkout
@@ -54,11 +49,6 @@ jobs:
           compiler: gcc-13
           use_actions_cache: false
 
-      - name: Configure OS
-        run: |
-          sudo bash -c "echo 0 > /proc/sys/vm/overcommit_memory"
-          sudo bash -c "echo 2 >/proc/sys/kernel/randomize_va_space"
-
       - name: Install CMake
         uses: seqan/actions/setup-cmake@main
         with:
@@ -69,7 +59,7 @@ jobs:
           mkdir build
           cd build
           cmake ../raptor/test/unit -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                    -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size"
+                                    -DCMAKE_CXX_FLAGS="-std=c++23 -fexceptions -g -grecord-gcc-switches -pipe -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -mtune=native -fasynchronous-unwind-tables -fstack-clash-protection -Wno-interference-size ${{ matrix.cxx_flags }}"
           make -j2 gtest_build
 
       - name: Build tests
