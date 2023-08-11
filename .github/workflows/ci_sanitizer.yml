@@ -48,11 +48,10 @@ jobs:
           fetch-depth: 1
           submodules: true
 
-      - name: Setup toolchain
-        uses: seqan/actions/setup-toolchain@main
+      - name: Setup compiler
+        uses: seqan/actions/setup-compiler@main
         with:
           compiler: gcc-13
-          use_actions_cache: false
 
       - name: Configure OS
         run: |
