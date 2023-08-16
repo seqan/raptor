@@ -5,72 +5,77 @@ library(RColorBrewer)
 library(patchwork)
 
 timings <- data.frame(
-  c("COBS", "00:01:15", "1", "1T"),
-  c("Metagraph", "00:03:46", "1", "1T"),
-  c("SeqOthello", "00:29:34", "1", "1T"),
-  c("HIBF", "00:01:01", "1", "1T"),
-  c("Mantis", "00:07:27", "1", "1T"),
-  c("COBS", "00:11:34", "2", "1M"),
-  c("Metagraph", "00:13:24", "2", "1M"),
-  c("SeqOthello", "01:43:48", "2", "1M"),
-  c("Mantis", "00:18:47", "2", "1M"),
-  c("HIBF", "00:01:15", "2", "1M"),
-  c("COBS", "00:57:13", "3", "5Mio"),
-  c("Metagraph", "00:52:09", "3", "5Mio"),
-  c("SeqOthello", NA, "3", "5Mio"),
-  c("HIBF", "00:02:29", "3", "5Mio"),
-  c("Mantis", "01:05:47", "3", "5Mio"),
-  c("COBS", "01:50:02", "4", "10Mio"),
-  c("Metagraph", "01:37:50", "4", "10Mio"),
-  c("SeqOthello", NA, "4", "10Mio"),
-  c("Mantis", "02:18:33", "4", "10Mio"),
-  c("HIBF", "00:04:11", "4", "10Mio"),
-  c("IBF", "00:02:31", "1", "1T"),
-  c("IBF", "00:03:59", "2", "1Mio"),
-  c("IBF", "00:08:28", "3", "5Mio"),
-  c("IBF", "00:13:08", "4", "10Mio"),
-  c("Bifrost", "01:17:43", "1", "1T"),
-  c("Bifrost", "01:21:55", "2", "1Mio"),
-  c("Bifrost", "01:39:00", "3", "5Mio"),
-  c("Bifrost", "02:02:33", "4", "10Mio")
+  c("COBS", "00:01:15", 1),
+  c("Bifrost", "01:17:43", 1),
+  c("Metagraph", "00:03:46", 1),
+  c("SeqOthello", "00:29:34", 1),
+  c("Mantis", "00:07:27", 1),
+  c("IBF", "00:02:31", 1),
+  c("HIBF", "00:01:01", 1),
+
+  c("COBS", "00:11:34", 2),
+  c("Bifrost", "01:21:55", 2),
+  c("Metagraph", "00:13:24", 2),
+  c("SeqOthello", "01:43:48", 2),
+  c("Mantis", "00:18:47", 2),
+  c("IBF", "00:03:59", 2),
+  c("HIBF", "00:01:15", 2),
+
+  c("COBS", "00:57:13", 3),
+  c("Bifrost", "01:39:00", 3),
+  c("Metagraph", "00:52:09", 3),
+  c("SeqOthello", NA, 3),
+  c("Mantis", "01:05:47", 3),
+  c("IBF", "00:08:28", 3),
+  c("HIBF", "00:02:29", 3),
+
+  c("COBS", "01:50:02", 4),
+  c("Bifrost", "02:02:33", 4),
+  c("Metagraph", "01:37:50", 4),
+  c("SeqOthello", NA, 4),
+  c("Mantis", "02:18:33", 4),
+  c("IBF", "00:13:08", 4),
+  c("HIBF", "00:04:11", 4)
 )
 
 timings <- data.frame(t(timings))
-colnames(timings) <- c("Method", "Time (HH:)MM:SS", "Point", "Label")
+colnames(timings) <- c("Method", "Time (HH:)MM:SS", "Point")
 
 timings$`Time (HH:)MM:SS` <- period_to_seconds(hms(as.character(timings$`Time (HH:)MM:SS`)))
-# timings$`Time (HH:)MM:SS` <- timings$`Time (HH:)MM:SS` / 3600
-timings$Point <- as.numeric(timings$Point )
+timings$Point <- as.numeric(timings$Point)
 
 memory <- data.frame(
+  c("COBS", 106.02, 1),
+  c("Bifrost", 282.89, 1),
+  c("Metagraph", 231.42, 1),
+  c("SeqOthello", 30.70, 1),
+  c("Mantis", 468.55, 1),
+  c("IBF", 374.04, 1),
+  c("HIBF", 133.05, 1),
+
   c("COBS", 127.47, 2),
+  c("Bifrost",  282.89, 2),
   c("Metagraph", 249.02, 2),
   c("SeqOthello", 287.71, 2),
   c("Mantis", 470.67, 2),
+  c("IBF",  374.38, 2),
   c("HIBF", 132.70, 2),
-  c("COBS", 106.02, 1),
-  c("Metagraph", 231.42, 1),
-  c("SeqOthello", 30.70, 1),
-  c("HIBF", 133.05, 1),
-  c("Mantis", 468.55, 1),
+
   c("COBS", 222.91, 3),
+  c("Bifrost", 282.89, 3),
   c("Metagraph", 249.56, 3),
   c("SeqOthello", NA, 3),
-  c("HIBF", 134.57, 3),
   c("Mantis", 472.93, 3),
-  c("SeqOthello", NA, 4),
-  c("Metagraph", 254.97, 4),
-  c("COBS",  342.51, 4),
-  c("HIBF", 136.47, 4),
-  c("Mantis", 496.40, 4),
-  c("IBF", 374.04, 1),
-  c("IBF",  374.38, 2),
   c("IBF", 376.83, 3),
+  c("HIBF", 134.57, 3),
+
+  c("COBS",  342.51, 4),
+  c("Bifrost", 282.89, 4),
+  c("Metagraph", 254.97, 4),
+  c("SeqOthello", NA, 4),
+  c("Mantis", 496.40, 4),
   c("IBF", 379.83, 4),
-  c("Bifrost", 282.89, 1),
-  c("Bifrost",  282.89, 2),
-  c("Bifrost", 282.89, 3),
-  c("Bifrost", 282.89, 4)
+  c("HIBF", 136.47, 4)
 )
 
 memory <- data.frame(t(memory))
@@ -79,13 +84,13 @@ memory$Memory <- as.numeric(as.character(memory$Memory))
 memory$Point <- as.numeric(memory$Point)
 
 index.size <- data.frame(
-  c("Metagraph", 216),
-  c("Mantis", 496),
   c("COBS", 104),
+  c("Bifrost", 68),
+  c("Metagraph", 216),
   c("SeqOthello", 315),
-  c("HIBF", 133),
+  c("Mantis", 496),
   c("IBF", 374),
-  c("Bifrost", 68)
+  c("HIBF", 133)
 )
 
 index.size <- data.frame(t(index.size))
@@ -93,19 +98,18 @@ colnames(index.size) <- c("Method", "Size")
 index.size$Size <- as.numeric(as.character(index.size$Size))
 
 index.time <- data.frame(
-  c("Metagraph",	"56:36:22"),
   c("COBS",	"00:34:04"),
+  c("Bifrost", "17:46:25")
+  c("Metagraph",	"56:36:22"),
   c("SeqOthello",	"49:26:04"),
   c("Mantis", "45:19:00"),
-  c("HIBF", "00:38:28"),
   c("IBF", "00:32:37"),
-  c("Bifrost", "17:46:25")
+  c("HIBF", "00:38:28")
 )
 
 index.time <- data.frame(t(index.time))
 colnames(index.time) <- c("Method", "Time")
 index.time$Time <- period_to_seconds(hms(as.character(index.time$Time)))
-# index.time$Time <- index.time$Time / 3600
 
 #               bifrost    COBS       HIBF       IBF        mantis     metagraph    SeqOthello
 my.colors <- c("#e29b03", "#3017b0", "darkgreen", "#8fbf5f", "#826546", "#9e4dc9", "#43a5f0")
