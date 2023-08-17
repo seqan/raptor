@@ -175,8 +175,8 @@ static void bulk_count(benchmark::State & state, double && fpr)
             auto view = query | hash_adaptor | std::views::common;
             minimiser.assign(view.begin(), view.end());
 
-            auto & result = agent.bulk_count(minimiser);
-            benchmark::DoNotOptimize(result);
+            [[maybe_unused]] auto & result = agent.bulk_count(minimiser);
+            benchmark::ClobberMemory();
         }
     }
 }
