@@ -13,7 +13,6 @@ include (../raptor-test.cmake)
 include (GoogleTest OPTIONAL)
 
 raptor_require_benchmark ()
-raptor_require_ccache ()
 raptor_require_test ()
 
 find_path (SEQAN3_TEST_CMAKE_MODULE_DIR

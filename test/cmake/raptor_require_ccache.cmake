@@ -22,12 +22,11 @@ macro (raptor_require_ccache)
     set (RAPTOR_FPROFILE_ABS_PATH "-fprofile-abs-path")
     if (RAPTOR_USE_CCACHE)
         find_program (CCACHE_PROGRAM ccache)
-        find_package_message (CCACHE_PROGRAM_PRE "Finding program ccache" "[${CCACHE_PROGRAM}]")
 
         if (NOT CCACHE_PROGRAM)
-            find_package_message (CCACHE_PROGRAM "Finding program ccache - Failed" "[${CCACHE_PROGRAM}]")
+            find_package_message (CCACHE_PROGRAM "  Finding program ccache - Failed" "[${CCACHE_PROGRAM}]")
         else ()
-            find_package_message (CCACHE_PROGRAM "Finding program ccache - Success" "[${CCACHE_PROGRAM}]")
+            find_package_message (CCACHE_PROGRAM "  Finding program ccache - Success" "[${CCACHE_PROGRAM}]")
             set (RAPTOR_FPROFILE_ABS_PATH "--ccache-skip -fprofile-abs-path")
             # New option since cmake >= 3.4:
             # https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_LAUNCHER.html

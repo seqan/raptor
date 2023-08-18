@@ -5,11 +5,6 @@ set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set (CMAKE_INSTALL_BINDIR "bin") # For chopper
 
-# CCache
-
-include (../test/cmake/raptor_require_ccache.cmake)
-raptor_require_ccache ()
-
 # Dependency: Chopper
 include (FetchContent)
 
@@ -37,7 +32,11 @@ set (CHOPPER_INSTALL
      CACHE BOOL "Install Chopper."
 )
 
+set (STORED_CMAKE_MESSAGE_LOG_LEVEL "${CMAKE_MESSAGE_LOG_LEVEL}")
+set (CMAKE_MESSAGE_LOG_LEVEL "ERROR")
 FetchContent_MakeAvailable (raptor_chopper_project)
+set (CMAKE_MESSAGE_LOG_LEVEL "${STORED_CMAKE_MESSAGE_LOG_LEVEL}")
+unset (STORED_CMAKE_MESSAGE_LOG_LEVEL)
 
 # Dependency: xxHash
 FetchContent_Declare (raptor_xxhash_project SOURCE_DIR "${RAPTOR_SUBMODULES_DIR}/xxHash" SOURCE_SUBDIR
@@ -49,7 +48,11 @@ set (XXHASH_BUILD_XXHSUM OFF)
 set (XXHASH_BUNDLED_MODE ON)
 set (BUILD_SHARED_LIBS OFF)
 
+set (STORED_CMAKE_MESSAGE_LOG_LEVEL "${CMAKE_MESSAGE_LOG_LEVEL}")
+set (CMAKE_MESSAGE_LOG_LEVEL "ERROR")
 FetchContent_MakeAvailable (raptor_xxhash_project)
+set (CMAKE_MESSAGE_LOG_LEVEL "${STORED_CMAKE_MESSAGE_LOG_LEVEL}")
+unset (STORED_CMAKE_MESSAGE_LOG_LEVEL)
 
 # Shared interface
 if (NOT TARGET raptor_interface)

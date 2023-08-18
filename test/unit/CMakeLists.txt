@@ -12,7 +12,6 @@ project (raptor_test_unit LANGUAGES CXX C)
 include (../raptor-test.cmake)
 include (GoogleTest OPTIONAL)
 
-raptor_require_ccache ()
 raptor_require_test ()
 
 add_subdirectory (api)

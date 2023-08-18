@@ -18,7 +18,7 @@ macro (raptor_require_test)
 
     # Also ensure that Google Test if fetched for the latest library cron, which sets the tag to "main".
     if (NOT GTest_FOUND OR "${RAPTOR_GTEST_TAG}" STREQUAL "main")
-        message (STATUS "Fetching Google Test ${RAPTOR_GTEST_TAG}")
+        message (STATUS "  Fetching Google Test ${RAPTOR_GTEST_TAG}")
 
         include (FetchContent)
         FetchContent_Declare (gtest_fetch_content
@@ -27,7 +27,11 @@ macro (raptor_require_test)
         )
         option (BUILD_GMOCK "" OFF)
         option (INSTALL_GTEST "" OFF)
+        set (STORED_CMAKE_MESSAGE_LOG_LEVEL "${CMAKE_MESSAGE_LOG_LEVEL}")
+        set (CMAKE_MESSAGE_LOG_LEVEL "ERROR")
         FetchContent_MakeAvailable (gtest_fetch_content)
+        set (CMAKE_MESSAGE_LOG_LEVEL "${STORED_CMAKE_MESSAGE_LOG_LEVEL}")
+        unset (STORED_CMAKE_MESSAGE_LOG_LEVEL)
     else ()
         message (STATUS "  Test dependency:            Google Test ${GTest_VERSION} found.")
     endif ()

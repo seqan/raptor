@@ -20,9 +20,6 @@ project (raptor_utility_common LANGUAGES CXX C)
 
 find_package (Raptor REQUIRED HINTS ${RAPTOR_CLONE_DIR}/build_system)
 
-include (${RAPTOR_CLONE_DIR}/test/cmake/raptor_require_ccache.cmake)
-raptor_require_ccache ()
-
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")

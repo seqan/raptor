@@ -9,9 +9,6 @@ cmake_minimum_required (VERSION 3.18)
 
 project (raptor_test_coverage LANGUAGES CXX C)
 
-include (../cmake/raptor_require_ccache.cmake)
-raptor_require_ccache ()
-
 # Add a custom build type: Coverage
 
 set (CMAKE_CXX_FLAGS_COVERAGE
