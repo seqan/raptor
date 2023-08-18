@@ -13,6 +13,5 @@ option (BUILD_RAPTOR_APP_FOR_TEST "" OFF)
 include (../raptor-test.cmake)
 
 raptor_require_benchmark ()
-raptor_require_ccache ()
 
 raptor_add_benchmark (bin_influence_benchmark.cpp)

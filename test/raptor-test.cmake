@@ -21,6 +21,8 @@ include (FindPackageMessage)
 
 option (RAPTOR_TEST_BUILD_OFFLINE "Skip the update step of external projects." OFF)
 
+message (STATUS "${ColourBold}Configuring tests${ColourReset}")
+
 # ----------------------------------------------------------------------------
 # Paths to folders.
 # ----------------------------------------------------------------------------

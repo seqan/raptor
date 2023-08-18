@@ -57,7 +57,6 @@ macro (raptor_snippets test_name_prefix snippet_base_path)
     endforeach ()
 endmacro ()
 
-raptor_require_ccache ()
 raptor_require_test ()
 
 raptor_snippets ("snippet" "${CMAKE_CURRENT_SOURCE_DIR}")
