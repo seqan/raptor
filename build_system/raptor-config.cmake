@@ -203,7 +203,7 @@ raptor_require_ccache ()
 set (CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
 
 set (CXXSTD_TEST_SOURCE
-     "#if !defined (__cplusplus) || (__cplusplus < 201709L)
+     "#if !defined (__cplusplus) || (__cplusplus < 202002)
     #error NOCXX20
     #endif
     int main() {}"
@@ -221,7 +221,7 @@ else ()
     if (CXX20_FLAG)
         raptor_config_print ("C++ Standard-20 support:    via -std=c++20")
     else ()
-        raptor_config_error ("RAPTOR requires C++20, but your compiler does not support it.")
+        raptor_config_error ("Raptor requires C++20, but your compiler does not support it.")
     endif ()
 
     set (RAPTOR_CXX_FLAGS "${RAPTOR_CXX_FLAGS} -std=c++20")
