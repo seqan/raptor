@@ -103,7 +103,6 @@ include (app_internal_datasources)
 include (raptor_add_benchmark)
 include (raptor_add_unit_test)
 include (raptor_require_benchmark)
-include (raptor_require_ccache)
 include (raptor_require_test)
 include (${CMAKE_CURRENT_LIST_DIR}/data/datasources.cmake)
 

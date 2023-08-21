@@ -190,6 +190,13 @@ option (RAPTOR_NO_ZLIB "Don't use ZLIB, even if present." OFF)
 option (RAPTOR_NO_BZIP2 "Don't use BZip2, even if present." OFF)
 
 # ----------------------------------------------------------------------------
+# ccache
+# ----------------------------------------------------------------------------
+
+include (${RAPTOR_CLONE_DIR}/test/cmake/raptor_require_ccache.cmake)
+raptor_require_ccache ()
+
+# ----------------------------------------------------------------------------
 # Require C++20
 # ----------------------------------------------------------------------------
 
@@ -223,6 +230,7 @@ endif ()
 # ----------------------------------------------------------------------------
 # Required: Sharg (with TDL for CWL/CTD support)
 # ----------------------------------------------------------------------------
+
 option (INSTALL_TDL "Enable installation of TDL." OFF)
 find_package (Sharg QUIET REQUIRED HINTS ${RAPTOR_SUBMODULES_DIR}/sharg-parser/build_system)
 
@@ -412,13 +420,6 @@ if (_RAPTOR_HAVE_EXECINFO)
 else ()
     raptor_config_print ("Optional dependency:        libexecinfo not found")
 endif ()
-
-# ----------------------------------------------------------------------------
-# ccache
-# ----------------------------------------------------------------------------
-
-include (${RAPTOR_CLONE_DIR}/test/cmake/raptor_require_ccache.cmake)
-raptor_require_ccache ()
 
 # ----------------------------------------------------------------------------
 # Perform compilability test of platform.hpp (tests some requirements)
