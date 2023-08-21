@@ -190,13 +190,20 @@ option (RAPTOR_NO_ZLIB "Don't use ZLIB, even if present." OFF)
 option (RAPTOR_NO_BZIP2 "Don't use BZip2, even if present." OFF)
 
 # ----------------------------------------------------------------------------
+# ccache
+# ----------------------------------------------------------------------------
+
+include (${RAPTOR_CLONE_DIR}/test/cmake/raptor_require_ccache.cmake)
+raptor_require_ccache ()
+
+# ----------------------------------------------------------------------------
 # Require C++20
 # ----------------------------------------------------------------------------
 
 set (CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
 
 set (CXXSTD_TEST_SOURCE
-     "#if !defined (__cplusplus) || (__cplusplus < 201709L)
+     "#if !defined (__cplusplus) || (__cplusplus < 202002)
     #error NOCXX20
     #endif
     int main() {}"
@@ -214,7 +221,7 @@ else ()
     if (CXX20_FLAG)
         raptor_config_print ("C++ Standard-20 support:    via -std=c++20")
     else ()
-        raptor_config_error ("RAPTOR requires C++20, but your compiler does not support it.")
+        raptor_config_error ("Raptor requires C++20, but your compiler does not support it.")
     endif ()
 
     set (RAPTOR_CXX_FLAGS "${RAPTOR_CXX_FLAGS} -std=c++20")
@@ -223,6 +230,7 @@ endif ()
 # ----------------------------------------------------------------------------
 # Required: Sharg (with TDL for CWL/CTD support)
 # ----------------------------------------------------------------------------
+
 option (INSTALL_TDL "Enable installation of TDL." OFF)
 find_package (Sharg QUIET REQUIRED HINTS ${RAPTOR_SUBMODULES_DIR}/sharg-parser/build_system)
 
@@ -412,13 +420,6 @@ if (_RAPTOR_HAVE_EXECINFO)
 else ()
     raptor_config_print ("Optional dependency:        libexecinfo not found")
 endif ()
-
-# ----------------------------------------------------------------------------
-# ccache
-# ----------------------------------------------------------------------------
-
-include (${RAPTOR_CLONE_DIR}/test/cmake/raptor_require_ccache.cmake)
-raptor_require_ccache ()
 
 # ----------------------------------------------------------------------------
 # Perform compilability test of platform.hpp (tests some requirements)
