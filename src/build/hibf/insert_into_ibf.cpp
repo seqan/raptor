@@ -28,7 +28,7 @@ void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
 
     timer<concurrent::no> local_fill_ibf_timer{};
     local_fill_ibf_timer.start();
-    for (auto chunk : kmers | seqan::std::views::chunk(chunk_size))
+    for (auto chunk : kmers | seqan::stl::views::chunk(chunk_size))
     {
         assert(chunk_number < number_of_bins);
         seqan3::bin_index const bin_idx{bin_index + chunk_number};

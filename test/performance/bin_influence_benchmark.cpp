@@ -83,11 +83,11 @@ static std::vector<size_t> cardinality(size_t const bin_count, auto && hash_adap
     std::vector<size_t> cardinalities(bin_count);
 
     size_t const chunked_genome_size{(genome_size + bin_count - 1) / bin_count};
-    auto chunked_genomes = genome | seqan::std::views::chunk(chunked_genome_size);
+    auto chunked_genomes = genome | seqan::stl::views::chunk(chunked_genome_size);
 
     size_t const workload_size = std::clamp<size_t>(std::bit_ceil(bin_count / construct_threads), 8u, 64u);
     auto workload =
-        seqan::std::views::zip(chunked_genomes, std::views::iota(0u)) | seqan::std::views::chunk(workload_size);
+        seqan::stl::views::zip(chunked_genomes, std::views::iota(0u)) | seqan::stl::views::chunk(workload_size);
 
     auto worker = [&cardinalities, &hash_adaptor](auto && payload, auto &&)
     {
@@ -111,11 +111,11 @@ static ibf_t construct_ibf(size_t const bin_count, auto && hash_adaptor, double 
     ibf_t ibf{seqan3::bin_count{bin_count}, seqan3::bin_size{bin_size}, seqan3::hash_function_count{hash_num}};
 
     size_t const chunked_genome_size{(genome_size + bin_count - 1) / bin_count};
-    auto chunked_genomes = genome | seqan::std::views::chunk(chunked_genome_size);
+    auto chunked_genomes = genome | seqan::stl::views::chunk(chunked_genome_size);
 
     size_t const workload_size = std::clamp<size_t>(std::bit_ceil(bin_count / construct_threads), 8u, 64u);
     auto workload =
-        seqan::std::views::zip(chunked_genomes, std::views::iota(0u)) | seqan::std::views::chunk(workload_size);
+        seqan::stl::views::zip(chunked_genomes, std::views::iota(0u)) | seqan::stl::views::chunk(workload_size);
 
     auto worker = [&ibf, &hash_adaptor](auto && payload, auto &&)
     {
