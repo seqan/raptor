@@ -8,14 +8,15 @@ You can skip this chapter if you want to use raptor with the default IBF.
 
 \tutorial_head{Easy, 30 min, \ref tutorial_first_steps,
 [<b>Interleaved Bloom Filter (IBF)</b>](https://docs.seqan.de/seqan/3-master-user/classseqan3_1_1interleaved__bloom__filter.html#details)\,
-\ref raptor::hierarchical_interleaved_bloom_filter "Hierarchical Interleaved Bloom Filter (HIBF)"}
+[<b>Hierarchical Interleaved Bloom Filter (HIBF)</b>](https://hibf.vercel.app/dev/html/classseqan_1_1hibf_1_1hierarchical__interleaved__bloom__filter.html#details)}
+
 
 [TOC]
 
 # IBF vs HIBF
 
 Raptor works with the Interleaved Bloom Filter by default. A new feature is the Hierarchical Interleaved Bloom Filter
-(HIBF) (raptor::hierarchical_interleaved_bloom_filter). This uses an almost always more space-saving method of storing
+(HIBF). This uses an almost always more space-saving method of storing
 the bins (except if the input samples are all of the same size). It distinguishes between the *user bins*, which reflect
 the individual input samples, and the *technical bins*, which are physical storage units within the HIBF.
 *Technical bins* may store a single user bin, a split part of a user bin, or several (merged) user bins. This is

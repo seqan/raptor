@@ -99,7 +99,7 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
             else
             {
                 local_query_ibf_timer.start();
-                auto & result = counter.bulk_contains(minimiser, threshold); // Results contains user bin IDs
+                auto & result = counter.membership_for(minimiser, threshold); // Results contains user bin IDs
                 local_query_ibf_timer.stop();
                 local_generate_results_timer.start();
                 for (auto && count : result)

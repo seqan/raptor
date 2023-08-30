@@ -5,6 +5,8 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
+#include <chopper/prefixes.hpp>
+
 #include <raptor/test/cli_test.hpp>
 
 struct search_hibf_preprocessing :
@@ -28,18 +30,24 @@ TEST_P(search_hibf_preprocessing, pipeline)
         std::string line{};
         std::ofstream file{"raptor_cli_test.layout"};
 
-        while (std::getline(input, line) && line.substr(0, 6) != "#FILES")
+        while (std::getline(input, line) && !line.starts_with(chopper::prefix::meta_chopper_user_bins_start))
             file << line << '\n';
         file << line << '\n';
-        while (std::getline(input, line))
+        // '@42 /some/path/bin2.fa'
+        while (std::getline(input, line) && !line.starts_with(chopper::prefix::meta_chopper_user_bins_end))
         {
             std::string_view sv{line};
-            size_t const filename_end = sv.find_first_of('\t');
-            size_t const bin_name_end = filename_end - 3u;
-            size_t const bin_name_start = sv.find_last_of('/', bin_name_end) + 1u;
-            std::string_view bin_stem{sv.substr(bin_name_start, bin_name_end - bin_name_start)};
-            file << "precomputed_minimisers/" << bin_stem << ".minimiser" << sv.substr(filename_end) << '\n';
+            size_t const filepath_start = sv.find(' ');
+            file << sv.substr(0, filepath_start + 1u); // '@42 '
+
+            size_t const filename_start = sv.find_last_of('/') + 1u;
+            file << "precomputed_minimisers/" << sv.substr(filename_start, sv.size() - filename_start - 3u) // 'bin2'
+                 << ".minimiser\n";
         }
+        file << line << '\n';
+
+        while (std::getline(input, line))
+            file << line << '\n';
     }
 
     cli_test_result const result1 = execute_app("raptor",
@@ -123,18 +131,24 @@ TEST_F(search_hibf_preprocessing, pipeline_with_continuation)
         std::string line{};
         std::ofstream file{"raptor_cli_test.layout"};
 
-        while (std::getline(input, line) && line.substr(0, 6) != "#FILES")
+        while (std::getline(input, line) && !line.starts_with(chopper::prefix::meta_chopper_user_bins_start))
             file << line << '\n';
         file << line << '\n';
-        while (std::getline(input, line))
+        // '@42 /some/path/bin2.fa'
+        while (std::getline(input, line) && !line.starts_with(chopper::prefix::meta_chopper_user_bins_end))
         {
             std::string_view sv{line};
-            size_t const filename_end = sv.find_first_of('\t');
-            size_t const bin_name_end = filename_end - 3u;
-            size_t const bin_name_start = sv.find_last_of('/', bin_name_end) + 1u;
-            std::string_view bin_stem{sv.substr(bin_name_start, bin_name_end - bin_name_start)};
-            file << "precomputed_minimisers/" << bin_stem << ".minimiser" << sv.substr(filename_end) << '\n';
+            size_t const filepath_start = sv.find(' ');
+            file << sv.substr(0, filepath_start + 1u); // '@42 '
+
+            size_t const filename_start = sv.find_last_of('/') + 1u;
+            file << "precomputed_minimisers/" << sv.substr(filename_start, sv.size() - filename_start - 3u) // 'bin2'
+                 << ".minimiser\n";
         }
+        file << line << '\n';
+
+        while (std::getline(input, line))
+            file << line << '\n';
     }
 
     // execute raptor prepare 3 times

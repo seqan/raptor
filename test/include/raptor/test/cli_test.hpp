@@ -200,9 +200,8 @@ struct raptor_base : public cli_test
     }
 
     // Good example for printing tables: https://en.cppreference.com/w/cpp/io/ios_base/width
-    static inline std::string const
-    debug_ibfs(seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed> const & expected_ibf,
-               seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed> const & actual_ibf)
+    static inline std::string const debug_ibfs(seqan::hibf::interleaved_bloom_filter const & expected_ibf,
+                                               seqan::hibf::interleaved_bloom_filter const & actual_ibf)
     {
         std::stringstream result{};
         result << ">>>IBFs differ<<<\n";

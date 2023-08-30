@@ -12,12 +12,11 @@
 
 #pragma once
 
-#include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
+#include <hibf/interleaved_bloom_filter.hpp>
 
 namespace raptor
 {
 
-template <typename container_t>
 class emplace_iterator
 {
 public:
@@ -34,41 +33,42 @@ public:
     emplace_iterator & operator=(emplace_iterator &&) = default;
     ~emplace_iterator() = default;
 
-    explicit constexpr emplace_iterator(container_t & cont, seqan3::bin_index const idx) :
-        container{std::addressof(cont)},
+    explicit constexpr emplace_iterator(seqan::hibf::interleaved_bloom_filter & ibf, seqan::hibf::bin_index const idx) :
+        ibf{std::addressof(ibf)},
         index{std::move(idx)}
     {}
 
-    constexpr emplace_iterator & operator=(uint64_t const value)
+    /* constexpr */ emplace_iterator & operator=(uint64_t const value) noexcept
     {
-        container->emplace(std::move(value), index);
+        assert(ibf != nullptr);
+        ibf->emplace(std::move(value), index);
         return *this;
     }
 
-    [[nodiscard]] constexpr emplace_iterator & operator*()
-    {
-        return *this;
-    }
-
-    constexpr emplace_iterator & operator++()
+    [[nodiscard]] constexpr emplace_iterator & operator*() noexcept
     {
         return *this;
     }
 
-    constexpr emplace_iterator operator++(int)
+    constexpr emplace_iterator & operator++() noexcept
+    {
+        return *this;
+    }
+
+    constexpr emplace_iterator operator++(int) noexcept
     {
         return *this;
     }
 
 private:
-    container_t * container{};
-    seqan3::bin_index index{};
+    seqan::hibf::interleaved_bloom_filter * ibf{nullptr};
+    seqan::hibf::bin_index index{};
 };
 
-template <typename container_t>
-[[nodiscard]] inline constexpr emplace_iterator<container_t> emplacer(container_t & cont, seqan3::bin_index const idx)
+[[nodiscard]] inline constexpr emplace_iterator emplacer(seqan::hibf::interleaved_bloom_filter & ibf,
+                                                         seqan::hibf::bin_index const idx)
 {
-    return emplace_iterator<container_t>(cont, std::move(idx));
+    return emplace_iterator{ibf, std::move(idx)};
 }
 
 } // namespace raptor

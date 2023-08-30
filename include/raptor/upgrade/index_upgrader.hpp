@@ -18,7 +18,6 @@
 namespace raptor
 {
 
-template <seqan3::data_layout data_layout_mode_ = seqan3::data_layout::uncompressed>
 class index_upgrader
 {
 public:
@@ -43,7 +42,7 @@ public:
 
     void upgrade()
     {
-        raptor_index<seqan3::interleaved_bloom_filter<data_layout_mode_>> index{};
+        raptor_index<index_structure::ibf> index{};
         {
             std::ifstream is{index_file, std::ios::binary};
             cereal::BinaryInputArchive iarchive{is};

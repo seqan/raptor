@@ -4,7 +4,7 @@ You will learn how to construct a Raptor index of large collections of nucleotid
 
 \tutorial_head{Easy, 30 min, \ref tutorial_first_steps \, for using HIBF: \ref tutorial_layout,
 [<b>Interleaved Bloom Filter (IBF)</b>](https://docs.seqan.de/seqan/3-master-user/classseqan3_1_1interleaved__bloom__filter.html#details)\,
-\ref raptor::hierarchical_interleaved_bloom_filter "Hierarchical Interleaved Bloom Filter (HIBF)"}
+[<b>Hierarchical Interleaved Bloom Filter (HIBF)</b>](https://hibf.vercel.app/dev/html/classseqan_1_1hibf_1_1hierarchical__interleaved__bloom__filter.html#details)}
 
 [TOC]
 

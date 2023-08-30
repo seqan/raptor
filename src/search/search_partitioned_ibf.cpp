@@ -60,9 +60,9 @@ void search_partitioned_ibf(search_arguments const & arguments)
         cereal_future.get();
         [[maybe_unused]] static bool header_written = write_header(); // called exactly once
 
-        std::vector<seqan3::counting_vector<uint16_t>> counts(
+        std::vector<seqan::hibf::counting_vector<uint16_t>> counts(
             records.size(),
-            seqan3::counting_vector<uint16_t>(index.ibf().bin_count(), 0));
+            seqan::hibf::counting_vector<uint16_t>(index.ibf().bin_count(), 0));
 
         size_t part{};
 

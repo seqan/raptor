@@ -10,9 +10,10 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
+#include <chopper/layout/input.hpp>
+
 #include <raptor/argument_parsing/parse_bin_path.hpp>
 #include <raptor/argument_parsing/validators.hpp>
-#include <raptor/build/hibf/parse_chopper_pack_line.hpp>
 
 namespace raptor
 {
@@ -25,19 +26,17 @@ void parse_bin_path(std::filesystem::path const & bin_file,
                     bool const is_hibf)
 {
     std::ifstream istrm{bin_file};
-    std::string line{};
-    std::string file_name{};
-    std::vector<std::string> tmp{};
 
     if (is_hibf)
     {
-        while (std::getline(istrm, line) && line.substr(0, 6) != "#FILES")
-        {}
-        while (std::getline(istrm, line))
-            hibf::parse_chopper_pack_line(line, bin_path);
+        bin_path = chopper::layout::read_filenames_from(istrm);
     }
     else
     {
+        std::string line{};
+        std::string file_name{};
+        std::vector<std::string> tmp{};
+
         while (std::getline(istrm, line))
         {
             if (!line.empty())

@@ -14,10 +14,11 @@
 
 #include <raptor/adjust_seed.hpp>
 #include <raptor/argument_parsing/compute_bin_size.hpp>
-#include <raptor/build/hibf/bin_size_in_bits.hpp>
 #include <raptor/call_parallel_on_bins.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/file_reader.hpp>
+
+#include <hibf/build/bin_size_in_bits.hpp>
 
 namespace raptor
 {
@@ -122,7 +123,7 @@ size_t compute_bin_size(build_arguments const & arguments)
 
     assert(max_count > 0u);
 
-    return hibf::bin_size_in_bits(arguments, max_count);
+    return seqan::hibf::bin_size_in_bits({.fpr = arguments.fpr, .hash_count = arguments.hash, .elements = max_count});
 }
 
 size_t max_bin_count(upgrade_arguments const & arguments)

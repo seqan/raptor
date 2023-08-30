@@ -10,8 +10,8 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
+#include <raptor/build/build_hibf.hpp>
 #include <raptor/build/build_ibf.hpp>
-#include <raptor/build/hibf/chopper_build.hpp>
 #include <raptor/build/raptor_build.hpp>
 
 namespace raptor
@@ -20,7 +20,7 @@ namespace raptor
 void raptor_build(build_arguments const & arguments)
 {
     if (arguments.is_hibf)
-        hibf::chopper_build(arguments);
+        build_hibf(arguments);
     else
         build_ibf(arguments);
 }

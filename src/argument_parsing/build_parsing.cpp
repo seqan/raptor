@@ -13,7 +13,6 @@
 #include <cereal/archives/json.hpp>
 
 #include <chopper/configuration.hpp>
-#include <chopper/prefixes.hpp>
 
 #include <raptor/argument_parsing/build_parsing.hpp>
 #include <raptor/argument_parsing/compute_bin_size.hpp>
@@ -23,61 +22,27 @@
 #include <raptor/argument_parsing/validators.hpp>
 #include <raptor/build/raptor_build.hpp>
 
+#include <hibf/layout/prefixes.hpp>
+
 namespace raptor
 {
 
-inline bool read_chopper_config(chopper::configuration & config, std::filesystem::path const & config_file)
+inline void read_chopper_config(chopper::configuration & config, std::filesystem::path const & config_file)
 {
     std::ifstream file_in{config_file};
-    std::string line{};
-    std::stringstream config_stream{};
-
-    std::getline(file_in, line, '\n');
-    if (line != "##CONFIG:")
-        return false;
-
-    while (std::getline(file_in, line, '\n') && line.starts_with("##"))
-    {
-        if (line == "##ENDCONFIG")
-            break;
-
-        std::string_view sv{line};
-        assert(line.size() > 1u);
-        sv.remove_prefix(2u);
-        config_stream << sv << '\n';
-    }
-
-    if (line != "##ENDCONFIG")
-        return false; // GCOVR_EXCL_LINE
-
-    cereal::JSONInputArchive iarchive(config_stream);
-    iarchive(config);
-    return true;
+    config.read_from(file_in);
 }
 
 inline void parse_chopper_config(sharg::parser & parser, build_arguments & arguments)
 {
     chopper::configuration config{};
     bool const kmer_set = parser.is_option_set("kmer");
-    bool const shape_set = parser.is_option_set("shape");
     bool const hash_set = parser.is_option_set("hash");
     bool const fpr_set = parser.is_option_set("fpr");
 
-    // If there is no config, but all three options are set, we can ignore the missing config.
-    // If the input are preprocessed minimizer files, we will use their kmer and window size, so we do not require
-    // --kmer to be set in this case.
-    bool const config_required = (!arguments.input_is_minimiser && !kmer_set && !shape_set) || !hash_set || !fpr_set;
+    read_chopper_config(config, arguments.bin_file);
 
-    bool const config_available = read_chopper_config(config, arguments.bin_file);
-    if (!config_available && config_required)
-    {
-        if (arguments.input_is_minimiser)
-            throw sharg::validation_error{"Could not read config from layout file. Please set --hash and --fpr."};
-
-        throw sharg::validation_error{"Could not read config from layout file. Please set --kmer, --hash, and --fpr."};
-    }
-
-    if (config_available && kmer_set && config.k != arguments.kmer_size)
+    if (kmer_set && config.k != arguments.kmer_size)
     {
         std::cerr << sharg::detail::to_string(
             "[WARNING] Given k-mer size(",
@@ -93,29 +58,29 @@ inline void parse_chopper_config(sharg::parser & parser, build_arguments & argum
 
     validate_shape(parser, arguments);
 
-    if (config_available && hash_set && config.num_hash_functions != arguments.hash)
+    if (hash_set && config.hibf_config.number_of_hash_functions != arguments.hash)
     {
         std::cerr << sharg::detail::to_string(
             "[WARNING] Given hash function count (",
             arguments.hash,
             ") differs from hash function count in the layout file (",
-            config.num_hash_functions,
+            config.hibf_config.number_of_hash_functions,
             "). The results may be suboptimal. If this was a conscious decision, you can ignore this warning.\n");
     }
     else
-        arguments.hash = config.num_hash_functions;
+        arguments.hash = config.hibf_config.number_of_hash_functions;
 
-    if (config_available && fpr_set && config.false_positive_rate != arguments.fpr)
+    if (fpr_set && config.hibf_config.maximum_false_positive_rate != arguments.fpr)
     {
         std::cerr << sharg::detail::to_string(
             "[WARNING] Given false positive rate (",
             arguments.fpr,
             ") differs from false positive rate in the layout file (",
-            config.false_positive_rate,
+            config.hibf_config.maximum_false_positive_rate,
             "). The results may be suboptimal. If this was a conscious decision, you can ignore this warning.");
     }
     else
-        arguments.fpr = config.false_positive_rate;
+        arguments.fpr = config.hibf_config.maximum_false_positive_rate;
 }
 
 inline void parse_shape_from_minimiser(sharg::parser & parser, build_arguments & arguments)
@@ -274,11 +239,13 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
 
 bool input_is_pack_file(std::filesystem::path const & path)
 {
-    std::ifstream file{path};
-    std::string line{};
-    while (std::getline(file, line) && line.starts_with("##")) // Skip parameter information
-    {}
-    return line.starts_with(chopper::prefix::first_header_line);
+    char const first_char = std::ifstream{path}.get();
+
+    if (first_char == '#')
+        throw sharg::parser_error{"The input file was determined to be a layout. However, the first line starts with "
+                                  "'#' (old format) instead of '@' (new format)."};
+
+    return seqan::hibf::prefix::meta_header.front() == first_char;
 }
 
 void build_parsing(sharg::parser & parser)

@@ -82,10 +82,10 @@ private:
                     [&](auto const & reader)
                     {
                         if (config == nullptr)
-                            reader.hash_into(file_names, emplacer(ibf, seqan3::bin_index{bin_number}));
+                            reader.hash_into(file_names, emplacer(ibf, seqan::hibf::bin_index{bin_number}));
                         else
                             reader.hash_into_if(file_names,
-                                                emplacer(ibf, seqan3::bin_index{bin_number}),
+                                                emplacer(ibf, seqan::hibf::bin_index{bin_number}),
                                                 [&](uint64_t const hash)
                                                 {
                                                     return config->hash_partition(hash) == part;

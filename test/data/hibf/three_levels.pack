@@ -1,178 +1,348 @@
-#HIGH_LEVEL_IBF max_bin_id:5
-#MERGED_BIN_0;0 max_bin_id:0
-#MERGED_BIN_0;1 max_bin_id:0
-#MERGED_BIN_0;2 max_bin_id:0
-#MERGED_BIN_0;3 max_bin_id:0
-#MERGED_BIN_0;4 max_bin_id:0
-#MERGED_BIN_0;5 max_bin_id:0
-#MERGED_BIN_0;6 max_bin_id:0
-#MERGED_BIN_0;7 max_bin_id:0
-#MERGED_BIN_0 max_bin_id:0
-#MERGED_BIN_1;1 max_bin_id:0
-#MERGED_BIN_1;2 max_bin_id:4
-#MERGED_BIN_1;3 max_bin_id:4
-#MERGED_BIN_1;4 max_bin_id:4
-#MERGED_BIN_1;5 max_bin_id:4
-#MERGED_BIN_1;6 max_bin_id:5
-#MERGED_BIN_1;7 max_bin_id:0
-#MERGED_BIN_1 max_bin_id:2
-#MERGED_BIN_2;3 max_bin_id:0
-#MERGED_BIN_2;4 max_bin_id:4
-#MERGED_BIN_2;5 max_bin_id:4
-#MERGED_BIN_2;6 max_bin_id:4
-#MERGED_BIN_2;7 max_bin_id:4
-#MERGED_BIN_2 max_bin_id:4
-#MERGED_BIN_3;3 max_bin_id:0
-#MERGED_BIN_3;4 max_bin_id:4
-#MERGED_BIN_3;5 max_bin_id:4
-#MERGED_BIN_3;6 max_bin_id:6
-#MERGED_BIN_3;7 max_bin_id:4
-#MERGED_BIN_3 max_bin_id:7
-#MERGED_BIN_4 max_bin_id:0
-#MERGED_BIN_5;3 max_bin_id:0
-#MERGED_BIN_5;4 max_bin_id:4
-#MERGED_BIN_5;5 max_bin_id:4
-#MERGED_BIN_5;6 max_bin_id:4
-#MERGED_BIN_5;7 max_bin_id:4
-#MERGED_BIN_5 max_bin_id:4
-#MERGED_BIN_6;3 max_bin_id:0
-#MERGED_BIN_6;4 max_bin_id:4
-#MERGED_BIN_6;5 max_bin_id:4
-#MERGED_BIN_6;6 max_bin_id:4
-#MERGED_BIN_6;7 max_bin_id:4
-#MERGED_BIN_6 max_bin_id:4
-#MERGED_BIN_7;3 max_bin_id:0
-#MERGED_BIN_7;4 max_bin_id:4
-#MERGED_BIN_7;5 max_bin_id:4
-#MERGED_BIN_7;6 max_bin_id:4
-#MERGED_BIN_7;7 max_bin_id:4
-#MERGED_BIN_7 max_bin_id:4
-#FILES	BIN_INDICES	NUMBER_OF_BINS
-@data_dir@/bin1.fa	0;0;0	1;1;4
-@data_dir@/bin1.fa	0;0;4	1;1;4
-@data_dir@/bin1.fa	0;1;0	1;1;4
-@data_dir@/bin1.fa	0;1;4	1;1;4
-@data_dir@/bin1.fa	0;2;0	1;1;4
-@data_dir@/bin1.fa	0;2;4	1;1;4
-@data_dir@/bin1.fa	0;3;0	1;1;4
-@data_dir@/bin1.fa	0;3;4	1;1;4
-@data_dir@/bin1.fa	0;4;0	1;1;4
-@data_dir@/bin1.fa	0;4;4	1;1;4
-@data_dir@/bin1.fa	0;5;0	1;1;4
-@data_dir@/bin1.fa	0;5;4	1;1;4
-@data_dir@/bin1.fa	0;6;0	1;1;4
-@data_dir@/bin1.fa	0;6;4	1;1;4
-@data_dir@/bin1.fa	0;7;0	1;1;4
-@data_dir@/bin1.fa	0;7;4	1;1;4
-@data_dir@/bin1.fa	1;0	1;1
-@data_dir@/bin1.fa	1;1;0	1;1;4
-@data_dir@/bin1.fa	1;1;4	1;1;4
-@data_dir@/bin1.fa	1;2;0	1;1;4
-@data_dir@/bin1.fa	1;2;4	1;1;2
-@data_dir@/bin1.fa	1;2;6	1;1;2
-@data_dir@/bin1.fa	1;3;0	1;1;4
-@data_dir@/bin1.fa	1;3;4	1;1;2
-@data_dir@/bin1.fa	1;3;6	1;1;2
-@data_dir@/bin1.fa	1;4;0	1;1;4
-@data_dir@/bin1.fa	1;4;4	1;1;2
-@data_dir@/bin1.fa	1;4;6	1;1;2
-@data_dir@/bin1.fa	1;5;0	1;1;4
-@data_dir@/bin1.fa	1;5;4	1;1;2
-@data_dir@/bin1.fa	1;5;6	1;1;2
-@data_dir@/bin2.fa	1;6;0	1;1;5
-@data_dir@/bin1.fa	1;6;5	1;1;3
-@data_dir@/bin2.fa	1;7;0	1;1;4
-@data_dir@/bin2.fa	1;7;4	1;1;4
-@data_dir@/bin2.fa	2;0	1;1
-@data_dir@/bin2.fa	2;1	1;1
-@data_dir@/bin2.fa	2;2	1;1
-@data_dir@/bin2.fa	2;3;0	1;1;4
-@data_dir@/bin2.fa	2;3;4	1;1;4
-@data_dir@/bin2.fa	2;4;0	1;1;4
-@data_dir@/bin2.fa	2;4;4	1;1;2
-@data_dir@/bin2.fa	2;4;6	1;1;2
-@data_dir@/bin2.fa	2;5;0	1;1;4
-@data_dir@/bin2.fa	2;5;4	1;1;2
-@data_dir@/bin2.fa	2;5;6	1;1;2
-@data_dir@/bin2.fa	2;6;0	1;1;4
-@data_dir@/bin2.fa	2;6;4	1;1;2
-@data_dir@/bin2.fa	2;6;6	1;1;2
-@data_dir@/bin2.fa	2;7;0	1;1;4
-@data_dir@/bin2.fa	2;7;4	1;1;2
-@data_dir@/bin2.fa	2;7;6	1;1;2
-@data_dir@/bin2.fa	3;0	1;1
-@data_dir@/bin2.fa	3;1	1;1
-@data_dir@/bin2.fa	3;2	1;1
-@data_dir@/bin2.fa	3;3;0	1;1;4
-@data_dir@/bin2.fa	3;3;4	1;1;4
-@data_dir@/bin2.fa	3;4;0	1;1;4
-@data_dir@/bin2.fa	3;4;4	1;1;2
-@data_dir@/bin2.fa	3;4;6	1;1;2
-@data_dir@/bin2.fa	3;5;0	1;1;4
-@data_dir@/bin2.fa	3;5;4	1;1;2
-@data_dir@/bin2.fa	3;5;6	1;1;2
-@data_dir@/bin4.fa	3;6;0	1;1;3
-@data_dir@/bin3.fa	3;6;3	1;1;3
-@data_dir@/bin2.fa	3;6;6	1;1;2
-@data_dir@/bin3.fa	3;7;0	1;1;4
-@data_dir@/bin4.fa	3;7;4	1;1;2
-@data_dir@/bin3.fa	3;7;6	1;1;2
-@data_dir@/bin3.fa	4;0	1;1
-@data_dir@/bin4.fa	4;1	1;1
-@data_dir@/bin3.fa	4;2	1;1
-@data_dir@/bin3.fa	4;3	1;1
-@data_dir@/bin4.fa	4;4	1;1
-@data_dir@/bin3.fa	4;5	1;1
-@data_dir@/bin4.fa	4;6	1;1
-@data_dir@/bin4.fa	4;7	1;1
-@data_dir@/bin3.fa	5;0	1;1
-@data_dir@/bin3.fa	5;1	1;1
-@data_dir@/bin4.fa	5;2	1;1
-@data_dir@/bin3.fa	5;3;0	1;1;4
-@data_dir@/bin4.fa	5;3;4	1;1;4
-@data_dir@/bin4.fa	5;4;0	1;1;4
-@data_dir@/bin4.fa	5;4;4	1;1;2
-@data_dir@/bin3.fa	5;4;6	1;1;2
-@data_dir@/bin3.fa	5;5;0	1;1;4
-@data_dir@/bin4.fa	5;5;4	1;1;2
-@data_dir@/bin3.fa	5;5;6	1;1;2
-@data_dir@/bin4.fa	5;6;0	1;1;4
-@data_dir@/bin4.fa	5;6;4	1;1;2
-@data_dir@/bin3.fa	5;6;6	1;1;2
-@data_dir@/bin4.fa	5;7;0	1;1;4
-@data_dir@/bin3.fa	5;7;4	1;1;2
-@data_dir@/bin3.fa	5;7;6	1;1;2
-@data_dir@/bin4.fa	6;0	1;1
-@data_dir@/bin3.fa	6;1	1;1
-@data_dir@/bin4.fa	6;2	1;1
-@data_dir@/bin3.fa	6;3;0	1;1;4
-@data_dir@/bin3.fa	6;3;4	1;1;4
-@data_dir@/bin4.fa	6;4;0	1;1;4
-@data_dir@/bin4.fa	6;4;4	1;1;2
-@data_dir@/bin3.fa	6;4;6	1;1;2
-@data_dir@/bin4.fa	6;5;0	1;1;4
-@data_dir@/bin4.fa	6;5;4	1;1;2
-@data_dir@/bin3.fa	6;5;6	1;1;2
-@data_dir@/bin3.fa	6;6;0	1;1;4
-@data_dir@/bin4.fa	6;6;4	1;1;2
-@data_dir@/bin3.fa	6;6;6	1;1;2
-@data_dir@/bin3.fa	6;7;0	1;1;4
-@data_dir@/bin4.fa	6;7;4	1;1;2
-@data_dir@/bin4.fa	6;7;6	1;1;2
-@data_dir@/bin4.fa	7;0	1;1
-@data_dir@/bin3.fa	7;1	1;1
-@data_dir@/bin3.fa	7;2	1;1
-@data_dir@/bin4.fa	7;3;0	1;1;4
-@data_dir@/bin4.fa	7;3;4	1;1;4
-@data_dir@/bin4.fa	7;4;0	1;1;4
-@data_dir@/bin3.fa	7;4;4	1;1;2
-@data_dir@/bin3.fa	7;4;6	1;1;2
-@data_dir@/bin4.fa	7;5;0	1;1;4
-@data_dir@/bin3.fa	7;5;4	1;1;2
-@data_dir@/bin4.fa	7;5;6	1;1;2
-@data_dir@/bin4.fa	7;6;0	1;1;4
-@data_dir@/bin3.fa	7;6;4	1;1;2
-@data_dir@/bin3.fa	7;6;6	1;1;2
-@data_dir@/bin4.fa	7;7;0	1;1;4
-@data_dir@/bin3.fa	7;7;4	1;1;2
-@data_dir@/bin4.fa	7;7;6	1;1;2
+@CHOPPER_USER_BINS
+@0 @data_dir@/bin1.fa
+@1 @data_dir@/bin1.fa
+@2 @data_dir@/bin1.fa
+@3 @data_dir@/bin1.fa
+@4 @data_dir@/bin1.fa
+@5 @data_dir@/bin1.fa
+@6 @data_dir@/bin1.fa
+@7 @data_dir@/bin1.fa
+@8 @data_dir@/bin1.fa
+@9 @data_dir@/bin1.fa
+@10 @data_dir@/bin1.fa
+@11 @data_dir@/bin1.fa
+@12 @data_dir@/bin1.fa
+@13 @data_dir@/bin1.fa
+@14 @data_dir@/bin1.fa
+@15 @data_dir@/bin1.fa
+@16 @data_dir@/bin1.fa
+@17 @data_dir@/bin1.fa
+@18 @data_dir@/bin1.fa
+@19 @data_dir@/bin1.fa
+@20 @data_dir@/bin1.fa
+@21 @data_dir@/bin1.fa
+@22 @data_dir@/bin1.fa
+@23 @data_dir@/bin1.fa
+@24 @data_dir@/bin1.fa
+@25 @data_dir@/bin1.fa
+@26 @data_dir@/bin1.fa
+@27 @data_dir@/bin1.fa
+@28 @data_dir@/bin1.fa
+@29 @data_dir@/bin1.fa
+@30 @data_dir@/bin1.fa
+@31 @data_dir@/bin2.fa
+@32 @data_dir@/bin1.fa
+@33 @data_dir@/bin2.fa
+@34 @data_dir@/bin2.fa
+@35 @data_dir@/bin2.fa
+@36 @data_dir@/bin2.fa
+@37 @data_dir@/bin2.fa
+@38 @data_dir@/bin2.fa
+@39 @data_dir@/bin2.fa
+@40 @data_dir@/bin2.fa
+@41 @data_dir@/bin2.fa
+@42 @data_dir@/bin2.fa
+@43 @data_dir@/bin2.fa
+@44 @data_dir@/bin2.fa
+@45 @data_dir@/bin2.fa
+@46 @data_dir@/bin2.fa
+@47 @data_dir@/bin2.fa
+@48 @data_dir@/bin2.fa
+@49 @data_dir@/bin2.fa
+@50 @data_dir@/bin2.fa
+@51 @data_dir@/bin2.fa
+@52 @data_dir@/bin2.fa
+@53 @data_dir@/bin2.fa
+@54 @data_dir@/bin2.fa
+@55 @data_dir@/bin2.fa
+@56 @data_dir@/bin2.fa
+@57 @data_dir@/bin2.fa
+@58 @data_dir@/bin2.fa
+@59 @data_dir@/bin2.fa
+@60 @data_dir@/bin2.fa
+@61 @data_dir@/bin2.fa
+@62 @data_dir@/bin2.fa
+@63 @data_dir@/bin4.fa
+@64 @data_dir@/bin3.fa
+@65 @data_dir@/bin2.fa
+@66 @data_dir@/bin3.fa
+@67 @data_dir@/bin4.fa
+@68 @data_dir@/bin3.fa
+@69 @data_dir@/bin3.fa
+@70 @data_dir@/bin4.fa
+@71 @data_dir@/bin3.fa
+@72 @data_dir@/bin3.fa
+@73 @data_dir@/bin4.fa
+@74 @data_dir@/bin3.fa
+@75 @data_dir@/bin4.fa
+@76 @data_dir@/bin4.fa
+@77 @data_dir@/bin3.fa
+@78 @data_dir@/bin3.fa
+@79 @data_dir@/bin4.fa
+@80 @data_dir@/bin3.fa
+@81 @data_dir@/bin4.fa
+@82 @data_dir@/bin4.fa
+@83 @data_dir@/bin4.fa
+@84 @data_dir@/bin3.fa
+@85 @data_dir@/bin3.fa
+@86 @data_dir@/bin4.fa
+@87 @data_dir@/bin3.fa
+@88 @data_dir@/bin4.fa
+@89 @data_dir@/bin4.fa
+@90 @data_dir@/bin3.fa
+@91 @data_dir@/bin4.fa
+@92 @data_dir@/bin3.fa
+@93 @data_dir@/bin3.fa
+@94 @data_dir@/bin4.fa
+@95 @data_dir@/bin3.fa
+@96 @data_dir@/bin4.fa
+@97 @data_dir@/bin3.fa
+@98 @data_dir@/bin3.fa
+@99 @data_dir@/bin4.fa
+@100 @data_dir@/bin4.fa
+@101 @data_dir@/bin3.fa
+@102 @data_dir@/bin4.fa
+@103 @data_dir@/bin4.fa
+@104 @data_dir@/bin3.fa
+@105 @data_dir@/bin3.fa
+@106 @data_dir@/bin4.fa
+@107 @data_dir@/bin3.fa
+@108 @data_dir@/bin3.fa
+@109 @data_dir@/bin4.fa
+@110 @data_dir@/bin4.fa
+@111 @data_dir@/bin4.fa
+@112 @data_dir@/bin3.fa
+@113 @data_dir@/bin3.fa
+@114 @data_dir@/bin4.fa
+@115 @data_dir@/bin4.fa
+@116 @data_dir@/bin4.fa
+@117 @data_dir@/bin3.fa
+@118 @data_dir@/bin3.fa
+@119 @data_dir@/bin4.fa
+@120 @data_dir@/bin3.fa
+@121 @data_dir@/bin4.fa
+@122 @data_dir@/bin4.fa
+@123 @data_dir@/bin3.fa
+@124 @data_dir@/bin3.fa
+@125 @data_dir@/bin4.fa
+@126 @data_dir@/bin3.fa
+@127 @data_dir@/bin4.fa
+@CHOPPER_USER_BINS_END
+@CHOPPER_CONFIG
+@{
+@    "chopper_config": {
+@        "version": 2,
+@        "data_file": {
+@            "value0": "list.txt"
+@        },
+@        "debug": false,
+@        "sketch_directory": {
+@            "value0": ""
+@        },
+@        "k": 19,
+@        "disable_sketch_output": true,
+@        "precomputed_files": false,
+@        "output_filename": {
+@            "value0": "layout.txt"
+@        },
+@        "determine_best_tmax": false,
+@        "force_all_binnings": false
+@    }
+@}
+@CHOPPER_CONFIG_END
+@HIBF_CONFIG
+@{
+@    "hibf_config": {
+@        "version": 1,
+@        "number_of_user_bins": 128,
+@        "number_of_hash_functions": 2,
+@        "maximum_false_positive_rate": 0.05,
+@        "threads": 1,
+@        "sketch_bits": 12,
+@        "tmax": 64,
+@        "alpha": 1.2,
+@        "max_rearrangement_ratio": 0.5,
+@        "disable_estimate_union": false,
+@        "disable_rearrangement": false,
+@        "disable_cutoffs": false
+@    }
+@}
+@HIBF_CONFIG_END
+#TOP_LEVEL_IBF fullest_technical_bin_idx:5
+#LOWER_LEVEL_IBF_0;0 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_0;1 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_0;2 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_0;3 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_0;4 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_0;5 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_0;6 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_0;7 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_0 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_1;1 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_1;2 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_1;3 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_1;4 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_1;5 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_1;6 fullest_technical_bin_idx:5
+#LOWER_LEVEL_IBF_1;7 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_1 fullest_technical_bin_idx:2
+#LOWER_LEVEL_IBF_2;3 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_2;4 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_2;5 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_2;6 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_2;7 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_2 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_3;3 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_3;4 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_3;5 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_3;6 fullest_technical_bin_idx:6
+#LOWER_LEVEL_IBF_3;7 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_3 fullest_technical_bin_idx:7
+#LOWER_LEVEL_IBF_4 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_5;3 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_5;4 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_5;5 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_5;6 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_5;7 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_5 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_6;3 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_6;4 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_6;5 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_6;6 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_6;7 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_6 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_7;3 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_7;4 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_7;5 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_7;6 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_7;7 fullest_technical_bin_idx:4
+#LOWER_LEVEL_IBF_7 fullest_technical_bin_idx:4
+#USER_BIN_IDX	TECHNICAL_BIN_INDICES	NUMBER_OF_TECHNICAL_BINS
+0	0;0;0	1;1;4
+1	0;0;4	1;1;4
+2	0;1;0	1;1;4
+3	0;1;4	1;1;4
+4	0;2;0	1;1;4
+5	0;2;4	1;1;4
+6	0;3;0	1;1;4
+7	0;3;4	1;1;4
+8	0;4;0	1;1;4
+9	0;4;4	1;1;4
+10	0;5;0	1;1;4
+11	0;5;4	1;1;4
+12	0;6;0	1;1;4
+13	0;6;4	1;1;4
+14	0;7;0	1;1;4
+15	0;7;4	1;1;4
+16	1;0	1;1
+17	1;1;0	1;1;4
+18	1;1;4	1;1;4
+19	1;2;0	1;1;4
+20	1;2;4	1;1;2
+21	1;2;6	1;1;2
+22	1;3;0	1;1;4
+23	1;3;4	1;1;2
+24	1;3;6	1;1;2
+25	1;4;0	1;1;4
+26	1;4;4	1;1;2
+27	1;4;6	1;1;2
+28	1;5;0	1;1;4
+29	1;5;4	1;1;2
+30	1;5;6	1;1;2
+31	1;6;0	1;1;5
+32	1;6;5	1;1;3
+33	1;7;0	1;1;4
+34	1;7;4	1;1;4
+35	2;0	1;1
+36	2;1	1;1
+37	2;2	1;1
+38	2;3;0	1;1;4
+39	2;3;4	1;1;4
+40	2;4;0	1;1;4
+41	2;4;4	1;1;2
+42	2;4;6	1;1;2
+43	2;5;0	1;1;4
+44	2;5;4	1;1;2
+45	2;5;6	1;1;2
+46	2;6;0	1;1;4
+47	2;6;4	1;1;2
+48	2;6;6	1;1;2
+49	2;7;0	1;1;4
+50	2;7;4	1;1;2
+51	2;7;6	1;1;2
+52	3;0	1;1
+53	3;1	1;1
+54	3;2	1;1
+55	3;3;0	1;1;4
+56	3;3;4	1;1;4
+57	3;4;0	1;1;4
+58	3;4;4	1;1;2
+59	3;4;6	1;1;2
+60	3;5;0	1;1;4
+61	3;5;4	1;1;2
+62	3;5;6	1;1;2
+63	3;6;0	1;1;3
+64	3;6;3	1;1;3
+65	3;6;6	1;1;2
+66	3;7;0	1;1;4
+67	3;7;4	1;1;2
+68	3;7;6	1;1;2
+69	4;0	1;1
+70	4;1	1;1
+71	4;2	1;1
+72	4;3	1;1
+73	4;4	1;1
+74	4;5	1;1
+75	4;6	1;1
+76	4;7	1;1
+77	5;0	1;1
+78	5;1	1;1
+79	5;2	1;1
+80	5;3;0	1;1;4
+81	5;3;4	1;1;4
+82	5;4;0	1;1;4
+83	5;4;4	1;1;2
+84	5;4;6	1;1;2
+85	5;5;0	1;1;4
+86	5;5;4	1;1;2
+87	5;5;6	1;1;2
+88	5;6;0	1;1;4
+89	5;6;4	1;1;2
+90	5;6;6	1;1;2
+91	5;7;0	1;1;4
+92	5;7;4	1;1;2
+93	5;7;6	1;1;2
+94	6;0	1;1
+95	6;1	1;1
+96	6;2	1;1
+97	6;3;0	1;1;4
+98	6;3;4	1;1;4
+99	6;4;0	1;1;4
+100	6;4;4	1;1;2
+101	6;4;6	1;1;2
+102	6;5;0	1;1;4
+103	6;5;4	1;1;2
+104	6;5;6	1;1;2
+105	6;6;0	1;1;4
+106	6;6;4	1;1;2
+107	6;6;6	1;1;2
+108	6;7;0	1;1;4
+109	6;7;4	1;1;2
+110	6;7;6	1;1;2
+111	7;0	1;1
+112	7;1	1;1
+113	7;2	1;1
+114	7;3;0	1;1;4
+115	7;3;4	1;1;4
+116	7;4;0	1;1;4
+117	7;4;4	1;1;2
+118	7;4;6	1;1;2
+119	7;5;0	1;1;4
+120	7;5;4	1;1;2
+121	7;5;6	1;1;2
+122	7;6;0	1;1;4
+123	7;6;4	1;1;2
+124	7;6;6	1;1;2
+125	7;7;0	1;1;4
+126	7;7;4	1;1;2
+127	7;7;6	1;1;2

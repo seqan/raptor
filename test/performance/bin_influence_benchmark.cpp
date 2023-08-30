@@ -11,13 +11,14 @@
 
 #include <seqan3/alphabet/nucleotide/dna4.hpp>
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
-#include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
 #include <seqan3/search/views/minimiser_hash.hpp>
 #include <seqan3/test/performance/sequence_generator.hpp>
 
 #include <raptor/adjust_seed.hpp>
 #include <raptor/contrib/std/chunk_view.hpp>
 #include <raptor/contrib/std/zip_view.hpp>
+
+#include <hibf/interleaved_bloom_filter.hpp>
 
 #define USE_UNIT_TEST_PARAMETERS 1
 
@@ -68,7 +69,7 @@ static std::vector<std::vector<seqan3::dna4>> const reads{
         return result;
     }(genome)};
 
-using ibf_t = seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed>;
+using ibf_t = seqan::hibf::interleaved_bloom_filter;
 
 static constexpr size_t compute_bin_size(size_t const max_bin_size, double const fpr)
 {
@@ -108,7 +109,9 @@ static ibf_t construct_ibf(size_t const bin_count, auto && hash_adaptor, double 
     if (bin_size * bin_count > max_ibf_size)
         throw std::runtime_error{"Resulting IBF would be too big. " + std::to_string(bin_size * bin_count)};
 
-    ibf_t ibf{seqan3::bin_count{bin_count}, seqan3::bin_size{bin_size}, seqan3::hash_function_count{hash_num}};
+    ibf_t ibf{seqan::hibf::bin_count{bin_count},
+              seqan::hibf::bin_size{bin_size},
+              seqan::hibf::hash_function_count{hash_num}};
 
     size_t const chunked_genome_size{(genome_size + bin_count - 1) / bin_count};
     auto chunked_genomes = genome | seqan::stl::views::chunk(chunked_genome_size);
@@ -121,7 +124,7 @@ static ibf_t construct_ibf(size_t const bin_count, auto && hash_adaptor, double 
     {
         for (auto && [sequence, bin_number] : payload)
             for (auto && hash : sequence | hash_adaptor)
-                ibf.emplace(hash, seqan3::bin_index{bin_number});
+                ibf.emplace(hash, seqan::hibf::bin_index{bin_number});
     };
 
     seqan3::detail::execution_handler_parallel executioner{construct_threads};
