@@ -298,10 +298,10 @@ struct raptor_base : public cli_test
         if constexpr (is_ibf)
         {
             for (auto const && [expected_list, actual_list] :
-                 seqan::std::views::zip(all_expected_bins, all_actual_bins))
+                 seqan::stl::views::zip(all_expected_bins, all_actual_bins))
             {
                 EXPECT_TRUE(std::ranges::distance(expected_list) > 0);
-                for (auto const && [expected_file, actual_file] : seqan::std::views::zip(expected_list, actual_list))
+                for (auto const && [expected_file, actual_file] : seqan::stl::views::zip(expected_list, actual_list))
                 {
                     std::filesystem::path const expected_path(expected_file);
                     std::filesystem::path const actual_path(actual_file);

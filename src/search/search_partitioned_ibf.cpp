@@ -44,7 +44,7 @@ void search_partitioned_ibf(search_arguments const & arguments)
 
     raptor::threshold::threshold const thresholder{arguments.make_threshold_parameters()};
 
-    for (auto && chunked_records : fin | seqan::std::views::chunk((1ULL << 20) * 10))
+    for (auto && chunked_records : fin | seqan::stl::views::chunk((1ULL << 20) * 10))
     {
         auto cereal_future = std::async(std::launch::async,
                                         [&]() // GCOVR_EXCL_LINE

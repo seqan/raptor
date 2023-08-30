@@ -70,7 +70,7 @@ public:
         for (auto const & file_list : arguments.bin_path)
         {
             file << '#' << user_bin_id << '\t';
-            for (auto const elem : seqan::std::views::join_with(file_list, ','))
+            for (auto const elem : seqan::stl::views::join_with(file_list, ','))
                 file << elem;
             file << '\n';
             ++user_bin_id;

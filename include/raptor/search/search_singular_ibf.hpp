@@ -131,7 +131,7 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
             return synced_out.write_header(arguments, index.ibf().ibf_vector[0].hash_function_count());
     };
 
-    for (auto && chunked_records : fin | seqan::std::views::chunk((1ULL << 20) * 10))
+    for (auto && chunked_records : fin | seqan::stl::views::chunk((1ULL << 20) * 10))
     {
         records.clear();
         arguments.query_file_io_timer.start();

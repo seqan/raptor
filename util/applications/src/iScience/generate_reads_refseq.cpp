@@ -140,7 +140,7 @@ void run_program(cmd_arguments const & arguments)
 
     size_t const chunk_size = std::bit_ceil(number_of_bins / arguments.threads);
     auto chunked_view =
-        seqan::std::views::zip(arguments.bin_path, std::views::iota(0u)) | seqan::std::views::chunk(chunk_size);
+        seqan::stl::views::zip(arguments.bin_path, std::views::iota(0u)) | seqan::stl::views::chunk(chunk_size);
     seqan3::detail::execution_handler_parallel executioner{arguments.threads};
     executioner.bulk_execute(std::move(worker), std::move(chunked_view), []() {});
 }

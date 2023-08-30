@@ -242,7 +242,7 @@ inline void apply_taxsbp(config const & cfg)
     };
 
     size_t const chunk_size = std::bit_ceil(num_bins / cfg.threads);
-    auto chunked_view = std::views::iota(0u, num_bins) | seqan::std::views::chunk(chunk_size);
+    auto chunked_view = std::views::iota(0u, num_bins) | seqan::stl::views::chunk(chunk_size);
     seqan3::detail::execution_handler_parallel executioner{cfg.threads};
     executioner.bulk_execute(std::move(worker), std::move(chunked_view), []() {});
 }

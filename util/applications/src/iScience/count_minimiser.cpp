@@ -61,7 +61,7 @@ void compute_minimisers(config const & cfg)
 
     size_t const chunk_size = std::max<size_t>(1, std::floor(cfg.bin_path.size() / static_cast<double>(cfg.threads)));
     auto chunked_view =
-        seqan::std::views::zip(cfg.bin_path, std::views::iota(0u)) | seqan::std::views::chunk(chunk_size);
+        seqan::stl::views::zip(cfg.bin_path, std::views::iota(0u)) | seqan::stl::views::chunk(chunk_size);
     seqan3::detail::execution_handler_parallel executioner{cfg.threads};
     executioner.bulk_execute(worker, std::move(chunked_view), []() {});
 
@@ -70,9 +70,9 @@ void compute_minimisers(config const & cfg)
     output << "# Window size: " << cfg.window_size << '\n';
     output << "# Unique k-mers across all: " << all_minimiser_set.size() << '\n';
     output << "# File\tUnique k-mer count\n";
-    for (auto && [file_names, count] : seqan::std::views::zip(cfg.bin_path, minimiser_counts))
+    for (auto && [file_names, count] : seqan::stl::views::zip(cfg.bin_path, minimiser_counts))
     {
-        for (auto && elem : seqan::std::views::join_with(file_names, ' '))
+        for (auto && elem : seqan::stl::views::join_with(file_names, ' '))
             output << elem;
         output << '\t';
         output << count << '\n';

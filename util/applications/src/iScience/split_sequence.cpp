@@ -98,7 +98,7 @@ inline void split_sequence(config const & cfg)
     size_t part{};
     size_t const n_zero = std::to_string(cfg.parts).length();
 
-    for (auto && split_sequence : (*input_sequence.begin()).sequence() | seqan::std::views::chunk(cfg.length))
+    for (auto && split_sequence : (*input_sequence.begin()).sequence() | seqan::stl::views::chunk(cfg.length))
     {
         std::string part_as_string = std::to_string(part);
         std::string padded_parts = std::string(n_zero - part_as_string.length(), '0') + part_as_string;
