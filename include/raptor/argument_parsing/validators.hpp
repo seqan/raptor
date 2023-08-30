@@ -178,6 +178,8 @@ public:
 
                 if (is_minimiser_input && (file_path.extension() != ".minimiser"))
                     throw sharg::validation_error{"You cannot mix sequence and minimiser files as input."};
+                if (!std::filesystem::exists(file_path))
+                    throw sharg::validation_error{"The file " + value + " does not exist."};
                 if (std::filesystem::file_size(file_path) == 0u)
                     throw sharg::validation_error{"The file " + value + " is empty."};
 

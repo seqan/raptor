@@ -21,24 +21,12 @@ namespace raptor
 
 void raptor_upgrade(upgrade_arguments & arguments)
 {
-    std::variant<index_upgrader<seqan3::data_layout::uncompressed>, index_upgrader<seqan3::data_layout::compressed>>
-        upgrader{};
-
     if (arguments.parts == 1u)
     {
         size_t const max_count = std::isnan(arguments.fpr) ? max_bin_count(arguments) : 0u;
 
-        if (arguments.compressed)
-            upgrader = index_upgrader<seqan3::data_layout::compressed>{arguments, max_count}; // GCOVR_EXCL_LINE
-        else
-            upgrader = index_upgrader<seqan3::data_layout::uncompressed>{arguments, max_count};
-
-        std::visit(
-            [](auto & u)
-            {
-                u.upgrade();
-            },
-            upgrader);
+        index_upgrader upgrader{arguments, max_count};
+        upgrader.upgrade();
     }
     else
     {
@@ -55,17 +43,8 @@ void raptor_upgrade(upgrade_arguments & arguments)
 
             size_t const max_count = std::isnan(arguments.fpr) ? count_per_partition[part] : 0u;
 
-            if (arguments.compressed)
-                upgrader = index_upgrader<seqan3::data_layout::compressed>{arguments, max_count}; // GCOVR_EXCL_LINE
-            else
-                upgrader = index_upgrader<seqan3::data_layout::uncompressed>{arguments, max_count};
-
-            std::visit(
-                [](auto & u)
-                {
-                    u.upgrade();
-                },
-                upgrader);
+            index_upgrader upgrader{arguments, max_count};
+            upgrader.upgrade();
         }
     }
 }

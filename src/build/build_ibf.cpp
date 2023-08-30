@@ -10,11 +10,12 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <raptor/build/hibf/bin_size_in_bits.hpp>
 #include <raptor/build/index_factory.hpp>
 #include <raptor/build/max_count_per_partition.hpp>
 #include <raptor/build/partition_config.hpp>
 #include <raptor/build/store_index.hpp>
+
+#include <hibf/build/bin_size_in_bits.hpp>
 
 namespace raptor
 {
@@ -26,7 +27,7 @@ void build_ibf(build_arguments const & arguments)
         index_factory factory{arguments};
         auto index = factory();
         arguments.store_index_timer.start();
-        store_index(arguments.out_path, std::move(index), arguments);
+        store_index(arguments.out_path, std::move(index));
         arguments.store_index_timer.stop();
     }
     else
@@ -37,12 +38,13 @@ void build_ibf(build_arguments const & arguments)
 
         for (size_t part = 0; part < arguments.parts; ++part)
         {
-            arguments.bits = hibf::bin_size_in_bits(arguments, kmers_per_partition[part]);
+            arguments.bits = seqan::hibf::bin_size_in_bits(
+                {.fpr = arguments.fpr, .hash_count = arguments.hash, .elements = kmers_per_partition[part]});
             auto index = factory(part);
             std::filesystem::path out_path{arguments.out_path};
             out_path += "_" + std::to_string(part);
             arguments.store_index_timer.start();
-            store_index(out_path, std::move(index), arguments);
+            store_index(out_path, std::move(index));
             arguments.store_index_timer.stop();
         }
     }

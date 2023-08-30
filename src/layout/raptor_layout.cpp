@@ -10,15 +10,13 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <chopper/configuration.hpp>
-#include <chopper/data_store.hpp>
+#include <chopper/input_functor.hpp>
 #include <chopper/layout/execute.hpp>
 #include <chopper/set_up_parser.hpp>
-#include <chopper/sketch/estimate_kmer_counts.hpp>
-#include <chopper/sketch/execute.hpp>
+#include <chopper/sketch/check_filenames.hpp>
+#include <chopper/sketch/read_data_file.hpp>
 
 #include <raptor/argument_parsing/init_shared_meta.hpp>
-#include <raptor/layout/raptor_layout.hpp>
 
 namespace raptor
 {
@@ -34,22 +32,18 @@ void chopper_layout(sharg::parser & parser)
     parser.parse();
     config.disable_sketch_output = !parser.is_option_set("output-sketches-to");
 
-    chopper::layout::layout hibf_layout{};
-    std::vector<std::string> filenames{};
-    std::vector<size_t> kmer_counts{};
-    std::vector<chopper::sketch::hyperloglog> sketches{};
+    if (std::filesystem::is_empty(config.data_file))
+        throw sharg::parser_error{"The input file is empty."};
 
+    std::vector<std::string> filenames{};
     chopper::sketch::read_data_file(config, filenames);
 
-    chopper::sketch::execute(config, filenames, sketches);
-    chopper::sketch::estimate_kmer_counts(sketches, kmer_counts);
+    chopper::sketch::check_filenames(filenames, config);
 
-    chopper::data_store store{.false_positive_rate = config.false_positive_rate,
-                              .hibf_layout = &hibf_layout,
-                              .kmer_counts = kmer_counts,
-                              .sketches = sketches};
+    config.hibf_config.input_fn = chopper::input_functor{filenames, config.precomputed_files, config.k};
+    config.hibf_config.number_of_user_bins = filenames.size();
 
-    chopper::layout::execute(config, filenames, store);
+    chopper::layout::execute(config, filenames);
 }
 
 } // namespace raptor

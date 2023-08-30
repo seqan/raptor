@@ -5,9 +5,46 @@ set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set (CMAKE_INSTALL_BINDIR "bin") # For chopper
 
-# Dependency: Chopper
 include (FetchContent)
 
+# Dependency: xxHash
+if (NOT TARGET xxHash::xxhash)
+    FetchContent_Declare (raptor_xxhash_project SOURCE_DIR "${RAPTOR_SUBMODULES_DIR}/xxHash" SOURCE_SUBDIR
+                                                "cmake_unofficial"
+    )
+
+    set (XXHASH_BUILD_ENABLE_INLINE_API ON)
+    set (XXHASH_BUILD_XXHSUM OFF)
+    set (XXHASH_BUNDLED_MODE ON)
+    set (BUILD_SHARED_LIBS OFF)
+
+    set (STORED_CMAKE_MESSAGE_LOG_LEVEL "${CMAKE_MESSAGE_LOG_LEVEL}")
+    set (CMAKE_MESSAGE_LOG_LEVEL "ERROR")
+    FetchContent_MakeAvailable (raptor_xxhash_project)
+    set (CMAKE_MESSAGE_LOG_LEVEL "${STORED_CMAKE_MESSAGE_LOG_LEVEL}")
+    unset (STORED_CMAKE_MESSAGE_LOG_LEVEL)
+endif ()
+
+# Dependency: HIBF lib
+set (HIBF_SUBMODULES_DIR
+     "${RAPTOR_SUBMODULES_DIR}"
+     CACHE STRING "Directory containing submodules."
+)
+
+if (NOT TARGET seqan::hibf)
+    FetchContent_Declare (raptor_hibf_project SOURCE_DIR
+                                              "${RAPTOR_SUBMODULES_DIR}/Hierarchical_Interleaved_Bloomfilter"
+    )
+    option (INSTALL_HIBF "Enable installation of HIBF." OFF)
+    option (HIBF_NATIVE_BUILD "Optimize build for current architecture." ${RAPTOR_NATIVE_BUILD})
+    set (STORED_CMAKE_MESSAGE_LOG_LEVEL "${CMAKE_MESSAGE_LOG_LEVEL}")
+    set (CMAKE_MESSAGE_LOG_LEVEL "ERROR")
+    FetchContent_MakeAvailable (raptor_hibf_project)
+    set (CMAKE_MESSAGE_LOG_LEVEL "${STORED_CMAKE_MESSAGE_LOG_LEVEL}")
+    unset (STORED_CMAKE_MESSAGE_LOG_LEVEL)
+endif ()
+
+# Dependency: Chopper
 FetchContent_Declare (raptor_chopper_project SOURCE_DIR "${RAPTOR_SUBMODULES_DIR}/chopper")
 
 set (SEQAN3_SUBMODULES_DIR "${RAPTOR_SUBMODULES_DIR}")
@@ -38,22 +75,6 @@ FetchContent_MakeAvailable (raptor_chopper_project)
 set (CMAKE_MESSAGE_LOG_LEVEL "${STORED_CMAKE_MESSAGE_LOG_LEVEL}")
 unset (STORED_CMAKE_MESSAGE_LOG_LEVEL)
 
-# Dependency: xxHash
-FetchContent_Declare (raptor_xxhash_project SOURCE_DIR "${RAPTOR_SUBMODULES_DIR}/xxHash" SOURCE_SUBDIR
-                                            "cmake_unofficial"
-)
-
-set (XXHASH_BUILD_ENABLE_INLINE_API ON)
-set (XXHASH_BUILD_XXHSUM OFF)
-set (XXHASH_BUNDLED_MODE ON)
-set (BUILD_SHARED_LIBS OFF)
-
-set (STORED_CMAKE_MESSAGE_LOG_LEVEL "${CMAKE_MESSAGE_LOG_LEVEL}")
-set (CMAKE_MESSAGE_LOG_LEVEL "ERROR")
-FetchContent_MakeAvailable (raptor_xxhash_project)
-set (CMAKE_MESSAGE_LOG_LEVEL "${STORED_CMAKE_MESSAGE_LOG_LEVEL}")
-unset (STORED_CMAKE_MESSAGE_LOG_LEVEL)
-
 # Shared interface
 if (NOT TARGET raptor_interface)
     add_library ("raptor_interface" INTERFACE)
@@ -67,7 +88,6 @@ if (NOT TARGET raptor_lib)
     target_link_libraries ("raptor_lib"
                            INTERFACE "raptor_argument_parsing"
                                      "raptor_build"
-                                     "raptor_build_hibf"
                                      "raptor_prepare"
                                      "raptor_search"
                                      "raptor_threshold"

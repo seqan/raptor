@@ -20,6 +20,8 @@ struct argparse_upgrade : public raptor_base
 {};
 struct argparse_prepare : public raptor_base
 {};
+struct argparse_layout : public raptor_base
+{};
 
 raptor::test::tmp_test_file const test_files{};
 // clang-format off
@@ -28,13 +30,15 @@ std::filesystem::path const
     dummy_sequence_file    = test_files.create("dummy.fasta",   ">ID\nACGTCACGATCGTACGATCGATCGATCG"),
     tmp_bin_list_file      = test_files.create("all_bins.txt",   dummy_sequence_file.c_str()),
     tmp_bin_list_empty     = test_files.create("empty.txt"),
-    tmp_bin_list_corrupted = test_files.create("corrupted.txt",  chopper::prefix::first_header_line),
+    tmp_bin_list_no_exist  = test_files.create("no_exist.txt", "raptor_options_test_non_existing_file.fa"),
+    tmp_bin_list_corrupted = test_files.create("corrupted.txt",  chopper::prefix::meta_chopper_user_bins_start, '\n', chopper::prefix::meta_chopper_user_bins_end),
     empty_sequence_file    = test_files.create("empty.fasta"),
     tmp_empty_bin_file     = test_files.create("empty_bin.txt",  empty_sequence_file.c_str()),
     header_file            = test_files.create("bin1.header",    "1111111111111111111\t19\t0\t1\n"),
     minimiser_file         = test_files.create("bin1.minimiser", "0"),
     minimiser_list         = test_files.create("minimiser.list", minimiser_file.c_str()),
-    mixed_bin_file         = test_files.create("mixed.txt",      minimiser_file.c_str(), "\nbin2.fasta");
+    mixed_bin_file         = test_files.create("mixed.txt",      minimiser_file.c_str(), "\nbin2.fasta"),
+    old_layout_file        = test_files.create("old.layout",     "#TOP_LEVEL_IBF");
 // clang-format on
 
 TEST_F(argparse_main, no_options)
@@ -96,6 +100,14 @@ TEST_F(argparse_main, unknown_option)
         "of [build, layout, prepare, search, upgrade]. Use -h/--help for more information.\n"};
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, expected);
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
+TEST_F(argparse_layout, no_bins_in_file)
+{
+    cli_test_result const result = execute_app("raptor", "layout", "--input-file", tmp_bin_list_empty);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] The input file is empty.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
@@ -174,6 +186,15 @@ TEST_F(argparse_build, no_bins_in_file)
         execute_app("raptor", "build", "--kmer 20", "--output index.raptor", "--input", tmp_bin_list_empty);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] The input file is empty.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
+TEST_F(argparse_build, bin_does_not_exist)
+{
+    cli_test_result const result =
+        execute_app("raptor", "build", "--kmer 20", "--output index.raptor", "--input", tmp_bin_list_no_exist);
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] The file raptor_options_test_non_existing_file.fa does not exist.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
@@ -285,27 +306,13 @@ TEST_F(argparse_build, layout_too_small_window)
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
-TEST_F(argparse_build, layout_config_missing)
+TEST_F(argparse_build, layout_old)
 {
-    cli_test_result const result =
-        execute_app("raptor", "build", "--window 19", "--output index.raptor", "--input", data("test_nocfg.layout"));
+    cli_test_result const result = execute_app("raptor", "build", "--output index.raptor", "--input", old_layout_file);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err,
-              std::string{"[Error] Could not read config from layout file. Please set --kmer, --hash, and --fpr.\n"});
-    RAPTOR_ASSERT_FAIL_EXIT(result);
-}
-
-TEST_F(argparse_build, layout_config_missing_preprocessed)
-{
-    cli_test_result const result = execute_app("raptor",
-                                               "build",
-                                               "--window 19",
-                                               "--output index.raptor",
-                                               "--input",
-                                               data("test_preprocessed_nocfg.layout"));
-    EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err,
-              std::string{"[Error] Could not read config from layout file. Please set --hash and --fpr.\n"});
+              std::string{"[Error] The input file was determined to be a layout. However, the first line starts "
+                          "with '#' (old format) instead of '@' (new format).\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 

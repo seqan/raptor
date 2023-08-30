@@ -59,22 +59,18 @@ TEST_F(upgrade, via_bin_file)
     compare_index(ibf_path(16, 19), "raptor.index");
 }
 
-// TEST_F(upgrade, compressed)
-// {
-//     cli_test_result const result = execute_app("raptor",
-//                                                "upgrade",
-//                                                "--input ",
-//                                                data("2.0.compressed.index"),
-//                                                "--output raptor.index",
-//                                                "--fpr 0.05");
-//     EXPECT_NE(result.out, std::string{});
-//     EXPECT_EQ(result.err, std::string{});
-//     RAPTOR_ASSERT_ZERO_EXIT(result);
-
-//     compare_index<raptor::index_structure::ibf_compressed>(ibf_path(16, 23, is_compressed::yes),
-//                                                            "raptor.index",
-//                                                            compare_extension::no);
-// }
+TEST_F(upgrade, compressed)
+{
+    cli_test_result const result = execute_app("raptor",
+                                               "upgrade",
+                                               "--input ",
+                                               data("2.0.compressed.index"),
+                                               "--output raptor.index",
+                                               "--fpr 0.05");
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] Compressed upgrade not yet supported on main branch.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
 
 TEST_F(upgrade, partitioned_ibf_via_fpr)
 {

@@ -6,9 +6,7 @@ target_link_libraries ("generate_reads" "utility_common")
 add_executable ("split_sequence" split_sequence.cpp)
 target_link_libraries ("split_sequence" "utility_common")
 
-add_executable ("count_minimiser" ${RAPTOR_CLONE_DIR}/src/argument_parsing/parse_bin_path.cpp
-                                  ${RAPTOR_CLONE_DIR}/src/build/hibf/parse_chopper_pack_line.cpp count_minimiser.cpp
-)
+add_executable ("count_minimiser" ${RAPTOR_CLONE_DIR}/src/argument_parsing/parse_bin_path.cpp count_minimiser.cpp)
 target_link_libraries ("count_minimiser" "utility_common")
 
 add_executable ("threshold_info"

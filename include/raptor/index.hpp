@@ -15,8 +15,9 @@
 #include <sharg/exceptions.hpp>
 
 #include <raptor/argument_parsing/build_arguments.hpp>
-#include <raptor/hierarchical_interleaved_bloom_filter.hpp>
 #include <raptor/strong_types.hpp>
+
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp>
 
 namespace raptor
 {
@@ -24,8 +25,8 @@ namespace raptor
 namespace index_structure
 {
 
-using ibf = seqan3::interleaved_bloom_filter<seqan3::data_layout::uncompressed>;
-using hibf = hierarchical_interleaved_bloom_filter;
+using ibf = seqan::hibf::interleaved_bloom_filter;
+using hibf = seqan::hibf::hierarchical_interleaved_bloom_filter;
 
 template <typename index_t>
 concept is_ibf = std::same_as<index_t, index_structure::ibf>;
@@ -33,16 +34,18 @@ concept is_ibf = std::same_as<index_t, index_structure::ibf>;
 template <typename index_t>
 concept is_hibf = std::same_as<index_t, index_structure::hibf>;
 
+template <typename index_t>
+concept is_valid = is_ibf<index_t> || is_hibf<index_t>;
+
 } // namespace index_structure
 
-template <seqan3::data_layout data_layout_mode_>
 class index_upgrader;
 
-template <typename data_t = index_structure::ibf>
+template <index_structure::is_valid data_t = index_structure::ibf>
 class raptor_index
 {
 private:
-    template <typename friend_data_t>
+    template <index_structure::is_valid friend_data_t>
     friend class raptor_index;
 
     uint64_t window_size_{};
@@ -55,7 +58,6 @@ private:
     data_t ibf_{};
 
 public:
-    static constexpr seqan3::data_layout data_layout_mode = data_t::data_layout_mode;
     static constexpr uint32_t version{2u};
 
     raptor_index() = default;
@@ -85,12 +87,10 @@ public:
         parts_{arguments.parts},
         bin_path_{arguments.bin_path},
         fpr_{arguments.fpr},
-        ibf_{seqan3::bin_count{arguments.bins},
-             seqan3::bin_size{arguments.bits / arguments.parts},
-             seqan3::hash_function_count{arguments.hash}}
-    {
-        static_assert(data_layout_mode == seqan3::data_layout::uncompressed);
-    }
+        ibf_{seqan::hibf::bin_count{arguments.bins},
+             seqan::hibf::bin_size{arguments.bits / arguments.parts},
+             seqan::hibf::hash_function_count{arguments.hash}}
+    {}
 
     uint64_t window_size() const
     {
@@ -105,6 +105,11 @@ public:
     uint8_t parts() const
     {
         return parts_;
+    }
+
+    bool compressed() const
+    {
+        return compressed_;
     }
 
     std::vector<std::vector<std::string>> const & bin_path() const
@@ -240,7 +245,6 @@ public:
     //!\endcond
 
 private:
-    template <seqan3::data_layout data_layout_mode_>
     friend class index_upgrader;
 
     //!\cond DEV

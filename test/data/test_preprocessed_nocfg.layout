@@ -1,4 +1,4 @@
-#HIGH_LEVEL_IBF max_bin_id:48
+@HIGH_LEVEL_IBF max_bin_id:48
 #FILES	BIN_INDICES	NUMBER_OF_BINS
 @data_dir@/bin1.minimiser	0	1
 @data_dir@/bin1.minimiser	1	1

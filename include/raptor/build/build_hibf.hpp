@@ -6,23 +6,17 @@
 // --------------------------------------------------------------------------------------------------
 
 /*!\file
- * \brief Provides raptor::hibf::compute_kmers.
+ * \brief Provides raptor::build_ibf.
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
 #pragma once
 
-#include <robin_hood.h>
+#include <raptor/argument_parsing/build_arguments.hpp>
 
-#include <chopper/layout/layout.hpp>
-
-#include <raptor/build/hibf/build_data.hpp>
-
-namespace raptor::hibf
+namespace raptor
 {
 
-void compute_kmers(robin_hood::unordered_flat_set<uint64_t> & kmers,
-                   build_data const & data,
-                   chopper::layout::layout::user_bin const & record);
+void build_hibf(build_arguments const & arguments);
 
-} // namespace raptor::hibf
+} // namespace raptor

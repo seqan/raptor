@@ -106,7 +106,9 @@ void upgrade_parsing(sharg::parser & parser)
         arguments.shape = tmp.shape();
         arguments.window_size = tmp.window_size();
         arguments.parts = tmp.parts();
-        arguments.compressed = false; /*tmp.compressed();*/
+        arguments.compressed = tmp.compressed();
+        if (arguments.compressed)
+            throw sharg::parser_error{"Compressed upgrade not yet supported on main branch."};
         if (arguments.bin_path.empty() && !parser.is_option_set("fpr"))
         {
             arguments.bin_path = tmp.bin_path();
