@@ -39,7 +39,7 @@ void build_hibf(build_arguments const & arguments)
 
     std::ifstream layout_stream{arguments.bin_file};
 
-    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{input_lambda, layout_stream};
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{input_lambda, layout_stream, arguments.threads};
 
     raptor_index<index_structure::hibf> index{window{arguments.window_size},
                                               arguments.shape,
