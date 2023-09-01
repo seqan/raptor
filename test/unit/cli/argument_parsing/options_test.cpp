@@ -103,9 +103,24 @@ TEST_F(argparse_main, unknown_option)
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
+TEST_F(argparse_layout, no_options)
+{
+    cli_test_result const result = execute_app("raptor", "layout");
+    std::string const expected{
+        "Raptor-layout - A fast and space-efficient pre-filter for querying very large "
+        "collections of nucleotide "
+        "sequences.\n=================================================================================================="
+        "================\n    raptor layout --input <file> [--output <file>] [--threads <number>]\n    [--kmer "
+        "<number>] [--fpr <number>] [--hash <number>]\n    [--disable-estimate-union] [--disable-rearrangement]\n    "
+        "Try -h or --help for more information.\n"};
+    EXPECT_EQ(result.out, expected);
+    EXPECT_EQ(result.err, std::string{});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
+}
+
 TEST_F(argparse_layout, no_bins_in_file)
 {
-    cli_test_result const result = execute_app("raptor", "layout", "--input-file", tmp_bin_list_empty);
+    cli_test_result const result = execute_app("raptor", "layout", "--input", tmp_bin_list_empty);
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] The input file is empty.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);

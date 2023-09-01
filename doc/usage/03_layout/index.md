@@ -7,7 +7,7 @@ A layout is only needed if you want to build an HIBF (\ref hibf_vs_ibf).
 
 # Main Parameters
 
-## -​-input-file {#usage_layout_input}
+## -​-input {#usage_layout_input}
 
 ### List of sequence files
 
@@ -22,27 +22,27 @@ one output file per bin, which can then be used with `raptor layout`.
 ### List of preprocessed files
 \include{doc} fragments/input_files_preprocessed.md
 
-## -​-kmer-size
+## -​-kmer
 See \ref usage_w_vs_k.
 \note
 This parameter will be used by `raptor build` and hence should be chosen carefully. However, overwriting it in the
 `raptor build` call is possible but not recommended, and will result in a warning being emitted.
 
-## -​-num-hash-functions
+## -​-hash
 \include{doc} fragments/ibf_h.md
 \note
 This parameter will be used by `raptor build` and hence should be chosen carefully. However, overwriting it in the
 `raptor build` call is possible but not recommended, and will result in a warning being emitted.
 
-## -​-false-positive-rate
+## -​-fpr
 \include{doc} fragments/ibf_fpr.md
 \note
 This parameter will be used by `raptor build` and hence should be chosen carefully. However, overwriting it in the
 `raptor build` call is possible but not recommended, and will result in a warning being emitted.
 
-## -​-output-filename
+## -​-output
 The output filename may be freely chosen. `raptor build` does not rely on the file name or extension.
-The default is `binning.out`.
+The default is `layout.txt`.
 
 ## -​-threads
 The number of threads to use. Currently, the layout algorithm is only partly parallelized.

@@ -55,7 +55,7 @@ count_time=$working_directory/$W\_$K\_count.time
     $CHOPPER_BINARY_DIR/chopper count \
         --threads $THREADS \
         --column-index 1 \
-        --input-file $working_directory/bins.list \
+        --input $working_directory/bins.list \
         --output-prefix $count_prefix
 echo "Done."
 
@@ -66,7 +66,7 @@ echo -n "[$(date +"%Y-%m-%d %T")] Determining best t_max..."
     $CHOPPER_BINARY_DIR/chopper layout \
         --input-prefix $count_prefix \
         --tmax 2048 \
-        --false-positive-rate $FPR \
+        --fpr $FPR \
         --estimate-union \
         --determine-best-tmax \
         --threads $THREADS \
@@ -82,7 +82,7 @@ for tmax in $TECHNICAL_BINS; do
         $CHOPPER_BINARY_DIR/chopper layout \
             --input-prefix $count_prefix \
             --tmax $tmax \
-            --false-positive-rate $FPR \
+            --fpr $FPR \
             --estimate-union \
             --threads $THREADS \
             --output-file $layout_file \

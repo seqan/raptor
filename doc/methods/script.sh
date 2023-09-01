@@ -27,7 +27,7 @@ raptor build --input precomputed_minimisers1/minimiser.list --fpr 0.05 --threads
 ## [01_introduction_snippet_5]
 
 ## [02_layout_snippet_1]
-raptor layout --input-file all_bin_paths.txt
+raptor layout --input all_bin_paths.txt
 ## [02_layout_snippet_1]
 
 ## [02_layout_snippet_2]
@@ -35,24 +35,24 @@ seq -f "example_data/1024/bins/bin_%04g.fasta" 0 1 1023 > all_bin_paths.txt
 ## [02_layout_snippet_2]
 
 ## [02_layout_snippet_3]
-raptor layout --input-file all_bin_paths.txt
+raptor layout --input all_bin_paths.txt
 ## [02_layout_snippet_3]
 
 ## [02_layout_snippet_4]
-raptor layout --input-file all_bin_paths.txt \
-              --kmer-size 17 \
-              --num-hash-functions 4 \
-              --false-positive-rate 0.25 \
-              --output-filename binning.layout
+raptor layout --input all_bin_paths.txt \
+              --kmer 17 \
+              --hash 4 \
+              --fpr 0.25 \
+              --output binning.layout
 ## [02_layout_snippet_4]
 
 ## [02_layout_snippet_5]
-raptor layout --input-file all_bin_paths.txt \
-              --kmer-size 16 \
-              --num-hash-functions 3 \
-              --false-positive-rate 0.1 \
+raptor layout --input all_bin_paths.txt \
+              --kmer 16 \
+              --hash 3 \
+              --fpr 0.1 \
               --threads 2 \
-              --output-filename binning2.layout
+              --output binning2.layout
 ## [02_layout_snippet_5]
 
 ## [03_index_snippet_1]
@@ -96,7 +96,7 @@ raptor build --input binning.layout \
 ## [03_index_snippet_8]
 
 ## [03_index_snippet_9]
-raptor build --input binning.out --output hibf.index
+raptor build --input layout.txt --output hibf.index
 raptor build --input binning2.layout --kmer 16 --hash 3 --fpr 0.1 --output hibf2.index
 ## [03_index_snippet_9]
 

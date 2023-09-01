@@ -51,13 +51,13 @@ Using all default values a first call will look like:
 
 \snippet script.sh 02_layout_snippet_1
 
-The `input-file` looks exactly as in our previous calls of `raptor index`; it contains all the paths of our database
+The `input` looks exactly as in our previous calls of `raptor index`; it contains all the paths of our database
 files.
 
 `raptor layout` chooses sensible defaults that showed to work well for the average use case.
 
-We then get the resulting layout (default: `binning.out`) as an output file, which we then pass to Raptor to create the
-index. You can change this default with `--output-filename`.
+We then get the resulting layout (default: `layout.txt`) as an output file, which we then pass to Raptor to create the
+index. You can change this default with `--output`.
 
 \note
 Raptor also has a help page, which can be accessed as usual by typing `raptor layout -h` or `raptor layout --help`.
@@ -103,7 +103,7 @@ Sometimes it would be better to use the absolute paths instead.
 
 And you should have run:
 \snippet script.sh 02_layout_snippet_3
-With the resulting `binning.out`:
+With the resulting `layout.txt`:
 ```bash
 ## ### Parameters ###
 ## number of user bins = 1023
@@ -127,7 +127,7 @@ Your directory should look like this:
 ```bash
 $ ls
 1024/                    all_bin_paths.txt        chopper_sketch.count     mini/
-64/                      binning.out              chopper_sketch_sketches/
+64/                      layout.txt              chopper_sketch_sketches/
 ```
 
 \note
@@ -158,9 +158,9 @@ This principle also applies to the Hierarchical Interleaved Bloom Filter, except
 efficiently as described above and this is described by the layout. This means that you already have to know some
 parameters for the layout, which you would otherwise specify in the index:
 
-With `--kmer-size` you can specify the length of the k-mers, which should be long enough to avoid random hits.
+With `--kmer` you can specify the length of the k-mers, which should be long enough to avoid random hits.
 By using multiple hash functions, you can sometimes further reduce the possibility of false positives
-(`--num-hash-functions`). We found a useful [Bloom Filter Calculator](https://hur.st/bloomfilter/) to get a calculation
+(`--hash`). We found a useful [Bloom Filter Calculator](https://hur.st/bloomfilter/) to get a calculation
 if it could help. As it is not ours, we do not guarantee its accuracy.
 To use this calculator the number of inserted elements is the number of kmers in a single bin and you should use the
 biggest bin to be sure.
@@ -168,7 +168,7 @@ biggest bin to be sure.
 Each Bloom Filter has a bit vector length that, across all Bloom Filters, gives the size of the Interleaved Bloom
 Filter, which we can specify in the IBF case. Since the HIBF calculates the size of the index itself, it is no longer
 possible to specify a size here. But we can offer the option to name the desired false positive rate with
-`--false-positive-rate`.
+`--fpr`.
 
 \note These parameters must be set identically for `raptor index`.
 
@@ -193,7 +193,7 @@ Your directory should look like this:
 ```bash
 $ ls
 1024/                    all_bin_paths.txt        binning2.layout          chopper_sketch_sketches/
-64/                      binning.out              chopper_sketch.count     mini/
+64/                      layout.txt              chopper_sketch.count     mini/
 ```
 \endsolution
 
