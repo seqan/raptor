@@ -94,13 +94,13 @@ process LAYOUT {
     script:
     """
     set -x # commands are printed to stdout for logging
-    raptor layout --input-file $refseq \
-                  --kmer-size "$kmer_size" \
+    raptor layout --input $refseq \
+                  --kmer "$kmer_size" \
                   --threads $task.cpus \
                   --tmax $tmax \
-                  --num-hash-functions 3 \
-                  --false-positive-rate "$fpr" \
-                  --output-filename hibf.layout
+                  --hash 3 \
+                  --fpr "$fpr" \
+                  --output hibf.layout
     """
 }
 

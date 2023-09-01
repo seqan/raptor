@@ -206,7 +206,7 @@ To use the HIBF, a layout must be created before creating an index. We have writ
 
 ### HIBF indexing with the use of the layout
 
-The layout replaces the `--input all_bin_path.txt` and is given instead with the layout: `--input binning.out`.
+The layout replaces the `--input all_bin_path.txt` and is given instead with the layout: `--input layout.txt`.
 
 We can set the desired false positive rate with `--fpr`. Thus, for example, a call looks like this:
 
@@ -227,7 +227,7 @@ example_data
     └── reads
 ```
 And use the data of the `1024` Folder and the two layouts we've created in the \ref tutorial_layout tutorial :
-`binning.out` and `binning2.layout`.
+`layout.txt` and `binning2.layout`.
 
 Lets use the HIBF with the default parameters and call the new indexes `hibf.index` and `hibf2.index`.
 \note
@@ -250,7 +250,7 @@ $ ls -la
 ... 128B 23 Sep  2020 1024/
 ... 128B 23 Sep  2020 64/
 ...  25K 12 Dez 12:52 all_bin_paths.txt
-...  37K 12 Dez 12:56 binning.out
+...  37K 12 Dez 12:56 layout.txt
 ...  37K 12 Dez 13:26 binning2.layout
 ...  55K 12 Dez 13:26 chopper_sketch.count
 ...  32K 12 Dez 12:52 chopper_sketch_sketches/

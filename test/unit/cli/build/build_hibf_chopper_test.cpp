@@ -31,13 +31,13 @@ TEST_F(build_hibf_layout, pipeline)
     { // build layout
         cli_test_result const result = execute_app("raptor",
                                                    "layout",
-                                                   "--kmer-size 19",
+                                                   "--kmer 19",
                                                    "--threads 1",
-                                                   "--input-file",
+                                                   "--input",
                                                    data_filename,
                                                    "--tmax 64",
-                                                   "--false-positive-rate 0.05",
-                                                   "--output-filename",
+                                                   "--fpr 0.05",
+                                                   "--output",
                                                    layout_filename);
 
         EXPECT_EQ(result.out, std::string{});
