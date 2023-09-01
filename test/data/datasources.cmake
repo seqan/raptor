@@ -129,37 +129,32 @@ declare_internal_datasource (FILE three_levels.hibf
 
 declare_internal_datasource (FILE 1bins.pack
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/1bins.pack
-                             URL_HASH SHA256=de0327a1c48bc592d4cc34bf810d8501f7e473f2238ec7c7763e0a34ce2e8826
+                             URL_HASH SHA256=fb6a5acd10a419f735961242019d4d24e97fded230602db4de4355da819666e8
                              CONFIGURE true
 )
 declare_internal_datasource (FILE 64bins.pack
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/64bins.pack
-                             URL_HASH SHA256=732963c575a363adb65c8037eef41f98332957cd2a453868a87730684035624e
+                             URL_HASH SHA256=e42fed94fd9a83e731bd1262ee77158b6cab91ffaeb8041c3d2765c2635ee7b2
                              CONFIGURE true
 )
 declare_internal_datasource (FILE 128bins.pack
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/128bins.pack
-                             URL_HASH SHA256=844fee5346c2eebffc3e323488269459063fdc75acf7c229e67daf1f0ac8e61c
+                             URL_HASH SHA256=eaf90b5214301dc9858807ba90a2f9977d98502607c53137ab11539492242e84
                              CONFIGURE true
 )
 declare_internal_datasource (FILE three_levels.pack
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/three_levels.pack
-                             URL_HASH SHA256=832a481b94f466f90ee5a296da69b78e0d5e68c2e33e880e0538d3ab356c670c
+                             URL_HASH SHA256=5ebe3f469774533b6d66df690a1076406240fbb36a73730c1ea3299bbe89e7ae
                              CONFIGURE true
 )
 declare_internal_datasource (FILE test.layout
                              URL ${CMAKE_CURRENT_LIST_DIR}/test.layout
-                             URL_HASH SHA256=d01861b3015a571738759c36b0319acbf87e1603a66762fd1e79cab0726b952f
+                             URL_HASH SHA256=fc8e2038062a67be39e79fbd8bfab3f6aaeb042189f8e8c9df2e3860ad05f94c
                              CONFIGURE true
 )
 declare_internal_datasource (FILE test_nocfg.layout
                              URL ${CMAKE_CURRENT_LIST_DIR}/test_nocfg.layout
-                             URL_HASH SHA256=25b4d14d4571b48006c36ad29424ef23dafec23f64aaeb73cd5b978aee8da1ee
-                             CONFIGURE true
-)
-declare_internal_datasource (FILE test_preprocessed_nocfg.layout
-                             URL ${CMAKE_CURRENT_LIST_DIR}/test_preprocessed_nocfg.layout
-                             URL_HASH SHA256=6918177abbced5584864d255d9d5c7bb056aa07baca26faff07ea91724340780
+                             URL_HASH SHA256=b3fe9494fca6a21265144a0501de7bbc3f40e38239a66b9d7e39703a390968a2
                              CONFIGURE true
 )
 

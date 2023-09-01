@@ -99,8 +99,7 @@
 @        "alpha": 1.2,
 @        "max_rearrangement_ratio": 0.5,
 @        "disable_estimate_union": false,
-@        "disable_rearrangement": false,
-@        "disable_cutoffs": false
+@        "disable_rearrangement": false
 @    }
 @}
 @HIBF_CONFIG_END

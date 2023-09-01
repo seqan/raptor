@@ -123,7 +123,8 @@ size_t compute_bin_size(build_arguments const & arguments)
 
     assert(max_count > 0u);
 
-    return seqan::hibf::bin_size_in_bits({.fpr = arguments.fpr, .hash_count = arguments.hash, .elements = max_count});
+    return seqan::hibf::build::bin_size_in_bits(
+        {.fpr = arguments.fpr, .hash_count = arguments.hash, .elements = max_count});
 }
 
 size_t max_bin_count(upgrade_arguments const & arguments)

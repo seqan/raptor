@@ -38,7 +38,7 @@ void build_ibf(build_arguments const & arguments)
 
         for (size_t part = 0; part < arguments.parts; ++part)
         {
-            arguments.bits = seqan::hibf::bin_size_in_bits(
+            arguments.bits = seqan::hibf::build::bin_size_in_bits(
                 {.fpr = arguments.fpr, .hash_count = arguments.hash, .elements = kmers_per_partition[part]});
             auto index = factory(part);
             std::filesystem::path out_path{arguments.out_path};
