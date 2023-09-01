@@ -144,7 +144,7 @@ declare_internal_datasource (FILE 128bins.pack
 )
 declare_internal_datasource (FILE three_levels.pack
                              URL ${CMAKE_CURRENT_LIST_DIR}/hibf/three_levels.pack
-                             URL_HASH SHA256=cc9713bb75b9802a439fc27a2c773f80846063c86ecb074de950ee7a1745b2bb
+                             URL_HASH SHA256=832a481b94f466f90ee5a296da69b78e0d5e68c2e33e880e0538d3ab356c670c
                              CONFIGURE true
 )
 declare_internal_datasource (FILE test.layout

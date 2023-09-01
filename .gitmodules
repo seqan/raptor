@@ -10,9 +10,6 @@
 [submodule "lib/submodules/sdsl-lite"]
 	path = lib/submodules/sdsl-lite
 	url = https://github.com/xxsds/sdsl-lite
-[submodule "lib/lemon"]
-	path = lib/submodules/lemon
-	url = https://github.com/seqan/lemon.git
 [submodule "lib/chopper"]
 	path = lib/chopper
 	url = https://github.com/seqan/chopper.git

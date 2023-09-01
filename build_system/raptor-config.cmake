@@ -24,12 +24,11 @@
 #   BZip2     -- libbz2 compression library
 #
 # If you don't wish for these to be detected (and used), you may define RAPTOR_NO_ZLIB,
-# RAPTOR_NO_BZIP2, RAPTOR_NO_CEREAL and RAPTOR_NO_LEMON respectively.
+# RAPTOR_NO_BZIP2, and RAPTOR_NO_CEREAL, respectively.
 #
 # If you wish to require the presence of ZLIB or BZip2, just check for the module before
 # finding RAPTOR, e.g. "find_package (ZLIB REQUIRED)".
 # If you wish to require the presence of CEREAL, you may define RAPTOR_CEREAL.
-# If you wish to require the presence of LEMON, you may define RAPTOR_LEMON.
 #
 # Once the search has been performed, the following variables will be set.
 #
