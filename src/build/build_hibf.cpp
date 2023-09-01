@@ -41,13 +41,23 @@ void build_hibf(build_arguments const & arguments)
 
     seqan::hibf::hierarchical_interleaved_bloom_filter hibf{input_lambda, layout_stream, arguments.threads};
 
+    arguments.index_allocation_timer = std::move(hibf.index_allocation_timer);
+    arguments.user_bin_io_timer = std::move(hibf.user_bin_io_timer);
+    arguments.merge_kmers_timer = std::move(hibf.merge_kmers_timer);
+    arguments.fill_ibf_timer = std::move(hibf.fill_ibf_timer);
+
+    arguments.index_allocation_timer.start();
     raptor_index<index_structure::hibf> index{window{arguments.window_size},
                                               arguments.shape,
                                               arguments.parts,
                                               arguments.bin_path,
                                               arguments.fpr,
                                               std::move(hibf)};
+    arguments.index_allocation_timer.stop();
+
+    arguments.store_index_timer.start();
     store_index(arguments.out_path, std::move(index));
+    arguments.store_index_timer.stop();
 }
 
 } // namespace raptor

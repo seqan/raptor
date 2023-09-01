@@ -68,8 +68,8 @@ void search_partitioned_ibf(search_arguments const & arguments)
 
         auto count_task = [&](size_t const start, size_t const extent)
         {
-            timer<concurrent::no> local_compute_minimiser_timer{};
-            timer<concurrent::no> local_query_ibf_timer{};
+            seqan::hibf::serial_timer local_compute_minimiser_timer{};
+            seqan::hibf::serial_timer local_query_ibf_timer{};
 
             auto & ibf = index.ibf();
             auto counter = ibf.template counting_agent<uint16_t>();
@@ -119,9 +119,9 @@ void search_partitioned_ibf(search_arguments const & arguments)
 
         auto output_task = [&](size_t const start, size_t const extent)
         {
-            timer<concurrent::no> local_compute_minimiser_timer{};
-            timer<concurrent::no> local_query_ibf_timer{};
-            timer<concurrent::no> local_generate_results_timer{};
+            seqan::hibf::serial_timer local_compute_minimiser_timer{};
+            seqan::hibf::serial_timer local_query_ibf_timer{};
+            seqan::hibf::serial_timer local_generate_results_timer{};
 
             auto & ibf = index.ibf();
             auto counter = ibf.template counting_agent<uint16_t>();

@@ -57,9 +57,9 @@ void compute_minimiser(prepare_arguments const & arguments)
 
     auto worker = [&](auto && zipped_view, auto &&)
     {
-        timer<concurrent::no> local_compute_minimiser_timer{};
-        timer<concurrent::no> local_write_minimiser_timer{};
-        timer<concurrent::no> local_write_header_timer{};
+        seqan::hibf::serial_timer local_compute_minimiser_timer{};
+        seqan::hibf::serial_timer local_write_minimiser_timer{};
+        seqan::hibf::serial_timer local_write_header_timer{};
 
         for (auto && [file_names, bin_number] : zipped_view)
         {

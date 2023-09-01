@@ -18,8 +18,9 @@
 #include <seqan3/search/kmer_index/shape.hpp>
 
 #include <raptor/argument_parsing/memory_usage.hpp>
-#include <raptor/argument_parsing/timer.hpp>
 #include <raptor/strong_types.hpp>
+
+#include <hibf/detail/timer.hpp>
 
 namespace raptor
 {
@@ -49,13 +50,13 @@ struct build_arguments
     bool quiet{false};
 
     // Timers do not copy the stored duration upon copy construction/assignment
-    mutable timer<concurrent::yes> wall_clock_timer{};
-    mutable timer<concurrent::yes> bin_size_timer{};
-    mutable timer<concurrent::yes> index_allocation_timer{};
-    mutable timer<concurrent::yes> user_bin_io_timer{};
-    mutable timer<concurrent::yes> merge_kmers_timer{};
-    mutable timer<concurrent::yes> fill_ibf_timer{};
-    mutable timer<concurrent::yes> store_index_timer{};
+    mutable seqan::hibf::concurrent_timer wall_clock_timer{};
+    mutable seqan::hibf::concurrent_timer bin_size_timer{};
+    mutable seqan::hibf::concurrent_timer index_allocation_timer{};
+    mutable seqan::hibf::concurrent_timer user_bin_io_timer{};
+    mutable seqan::hibf::concurrent_timer merge_kmers_timer{};
+    mutable seqan::hibf::concurrent_timer fill_ibf_timer{};
+    mutable seqan::hibf::concurrent_timer store_index_timer{};
 
     void print_timings() const
     {
