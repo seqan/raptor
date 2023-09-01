@@ -73,7 +73,7 @@ private:
 
         auto worker = [&](auto && zipped_view, auto &&)
         {
-            timer<concurrent::no> local_timer{};
+            seqan::hibf::serial_timer local_timer{};
             auto & ibf = index.ibf();
             local_timer.start();
             for (auto && [file_names, bin_number] : zipped_view)
