@@ -7,12 +7,22 @@
 
 #include <raptor/test/cli_test.hpp>
 
+#if defined(__SANITIZE_THREAD__)
+#    define RAPTOR_USES_TSAN true
+#else
+#    define RAPTOR_USES_TSAN false
+#endif
+
 struct build_hibf : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, bool>>
 {};
 
 TEST_P(build_hibf, with_file)
 {
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
+
+    if (RAPTOR_USES_TSAN && run_parallel_tmp)
+        GTEST_SKIP() << "Threadsantizier + OpenMP causes false positives.";
+
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
 
     cli_test_result const result = execute_app("raptor",
@@ -39,6 +49,10 @@ TEST_P(build_hibf, with_file)
 TEST_P(build_hibf, with_shape)
 {
     auto const [number_of_repeated_bins, window_size, run_parallel_tmp] = GetParam();
+
+    if (RAPTOR_USES_TSAN && run_parallel_tmp)
+        GTEST_SKIP() << "Threadsantizier + OpenMP causes false positives.";
+
     bool const run_parallel = run_parallel_tmp && number_of_repeated_bins >= 32;
 
     cli_test_result const result = execute_app("raptor",
