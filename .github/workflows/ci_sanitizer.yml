@@ -32,7 +32,7 @@ jobs:
         build_type: [Release, Debug]
         include:
           - name: "AddressSanitizer"
-            cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=address"
+            cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=address -Wno-maybe-uninitialized"
 
           - name: "ThreadSanitizer"
             cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=thread"
