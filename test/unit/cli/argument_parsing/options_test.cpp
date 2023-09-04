@@ -289,13 +289,23 @@ TEST_F(argparse_build, minimiser_and_window)
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
-TEST_F(argparse_build, layout_config_and_options)
+TEST_F(argparse_build, layout_and_kmer)
+{
+    cli_test_result const result =
+        execute_app("raptor", "build", "--kmer 20", "--output index.raptor", "--quiet", "--input", data("test.layout"));
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(
+        result.err,
+        std::string{"[WARNING] Given k-mer size (20) differs from k-mer size in the layout file (19). The results may "
+                    "be suboptimal. If this was a conscious decision, you can ignore this warning.\n"});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
+}
+
+TEST_F(argparse_build, layout_and_shape)
 {
     cli_test_result const result = execute_app("raptor",
                                                "build",
-                                               "--kmer 20",
-                                               "--hash 3",
-                                               "--fpr 0.01",
+                                               "--shape 1111111111",
                                                "--output index.raptor",
                                                "--quiet",
                                                "--input",
@@ -303,13 +313,32 @@ TEST_F(argparse_build, layout_config_and_options)
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(
         result.err,
-        std::string{"[WARNING] Given k-mer size(20) differs from k-mer size in the layout file (19). The results may "
-                    "be suboptimal. If this was a conscious decision, you can ignore this warning.\n[WARNING] Given "
-                    "hash function count (3) differs from hash function count in the layout file (2). The results may "
-                    "be suboptimal. If this was a conscious decision, you can ignore this warning.\n[WARNING] Given "
-                    "false positive rate (0.01) differs from false positive rate in the layout file (0.05). The "
-                    "results may be suboptimal. If this was a conscious decision, you can ignore this warning."});
+        std::string{"[WARNING] Given size of the shape (10) differs from k-mer size in the layout file (19). The "
+                    "results may be suboptimal. If this was a conscious decision, you can ignore this warning.\n"});
     RAPTOR_ASSERT_ZERO_EXIT(result);
+}
+
+TEST_F(argparse_build, layout_and_hash)
+{
+    cli_test_result const result =
+        execute_app("raptor", "build", "--hash 3", "--output index.raptor", "--quiet", "--input", data("test.layout"));
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] You cannot set --hash when using a layout file as input.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
+}
+
+TEST_F(argparse_build, layout_and_fpr)
+{
+    cli_test_result const result = execute_app("raptor",
+                                               "build",
+                                               "--fpr 0.05",
+                                               "--output index.raptor",
+                                               "--quiet",
+                                               "--input",
+                                               data("test.layout"));
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{"[Error] You cannot set --fpr when using a layout file as input.\n"});
+    RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
 TEST_F(argparse_build, layout_too_small_window)

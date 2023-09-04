@@ -73,8 +73,6 @@ TEST_P(search_hibf_preprocessing, pipeline)
 
     cli_test_result const result2 = execute_app("raptor",
                                                 "build",
-                                                "--hash 2",
-                                                "--fpr 0.05",
                                                 "--threads ",
                                                 (run_parallel && !RAPTOR_USES_TSAN) ? "2" : "1",
                                                 "--output raptor.index",
@@ -203,8 +201,6 @@ TEST_F(search_hibf_preprocessing, pipeline_with_continuation)
     cli_test_result const result2 = execute_app("raptor",
                                                 "build",
                                                 "--threads 2",
-                                                "--hash 2",
-                                                "--fpr 0.05",
                                                 "--output raptor.index",
                                                 "--quiet",
                                                 "--input raptor_cli_test.layout");

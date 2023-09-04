@@ -121,8 +121,6 @@ process INDEX {
     """
     raptor build --kmer "$kmer_size"  \
                  --window "$kmer_size"  \
-                 --hash $num_hash_fn  \
-                 --fpr "$fpr"  \
                  --threads $task.cpus  \
                  --output hibf.index  \
                  --input $layout

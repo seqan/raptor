@@ -35,18 +35,29 @@ inline void read_chopper_config(chopper::configuration & config, std::filesystem
 
 inline void parse_chopper_config(sharg::parser & parser, build_arguments & arguments)
 {
+    if (parser.is_option_set("hash"))
+        throw sharg::parser_error{"You cannot set --hash when using a layout file as input."};
+    if (parser.is_option_set("fpr"))
+        throw sharg::parser_error{"You cannot set --fpr when using a layout file as input."};
+
     chopper::configuration config{};
-    bool const kmer_set = parser.is_option_set("kmer");
-    bool const hash_set = parser.is_option_set("hash");
-    bool const fpr_set = parser.is_option_set("fpr");
 
     read_chopper_config(config, arguments.bin_file);
 
-    if (kmer_set && config.k != arguments.kmer_size)
+    if (parser.is_option_set("kmer") && config.k != arguments.kmer_size)
     {
         std::cerr << sharg::detail::to_string(
-            "[WARNING] Given k-mer size(",
+            "[WARNING] Given k-mer size (",
             arguments.kmer_size,
+            ") differs from k-mer size in the layout file (",
+            config.k,
+            "). The results may be suboptimal. If this was a conscious decision, you can ignore this warning.\n");
+    }
+    else if (parser.is_option_set("shape") && config.k != arguments.shape_string.size())
+    {
+        std::cerr << sharg::detail::to_string(
+            "[WARNING] Given size of the shape (",
+            arguments.shape_string.size(),
             ") differs from k-mer size in the layout file (",
             config.k,
             "). The results may be suboptimal. If this was a conscious decision, you can ignore this warning.\n");
@@ -57,30 +68,6 @@ inline void parse_chopper_config(sharg::parser & parser, build_arguments & argum
     }
 
     validate_shape(parser, arguments);
-
-    if (hash_set && config.hibf_config.number_of_hash_functions != arguments.hash)
-    {
-        std::cerr << sharg::detail::to_string(
-            "[WARNING] Given hash function count (",
-            arguments.hash,
-            ") differs from hash function count in the layout file (",
-            config.hibf_config.number_of_hash_functions,
-            "). The results may be suboptimal. If this was a conscious decision, you can ignore this warning.\n");
-    }
-    else
-        arguments.hash = config.hibf_config.number_of_hash_functions;
-
-    if (fpr_set && config.hibf_config.maximum_false_positive_rate != arguments.fpr)
-    {
-        std::cerr << sharg::detail::to_string(
-            "[WARNING] Given false positive rate (",
-            arguments.fpr,
-            ") differs from false positive rate in the layout file (",
-            config.hibf_config.maximum_false_positive_rate,
-            "). The results may be suboptimal. If this was a conscious decision, you can ignore this warning.");
-    }
-    else
-        arguments.fpr = config.hibf_config.maximum_false_positive_rate;
 }
 
 inline void parse_shape_from_minimiser(sharg::parser & parser, build_arguments & arguments)
@@ -118,7 +105,6 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
                                       "--output raptor.index");
     parser.info.examples.emplace_back("raptor build --input minimiser.list --fpr 0.05 --output raptor.index");
     parser.info.examples.emplace_back("raptor build --input raptor.layout --output raptor.index");
-    parser.info.examples.emplace_back("raptor build --input raptor.layout --fpr 0.05 --output raptor.index");
     parser.info.synopsis.emplace_back("raptor build --input <file> --output <file> [--threads <number>] [--quiet] "
                                       "[--kmer <number>|--shape <01-pattern>] [--window <number>] [--fpr <number>] "
                                       "[--hash <number>] [--parts <number>]");
