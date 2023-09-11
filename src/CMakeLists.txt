@@ -32,9 +32,7 @@ set (HIBF_SUBMODULES_DIR
 )
 
 if (NOT TARGET seqan::hibf)
-    FetchContent_Declare (raptor_hibf_project SOURCE_DIR
-                                              "${RAPTOR_SUBMODULES_DIR}/Hierarchical_Interleaved_Bloomfilter"
-    )
+    FetchContent_Declare (raptor_hibf_project SOURCE_DIR "${RAPTOR_SUBMODULES_DIR}/hibf")
     option (INSTALL_HIBF "Enable installation of HIBF." OFF)
     option (HIBF_NATIVE_BUILD "Optimize build for current architecture." ${RAPTOR_NATIVE_BUILD})
     set (STORED_CMAKE_MESSAGE_LOG_LEVEL "${CMAKE_MESSAGE_LOG_LEVEL}")

@@ -28,3 +28,6 @@
 [submodule "include/raptor/contrib/std"]
 	path = include/raptor/contrib/std
 	url = https://github.com/seqan/seqan-std.git
+[submodule "lib/hibf"]
+	path = lib/hibf
+	url = https://github.com/seqan/hibf.git
