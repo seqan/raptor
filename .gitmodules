@@ -28,6 +28,3 @@
 [submodule "include/raptor/contrib/std"]
 	path = include/raptor/contrib/std
 	url = https://github.com/seqan/seqan-std.git
-[submodule "lib/Hierarchical_Interleaved_Bloomfilter"]
-	path = lib/Hierarchical_Interleaved_Bloomfilter
-	url = https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter.git
