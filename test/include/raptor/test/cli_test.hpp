@@ -9,6 +9,8 @@
 
 #include <gtest/gtest.h>
 
+#include <charconv>
+
 #include <seqan3/test/expect_range_eq.hpp>
 #include <seqan3/utility/views/repeat_n.hpp>
 
@@ -349,31 +351,56 @@ struct raptor_base : public cli_test
         std::string_view const missed_bin = number_of_errors ? "none" : preprocessed ? "bin4.minimiser" : "bin4.fa";
         std::ifstream search_result{filename.data()};
         std::string line;
-        std::string expected_hits;
+        std::vector<uint64_t> expected_hits;
+        std::vector<uint64_t> actual_hits;
+        uint64_t tmp{};
 
         // Skip parameter information
         while (std::getline(search_result, line) && line.starts_with("##"))
         {}
 
+        // Parse user bin IDs, skipping missed_bin
         for (size_t i = 0; i < number_of_bins; ++i)
         {
             std::string_view line_view{line};
             if (!empty && !line_view.ends_with(missed_bin))
-                expected_hits += line_view.substr(1, line_view.find('\t'));
+            {
+                std::from_chars(line_view.data() + 1u, line_view.data() + line_view.find('\t'), tmp);
+                expected_hits.push_back(tmp);
+            }
             ASSERT_TRUE(std::getline(search_result, line));
         }
-
-        if (!expected_hits.empty())
-            expected_hits.pop_back(); // remove trailing '\t'
-        std::ranges::replace(expected_hits, '\t', ',');
 
         ASSERT_EQ(line, "#QUERY_NAME\tUSER_BINS");
 
         std::string const query_prefix{"query"};
         for (char i : {'1', '2', '3'})
         {
-            EXPECT_TRUE(std::getline(search_result, line));
-            EXPECT_EQ(line, query_prefix + i + '\t' + expected_hits);
+            ASSERT_TRUE(std::getline(search_result, line));
+            std::string_view line_view{line};
+
+            ASSERT_EQ(line_view.substr(0, query_prefix.size() + 2u), query_prefix + i + '\t');
+
+            actual_hits.clear();
+
+            for (auto && hit : std::views::split(line_view.substr(query_prefix.size() + 2u), ','))
+            {
+// GCC 11 does not implement P2210R2, hence GCC 11's split_view is actually a lazy_split_view.
+#if defined(__GNUC__) && !defined(__llvm__) && !defined(__INTEL_COMPILER) && (__GNUC__ > 10) && (__GNUC__ < 12)
+                std::stringstream buf;
+                for (auto const & inner_view : hit)
+                {
+                    buf << inner_view;
+                }
+                auto view = buf.view();
+                std::from_chars(view.data(), view.data() + view.size(), tmp);
+#else
+                std::from_chars(hit.data(), hit.data() + hit.size(), tmp);
+#endif
+                actual_hits.push_back(tmp);
+            }
+            std::ranges::sort(actual_hits);
+            ASSERT_EQ(expected_hits, actual_hits);
         }
 
         EXPECT_FALSE(std::getline(search_result, line));

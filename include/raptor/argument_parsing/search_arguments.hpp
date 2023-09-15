@@ -20,7 +20,7 @@
 #include <raptor/argument_parsing/memory_usage.hpp>
 #include <raptor/threshold/threshold_parameters.hpp>
 
-#include <hibf/detail/timer.hpp>
+#include <hibf/misc/timer.hpp>
 
 namespace raptor
 {

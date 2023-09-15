@@ -37,9 +37,22 @@ void build_hibf(build_arguments const & arguments)
             reader);
     };
 
-    std::ifstream layout_stream{arguments.bin_file};
+    // Parse config+layout
+    seqan::hibf::config config{};
+    seqan::hibf::layout::layout layout{};
 
-    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{input_lambda, layout_stream, arguments.threads};
+    {
+        std::ifstream layout_stream{arguments.bin_file};
+        config.read_from(layout_stream);
+        layout.read_from(layout_stream);
+    }
+
+    // Adapt config
+    config.input_fn = input_lambda;
+    config.threads = arguments.threads;
+
+    // Call ctor
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config, layout};
 
     arguments.index_allocation_timer = std::move(hibf.index_allocation_timer);
     arguments.user_bin_io_timer = std::move(hibf.user_bin_io_timer);
