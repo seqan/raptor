@@ -78,6 +78,7 @@ if (NOT TARGET raptor_interface)
     add_library ("raptor_interface" INTERFACE)
     target_link_libraries ("raptor_interface" INTERFACE raptor::raptor)
     target_compile_options ("raptor_interface" INTERFACE "-pedantic" "-Wall" "-Wextra")
+    target_compile_definitions ("raptor_interface" INTERFACE "RAPTOR_OLD_HIBF")
 endif ()
 
 # Raptor library

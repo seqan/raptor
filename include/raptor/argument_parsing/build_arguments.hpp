@@ -20,7 +20,7 @@
 #include <raptor/argument_parsing/memory_usage.hpp>
 #include <raptor/strong_types.hpp>
 
-#include <hibf/detail/timer.hpp>
+#include <hibf/misc/timer.hpp>
 
 namespace raptor
 {

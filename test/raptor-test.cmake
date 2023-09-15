@@ -70,7 +70,7 @@ if (NOT TARGET raptor::test::performance)
         endif ()
     endif ()
 
-    target_link_libraries (raptor_test_performance INTERFACE "raptor::raptor" "benchmark_main" "benchmark")
+    target_link_libraries (raptor_test_performance INTERFACE "raptor::test" "benchmark_main" "benchmark")
 
     add_library (raptor::test::performance ALIAS raptor_test_performance)
 endif ()
@@ -110,12 +110,8 @@ include (${CMAKE_CURRENT_LIST_DIR}/data/datasources.cmake)
 # Add app.
 # ----------------------------------------------------------------------------
 
-option (BUILD_RAPTOR_APP_FOR_TEST "Enable building of Raptor." ON)
-
-if (BUILD_RAPTOR_APP_FOR_TEST)
-    get_filename_component (RAPTOR_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../src" ABSOLUTE)
-    add_subdirectory ("${RAPTOR_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/src")
-endif ()
+get_filename_component (RAPTOR_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../src" ABSOLUTE)
+add_subdirectory ("${RAPTOR_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/src")
 
 # ----------------------------------------------------------------------------
 # Set directories for test output files, input data and binaries.
