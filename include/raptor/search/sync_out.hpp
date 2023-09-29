@@ -26,10 +26,10 @@ class sync_out
 {
 public:
     sync_out() = default;
-    sync_out(sync_out const &) = default;
-    sync_out & operator=(sync_out const &) = default;
-    sync_out(sync_out &&) = default;
-    sync_out & operator=(sync_out &&) = default;
+    sync_out(sync_out const &) = delete;             // std::ofstream
+    sync_out & operator=(sync_out const &) = delete; // std::ofstream
+    sync_out(sync_out &&) = delete;                  // std::mutex
+    sync_out & operator=(sync_out &&) = delete;      // std::mutex
     ~sync_out() = default;
 
     sync_out(search_arguments const & arguments) : file{arguments.out_file}

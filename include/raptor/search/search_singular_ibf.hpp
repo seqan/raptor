@@ -51,7 +51,11 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
         seqan::hibf::serial_timer local_query_ibf_timer{};
         seqan::hibf::serial_timer local_generate_results_timer{};
 
+#if defined(__clang__)
+        auto counter = [&index]()
+#else
         auto counter = [&index, is_ibf]()
+#endif
         {
             if constexpr (is_ibf)
                 return index.ibf().template counting_agent<uint16_t>();

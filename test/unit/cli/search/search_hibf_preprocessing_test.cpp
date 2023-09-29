@@ -9,12 +9,6 @@
 
 #include <raptor/test/cli_test.hpp>
 
-#if defined(__SANITIZE_THREAD__)
-#    define RAPTOR_USES_TSAN true
-#else
-#    define RAPTOR_USES_TSAN false
-#endif
-
 struct search_hibf_preprocessing :
     public raptor_base,
     public testing::WithParamInterface<std::tuple<size_t, size_t, bool, size_t>>
@@ -74,7 +68,7 @@ TEST_P(search_hibf_preprocessing, pipeline)
     cli_test_result const result2 = execute_app("raptor",
                                                 "build",
                                                 "--threads ",
-                                                (run_parallel && !RAPTOR_USES_TSAN) ? "2" : "1",
+                                                run_parallel ? "2" : "1",
                                                 "--output raptor.index",
                                                 "--quiet",
                                                 "--input raptor_cli_test.layout");
