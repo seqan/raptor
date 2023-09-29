@@ -13,6 +13,7 @@ env:
   SHARG_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
   ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1
+  TSAN_OPTIONS: ignore_noninstrumented_modules=1
   UBSAN_OPTIONS: print_stacktrace=1
 
 defaults:
@@ -32,13 +33,16 @@ jobs:
         build_type: [Release, Debug]
         include:
           - name: "AddressSanitizer"
-            cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=address -Wno-maybe-uninitialized"
+            compiler: gcc-13
+            cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=address -Wno-maybe-uninitialized -Wno-interference-size"
 
           - name: "ThreadSanitizer"
-            cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=thread"
+            compiler: clang-17
+            cxx_flags: "-std=c++20 -fno-omit-frame-pointer -fsanitize=thread"
 
           - name: "UndefinedBehaviorSanitizer"
-            cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=undefined"
+            compiler: gcc-13
+            cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=undefined -Wno-interference-size"
 
     steps:
       - name: Checkout
@@ -52,6 +56,12 @@ jobs:
         uses: seqan/actions/setup-compiler@main
         with:
           compiler: gcc-13
+
+      - name: Install OpenMP
+        if: contains(matrix.name, 'clang')
+        run: |
+          install libomp-17-dev
+          echo "OMP_TOOL_LIBRARIES=/usr/lib/llvm-17/lib/libarcher.so" >> "$GITHUB_ENV"
 
       - name: Configure OS
         run: |
@@ -68,7 +78,7 @@ jobs:
           mkdir build
           cd build
           cmake ../raptor/test/unit -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                    -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size"
+                                    -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
           make -j2 gtest_build
 
       - name: Build tests

@@ -155,7 +155,7 @@ struct raptor_base : public cli_test
         using strong_bool::value;
     };
 
-    static inline auto const get_repeated_bins(size_t const repetitions) noexcept
+    static inline auto get_repeated_bins(size_t const repetitions) noexcept
     {
         using vec_t = std::vector<std::string>;
 

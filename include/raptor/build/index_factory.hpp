@@ -31,8 +31,8 @@ public:
     index_factory() = default;
     index_factory(index_factory const &) = default;
     index_factory(index_factory &&) = default;
-    index_factory & operator=(index_factory const &) = default;
-    index_factory & operator=(index_factory &&) = default;
+    index_factory & operator=(index_factory const &) = delete; // const member
+    index_factory & operator=(index_factory &&) = delete;      // const member
     ~index_factory() = default;
 
     explicit index_factory(build_arguments const & args) : arguments{std::addressof(args)}
@@ -76,11 +76,14 @@ private:
             seqan::hibf::serial_timer local_timer{};
             auto & ibf = index.ibf();
             local_timer.start();
-            for (auto && [file_names, bin_number] : zipped_view)
+            // https://godbolt.org/z/PeKnxzjn1
+            for (auto && zipped : zipped_view)
             {
                 std::visit(
                     [&](auto const & reader)
                     {
+                        auto && [file_names, bin_number] = zipped;
+
                         if (config == nullptr)
                             reader.hash_into(file_names, emplacer(ibf, seqan::hibf::bin_index{bin_number}));
                         else

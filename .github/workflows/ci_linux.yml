@@ -31,23 +31,29 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - name: "clang17"
+            compiler: "clang-17"
+            build: unit
+            build_type: Release
+            cxx_flags: "-std=c++20"
+
           - name: "gcc13"
             compiler: "gcc-13"
             build: unit
             build_type: Release
-            cxx_flags: "-std=c++23"
+            cxx_flags: "-std=c++23 -Wno-interference-size"
 
           - name: "gcc12"
             compiler: "gcc-12"
             build: unit
             build_type: Release
-            cxx_flags: "-std=c++23"
+            cxx_flags: "-std=c++23 -Wno-interference-size"
 
           - name: "gcc11"
             compiler: "gcc-11"
             build: unit
             build_type: Release
-            cxx_flags: "-std=c++23"
+            cxx_flags: "-std=c++23 -Wno-interference-size"
 
     steps:
       - name: Checkout
@@ -63,6 +69,10 @@ jobs:
           compiler: ${{ matrix.compiler }}
           ccache_size: 150M
 
+      - name: Install OpenMP
+        if: contains(matrix.name, 'clang')
+        run: install libomp-17-dev
+
       - name: Install CMake
         uses: seqan/actions/setup-cmake@main
         with:
@@ -73,7 +83,7 @@ jobs:
           mkdir build
           cd build
           cmake ../raptor/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                                   -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size" \
+                                                   -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
                                                    -DRAPTOR_NATIVE_BUILD=OFF
           make -j2 gtest_build
 

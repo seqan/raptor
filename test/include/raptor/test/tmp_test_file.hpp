@@ -16,10 +16,10 @@ class tmp_test_file
 {
 public:
     tmp_test_file() = default;
-    tmp_test_file(tmp_test_file const &) = default;
-    tmp_test_file & operator=(tmp_test_file const &) = default;
-    tmp_test_file(tmp_test_file &&) = default;
-    tmp_test_file & operator=(tmp_test_file &&) = default;
+    tmp_test_file(tmp_test_file const &) = delete;
+    tmp_test_file & operator=(tmp_test_file const &) = delete;
+    tmp_test_file(tmp_test_file &&) = delete;
+    tmp_test_file & operator=(tmp_test_file &&) = delete;
     ~tmp_test_file() = default;
 
     template <typename... t>
