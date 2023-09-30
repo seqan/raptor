@@ -55,10 +55,10 @@ jobs:
       - name: Setup compiler
         uses: seqan/actions/setup-compiler@main
         with:
-          compiler: gcc-13
+          compiler: ${{ matrix.compiler }}
 
       - name: Install OpenMP
-        if: contains(matrix.name, 'clang')
+        if: contains(matrix.compiler, 'clang')
         run: |
           install libomp-17-dev
           echo "OMP_TOOL_LIBRARIES=/usr/lib/llvm-17/lib/libarcher.so" >> "$GITHUB_ENV"
