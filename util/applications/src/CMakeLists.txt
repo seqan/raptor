@@ -24,6 +24,9 @@ if (NOT TARGET utility_common)
     target_compile_options ("utility_common" INTERFACE "-pedantic" "-Wall" "-Wextra")
 endif ()
 
+add_executable ("hibf_sizes" hibf_sizes.cpp)
+target_link_libraries ("hibf_sizes" "utility_common")
+
 option (RAPTOR_UTILITY_BUILD_iScience "" ON)
 option (RAPTOR_UTILITY_BUILD_Genome_Biology "" ON)
 
