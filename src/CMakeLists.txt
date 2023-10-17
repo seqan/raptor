@@ -7,24 +7,6 @@ set (CMAKE_INSTALL_BINDIR "bin") # For chopper
 
 include (FetchContent)
 
-# Dependency: xxHash
-if (NOT TARGET xxHash::xxhash)
-    FetchContent_Declare (raptor_xxhash_project SOURCE_DIR "${RAPTOR_SUBMODULES_DIR}/xxHash" SOURCE_SUBDIR
-                                                "cmake_unofficial"
-    )
-
-    set (XXHASH_BUILD_ENABLE_INLINE_API ON)
-    set (XXHASH_BUILD_XXHSUM OFF)
-    set (XXHASH_BUNDLED_MODE ON)
-    set (BUILD_SHARED_LIBS OFF)
-
-    set (STORED_CMAKE_MESSAGE_LOG_LEVEL "${CMAKE_MESSAGE_LOG_LEVEL}")
-    set (CMAKE_MESSAGE_LOG_LEVEL "ERROR")
-    FetchContent_MakeAvailable (raptor_xxhash_project)
-    set (CMAKE_MESSAGE_LOG_LEVEL "${STORED_CMAKE_MESSAGE_LOG_LEVEL}")
-    unset (STORED_CMAKE_MESSAGE_LOG_LEVEL)
-endif ()
-
 # Dependency: HIBF lib
 set (HIBF_SUBMODULES_DIR
      "${RAPTOR_SUBMODULES_DIR}"
@@ -70,6 +52,7 @@ set (CHOPPER_INSTALL
 set (STORED_CMAKE_MESSAGE_LOG_LEVEL "${CMAKE_MESSAGE_LOG_LEVEL}")
 set (CMAKE_MESSAGE_LOG_LEVEL "ERROR")
 FetchContent_MakeAvailable (raptor_chopper_project)
+set_target_properties (chopper PROPERTIES EXCLUDE_FROM_ALL TRUE)
 set (CMAKE_MESSAGE_LOG_LEVEL "${STORED_CMAKE_MESSAGE_LOG_LEVEL}")
 unset (STORED_CMAKE_MESSAGE_LOG_LEVEL)
 
