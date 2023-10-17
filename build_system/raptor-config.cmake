@@ -112,7 +112,7 @@ macro (raptor_config_error text)
 endmacro ()
 
 # ----------------------------------------------------------------------------
-# Check CXX and C compiler versions (xxHash uses C).
+# Check CXX and C compiler versions.
 # ----------------------------------------------------------------------------
 
 string (REGEX MATCH "^[0-9]+" RAPTOR_CXX_MAJOR_VERSION "${CMAKE_CXX_COMPILER_VERSION}")
