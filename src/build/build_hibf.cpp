@@ -70,4 +70,25 @@ void build_hibf(build_arguments const & arguments)
     arguments.store_index_timer.stop();
 }
 
+void build_partitioned_hibf(build_arguments const & arguments)
+{
+
+        partition_config const cfg{arguments.parts};
+        index_factory factory{arguments, cfg};
+        std::vector<size_t> const kmers_per_partition = max_count_per_partition(cfg, arguments);
+
+        for (size_t part = 0; part < arguments.parts; ++part)
+        {
+            arguments.bits = seqan::hibf::build::bin_size_in_bits(
+                {.fpr = arguments.fpr, .hash_count = arguments.hash, .elements = kmers_per_partition[part]});
+            auto index = factory(part);
+            std::filesystem::path out_path{arguments.out_path};
+            out_path += "_" + std::to_string(part);
+            arguments.store_index_timer.start();
+            store_index(out_path, std::move(index));
+            arguments.store_index_timer.stop();
+        }
+
+}
+
 } // namespace raptor
