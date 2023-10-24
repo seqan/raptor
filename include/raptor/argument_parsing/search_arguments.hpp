@@ -17,6 +17,7 @@
 
 #include <seqan3/search/kmer_index/shape.hpp>
 
+#include <raptor/argument_parsing/formatted_index_size.hpp>
 #include <raptor/argument_parsing/memory_usage.hpp>
 #include <raptor/threshold/threshold_parameters.hpp>
 
@@ -54,6 +55,7 @@ struct search_arguments
     bool is_hibf{false};
     bool cache_thresholds{false};
     bool quiet{false};
+    std::filesystem::path timing_out{};
 
     // Timers do not copy the stored duration upon copy construction/assignment
     mutable seqan::hibf::concurrent_timer wall_clock_timer{};
@@ -64,20 +66,8 @@ struct search_arguments
     mutable seqan::hibf::concurrent_timer query_ibf_timer{};
     mutable seqan::hibf::concurrent_timer generate_results_timer{};
 
-    void print_timings() const
-    {
-        if (quiet)
-            return;
-        std::cerr << std::fixed << std::setprecision(2) << "============= Timings =============\n";
-        std::cerr << "Wall clock time [s]: " << wall_clock_timer.in_seconds() << '\n';
-        std::cerr << "Peak memory usage " << formatted_peak_ram() << '\n';
-        std::cerr << "Determine query length [s]: " << query_length_timer.in_seconds() << '\n';
-        std::cerr << "Query file I/O [s]: " << query_file_io_timer.in_seconds() << '\n';
-        std::cerr << "Load index [s]: " << load_index_timer.in_seconds() << '\n';
-        std::cerr << "Compute minimiser [s]: " << compute_minimiser_timer.in_seconds() / threads << '\n';
-        std::cerr << "Query IBF [s]: " << query_ibf_timer.in_seconds() / threads << '\n';
-        std::cerr << "Generate results [s]: " << generate_results_timer.in_seconds() / threads << '\n';
-    }
+    void print_timings() const;
+    void write_timings_to_file() const;
 
     raptor::threshold::threshold_parameters make_threshold_parameters() const noexcept
     {

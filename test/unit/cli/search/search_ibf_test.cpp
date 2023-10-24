@@ -132,6 +132,7 @@ TEST_F(search_ibf, verbose)
     cli_test_result const result = execute_app("raptor",
                                                "search",
                                                "--output search.out",
+                                               "--timing-output raptor.time",
                                                "--error 1",
                                                "--p_max 0.4",
                                                "--index ",
@@ -139,7 +140,8 @@ TEST_F(search_ibf, verbose)
                                                "--query ",
                                                data("query.fq"));
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_NE(result.err, std::string{});
+    EXPECT_TRUE(result.err.starts_with("============= Timings ============="));
+    EXPECT_TRUE(std::filesystem::exists("raptor.time"));
     RAPTOR_ASSERT_ZERO_EXIT(result);
 
     compare_search(16, 1, "search.out");

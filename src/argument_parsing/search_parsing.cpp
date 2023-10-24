@@ -60,9 +60,15 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                                     .long_id = "threads",
                                     .description = "The number of threads to use.",
                                     .validator = positive_integer_validator{}});
-    parser.add_flag(
-        arguments.quiet,
-        sharg::config{.short_id = '\0', .long_id = "quiet", .description = "Do not print time and memory usage."});
+    parser.add_flag(arguments.quiet,
+                    sharg::config{.short_id = '\0',
+                                  .long_id = "quiet",
+                                  .description = "Do not print time and memory usage to stderr."});
+    parser.add_option(arguments.timing_out,
+                      sharg::config{.short_id = '\0',
+                                    .long_id = "timing-output",
+                                    .description = "Write time and memory usage to specified file (TSV format).",
+                                    .validator = output_file_validator{}});
 
     parser.add_subsection("Threshold method options");
     parser.add_line("\\fBIf no option is set, --error " + std::to_string(arguments.errors)
@@ -245,7 +251,10 @@ void search_parsing(sharg::parser & parser)
     raptor_search(arguments);
 
     arguments.wall_clock_timer.stop();
-    arguments.print_timings();
+    if (!arguments.quiet)
+        arguments.print_timings();
+    if (parser.is_option_set("timing-output"))
+        arguments.write_timings_to_file();
 }
 
 } // namespace raptor
