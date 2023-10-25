@@ -97,10 +97,12 @@ TEST_F(build_hibf, verbose)
                                                "--window 19",
                                                "--threads 1",
                                                "--output raptor.index",
+                                               "--timing-output raptor.time",
                                                "--input",
                                                data("three_levels.pack"));
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_NE(result.err, std::string{});
+    EXPECT_TRUE(result.err.starts_with("============= Timings ============="));
+    EXPECT_TRUE(std::filesystem::exists("raptor.time"));
     RAPTOR_ASSERT_ZERO_EXIT(result);
 
     compare_index<raptor::index_structure::hibf>(data("three_levels.hibf"), "raptor.index");

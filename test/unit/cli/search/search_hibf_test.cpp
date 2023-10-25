@@ -93,11 +93,12 @@ TEST_F(search_hibf, three_levels)
                                                "--error 0",
                                                "--index ",
                                                data("three_levels.hibf"),
-                                               "--quiet",
+                                               "--timing-output raptor.time",
                                                "--query ",
                                                data("query.fq"));
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{});
+    EXPECT_TRUE(result.err.starts_with("============= Timings ============="));
+    EXPECT_TRUE(std::filesystem::exists("raptor.time"));
     RAPTOR_ASSERT_ZERO_EXIT(result);
 
     compare_search(32, 0, "search.out");

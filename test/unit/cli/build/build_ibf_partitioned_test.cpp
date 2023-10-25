@@ -38,11 +38,12 @@ TEST_P(build_ibf_partitioned, pipeline)
                                                 "--threads 2",
                                                 "--parts ",
                                                 std::to_string(parts),
-                                                "--quiet",
+                                                "--timing-output raptor.time",
                                                 "--input",
                                                 "raptor_cli_test.txt");
     EXPECT_EQ(result1.out, std::string{});
-    EXPECT_EQ(result1.err, std::string{});
+    EXPECT_TRUE(result1.err.starts_with("============= Timings ============="));
+    EXPECT_TRUE(std::filesystem::exists("raptor.time"));
     RAPTOR_ASSERT_ZERO_EXIT(result1);
 
     cli_test_result const result2 = execute_app("raptor",
@@ -52,11 +53,12 @@ TEST_P(build_ibf_partitioned, pipeline)
                                                 std::to_string(number_of_errors),
                                                 "--index ",
                                                 "raptor.index",
-                                                "--quiet",
+                                                "--timing-output search.time",
                                                 "--query ",
                                                 data("query.fq"));
     EXPECT_EQ(result2.out, std::string{});
-    EXPECT_EQ(result2.err, std::string{});
+    EXPECT_TRUE(result2.err.starts_with("============= Timings ============="));
+    EXPECT_TRUE(std::filesystem::exists("search.time"));
     RAPTOR_ASSERT_ZERO_EXIT(result2);
 
     compare_search(number_of_repeated_bins, number_of_errors, "search.out");
