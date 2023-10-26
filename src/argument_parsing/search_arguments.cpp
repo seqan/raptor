@@ -41,8 +41,8 @@ void search_arguments::write_timings_to_file() const
     std::ofstream output_stream{timing_out};
     output_stream << std::fixed << std::setprecision(2);
     output_stream << "wall_clock_time_in_seconds\t"
-                  << "peak_memory_usage_in_KiB\t"
-                  << "index_size_in_KiB\t"
+                  << "peak_memory_usage_in_kibibytes\t"
+                  << "index_size_in_kibibytes\t"
                   << "determine_query_length_in_seconds\t"
                   << "query_file_io_in_seconds\t"
                   << "load_index_in_seconds\t"
