@@ -56,8 +56,8 @@ void build_arguments::write_timings_to_file() const
     std::ofstream output_stream{timing_out};
     output_stream << std::fixed << std::setprecision(2);
     output_stream << "wall_clock_time_in_seconds\t"
-                  << "peak_memory_usage_in_KiB\t"
-                  << "index_size_in_KiB\t"
+                  << "peak_memory_usage_in_kibibytes\t"
+                  << "index_size_in_kibibytes\t"
                   << "determine_ibf_size_in_seconds\t"
                   << "index_allocation_in_seconds\t"
                   << "user_bin_io_avg_per_thread_in_seconds\t"
