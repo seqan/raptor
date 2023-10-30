@@ -13,7 +13,7 @@ macro (raptor_require_mason)
     ExternalProject_Add (mason
                          PREFIX mason
                          GIT_REPOSITORY "https://github.com/seqan/seqan.git"
-                         GIT_TAG "develop"
+                         GIT_TAG "main"
                          GIT_SHALLOW true
                          SOURCE_DIR "${PROJECT_BINARY_DIR}/mason/seqan"
                          CMAKE_ARGS "${mason_args}"
