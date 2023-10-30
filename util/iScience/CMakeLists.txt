@@ -16,7 +16,7 @@ list (APPEND CMAKE_MODULE_PATH "${RAPTOR_CLONE_DIR}/build_system")
 
 include (raptor-config-version)
 
-project (raptor_utility_common LANGUAGES CXX C)
+project (raptor_utility_common LANGUAGES CXX)
 
 find_package (Raptor REQUIRED HINTS ${RAPTOR_CLONE_DIR}/build_system)
 
@@ -58,8 +58,4 @@ else ()
     message ("-- DREAM-Yara will not be built. Enable via 'cmake -DRAPTOR_UTILITY_BUILD_DREAM_YARA=1 .'")
 endif ()
 
-option (RAPTOR_UTILITY_BUILD_iScience_APPS "" ON)
-if (RAPTOR_UTILITY_BUILD_iScience_APPS)
-    option (RAPTOR_UTILITY_BUILD_Genome_Biology "" OFF)
-    add_subdirectory ("${RAPTOR_CLONE_DIR}/util/applications/src" "${CMAKE_CURRENT_BINARY_DIR}/applications")
-endif ()
+add_subdirectory ("${RAPTOR_CLONE_DIR}/util/applications/src" "${CMAKE_CURRENT_BINARY_DIR}/applications")

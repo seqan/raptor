@@ -11,8 +11,6 @@ project (raptor_utility_test)
 
 get_filename_component (RAPTOR_UTIL_ROOT "${CMAKE_CURRENT_LIST_DIR}/../dummy" DIRECTORY)
 
-option (RAPTOR_UTILITY_BUILD_iScience_APPS "" OFF)
-
 message (STATUS "Adding applications...")
 add_subdirectory ("${RAPTOR_UTIL_ROOT}/applications/src" "${CMAKE_CURRENT_BINARY_DIR}/applications")
 message (STATUS "Adding iScience...")
