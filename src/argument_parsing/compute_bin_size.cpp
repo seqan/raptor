@@ -127,13 +127,4 @@ size_t compute_bin_size(build_arguments const & arguments)
         {.fpr = arguments.fpr, .hash_count = arguments.hash, .elements = max_count});
 }
 
-size_t max_bin_count(upgrade_arguments const & arguments)
-{
-    return arguments.input_is_minimiser ? detail::kmer_count_from_minimiser_files(arguments.bin_path, arguments.threads)
-                                        : detail::kmer_count_from_sequence_files(arguments.bin_path,
-                                                                                 arguments.threads,
-                                                                                 arguments.shape,
-                                                                                 arguments.window_size);
-}
-
 } // namespace raptor
