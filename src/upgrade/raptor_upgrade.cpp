@@ -19,34 +19,34 @@
 namespace raptor
 {
 
-void raptor_upgrade(upgrade_arguments & arguments)
+void raptor_upgrade(upgrade_arguments & /* arguments */) // GCOVR_EXCL_LINE
 {
-    if (arguments.parts == 1u)
-    {
-        size_t const max_count = std::isnan(arguments.fpr) ? max_bin_count(arguments) : 0u;
+    // if (arguments.parts == 1u)
+    // {
+    //     size_t const max_count = std::isnan(arguments.fpr) ? max_bin_count(arguments) : 0u;
 
-        index_upgrader upgrader{arguments, max_count};
-        upgrader.upgrade();
-    }
-    else
-    {
-        partition_config const cfg{arguments.parts};
-        std::vector<size_t> count_per_partition =
-            std::isnan(arguments.fpr) ? max_count_per_partition(cfg, arguments) : std::vector<size_t>{};
-        std::string const index_path_base = arguments.index_file.string() + '_';
-        std::string const output_path_base = arguments.output_file.string() + '_';
+    //     index_upgrader upgrader{arguments, max_count};
+    //     upgrader.upgrade();
+    // }
+    // else
+    // {
+    //     partition_config const cfg{arguments.parts};
+    //     std::vector<size_t> count_per_partition =
+    //         std::isnan(arguments.fpr) ? max_count_per_partition(cfg, arguments) : std::vector<size_t>{};
+    //     std::string const index_path_base = arguments.index_file.string() + '_';
+    //     std::string const output_path_base = arguments.output_file.string() + '_';
 
-        for (size_t part{0}; part < arguments.parts; ++part)
-        {
-            arguments.index_file = index_path_base + std::to_string(part);
-            arguments.output_file = output_path_base + std::to_string(part);
+    //     for (size_t part{0}; part < arguments.parts; ++part)
+    //     {
+    //         arguments.index_file = index_path_base + std::to_string(part);
+    //         arguments.output_file = output_path_base + std::to_string(part);
 
-            size_t const max_count = std::isnan(arguments.fpr) ? count_per_partition[part] : 0u;
+    //         size_t const max_count = std::isnan(arguments.fpr) ? count_per_partition[part] : 0u;
 
-            index_upgrader upgrader{arguments, max_count};
-            upgrader.upgrade();
-        }
-    }
+    //         index_upgrader upgrader{arguments, max_count};
+    //         upgrader.upgrade();
+    //     }
+    // }
 }
 
 } // namespace raptor

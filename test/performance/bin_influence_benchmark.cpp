@@ -8,6 +8,7 @@
 #include <benchmark/benchmark.h>
 
 #include <filesystem>
+#include <fstream>
 
 #include <seqan3/alphabet/nucleotide/dna4.hpp>
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>

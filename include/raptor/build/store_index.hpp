@@ -13,6 +13,7 @@
 #pragma once
 
 #include <filesystem>
+#include <fstream>
 
 #include <raptor/index.hpp>
 #include <raptor/strong_types.hpp>

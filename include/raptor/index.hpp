@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <cereal/types/string.hpp>
+
 #include <sharg/exceptions.hpp>
 
 #include <raptor/argument_parsing/build_arguments.hpp>
@@ -51,14 +53,13 @@ private:
     uint64_t window_size_{};
     seqan3::shape shape_{};
     uint8_t parts_{};
-    bool compressed_{false};
     std::vector<std::vector<std::string>> bin_path_{};
     double fpr_{};
     bool is_hibf_{index_structure::is_hibf<data_t>};
     data_t ibf_{};
 
 public:
-    static constexpr uint32_t version{2u};
+    static constexpr uint32_t version{3u};
 
     raptor_index() = default;
     raptor_index(raptor_index const &) = default;
@@ -107,11 +108,6 @@ public:
         return parts_;
     }
 
-    bool compressed() const
-    {
-        return compressed_;
-    }
-
     std::vector<std::vector<std::string>> const & bin_path() const
     {
         return bin_path_;
@@ -157,18 +153,17 @@ public:
                 archive(window_size_);
                 archive(shape_);
                 archive(parts_);
-                archive(compressed_);
-                if (compressed_)
-                    throw sharg::parser_error{"Index cannot be compressed."};
                 archive(bin_path_);
                 archive(fpr_);
                 archive(is_hibf_);
                 archive(ibf_);
             }
+            // GCOVR_EXCL_START
             catch (std::exception const & e)
             {
                 throw sharg::parser_error{"Cannot read index: " + std::string{e.what()}};
             }
+            // GCOVR_EXCL_STOP
         }
         else
         {
@@ -196,7 +191,6 @@ public:
                 archive(window_size_);
                 archive(shape_);
                 archive(parts_);
-                archive(compressed_);
                 archive(bin_path_);
                 archive(fpr_);
                 archive(is_hibf_);
@@ -211,70 +205,6 @@ public:
         else
         {
             throw sharg::parser_error{"Unsupported index version. Check raptor upgrade."}; // GCOVR_EXCL_LINE
-        }
-    }
-
-    //!\brief Load parameters from old index format for use with raptor upgrade.
-    template <seqan3::cereal_input_archive archive_t>
-    void load_old_parameters(archive_t & archive)
-    {
-        uint32_t parsed_version{};
-        archive(parsed_version);
-        if (parsed_version == 1u)
-        {
-            try
-            {
-                archive(window_size_);
-                archive(shape_);
-                archive(parts_);
-                archive(compressed_);
-                archive(bin_path_);
-            }
-            // GCOVR_EXCL_START
-            catch (std::exception const & e)
-            {
-                throw sharg::parser_error{"Cannot read index: " + std::string{e.what()}};
-            }
-            // GCOVR_EXCL_STOP
-        }
-        else
-        {
-            throw sharg::parser_error{"Unsupported index version. Use Raptor 2.0's upgrade first."}; // LCOV_EXCL_LINE
-        }
-    }
-    //!\endcond
-
-private:
-    friend class index_upgrader;
-
-    //!\cond DEV
-    //!\brief Load old index format for use with raptor upgrade.
-    template <seqan3::cereal_archive archive_t>
-    void load_old_index(archive_t & archive)
-    {
-        uint32_t parsed_version{};
-        archive(parsed_version);
-        if (parsed_version == 1u)
-        {
-            try
-            {
-                archive(window_size_);
-                archive(shape_);
-                archive(parts_);
-                archive(compressed_);
-                archive(bin_path_);
-                archive(ibf_);
-            }
-            // GCOVR_EXCL_START
-            catch (std::exception const & e)
-            {
-                throw sharg::parser_error{"Cannot read index: " + std::string{e.what()}};
-            }
-            // GCOVR_EXCL_STOP
-        }
-        else
-        {
-            throw sharg::parser_error{"Unsupported index version. Use Raptor 2.0's upgrade first."}; // LCOV_EXCL_LINE
         }
     }
     //!\endcond

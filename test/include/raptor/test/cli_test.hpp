@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 
 #include <charconv>
+#include <fstream>
 
 #include <seqan3/test/expect_range_eq.hpp>
 #include <seqan3/utility/views/repeat_n.hpp>

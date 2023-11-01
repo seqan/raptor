@@ -98,6 +98,6 @@ jobs:
         run: |
           raptor build --export-help cwl > raptor.cwl
           cwltool --validate raptor.cwl
-          cwltool raptor.cwl raptor/workflow/cwl/tests/raptor-build-0_bins_window_19.yml | grep 098169f476fb949b0d08f2d1e05881049819b811
-          cwltool raptor.cwl raptor/workflow/cwl/tests/raptor-build-16_bins_window_19.yml | grep 64a4328eb3dab99bf6ecd38f84f4ae45fd01a4dd
+          cwltool raptor.cwl raptor/workflow/cwl/tests/raptor-build-0_bins_window_19.yml | grep 87bb8bcd1c9ffc2f7ed6e6d1ecc3ca799a8620ff
+          cwltool raptor.cwl raptor/workflow/cwl/tests/raptor-build-16_bins_window_19.yml | grep bae996beebec30b48d3bc6f42ef8af7e143effad
 
