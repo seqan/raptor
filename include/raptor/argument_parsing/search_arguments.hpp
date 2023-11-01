@@ -65,6 +65,8 @@ struct search_arguments
     mutable seqan::hibf::concurrent_timer compute_minimiser_timer{};
     mutable seqan::hibf::concurrent_timer query_ibf_timer{};
     mutable seqan::hibf::concurrent_timer generate_results_timer{};
+    mutable seqan::hibf::concurrent_timer complete_search_timer{};
+    mutable seqan::hibf::concurrent_timer parallel_search_timer{};
 
     void print_timings() const;
     void write_timings_to_file() const;

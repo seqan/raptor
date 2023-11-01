@@ -109,13 +109,17 @@ void search_partitioned_ibf(search_arguments const & arguments)
             arguments.query_ibf_timer += local_query_ibf_timer;
         };
 
+        arguments.parallel_search_timer.start();
         do_parallel(count_task, records.size(), arguments.threads);
+        arguments.parallel_search_timer.stop();
         ++part;
 
         for (; part < arguments.parts - 1u; ++part)
         {
             load_index(index, arguments, part);
+            arguments.parallel_search_timer.start();
             do_parallel(count_task, records.size(), arguments.threads);
+            arguments.parallel_search_timer.stop();
         }
 
         assert(part == arguments.parts - 1u);
@@ -188,7 +192,9 @@ void search_partitioned_ibf(search_arguments const & arguments)
             arguments.generate_results_timer += local_generate_results_timer;
         };
 
+        arguments.parallel_search_timer.start();
         do_parallel(output_task, records.size(), arguments.threads);
+        arguments.parallel_search_timer.stop();
     }
 }
 
