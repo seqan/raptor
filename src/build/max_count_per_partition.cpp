@@ -87,23 +87,4 @@ std::vector<size_t> max_count_per_partition(partition_config const & cfg, build_
     return result;
 }
 
-std::vector<size_t> max_count_per_partition(partition_config const & cfg, upgrade_arguments const & arguments)
-{
-    // GCOVR_EXCL_START
-    std::vector<size_t> result = arguments.input_is_minimiser
-                                   ? detail::max_count_per_partition<file_types::minimiser>(cfg,
-                                                                                            arguments.bin_path,
-                                                                                            arguments.threads,
-                                                                                            arguments.shape,
-                                                                                            arguments.window_size)
-                                   : detail::max_count_per_partition<file_types::sequence>(cfg,
-                                                                                           arguments.bin_path,
-                                                                                           arguments.threads,
-                                                                                           arguments.shape,
-                                                                                           arguments.window_size);
-    // GCOVR_EXCL_STOP
-
-    return result;
-}
-
 } // namespace raptor

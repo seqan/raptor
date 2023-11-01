@@ -71,11 +71,4 @@ void parse_bin_path(prepare_arguments & arguments)
     raptor::detail::parse_bin_path(arguments.bin_file, arguments.bin_path, false);
 }
 
-void parse_bin_path(upgrade_arguments & arguments)
-{
-    raptor::detail::parse_bin_path(arguments.bin_file, arguments.bin_path, false);
-    std::filesystem::path first_bin_path = arguments.bin_path[0][0];
-    arguments.input_is_minimiser = first_bin_path.extension() == ".minimiser";
-}
-
 } // namespace raptor
