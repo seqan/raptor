@@ -412,7 +412,7 @@ TEST_F(argparse_search, old_index)
                                                "--query ",
                                                data("query.fq"),
                                                "--index ",
-                                               data("2.0.index"),
+                                               data("3.0.index"),
                                                "--output search.out");
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] Unsupported index version. Check raptor upgrade.\n"});
@@ -432,21 +432,6 @@ TEST_F(argparse_search, ambiguous_index)
     EXPECT_EQ(result.err,
               std::string{"[Error] Ambiguous index. Both monolithic (raptor.index) and partitioned index "
                           "(raptor.index_0) exist. Please rename the monolithic index.\n"});
-    RAPTOR_ASSERT_FAIL_EXIT(result);
-}
-
-TEST_F(argparse_search, compressed_index)
-{
-
-    cli_test_result const result = execute_app("raptor",
-                                               "search",
-                                               "--query ",
-                                               data("query.fq"),
-                                               "--index",
-                                               cli_test::data("64bins23windowc.index"),
-                                               "--output search.out");
-    EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] Cannot read index: Index cannot be compressed.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
@@ -554,50 +539,11 @@ TEST_F(argparse_search, queries_unsupported_length)
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
-TEST_F(argparse_upgrade, exclusive_options)
+TEST_F(argparse_upgrade, not_implemented)
 {
-    {
-        std::ofstream monolithic_index{"raptor.index"};
-        std::ofstream bins{"bins.list"};
-    }
-
-    cli_test_result const result = execute_app("raptor",
-                                               "upgrade",
-                                               "--input raptor.index",
-                                               "--output upgrade.index",
-                                               "--fpr 0.05",
-                                               "--bins bins.list");
+    cli_test_result const result = execute_app("raptor", "upgrade");
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] You cannot set both --fpr and --bins.\n"});
-    RAPTOR_ASSERT_FAIL_EXIT(result);
-}
-
-TEST_F(argparse_upgrade, ambiguous_index)
-{
-    {
-        std::ofstream monolithic_index{"raptor.index"};
-        std::ofstream partitioned_index{"raptor.index_0"};
-    }
-
-    cli_test_result const result =
-        execute_app("raptor", "upgrade", "--input raptor.index", "--output upgrade.index", "--fpr 0.05");
-    EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err,
-              std::string{"[Error] Ambiguous index. Both monolithic (raptor.index) and partitioned index "
-                          "(raptor.index_0) exist. Please rename the monolithic index.\n"});
-    RAPTOR_ASSERT_FAIL_EXIT(result);
-}
-
-TEST_F(argparse_upgrade, unsupported_index)
-{
-    cli_test_result const result = execute_app("raptor",
-                                               "upgrade",
-                                               "--input",
-                                               data("1bins23window.index"),
-                                               "--output upgrade.index",
-                                               "--fpr 0.05");
-    EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] Unsupported index version. Use Raptor 2.0's upgrade first.\n"});
+    EXPECT_EQ(result.err, std::string{"[Error] Upgrade not yet implemented for Raptor 4.0.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 

@@ -15,9 +15,9 @@
 #include <cstdint>
 
 //!\brief The major version as MACRO.
-#define RAPTOR_VERSION_MAJOR 3
+#define RAPTOR_VERSION_MAJOR 4
 //!\brief The minor version as MACRO.
-#define RAPTOR_VERSION_MINOR 1
+#define RAPTOR_VERSION_MINOR 0
 //!\brief The patch version as MACRO.
 #define RAPTOR_VERSION_PATCH 0
 //!\brief The release candidate number. 0 means stable release, >= 1 means release candidate.
