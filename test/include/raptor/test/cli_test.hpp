@@ -375,7 +375,7 @@ struct raptor_base : public cli_test
         ASSERT_EQ(line, "#QUERY_NAME\tUSER_BINS");
 
         std::string const query_prefix{"query"};
-        for (char i : {'1', '2', '3'})
+        for (char i : {'3', '1', '2'})
         {
             ASSERT_TRUE(std::getline(search_result, line));
             std::string_view line_view{line};
