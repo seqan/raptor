@@ -10,6 +10,8 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
+#include <random>
+
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <raptor/adjust_seed.hpp>
@@ -55,6 +57,8 @@ void search_partitioned_ibf(search_arguments const & arguments)
         records.clear();
         arguments.query_file_io_timer.start();
         std::ranges::move(chunked_records, std::back_inserter(records));
+        // Very fast, improves parallel processing when chunks of the query belong to the same bin.
+        std::ranges::shuffle(records, std::mt19937_64{0u});
         arguments.query_file_io_timer.stop();
 
         cereal_future.get();
