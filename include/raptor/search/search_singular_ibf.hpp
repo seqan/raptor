@@ -149,7 +149,9 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
         cereal_future.get();
         [[maybe_unused]] static bool header_written = write_header(); // called exactly once
 
+        arguments.parallel_search_timer.start();
         do_parallel(worker, records.size(), arguments.threads);
+        arguments.parallel_search_timer.stop();
     }
 }
 
