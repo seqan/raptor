@@ -106,6 +106,24 @@ TEST(minimiser, minimum)
         EXPECT_LE(threshold.get(i), threshold.get(i + 1u)) << i;
 }
 
+TEST(minimiser, logspace_substract)
+{
+    raptor::threshold::threshold_parameters const parameters{.window_size = 15,
+                                                             .shape = seqan3::ungapped{13u},
+                                                             .query_length = 50u,
+                                                             .errors = 2u,
+                                                             .p_max = 0.15,
+                                                             .fpr = 0.05,
+                                                             .tau = 0.9999};
+
+    raptor::threshold::threshold const threshold{parameters};
+    std::vector<size_t> const expected{1u,  1u,  1u,  1u,  2u,  3u,  4u,  5u,  6u,  6u,  7u,  8u, 9u,
+                                       10u, 11u, 12u, 13u, 13u, 14u, 15u, 16u, 17u, 18u, 20u, 21u};
+    ASSERT_EQ(expected.size(), 37u - 12u);
+    for (size_t i = 12u; i < 37u; ++i)
+        EXPECT_EQ(threshold.get(i), expected[i - 12u]);
+}
+
 TEST(percentage, 100)
 {
     auto threshold_params = default_parameters;
