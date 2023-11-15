@@ -13,7 +13,7 @@ TEST_F(build_hibf_layout, pipeline)
     std::filesystem::path const layout_filename = "raptor_cli_test.layout";
     std::filesystem::path const index_filename = "raptor.index";
     std::filesystem::path const search_filename = "search.out";
-    size_t const number_of_repeated_bins{16};
+    size_t const number_of_repeated_bins{64};
     size_t const number_of_errors{0}; // search
 
     { // generate sequence (data) input file
@@ -30,6 +30,7 @@ TEST_F(build_hibf_layout, pipeline)
                                                    "layout",
                                                    "--kmer 19",
                                                    "--threads 1",
+                                                   "--partitioning-approach 1",
                                                    "--input",
                                                    data_filename,
                                                    "--tmax 64",

@@ -67,6 +67,8 @@ inline void parse_chopper_config(sharg::parser & parser, build_arguments & argum
     }
 
     validate_shape(parser, arguments);
+
+    arguments.parts = config.number_of_partitions; // update number of partitions for the HIBF
 }
 
 inline void parse_shape_from_minimiser(sharg::parser & parser, build_arguments & arguments)
@@ -177,7 +179,7 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
     parser.add_option(arguments.parts,
                       sharg::config{.short_id = '\0',
                                     .long_id = "parts",
-                                    .description = "Splits the index in this many parts. Not available for the HIBF.",
+                                    .description = "Splits the index in this many parts. Not available for the HIBF. Needs to be set at layouting step.",
                                     .validator = power_of_two_validator{}});
 
     // GCOVR_EXCL_START
@@ -253,7 +255,7 @@ void build_parsing(sharg::parser & parser)
     arguments.is_hibf = input_is_pack_file(arguments.bin_file);
 
     if (arguments.is_hibf && arguments.parts != 1u)
-        throw sharg::parser_error{"The HIBF cannot yet be partitioned."};
+        throw sharg::parser_error{"The HIBF cannot yet be partitioned when building. Please set parts when layouting."};
 
     parse_bin_path(arguments);
 

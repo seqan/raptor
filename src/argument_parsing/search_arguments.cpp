@@ -69,7 +69,7 @@ void search_arguments::print_timings() const
 
 void search_arguments::write_timings_to_file() const
 {
-    std::ofstream output_stream{timing_out};
+    std::ofstream output_stream{timing_out, std::ios_base::app};
     output_stream << std::fixed << std::setprecision(2);
     output_stream << "peak_memory_usage_in_kibibytes\t"
                   << "index_size_in_kibibytes\t"
