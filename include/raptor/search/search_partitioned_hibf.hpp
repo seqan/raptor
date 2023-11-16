@@ -33,6 +33,7 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
     using record_type = typename decltype(fin)::record_type;
     std::vector<record_type> records{};
 
+    // make into vector
     robin_hood::unordered_flat_map<std::string, std::string> results; // cache results when searching multiple hibfs
 
     raptor::threshold::threshold const thresholder{arguments.make_threshold_parameters()};
@@ -90,7 +91,7 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
         seqan::hibf::serial_timer local_query_ibf_timer{};
         seqan::hibf::serial_timer local_generate_results_timer{};
 
-        auto counter = return index.ibf().membership_agent();
+        auto counter = index.ibf().membership_agent();
         std::vector<uint64_t> minimiser;
 
         auto hash_adaptor = seqan3::views::minimiser_hash(arguments.shape,
@@ -153,10 +154,10 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
         cereal_future.get();
         synced_out.write_header(arguments, index.ibf().ibf_vector[0].hash_function_count());
 
-        for (size_t part{}; part < arguments.parts; ++part)
+        for (size_t part{}; part < arguments.parts - 1; ++part)
         {
             do_parallel(worker, records.size(), arguments.threads);
-            load_index(index, arguments, part);
+            load_index(index, arguments, part + 1);
         }
 
         do_parallel(output_worker, records.size(), arguments.threads); // when last part also write result
