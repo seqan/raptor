@@ -34,7 +34,7 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
     std::vector<record_type> records{};
 
     // make into vector
-    robin_hood::unordered_flat_map<std::string, std::string> results; // cache results when searching multiple hibfs
+    std::vector<std::string> results; // cache results since we are searching multiple hibfs
 
     raptor::threshold::threshold const thresholder{arguments.make_threshold_parameters()};
 
@@ -54,9 +54,10 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
                                                           seqan3::window_size{arguments.window_size},
                                                           seqan3::seed{adjust_seed(arguments.shape_weight)});
 
-        for (auto && [id, seq] : std::span{records.data() + start, extent})
+        for (size_t pos = start; pos < start + extent; ++pos)
         {
-            std::string & result_string = results[id]; // TODO concurrent access??
+            auto const & seq = records[pos].sequence();
+            std::string & result_string = results[pos];
 
             auto minimiser_view = seq | hash_adaptor | std::views::common;
             local_compute_minimiser_timer.start();
@@ -98,9 +99,11 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
                                                           seqan3::window_size{arguments.window_size},
                                                           seqan3::seed{adjust_seed(arguments.shape_weight)});
 
-        for (auto && [id, seq] : std::span{records.data() + start, extent})
+        for (size_t pos = start; pos < start + extent; ++pos)
         {
-            std::string & result_string = results[id];
+            auto const & seq = records[pos].sequence();
+            auto const & id = records[pos].id();
+            std::string & result_string = results[pos];
 
             auto minimiser_view = seq | hash_adaptor | std::views::common;
             local_compute_minimiser_timer.start();
@@ -150,6 +153,8 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
         arguments.query_file_io_timer.start();
         std::ranges::move(chunked_records, std::back_inserter(records));
         arguments.query_file_io_timer.stop();
+
+        results.resize(records.size());
 
         cereal_future.get();
         synced_out.write_header(arguments, index.ibf().ibf_vector[0].hash_function_count());
