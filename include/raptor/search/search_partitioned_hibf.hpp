@@ -39,7 +39,7 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
     raptor::threshold::threshold const thresholder{arguments.make_threshold_parameters()};
 
     // searching with storing all results in results map
-    auto worker = [&](size_t const start, size_t const extent)
+    auto worker = [&](size_t const start, size_t const extent, bool output_results)
     {
         seqan::hibf::serial_timer local_compute_minimiser_timer{};
         seqan::hibf::serial_timer local_query_ibf_timer{};
@@ -77,60 +77,18 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
                 result_string += ',';
             }
 
-            local_generate_results_timer.stop();
-        }
-
-        arguments.compute_minimiser_timer += local_compute_minimiser_timer;
-        arguments.query_ibf_timer += local_query_ibf_timer;
-        arguments.generate_results_timer += local_generate_results_timer;
-    };
-
-    // searching and writing results to file
-    auto output_worker = [&](size_t const start, size_t const extent)
-    {
-        seqan::hibf::serial_timer local_compute_minimiser_timer{};
-        seqan::hibf::serial_timer local_query_ibf_timer{};
-        seqan::hibf::serial_timer local_generate_results_timer{};
-
-        auto counter = index.ibf().membership_agent();
-        std::vector<uint64_t> minimiser;
-
-        auto hash_adaptor = seqan3::views::minimiser_hash(arguments.shape,
-                                                          seqan3::window_size{arguments.window_size},
-                                                          seqan3::seed{adjust_seed(arguments.shape_weight)});
-
-        for (size_t pos = start; pos < start + extent; ++pos)
-        {
-            auto const & seq = records[pos].sequence();
-            auto const & id = records[pos].id();
-            std::string & result_string = results[pos];
-
-            auto minimiser_view = seq | hash_adaptor | std::views::common;
-            local_compute_minimiser_timer.start();
-            minimiser.assign(minimiser_view.begin(), minimiser_view.end());
-            local_compute_minimiser_timer.stop();
-
-            size_t const minimiser_count{minimiser.size()};
-            size_t const threshold = thresholder.get(minimiser_count);
-
-            local_query_ibf_timer.start();
-            auto & result = counter.membership_for(minimiser, threshold); // Results contains user bin IDs
-            local_query_ibf_timer.stop();
-            local_generate_results_timer.start();
-            for (auto && count : result)
+            if (output_results)
             {
-                result_string += std::to_string(count);
-                result_string += ',';
+                if (auto & last_char = result_string.back(); last_char == ',')
+                    last_char = '\n';
+                else
+                    result_string += '\n';
+
+                result_string.insert(result_string.begin(), '\t');
+                result_string.insert(result_string.begin(), id.begin(), id.end());
+                synced_out.write(result_string);
+                result_string.clear(); // free memory
             }
-
-            if (auto & last_char = result_string.back(); last_char == ',')
-                last_char = '\n';
-            else
-                result_string += '\n';
-
-            result_string.insert(result_string.begin(), '\t');
-            result_string.insert(result_string.begin(), id.begin(), id.end());
-            synced_out.write(result_string);
             local_generate_results_timer.stop();
         }
 
@@ -161,11 +119,11 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
 
         for (size_t part{}; part < arguments.parts - 1; ++part)
         {
-            do_parallel(worker, records.size(), arguments.threads);
+            do_parallel(worker, records.size(), arguments.threads, false/*do not write results*/);
             load_index(index, arguments, part + 1);
         }
 
-        do_parallel(output_worker, records.size(), arguments.threads); // when last part also write result
+        do_parallel(worker, records.size(), arguments.threads, true/*write results*/);
     }
 }
 
