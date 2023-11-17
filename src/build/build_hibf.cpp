@@ -20,8 +20,8 @@ namespace raptor
 {
 
 void construct_hibf(build_arguments const & arguments,
-                seqan::hibf::config & config,
-                seqan::hibf::layout::layout const & layout)
+                    seqan::hibf::config & config,
+                    seqan::hibf::layout::layout const & layout)
 {
     // Call ctor
     seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config, layout};
@@ -81,8 +81,8 @@ void build_hibf(build_arguments const & arguments)
         // Inc ase of partitioned HIBF, replace out_path by appending `_[part]` for each index partition.
         build_arguments local_arguments = arguments;
         local_arguments.out_path = (config.number_of_partitions > 1)
-                                 ? arguments.out_path.string() + "_" + std::to_string(part)
-                                 : arguments.out_path.string();
+                                     ? arguments.out_path.string() + "_" + std::to_string(part)
+                                     : arguments.out_path.string();
 
         construct_hibf(local_arguments, config, layout);
     }
