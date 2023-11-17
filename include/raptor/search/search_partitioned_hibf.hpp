@@ -31,15 +31,17 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
     seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::id, seqan3::field::seq>> fin{
         arguments.query_file};
     using record_type = typename decltype(fin)::record_type;
+
     std::vector<record_type> records{};
 
-    // make into vector
+    sync_out synced_out{arguments};
+
     std::vector<std::string> results; // cache results since we are searching multiple hibfs
 
     raptor::threshold::threshold const thresholder{arguments.make_threshold_parameters()};
 
     // searching with storing all results in results map
-    auto worker = [&](size_t const start, size_t const extent, bool output_results)
+    auto worker = [&](size_t const start, size_t const extent, bool const output_results)
     {
         seqan::hibf::serial_timer local_compute_minimiser_timer{};
         seqan::hibf::serial_timer local_query_ibf_timer{};
@@ -79,13 +81,15 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
 
             if (output_results)
             {
+                result_string.insert(result_string.begin(), '\t');
+                auto const & id = records[pos].id();
+                result_string.insert(result_string.begin(), id.begin(), id.end());
+
                 if (auto & last_char = result_string.back(); last_char == ',')
                     last_char = '\n';
                 else
                     result_string += '\n';
 
-                result_string.insert(result_string.begin(), '\t');
-                result_string.insert(result_string.begin(), id.begin(), id.end());
                 synced_out.write(result_string);
                 result_string.clear(); // free memory
             }
@@ -116,7 +120,8 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
         cereal_future.get();
         synced_out.write_header(arguments, index.ibf().ibf_vector[0].hash_function_count());
 
-        for (size_t part{}; part < arguments.parts - 1; ++part)
+        assert(arguments.parts > 0);
+        for (int part = 0; part < arguments.parts - 1; ++part)
         {
             do_parallel(worker, records.size(), arguments.threads, false/*do not write results*/);
             load_index(index, arguments, part + 1);
