@@ -99,7 +99,6 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
 
     for (auto && chunked_records : fin | seqan::stl::views::chunk((1ULL << 20) * 10))
     {
-        assert(arguments.parts > 1); // a partitioned HIBF should have at lease 2 partitions
         // prefetch the first partition while query IO is done
         auto cereal_future = std::async(std::launch::async,
                                         [&]()
