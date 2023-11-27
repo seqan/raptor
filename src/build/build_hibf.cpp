@@ -75,6 +75,7 @@ void build_hibf(build_arguments const & arguments)
 
     for (size_t part = 0; part < arguments.parts; ++part)
     {
+        layout.clear();
         layout.read_from(layout_stream); // read current layout
 
         // Inc ase of partitioned HIBF, replace out_path by appending `_[part]` for each index partition.

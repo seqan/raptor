@@ -47,7 +47,7 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
         seqan::hibf::serial_timer local_query_ibf_timer{};
         seqan::hibf::serial_timer local_generate_results_timer{};
 
-        auto counter = index.ibf().membership_agent();
+        auto agent = index.ibf().membership_agent();            
 
         std::string result_string{};
         std::vector<uint64_t> minimiser;
@@ -70,12 +70,12 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
             size_t const threshold = thresholder.get(minimiser_count);
 
             local_query_ibf_timer.start();
-            auto & result = counter.membership_for(minimiser, threshold); // Results contains user bin IDs
+            auto & result = agent.membership_for(minimiser, threshold); // Results contains user bin IDs
             local_query_ibf_timer.stop();
             local_generate_results_timer.start();
-            for (auto && count : result)
+            for (auto && user_bin_id : result)
             {
-                result_string += std::to_string(count);
+                result_string += std::to_string(user_bin_id);
                 result_string += ',';
             }
 
