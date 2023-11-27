@@ -14,6 +14,9 @@
 
 #include <sharg/exceptions.hpp>
 
+#include <cereal/types/string.hpp>
+#include <cereal/types/vector.hpp>
+
 #include <raptor/argument_parsing/build_arguments.hpp>
 #include <raptor/strong_types.hpp>
 

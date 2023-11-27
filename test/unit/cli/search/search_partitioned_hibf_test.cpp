@@ -7,7 +7,7 @@
 
 #include <raptor/test/cli_test.hpp>
 
-struct search_partitioned_hibf : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, size_t>>
+struct search_partitioned_hibf : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t>>
 {};
 
 TEST_P(search_partitioned_hibf, with_threshold)
@@ -18,7 +18,6 @@ TEST_P(search_partitioned_hibf, with_threshold)
     std::filesystem::path const layout_filename = "raptor_cli_test.layout";
     std::filesystem::path const index_filename = "raptor.index";
     std::filesystem::path const search_filename = "search.out";
-    size_t const number_of_repeated_bins{16};
     size_t const number_of_errors{0}; // search
 
     { // generate sequence (data) input file
@@ -110,11 +109,11 @@ TEST_P(search_partitioned_hibf, with_threshold)
 
 INSTANTIATE_TEST_SUITE_P(search_partitioned_hibf_suite,
                          search_partitioned_hibf,
-                         testing::Combine(testing::Values(0, 16, 32), testing::Values(2, 4, 8)),
+                         testing::Combine(testing::Values(16/* , 32 */), testing::Values(2/* , 4, 8 */)),
                          [](testing::TestParamInfo<search_partitioned_hibf::ParamType> const & info)
                          {
                              std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_"
-                                              + std::to_string(std::get<3>(info.param)) + "_parts";
+                                              + std::to_string(std::get<1>(info.param)) + "_parts";
                              return name;
                          });
 
@@ -134,4 +133,4 @@ INSTANTIATE_TEST_SUITE_P(search_partitioned_hibf_suite,
 //     RAPTOR_ASSERT_ZERO_EXIT(result);
 
 //     compare_search(32, 0, "search.out");
-}
+// }

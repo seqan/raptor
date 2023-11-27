@@ -68,6 +68,8 @@ inline void parse_chopper_config(sharg::parser & parser, build_arguments & argum
     }
 
     validate_shape(parser, arguments);
+
+    arguments.parts = config.number_of_partitions; // update number of partitions for the HIBF
 }
 
 inline void parse_shape_from_minimiser(sharg::parser & parser, build_arguments & arguments)

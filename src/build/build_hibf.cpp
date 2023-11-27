@@ -72,7 +72,6 @@ void build_hibf(build_arguments const & arguments)
     // update config and build_arguments
     config.threads = arguments.threads;
     config.input_fn = input_lambda;
-    arguments.parts = config.number_of_partitions;
 
     for (size_t part = 0; part < arguments.parts; ++part)
     {
@@ -80,9 +79,9 @@ void build_hibf(build_arguments const & arguments)
 
         // Inc ase of partitioned HIBF, replace out_path by appending `_[part]` for each index partition.
         build_arguments local_arguments = arguments;
-        local_arguments.out_path = (config.number_of_partitions > 1)
-                                     ? arguments.out_path.string() + "_" + std::to_string(part)
-                                     : arguments.out_path.string();
+        local_arguments.out_path = (arguments.parts > 1)
+                                 ? arguments.out_path.string() + "_" + std::to_string(part)
+                                 : arguments.out_path.string();
 
         construct_hibf(local_arguments, config, layout);
     }
