@@ -124,10 +124,16 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
         for (int part = 0; part < arguments.parts - 1; ++part)
         {
             do_parallel(worker, records.size(), arguments.threads, false /*do not write results*/);
+            arguments.write_timings_to_file();
+            arguments.compute_minimiser_timer = {};
+            arguments.query_ibf_timer = {};
+            arguments.generate_results_timer = {};
+            arguments.load_index_timer = {};
             load_index(index, arguments, part + 1);
         }
 
         do_parallel(worker, records.size(), arguments.threads, true /*write results*/);
+        arguments.write_timings_to_file();
     }
 }
 
