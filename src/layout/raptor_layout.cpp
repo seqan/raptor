@@ -36,12 +36,12 @@ void chopper_layout(sharg::parser & parser)
     if (std::filesystem::is_empty(config.data_file))
         throw sharg::parser_error{"The input file is empty."};
 
-    std::vector<std::string> filenames{};
+    std::vector<std::vector<std::string>> filenames{};
     chopper::sketch::read_data_file(config, filenames);
 
     chopper::sketch::check_filenames(filenames, config);
 
-    config.hibf_config.input_fn = chopper::input_functor{filenames, config.precomputed_files, config.k};
+    config.hibf_config.input_fn = chopper::input_functor{filenames, config.precomputed_files, config.k, config.window_size};
     config.hibf_config.number_of_user_bins = filenames.size();
 
     chopper::layout::execute(config, filenames);
