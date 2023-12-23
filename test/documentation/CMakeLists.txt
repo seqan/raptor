@@ -6,12 +6,12 @@
 # --------------------------------------------------------------------------------------------------------
 
 # Minimum cmake version
-cmake_minimum_required (VERSION 3.7)
+cmake_minimum_required (VERSION 3.17)
 
 set (RAPTOR_DOXYGEN_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 get_filename_component (RAPTOR_CLONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../.." ABSOLUTE)
 
-include (${RAPTOR_CLONE_DIR}/cmake/raptor-config-version.cmake)
+include (${RAPTOR_CLONE_DIR}/cmake/version.cmake)
 
 project (docs
          LANGUAGES NONE

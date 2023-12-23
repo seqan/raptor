@@ -6,7 +6,7 @@ This subfolder contains scripts and documentation related to the experiments run
 
 The base requirements are the same as for the main Raptor application:
 
-* CMake >= 3.18
+* CMake >= 3.21
 * GCC 11, 12 or 13 (most recent minor version)
 * git
 

@@ -5,14 +5,14 @@
 # shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 # --------------------------------------------------------------------------------------------------
 
-cmake_minimum_required (VERSION 3.10)
+cmake_minimum_required (VERSION 3.21)
 
 project (raptor_test_unit LANGUAGES CXX C)
 
 include (../raptor-test.cmake)
 include (GoogleTest OPTIONAL)
 
-CPMGetPackage (googletest)
+CPMGetSystemPackage (googletest)
 
 add_subdirectory (api)
 add_subdirectory (cli)

@@ -5,7 +5,7 @@
 # shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 # --------------------------------------------------------------------------------------------------
 
-cmake_minimum_required (VERSION 3.18)
+cmake_minimum_required (VERSION 3.21)
 
 include (FindPackageMessage)
 
@@ -28,16 +28,9 @@ macro (raptor_require_ccache)
         else ()
             find_package_message (CCACHE_PROGRAM "  Ccache program:             available" "[${CCACHE_PROGRAM}]")
             set (RAPTOR_FPROFILE_ABS_PATH "--ccache-skip -fprofile-abs-path")
-            # New option since cmake >= 3.4:
-            # https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_LAUNCHER.html
-            if (NOT CMAKE_VERSION VERSION_LESS 3.15) # cmake >= 3.15
-                list (PREPEND CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
-                list (PREPEND CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
-            else ()
-                # prepend ccache to CMAKE_CXX_COMPILER_LAUNCHER
-                list (INSERT CMAKE_CXX_COMPILER_LAUNCHER 0 "${CCACHE_PROGRAM}")
-                list (INSERT CMAKE_C_COMPILER_LAUNCHER 0 "${CCACHE_PROGRAM}")
-            endif ()
+
+            list (PREPEND CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+            list (PREPEND CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
 
             # use ccache in external cmake projects
             list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS
@@ -45,16 +38,11 @@ macro (raptor_require_ccache)
             )
             list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_C_COMPILER_LAUNCHER=${CMAKE_C_COMPILER_LAUNCHER}")
 
-            if (NOT CMAKE_VERSION VERSION_LESS 3.21) # cmake >= 3.21
-                list (PREPEND CMAKE_CXX_LINKER_LAUNCHER "${CCACHE_PROGRAM}")
-                list (PREPEND CMAKE_C_LINKER_LAUNCHER "${CCACHE_PROGRAM}")
-                list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS
-                      "-DCMAKE_CXX_LINKER_LAUNCHER=${CMAKE_CXX_LINKER_LAUNCHER}"
-                )
-                list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_C_LINKER_LAUNCHER=${CMAKE_C_LINKER_LAUNCHER}")
-            else ()
-                set_property (GLOBAL PROPERTY RULE_LAUNCH_LINK "${CCACHE_PROGRAM}")
-            endif ()
+            list (PREPEND CMAKE_CXX_LINKER_LAUNCHER "${CCACHE_PROGRAM}")
+            list (PREPEND CMAKE_C_LINKER_LAUNCHER "${CCACHE_PROGRAM}")
+            list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_CXX_LINKER_LAUNCHER=${CMAKE_CXX_LINKER_LAUNCHER}")
+            list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_C_LINKER_LAUNCHER=${CMAKE_C_LINKER_LAUNCHER}")
+
         endif ()
         unset (CCACHE_PROGRAM)
     endif ()

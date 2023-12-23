@@ -1,7 +1,9 @@
-cmake_minimum_required (VERSION 3.18)
+cmake_minimum_required (VERSION 3.21)
 
-if (NOT TARGET raptor_prepare)
-    add_library ("raptor_prepare" STATIC compute_minimiser.cpp)
-
-    target_link_libraries ("raptor_prepare" PUBLIC "raptor_interface")
+if (TARGET raptor_prepare)
+    return ()
 endif ()
+
+add_library ("raptor_prepare" STATIC compute_minimiser.cpp)
+
+target_link_libraries ("raptor_prepare" PUBLIC "raptor::raptor")
