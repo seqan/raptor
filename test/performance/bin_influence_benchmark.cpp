@@ -16,9 +16,9 @@
 #include <seqan3/test/performance/sequence_generator.hpp>
 
 #include <raptor/adjust_seed.hpp>
-#include <raptor/contrib/std/chunk_view.hpp>
-#include <raptor/contrib/std/zip_view.hpp>
 
+#include <hibf/contrib/std/chunk_view.hpp>
+#include <hibf/contrib/std/zip_view.hpp>
 #include <hibf/interleaved_bloom_filter.hpp>
 
 #define USE_UNIT_TEST_PARAMETERS 1

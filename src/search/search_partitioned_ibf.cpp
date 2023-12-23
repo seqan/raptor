@@ -16,13 +16,14 @@
 
 #include <raptor/adjust_seed.hpp>
 #include <raptor/build/partition_config.hpp>
-#include <raptor/contrib/std/chunk_view.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/search/do_parallel.hpp>
 #include <raptor/search/load_index.hpp>
 #include <raptor/search/search_partitioned_ibf.hpp>
 #include <raptor/search/sync_out.hpp>
 #include <raptor/threshold/threshold.hpp>
+
+#include <hibf/contrib/std/chunk_view.hpp>
 
 namespace raptor
 {

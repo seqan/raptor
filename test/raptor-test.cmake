@@ -12,8 +12,8 @@
 cmake_minimum_required (VERSION 3.10)
 
 # require Raptor package
-find_package (Raptor REQUIRED HINTS ${CMAKE_CURRENT_LIST_DIR}/../build_system)
-include (${CMAKE_CURRENT_LIST_DIR}/../build_system/raptor-config-version.cmake)
+find_package (Raptor REQUIRED HINTS ${CMAKE_CURRENT_LIST_DIR}/../cmake)
+include (${CMAKE_CURRENT_LIST_DIR}/../cmake/raptor-config-version.cmake)
 
 include (CheckCXXSourceCompiles)
 include (FindPackageHandleStandardArgs)
@@ -22,6 +22,9 @@ include (FindPackageMessage)
 option (RAPTOR_TEST_BUILD_OFFLINE "Skip the update step of external projects." OFF)
 
 message (STATUS "${ColourBold}Configuring tests${ColourReset}")
+
+set (CPM_INDENT "  CMake Package Manager CPM: ")
+CPMUsePackageLock ("${CMAKE_CURRENT_LIST_DIR}/../cmake/package-lock.cmake")
 
 # ----------------------------------------------------------------------------
 # Paths to folders.
@@ -37,6 +40,8 @@ list (APPEND CMAKE_MODULE_PATH "${RAPTOR_TEST_CMAKE_MODULE_DIR}")
 # Interface targets for the different test modules in seqan3.
 # ----------------------------------------------------------------------------
 
+enable_testing ()
+
 # raptor::test exposes a base set of required flags, includes, definitions and
 # libraries which are in common for **all** seqan3 tests
 if (NOT TARGET raptor::test)
@@ -50,7 +55,7 @@ if (NOT TARGET raptor::test)
         endif ()
     endif ()
 
-    target_link_libraries (raptor_test INTERFACE "raptor_lib" "pthread" "chopper_lib")
+    target_link_libraries (raptor_test INTERFACE "raptor_lib")
 
     target_include_directories (raptor_test INTERFACE "${CMAKE_CURRENT_LIST_DIR}/include")
 
@@ -61,17 +66,7 @@ endif ()
 # needed for performance test cases in raptor/test/performance
 if (NOT TARGET raptor::test::performance)
     add_library (raptor_test_performance INTERFACE)
-    target_compile_options (raptor_test_performance INTERFACE "-pedantic" "-Wall" "-Wextra" "-Werror")
-
-    # GCC12 and above: Disable warning about std::hardware_destructive_interference_size not being ABI-stable.
-    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 12)
-            target_compile_options (raptor_test_performance INTERFACE "-Wno-interference-size")
-        endif ()
-    endif ()
-
-    target_link_libraries (raptor_test_performance INTERFACE "raptor::test" "benchmark_main" "benchmark")
-
+    target_link_libraries (raptor_test_performance INTERFACE "raptor::test" "benchmark::benchmark_main")
     add_library (raptor::test::performance ALIAS raptor_test_performance)
 endif ()
 
@@ -79,7 +74,16 @@ endif ()
 # needed for unit test cases in raptor/test/unit
 if (NOT TARGET raptor::test::unit)
     add_library (raptor_test_unit INTERFACE)
-    target_link_libraries (raptor_test_unit INTERFACE "raptor::test" "gtest_main" "gtest")
+
+    # GCC12 has some bogus warnings. They will not be fixed in googletest.
+    # https://github.com/google/googletest/issues/4232
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 12 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 13)
+            target_compile_options (raptor_test INTERFACE "-Wno-restrict")
+        endif ()
+    endif ()
+
+    target_link_libraries (raptor_test_unit INTERFACE "raptor::test" "GTest::gtest_main")
     add_library (raptor::test::unit ALIAS raptor_test_unit)
 endif ()
 
@@ -89,8 +93,6 @@ if (NOT TARGET raptor::test::header)
     add_library (raptor_test_header INTERFACE)
     target_link_libraries (raptor_test_header INTERFACE "raptor::test::unit")
     target_link_libraries (raptor_test_header INTERFACE "raptor::test::performance")
-    target_compile_definitions (raptor_test_header INTERFACE -DRAPTOR_DISABLE_DEPRECATED_WARNINGS)
-    target_compile_definitions (raptor_test_header INTERFACE -DRAPTOR_HEADER_TEST)
     add_library (raptor::test::header ALIAS raptor_test_header)
 endif ()
 
@@ -102,8 +104,6 @@ include (app_datasources)
 include (app_internal_datasources)
 include (raptor_add_benchmark)
 include (raptor_add_unit_test)
-include (raptor_require_benchmark)
-include (raptor_require_test)
 include (${CMAKE_CURRENT_LIST_DIR}/data/datasources.cmake)
 
 # ----------------------------------------------------------------------------

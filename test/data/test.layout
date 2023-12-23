@@ -76,6 +76,7 @@
 @            "value0": ""
 @        },
 @        "k": 19,
+@        "window_size" : 19,
 @        "disable_sketch_output": true,
 @        "precomputed_files": false,
 @        "output_filename": {

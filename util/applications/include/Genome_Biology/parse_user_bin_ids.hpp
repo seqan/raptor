@@ -11,7 +11,7 @@
 #include <string>
 #include <string_view>
 
-#include <robin_hood.h>
+#include <hibf/contrib/robin_hood.hpp>
 
 inline robin_hood::unordered_map<std::string, uint64_t>
 parse_user_bin_ids(std::filesystem::path const & user_bin_ids_file)

@@ -34,17 +34,17 @@ jobs:
     - name: Install CMake
       uses: seqan/actions/setup-cmake@main
       with:
-        cmake: 3.18.4
+        cmake: 3.21.7
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@v2
       with:
         languages: cpp
 
     - name: Autobuild
-      uses: github/codeql-action/autobuild@v3
+      uses: github/codeql-action/autobuild@v2
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@v2
       with:
         category: "/language:cpp"

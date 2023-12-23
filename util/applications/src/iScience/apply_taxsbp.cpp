@@ -14,7 +14,7 @@
 #include <seqan3/io/sequence_file/input.hpp>
 #include <seqan3/io/sequence_file/output.hpp>
 
-#include <raptor/contrib/std/chunk_view.hpp>
+#include <hibf/contrib/std/chunk_view.hpp>
 
 struct config
 {

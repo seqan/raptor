@@ -12,12 +12,12 @@ project (raptor_test_header LANGUAGES CXX C)
 include (../raptor-test.cmake)
 include (GoogleTest OPTIONAL)
 
-raptor_require_benchmark ()
-raptor_require_test ()
+CPMGetPackage (benchmark)
+CPMGetPackage (googletest)
 
 find_path (SEQAN3_TEST_CMAKE_MODULE_DIR
            NAMES seqan3_test_files.cmake
-           HINTS "${RAPTOR_SUBMODULES_DIR}/seqan3/test/cmake/"
+           HINTS "${seqan3_SOURCE_DIR}/test/cmake/"
 )
 list (APPEND CMAKE_MODULE_PATH "${SEQAN3_TEST_CMAKE_MODULE_DIR}")
 
@@ -35,7 +35,7 @@ file (GLOB_RECURSE header_files
       "${header_base_path}/*.hpp"
 )
 
-list (FILTER header_files EXCLUDE REGEX "raptor/version.hpp|raptor/contrib/std")
+list (FILTER header_files EXCLUDE REGEX "raptor/version.hpp|hibf/contrib/std")
 
 file (WRITE "${PROJECT_BINARY_DIR}/${target}.cpp" "")
 add_executable (${target} ${PROJECT_BINARY_DIR}/${target}.cpp)

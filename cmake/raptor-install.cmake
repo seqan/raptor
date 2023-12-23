@@ -18,8 +18,7 @@ install (FILES "${RAPTOR_CLONE_DIR}/CHANGELOG.md" #
 )
 
 # install cmake files in /share/cmake
-install (FILES "${RAPTOR_CLONE_DIR}/build_system/raptor-config.cmake"
-               "${RAPTOR_CLONE_DIR}/build_system/raptor-config-version.cmake"
+install (FILES "${RAPTOR_CLONE_DIR}/cmake/raptor-config.cmake" "${RAPTOR_CLONE_DIR}/cmake/raptor-config-version.cmake"
          DESTINATION "${CMAKE_INSTALL_DATADIR}/cmake/raptor"
 )
 

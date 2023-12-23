@@ -11,6 +11,6 @@ project (raptor_test_performance LANGUAGES CXX C)
 
 include (../raptor-test.cmake)
 
-raptor_require_benchmark ()
+CPMGetPackage (benchmark)
 
 raptor_add_benchmark (bin_influence_benchmark.cpp)

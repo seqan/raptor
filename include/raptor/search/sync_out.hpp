@@ -17,7 +17,8 @@
 #include <mutex>
 
 #include <raptor/argument_parsing/search_arguments.hpp>
-#include <raptor/contrib/std/join_with_view.hpp>
+
+#include <hibf/contrib/std/join_with_view.hpp>
 
 namespace raptor
 {

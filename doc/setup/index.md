@@ -55,4 +55,4 @@ raptor --version
 ```
 
 By default, Raptor will be built with host specific optimizations (`-march=native`). This behavior can be disabled by
-passing `-DRAPTOR_NATIVE_BUILD=OFF` to CMake.
+passing `-DHIBF_NATIVE_BUILD=OFF` to CMake.

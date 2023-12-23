@@ -57,7 +57,7 @@ jobs:
       - name: Install CMake
         uses: seqan/actions/setup-cmake@main
         with:
-          cmake: 3.18.4
+          cmake: 3.21.7
 
       - name: Install Nextflow
         if: matrix.name == 'Nextflow'
@@ -77,7 +77,7 @@ jobs:
           cd build
           cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                           -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size" \
-                          -DRAPTOR_NATIVE_BUILD=OFF
+                          -DHIBF_NATIVE_BUILD=OFF
 
       - name: Build Raptor
         run: |
@@ -98,6 +98,6 @@ jobs:
         run: |
           raptor build --export-help cwl > raptor.cwl
           cwltool --validate raptor.cwl
-          cwltool raptor.cwl raptor/workflow/cwl/tests/raptor-build-0_bins_window_19.yml | grep 87bb8bcd1c9ffc2f7ed6e6d1ecc3ca799a8620ff
-          cwltool raptor.cwl raptor/workflow/cwl/tests/raptor-build-16_bins_window_19.yml | grep bae996beebec30b48d3bc6f42ef8af7e143effad
+          cwltool raptor.cwl raptor/workflow/cwl/tests/raptor-build-0_bins_window_19.yml
+          cwltool raptor.cwl raptor/workflow/cwl/tests/raptor-build-16_bins_window_19.yml
 
