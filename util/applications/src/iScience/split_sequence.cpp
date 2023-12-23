@@ -13,7 +13,7 @@
 #include <seqan3/io/sequence_file/input.hpp>
 #include <seqan3/io/sequence_file/output.hpp>
 
-#include <raptor/contrib/std/chunk_view.hpp>
+#include <hibf/contrib/std/chunk_view.hpp>
 
 static inline std::vector<std::string> sequence_extensions{
     seqan3::detail::valid_file_extensions<typename seqan3::sequence_file_input<>::valid_formats>()};

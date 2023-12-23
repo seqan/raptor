@@ -51,7 +51,7 @@ jobs:
       - name: Install CMake
         uses: seqan/actions/setup-cmake@main
         with:
-          cmake: 3.18.4
+          cmake: 3.21.7
 
       - name: Configure tests
         run: |
@@ -59,7 +59,7 @@ jobs:
           cd build
           cmake ../raptor/test/unit -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                     -DCMAKE_CXX_FLAGS="-std=c++23 -fexceptions -g -grecord-gcc-switches -pipe -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -mtune=native -fasynchronous-unwind-tables -fstack-clash-protection -Wno-interference-size ${{ matrix.cxx_flags }}"
-          make -j2 gtest_build
+          make -j2 gtest_main
 
       - name: Build tests
         run: |

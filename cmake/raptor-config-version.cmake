@@ -13,7 +13,7 @@
 
 # Note that raptor-config.cmake can be standalone and thus RAPTOR_CLONE_DIR might be empty.
 find_path (RAPTOR_CLONE_DIR
-           NAMES build_system/raptor-config.cmake
+           NAMES cmake/raptor-config.cmake
            HINTS "${CMAKE_CURRENT_LIST_DIR}/.."
 )
 find_path (RAPTOR_INCLUDE_DIR

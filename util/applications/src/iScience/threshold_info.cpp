@@ -9,8 +9,6 @@
 #include <mutex>
 #include <vector>
 
-#include <robin_hood.h>
-
 #include <sharg/all.hpp>
 
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
@@ -20,11 +18,13 @@
 #include <raptor/adjust_seed.hpp>
 #include <raptor/argument_parsing/search_arguments.hpp>
 #include <raptor/argument_parsing/validators.hpp>
-#include <raptor/contrib/std/chunk_view.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/search/do_parallel.hpp>
 #include <raptor/threshold/precompute_correction.hpp>
 #include <raptor/threshold/precompute_threshold.hpp>
+
+#include <hibf/contrib/robin_hood.hpp>
+#include <hibf/contrib/std/chunk_view.hpp>
 
 void threshold_info(raptor::search_arguments const & arguments, std::string const & shape_string)
 {

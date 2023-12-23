@@ -15,9 +15,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include <robin_hood.h>
-
 #include <sharg/parser.hpp>
+
+#include <hibf/contrib/robin_hood.hpp>
 
 // #include <seqan3/std/algorithm>
 

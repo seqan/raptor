@@ -7,7 +7,7 @@
 
 cmake_minimum_required (VERSION 3.18)
 
-find_path (RAPTOR_MODULE_PATH "raptor-config.cmake" HINTS "${CMAKE_CURRENT_LIST_DIR}/build_system/")
+find_path (RAPTOR_MODULE_PATH "raptor-config.cmake" HINTS "${CMAKE_CURRENT_LIST_DIR}/cmake/")
 list (APPEND CMAKE_MODULE_PATH "${RAPTOR_MODULE_PATH}")
 
 include (raptor-config-version)

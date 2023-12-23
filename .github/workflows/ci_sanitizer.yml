@@ -71,7 +71,7 @@ jobs:
       - name: Install CMake
         uses: seqan/actions/setup-cmake@main
         with:
-          cmake: 3.18.4
+          cmake: 3.21.7
 
       - name: Configure tests
         run: |
@@ -79,7 +79,7 @@ jobs:
           cd build
           cmake ../raptor/test/unit -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                     -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
-          make -j2 gtest_build
+          make -j2 gtest_main
 
       - name: Build tests
         run: |

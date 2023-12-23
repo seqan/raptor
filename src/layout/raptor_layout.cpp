@@ -36,7 +36,7 @@ void chopper_layout(sharg::parser & parser)
     if (std::filesystem::is_empty(config.data_file))
         throw sharg::parser_error{"The input file is empty."};
 
-    std::vector<std::string> filenames{};
+    std::vector<std::vector<std::string>> filenames{};
     chopper::sketch::read_data_file(config, filenames);
 
     chopper::sketch::check_filenames(filenames, config);

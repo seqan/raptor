@@ -8,17 +8,17 @@
 cmake_minimum_required (VERSION 3.18)
 
 find_path (RAPTOR_CLONE_DIR
-           NAMES build_system/raptor-config.cmake
+           NAMES cmake/raptor-config.cmake
            HINTS "${CMAKE_CURRENT_LIST_DIR}/../.."
 )
 
-list (APPEND CMAKE_MODULE_PATH "${RAPTOR_CLONE_DIR}/build_system")
+list (APPEND CMAKE_MODULE_PATH "${RAPTOR_CLONE_DIR}/cmake")
 
 include (raptor-config-version)
 
 project (raptor_utility_common LANGUAGES CXX)
 
-find_package (Raptor REQUIRED HINTS ${RAPTOR_CLONE_DIR}/build_system)
+find_package (Raptor REQUIRED HINTS ${RAPTOR_CLONE_DIR}/cmake)
 
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")

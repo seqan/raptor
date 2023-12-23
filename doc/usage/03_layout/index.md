@@ -13,12 +13,6 @@ A layout is only needed if you want to build an HIBF (\ref hibf_vs_ibf).
 
 \include{doc} fragments/input_files_sequence.md
 
-\note
-Currently, `raptor build` accepts multiple paths per line in its input file. However, `raptor layout` does not.
-A possible workaround is to concatenate your sequence files. To avoid changing your files, you can also use
-`raptor prepare` to preprocess the files. `raptor prepare` accepts multiple paths per line, but only produces
-one output file per bin, which can then be used with `raptor layout`.
-
 ### List of preprocessed files
 \include{doc} fragments/input_files_preprocessed.md
 

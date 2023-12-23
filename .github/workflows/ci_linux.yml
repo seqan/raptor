@@ -69,14 +69,10 @@ jobs:
           compiler: ${{ matrix.compiler }}
           ccache_size: 150M
 
-      - name: Install OpenMP
-        if: contains(matrix.name, 'clang')
-        run: install libomp-17-dev
-
       - name: Install CMake
         uses: seqan/actions/setup-cmake@main
         with:
-          cmake: 3.18.4
+          cmake: 3.21.7
 
       - name: Configure tests
         run: |
@@ -84,8 +80,8 @@ jobs:
           cd build
           cmake ../raptor/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                                    -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
-                                                   -DRAPTOR_NATIVE_BUILD=OFF
-          make -j2 gtest_build
+                                                   -DHIBF_NATIVE_BUILD=OFF
+          make -j2 gtest_main
 
       - name: Build tests
         run: |

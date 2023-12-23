@@ -10,19 +10,19 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <robin_hood.h>
-
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
 #include <seqan3/io/sequence_file/input.hpp>
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <raptor/adjust_seed.hpp>
-#include <raptor/contrib/std/chunk_view.hpp>
-#include <raptor/contrib/std/zip_view.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/file_reader.hpp>
 #include <raptor/prepare/compute_minimiser.hpp>
 #include <raptor/prepare/cutoff.hpp>
+
+#include <hibf/contrib/robin_hood.hpp>
+#include <hibf/contrib/std/chunk_view.hpp>
+#include <hibf/contrib/std/zip_view.hpp>
 
 namespace raptor
 {

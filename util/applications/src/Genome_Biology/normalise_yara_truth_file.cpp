@@ -12,9 +12,9 @@
 #include <string>
 #include <vector>
 
-#include <robin_hood.h>
-
 #include <sharg/parser.hpp>
+
+#include <hibf/contrib/robin_hood.hpp>
 
 inline void check_output_file(std::filesystem::path const & output_file)
 {

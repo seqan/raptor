@@ -14,8 +14,8 @@
 
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
 
-#include <raptor/contrib/std/chunk_view.hpp>
-#include <raptor/contrib/std/zip_view.hpp>
+#include <hibf/contrib/std/chunk_view.hpp>
+#include <hibf/contrib/std/zip_view.hpp>
 
 namespace raptor
 {
