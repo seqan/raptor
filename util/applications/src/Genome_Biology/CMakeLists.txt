@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.18)
+cmake_minimum_required (VERSION 3.21)
 
 if (NOT TARGET fasta_to_fastq)
     add_executable ("fasta_to_fastq" fasta_to_fastq.cpp)

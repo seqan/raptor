@@ -5,31 +5,34 @@
 # shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 # --------------------------------------------------------------------------------------------------
 
-cmake_minimum_required (VERSION 3.18)
+cmake_minimum_required (VERSION 3.21)
 
-find_path (RAPTOR_MODULE_PATH "raptor-config.cmake" HINTS "${CMAKE_CURRENT_LIST_DIR}/cmake/")
+find_path (RAPTOR_MODULE_PATH "configuration.cmake" HINTS "${CMAKE_CURRENT_LIST_DIR}/cmake/")
 list (APPEND CMAKE_MODULE_PATH "${RAPTOR_MODULE_PATH}")
 
-include (raptor-config-version)
+include (version)
 
-project (raptor
-         LANGUAGES CXX C
+project (Raptor
+         LANGUAGES CXX
          VERSION "${RAPTOR_PROJECT_VERSION}"
          DESCRIPTION "Raptor -- A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences"
          HOMEPAGE_URL "https://github.com/seqan/raptor"
 )
 
-find_package (Raptor REQUIRED HINTS ${RAPTOR_MODULE_PATH})
-
-option (BUILD_RAPTOR "Enable building of Raptor." ON)
-
-if (BUILD_RAPTOR)
-    add_subdirectory (src)
+if (NOT CMAKE_BUILD_TYPE)
+    set (CMAKE_BUILD_TYPE
+         Release
+         CACHE STRING "Choose the type of build, options are: Debug Coverage Release RelWithDebInfo MinSizeRel." FORCE
+    )
 endif ()
 
-option (INSTALL_RAPTOR_HEADERS "Enable installation of Raptor headers." OFF)
+include (configuration)
 
-if (INSTALL_RAPTOR_HEADERS)
-    include (raptor-install)
-    include (raptor-package)
+add_subdirectory (src)
+
+option (INSTALL_RAPTOR "Enable installation of Raptor." ON)
+
+if (INSTALL_RAPTOR)
+    include (GNUInstallDirs)
+    install (TARGETS raptor RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
 endif ()

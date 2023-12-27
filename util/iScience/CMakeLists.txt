@@ -5,24 +5,14 @@
 # shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 # --------------------------------------------------------------------------------------------------
 
-cmake_minimum_required (VERSION 3.18)
-
-find_path (RAPTOR_CLONE_DIR
-           NAMES cmake/raptor-config.cmake
-           HINTS "${CMAKE_CURRENT_LIST_DIR}/../.."
-)
-
-list (APPEND CMAKE_MODULE_PATH "${RAPTOR_CLONE_DIR}/cmake")
-
-include (raptor-config-version)
-
-project (raptor_utility_common LANGUAGES CXX)
-
-find_package (Raptor REQUIRED HINTS ${RAPTOR_CLONE_DIR}/cmake)
+cmake_minimum_required (VERSION 3.21)
 
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+get_filename_component (RAPTOR_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
+add_subdirectory ("${RAPTOR_ROOT_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/raptor")
 
 # Define cmake configuration flags to configure and build external projects with the same flags as specified for
 # this project.
@@ -58,4 +48,4 @@ else ()
     message ("-- DREAM-Yara will not be built. Enable via 'cmake -DRAPTOR_UTILITY_BUILD_DREAM_YARA=1 .'")
 endif ()
 
-add_subdirectory ("${RAPTOR_CLONE_DIR}/util/applications/src" "${CMAKE_CURRENT_BINARY_DIR}/applications")
+add_subdirectory ("${RAPTOR_ROOT_DIR}/util/applications/src" "${CMAKE_CURRENT_BINARY_DIR}/applications")

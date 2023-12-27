@@ -5,7 +5,7 @@
 # shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 # --------------------------------------------------------------------------------------------------
 
-cmake_minimum_required (VERSION 3.18)
+cmake_minimum_required (VERSION 3.21)
 
 raptor_add_unit_test (build_hibf_chopper_test.cpp)
 raptor_add_unit_test (build_hibf_test.cpp)

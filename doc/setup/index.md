@@ -13,7 +13,7 @@ conda install -c bioconda -c conda-forge raptor
 ## Compile from source
 
 ### Prerequisites
-* CMake >= 3.18
+* CMake >= 3.21
 * GCC 11, 12 or 13 (most recent minor version)
 * git
 

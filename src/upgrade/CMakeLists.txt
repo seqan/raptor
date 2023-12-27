@@ -1,6 +1,8 @@
-cmake_minimum_required (VERSION 3.18)
+cmake_minimum_required (VERSION 3.21)
 
-if (NOT TARGET raptor_upgrade)
-    add_library ("raptor_upgrade" STATIC raptor_upgrade.cpp)
-    target_link_libraries ("raptor_upgrade" PUBLIC "raptor_interface")
+if (TARGET raptor_upgrade)
+    return ()
 endif ()
+
+add_library ("raptor_upgrade" STATIC raptor_upgrade.cpp)
+target_link_libraries ("raptor_upgrade" PUBLIC "raptor::raptor")

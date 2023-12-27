@@ -42,7 +42,14 @@ void build_ibf(build_arguments const & arguments)
                 {.fpr = arguments.fpr, .hash_count = arguments.hash, .elements = kmers_per_partition[part]});
             auto index = factory(part);
             std::filesystem::path out_path{arguments.out_path};
+#if HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wrestrict"
+#endif // HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
             out_path += "_" + std::to_string(part);
+#if HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
+#    pragma GCC diagnostic pop
+#endif // HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
             arguments.store_index_timer.start();
             store_index(out_path, std::move(index));
             arguments.store_index_timer.stop();

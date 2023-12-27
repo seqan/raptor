@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.18)
+cmake_minimum_required (VERSION 3.21)
 
 if (NOT TARGET generate_reads)
     add_executable ("generate_reads" generate_reads.cpp)
@@ -11,18 +11,18 @@ if (NOT TARGET split_sequence)
 endif ()
 
 if (NOT TARGET count_minimiser)
-    add_executable ("count_minimiser" ${RAPTOR_CLONE_DIR}/src/argument_parsing/parse_bin_path.cpp count_minimiser.cpp)
+    add_executable ("count_minimiser" ${RAPTOR_ROOT_DIR}/src/argument_parsing/parse_bin_path.cpp count_minimiser.cpp)
     target_link_libraries ("count_minimiser" "utility_common")
 endif ()
 
 if (NOT TARGET threshold_info)
     add_executable ("threshold_info"
-                    ${RAPTOR_CLONE_DIR}/src/threshold/multiple_error_model.cpp
-                    ${RAPTOR_CLONE_DIR}/src/threshold/one_error_model.cpp
-                    ${RAPTOR_CLONE_DIR}/src/threshold/one_indirect_error_model.cpp
-                    ${RAPTOR_CLONE_DIR}/src/threshold/pascal_row.cpp
-                    ${RAPTOR_CLONE_DIR}/src/threshold/precompute_correction.cpp
-                    ${RAPTOR_CLONE_DIR}/src/threshold/precompute_threshold.cpp
+                    ${RAPTOR_ROOT_DIR}/src/threshold/multiple_error_model.cpp
+                    ${RAPTOR_ROOT_DIR}/src/threshold/one_error_model.cpp
+                    ${RAPTOR_ROOT_DIR}/src/threshold/one_indirect_error_model.cpp
+                    ${RAPTOR_ROOT_DIR}/src/threshold/pascal_row.cpp
+                    ${RAPTOR_ROOT_DIR}/src/threshold/precompute_correction.cpp
+                    ${RAPTOR_ROOT_DIR}/src/threshold/precompute_threshold.cpp
                     threshold_info.cpp
     )
     target_link_libraries ("threshold_info" "utility_common")

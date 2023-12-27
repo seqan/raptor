@@ -158,7 +158,7 @@ inline std::unordered_map<uint64_t, std::vector<std::string>> parse_sbp_binning(
     {
         std::string line;
         std::string refseq_accession;
-        uint64_t bin_index;
+        uint64_t bin_index{};
 
         while (std::getline(file, line))
         {
