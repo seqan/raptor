@@ -31,6 +31,12 @@ void chopper_layout(sharg::parser & parser)
     parser.info.email = "svenja.mehringer@fu-berlin.de";
 
     parser.parse();
+
+    if (!parser.is_option_set("window"))
+        config.window_size = config.k;
+    else if (config.k > config.window_size)
+        throw sharg::parser_error{"The k-mer size cannot be bigger than the window size."};
+
     config.disable_sketch_output = !parser.is_option_set("output-sketches-to");
 
     if (std::filesystem::is_empty(config.data_file))
@@ -41,7 +47,10 @@ void chopper_layout(sharg::parser & parser)
 
     chopper::sketch::check_filenames(filenames, config);
 
-    config.hibf_config.input_fn = chopper::input_functor{filenames, config.precomputed_files, config.k};
+    config.hibf_config.input_fn = chopper::input_functor{.filenames = filenames,
+                                                         .input_are_precomputed_files = config.precomputed_files,
+                                                         .kmer_size = config.k,
+                                                         .window_size = config.window_size};
     config.hibf_config.number_of_user_bins = filenames.size();
 
     chopper::layout::execute(config, filenames);
