@@ -15,10 +15,8 @@ include (FindPackageMessage)
 # * https://ccache.dev/
 # * https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_LAUNCHER.html
 macro (raptor_require_ccache)
-    set (RAPTOR_USE_CCACHE
-         ON
-         CACHE BOOL "Use ccache if available."
-    )
+    option (RAPTOR_USE_CCACHE "Use ccache if available." ON)
+    option (RAPTOR_USE_CCACHE_IN_PARENT_PROJECT "Use ccache in parent project if available." OFF)
     set (RAPTOR_FPROFILE_ABS_PATH "-fprofile-abs-path")
     if (RAPTOR_USE_CCACHE)
         find_program (CCACHE_PROGRAM ccache)
@@ -42,7 +40,33 @@ macro (raptor_require_ccache)
             list (PREPEND CMAKE_C_LINKER_LAUNCHER "${CCACHE_PROGRAM}")
             list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_CXX_LINKER_LAUNCHER=${CMAKE_CXX_LINKER_LAUNCHER}")
             list (APPEND SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_C_LINKER_LAUNCHER=${CMAKE_C_LINKER_LAUNCHER}")
+        endif ()
 
+        if (RAPTOR_USE_CCACHE_IN_PARENT_PROJECT)
+            set (RAPTOR_FPROFILE_ABS_PATH
+                 ${RAPTOR_FPROFILE_ABS_PATH}
+                 PARENT_SCOPE
+            )
+            set (SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS
+                 ${SEQAN3_EXTERNAL_PROJECT_CMAKE_ARGS}
+                 PARENT_SCOPE
+            )
+            set (CMAKE_CXX_COMPILER_LAUNCHER
+                 ${CMAKE_CXX_COMPILER_LAUNCHER}
+                 PARENT_SCOPE
+            )
+            set (CMAKE_C_COMPILER_LAUNCHER
+                 ${CMAKE_C_COMPILER_LAUNCHER}
+                 PARENT_SCOPE
+            )
+            set (CMAKE_CXX_LINKER_LAUNCHER
+                 ${CMAKE_CXX_LINKER_LAUNCHER}
+                 PARENT_SCOPE
+            )
+            set (CMAKE_C_LINKER_LAUNCHER
+                 ${CMAKE_C_LINKER_LAUNCHER}
+                 PARENT_SCOPE
+            )
         endif ()
         unset (CCACHE_PROGRAM)
     endif ()
