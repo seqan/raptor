@@ -7,12 +7,12 @@
 
 #include <raptor/test/cli_test.hpp>
 
-struct search_partitioned_hibf : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, size_t>>
+struct search_partitioned_hibf : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, size_t, size_t>>
 {};
 
 TEST_P(search_partitioned_hibf, with_threshold)
 {
-    auto const [number_of_repeated_bins, parts, number_of_errors] = GetParam();
+    auto const [number_of_repeated_bins, parts, number_of_errors, approach_idx] = GetParam();
 
     std::filesystem::path const input_filename = "raptor_cli_test.txt";
     std::filesystem::path const layout_filename = "raptor_cli_test.layout";
@@ -31,6 +31,8 @@ TEST_P(search_partitioned_hibf, with_threshold)
     { // build layout
         cli_test_result const result = execute_app("raptor",
                                                    "layout",
+                                                   "--partitioning-approach",
+                                                   approach_idx,
                                                    "--kmer 19",
                                                    "--threads 1",
                                                    "--input",
@@ -87,7 +89,7 @@ TEST_P(search_partitioned_hibf, with_threshold)
 
 TEST_P(search_partitioned_hibf, no_hits)
 {
-    auto const [number_of_repeated_bins, parts, number_of_errors] = GetParam();
+    auto const [number_of_repeated_bins, parts, number_of_errors, approach_idx] = GetParam();
 
     std::filesystem::path const input_filename = "raptor_cli_test.txt";
     std::filesystem::path const layout_filename = "raptor_cli_test.layout";
@@ -106,6 +108,8 @@ TEST_P(search_partitioned_hibf, no_hits)
     { // build layout
         cli_test_result const result = execute_app("raptor",
                                                    "layout",
+                                                   "--partitioning-approach",
+                                                   approach_idx,
                                                    "--kmer 19",
                                                    "--threads 1",
                                                    "--input",
@@ -161,11 +165,12 @@ TEST_P(search_partitioned_hibf, no_hits)
 
 INSTANTIATE_TEST_SUITE_P(search_partitioned_hibf_suite,
                          search_partitioned_hibf,
-                         testing::Combine(testing::Values(16, 32), testing::Values(2, 4, 8), testing::Values(0, 1)),
+                         testing::Combine(testing::Values(16, 32), testing::Values(2, 4, 8), testing::Values(0, 1), testing::Values(0, 1, 2, 3, 4)),
                          [](testing::TestParamInfo<search_partitioned_hibf::ParamType> const & info)
                          {
                              std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_"
                                               + std::to_string(std::get<1>(info.param)) + "_parts"
-                                              + std::to_string(std::get<2>(info.param)) + "_error";
+                                              + std::to_string(std::get<2>(info.param)) + "_error"
+                                              + std::to_string(std::get<3>(info.param)) + "_approach";
                              return name;
                          });
