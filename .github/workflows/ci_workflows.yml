@@ -61,7 +61,7 @@ jobs:
 
       - name: Install Nextflow
         if: matrix.name == 'Nextflow'
-        uses: nf-core/setup-nextflow@v1
+        uses: nf-core/setup-nextflow@v2
         with:
           version: latest-stable
 
