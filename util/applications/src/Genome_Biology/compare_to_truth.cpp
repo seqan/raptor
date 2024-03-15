@@ -19,8 +19,6 @@
 
 #include <hibf/contrib/robin_hood.hpp>
 
-// #include <seqan3/std/algorithm>
-
 struct parser_options
 {
     std::filesystem::path result_file{};

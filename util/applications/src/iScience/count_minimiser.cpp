@@ -13,14 +13,14 @@
 
 #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
 
-#include <raptor/argument_parsing/parse_bin_path.hpp>
-#include <raptor/argument_parsing/validators.hpp>
-#include <raptor/file_reader.hpp>
-
 #include <hibf/contrib/robin_hood.hpp>
 #include <hibf/contrib/std/chunk_view.hpp>
 #include <hibf/contrib/std/join_with_view.hpp>
 #include <hibf/contrib/std/zip_view.hpp>
+
+#include <raptor/argument_parsing/parse_bin_path.hpp>
+#include <raptor/argument_parsing/validators.hpp>
+#include <raptor/file_reader.hpp>
 
 struct config
 {

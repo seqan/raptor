@@ -17,10 +17,10 @@
 
 #include <seqan3/search/kmer_index/shape.hpp>
 
+#include <hibf/misc/timer.hpp>
+
 #include <raptor/argument_parsing/memory_usage.hpp>
 #include <raptor/strong_types.hpp>
-
-#include <hibf/misc/timer.hpp>
 
 namespace raptor
 {

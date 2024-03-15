@@ -17,11 +17,11 @@
 
 #include <seqan3/search/kmer_index/shape.hpp>
 
+#include <hibf/misc/timer.hpp>
+
 #include <raptor/argument_parsing/formatted_index_size.hpp>
 #include <raptor/argument_parsing/memory_usage.hpp>
 #include <raptor/threshold/threshold_parameters.hpp>
-
-#include <hibf/misc/timer.hpp>
 
 namespace raptor
 {

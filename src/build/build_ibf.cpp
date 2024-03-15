@@ -10,12 +10,12 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
+#include <hibf/build/bin_size_in_bits.hpp>
+
 #include <raptor/build/index_factory.hpp>
 #include <raptor/build/max_count_per_partition.hpp>
 #include <raptor/build/partition_config.hpp>
 #include <raptor/build/store_index.hpp>
-
-#include <hibf/build/bin_size_in_bits.hpp>
 
 namespace raptor
 {

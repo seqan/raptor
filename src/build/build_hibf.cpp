@@ -10,11 +10,11 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp>
+
 #include <raptor/build/build_hibf.hpp>
 #include <raptor/build/store_index.hpp>
 #include <raptor/file_reader.hpp>
-
-#include <hibf/hierarchical_interleaved_bloom_filter.hpp>
 
 namespace raptor
 {

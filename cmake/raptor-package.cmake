@@ -7,7 +7,7 @@
 
 # This file describes how Sharg will be packaged.
 
-cmake_minimum_required (VERSION 3.21)
+cmake_minimum_required (VERSION 3.25)
 
 set (CPACK_GENERATOR "TXZ")
 
