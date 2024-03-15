@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
-cmake_minimum_required (VERSION 3.21)
+cmake_minimum_required (VERSION 3.25)
 
 # ----------------------------------------------------------------------------
 # Short-circuit if Raptor is already configured
@@ -31,17 +31,10 @@ macro (raptor_config_error text)
 endmacro ()
 
 # ----------------------------------------------------------------------------
-# ccache
-# ----------------------------------------------------------------------------
-
-include (ccache)
-raptor_require_ccache ()
-
-# ----------------------------------------------------------------------------
 # CPM
 # ----------------------------------------------------------------------------
 
-set (CPM_INDENT "  CMake Package Manager CPM: ")
+set (CPM_INDENT "CMake Package Manager CPM: ")
 include (CPM)
 CPMUsePackageLock (${Raptor_SOURCE_DIR}/cmake/package-lock.cmake)
 
@@ -49,12 +42,11 @@ CPMUsePackageLock (${Raptor_SOURCE_DIR}/cmake/package-lock.cmake)
 # Find or add dependencies
 # ----------------------------------------------------------------------------
 
-include (CPMGetSystemPackage)
-
-CPMGetSystemPackage (hibf)
-CPMGetSystemPackage (sharg)
-CPMGetSystemPackage (seqan3)
-CPMGetSystemPackage (chopper)
+CPMGetPackage (use_ccache)
+CPMGetPackage (hibf)
+CPMGetPackage (sharg)
+CPMGetPackage (seqan3)
+CPMGetPackage (chopper)
 
 # ----------------------------------------------------------------------------
 # Find Raptor include path

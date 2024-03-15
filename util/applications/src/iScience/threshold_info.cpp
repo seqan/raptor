@@ -15,6 +15,9 @@
 #include <seqan3/io/views/async_input_buffer.hpp>
 #include <seqan3/search/views/minimiser_hash.hpp>
 
+#include <hibf/contrib/robin_hood.hpp>
+#include <hibf/contrib/std/chunk_view.hpp>
+
 #include <raptor/adjust_seed.hpp>
 #include <raptor/argument_parsing/search_arguments.hpp>
 #include <raptor/argument_parsing/validators.hpp>
@@ -22,9 +25,6 @@
 #include <raptor/search/do_parallel.hpp>
 #include <raptor/threshold/precompute_correction.hpp>
 #include <raptor/threshold/precompute_threshold.hpp>
-
-#include <hibf/contrib/robin_hood.hpp>
-#include <hibf/contrib/std/chunk_view.hpp>
 
 void threshold_info(raptor::search_arguments const & arguments, std::string const & shape_string)
 {

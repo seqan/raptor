@@ -5,7 +5,7 @@
 # shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 # --------------------------------------------------------------------------------------------------
 
-cmake_minimum_required (VERSION 3.21)
+cmake_minimum_required (VERSION 3.25)
 
 # Define the application name.
 project (minimizer_thresholds LANGUAGES CXX C)
@@ -27,8 +27,8 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 include (${CMAKE_CURRENT_LIST_DIR}/../../../cmake/CPM.cmake)
 CPMUsePackageLock (${CMAKE_CURRENT_LIST_DIR}/../../../cmake/package-lock.cmake)
 
-CPMGetSystemPackage (sharg)
-CPMGetSystemPackage (seqan3)
+CPMGetPackage (sharg)
+CPMGetPackage (seqan3)
 
 add_library (common_thresholding INTERFACE)
 target_link_libraries ("common_thresholding" INTERFACE seqan3::seqan3 sharg::sharg)

@@ -12,13 +12,13 @@
 
 #include <seqan3/search/views/minimiser_hash.hpp>
 
+#include <hibf/build/bin_size_in_bits.hpp>
+
 #include <raptor/adjust_seed.hpp>
 #include <raptor/argument_parsing/compute_bin_size.hpp>
 #include <raptor/call_parallel_on_bins.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/file_reader.hpp>
-
-#include <hibf/build/bin_size_in_bits.hpp>
 
 namespace raptor
 {

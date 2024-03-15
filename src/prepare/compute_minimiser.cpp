@@ -14,15 +14,15 @@
 #include <seqan3/io/sequence_file/input.hpp>
 #include <seqan3/search/views/minimiser_hash.hpp>
 
+#include <hibf/contrib/robin_hood.hpp>
+#include <hibf/contrib/std/chunk_view.hpp>
+#include <hibf/contrib/std/zip_view.hpp>
+
 #include <raptor/adjust_seed.hpp>
 #include <raptor/dna4_traits.hpp>
 #include <raptor/file_reader.hpp>
 #include <raptor/prepare/compute_minimiser.hpp>
 #include <raptor/prepare/cutoff.hpp>
-
-#include <hibf/contrib/robin_hood.hpp>
-#include <hibf/contrib/std/chunk_view.hpp>
-#include <hibf/contrib/std/zip_view.hpp>
 
 namespace raptor
 {

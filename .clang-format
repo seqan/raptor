@@ -81,21 +81,21 @@ ForEachMacros:
 IfMacros:
 IncludeBlocks:   Regroup
 IncludeCategories:
-  - Regex:           '(<gtest/.*|<benchmark/.*)'
+  - Regex:           '<gtest/'
     Priority:        1
-  - Regex:           '<robin_hood'
-    Priority:        6
-  - Regex:           '(<[[:alnum:]._]+>|<seqan3/std/.*>)'
-    Priority:        3
-  - Regex:           '<lemon/'
+  - Regex:           '<benchmark/'
     Priority:        2
+  - Regex:           '<[[:alnum:]._]+>'
+    Priority:        3
   - Regex:           '<cereal/'
     Priority:        4
-  - Regex:           '<sdsl/'
+  - Regex:           '<yaml-cpp/'
     Priority:        5
   - Regex:           '<sharg/'
-    Priority:        7
+    Priority:        6
   - Regex:           '<seqan3/'
+    Priority:        7
+  - Regex:           '<hibf/'
     Priority:        8
   - Regex:           '<chopper/'
     Priority:        9

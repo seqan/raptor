@@ -14,6 +14,8 @@
 
 #include <seqan3/search/views/minimiser_hash.hpp>
 
+#include <hibf/contrib/std/chunk_view.hpp>
+
 #include <raptor/adjust_seed.hpp>
 #include <raptor/build/partition_config.hpp>
 #include <raptor/dna4_traits.hpp>
@@ -22,8 +24,6 @@
 #include <raptor/search/search_partitioned_ibf.hpp>
 #include <raptor/search/sync_out.hpp>
 #include <raptor/threshold/threshold.hpp>
-
-#include <hibf/contrib/std/chunk_view.hpp>
 
 namespace raptor
 {

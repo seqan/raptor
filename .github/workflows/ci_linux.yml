@@ -55,6 +55,12 @@ jobs:
             build_type: Release
             cxx_flags: "-std=c++23 -Wno-interference-size"
 
+          - name: "IntelLLVM"
+            compiler: "intel"
+            build: unit
+            build_type: Release
+            cxx_flags: "-fp-model=strict -Wno-overriding-t-option" # Ignore that googletest sets -fp-model=precise
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -72,7 +78,7 @@ jobs:
       - name: Install CMake
         uses: seqan/actions/setup-cmake@main
         with:
-          cmake: 3.21.7
+          cmake: 3.25.3
 
       - name: Configure tests
         run: |

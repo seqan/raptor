@@ -13,9 +13,6 @@ parse:
     cpmgetpackage:
       pargs: 1
       spelling: CPMGetPackage
-    cpmgetsystempackage:
-      pargs: 1
-      spelling: CPMGetSystemPackage
     cpmaddpackage:
       pargs:
         nargs: '*'

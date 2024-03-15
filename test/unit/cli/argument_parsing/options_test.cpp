@@ -84,9 +84,8 @@ TEST_F(argparse_search, no_options)
 TEST_F(argparse_main, no_subparser)
 {
     cli_test_result const result = execute_app("raptor", "foo");
-    std::string const expected{
-        "[Error] You misspelled the subcommand! Please specify which sub-program you want to use: one "
-        "of [build, layout, prepare, search, upgrade]. Use -h/--help for more information.\n"};
+    std::string const expected{"[Error] You specified an unknown subcommand! Available subcommands are: "
+                               "[build, layout, prepare, search, upgrade]. Use -h/--help for more information.\n"};
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, expected);
     RAPTOR_ASSERT_FAIL_EXIT(result);
@@ -96,8 +95,8 @@ TEST_F(argparse_main, unknown_option)
 {
     cli_test_result const result = execute_app("raptor", "-v");
     std::string const expected{
-        "[Error] You misspelled the subcommand! Please specify which sub-program you want to use: one "
-        "of [build, layout, prepare, search, upgrade]. Use -h/--help for more information.\n"};
+        "[Error] Unknown option -v. In case this is meant to be a non-option/argument/parameter, "
+        "please specify the start of non-options with '--'. See -h/--help for program information.\n"};
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, expected);
     RAPTOR_ASSERT_FAIL_EXIT(result);

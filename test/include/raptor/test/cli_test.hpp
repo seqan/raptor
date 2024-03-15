@@ -15,9 +15,9 @@
 #include <seqan3/test/expect_range_eq.hpp>
 #include <seqan3/utility/views/repeat_n.hpp>
 
-#include <raptor/index.hpp>
-
 #include <hibf/contrib/std/zip_view.hpp>
+
+#include <raptor/index.hpp>
 
 #ifndef RAPTOR_ASSERT_ZERO_EXIT
 #    define RAPTOR_ASSERT_ZERO_EXIT(arg) ASSERT_EQ(arg.exit_code, 0) << "Command: " << arg.command

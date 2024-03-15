@@ -15,11 +15,11 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 #include <seqan3/test/performance/sequence_generator.hpp>
 
-#include <raptor/adjust_seed.hpp>
-
 #include <hibf/contrib/std/chunk_view.hpp>
 #include <hibf/contrib/std/zip_view.hpp>
 #include <hibf/interleaved_bloom_filter.hpp>
+
+#include <raptor/adjust_seed.hpp>
 
 #define USE_UNIT_TEST_PARAMETERS 1
 

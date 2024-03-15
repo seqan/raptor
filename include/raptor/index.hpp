@@ -16,10 +16,10 @@
 
 #include <sharg/exceptions.hpp>
 
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp>
+
 #include <raptor/argument_parsing/build_arguments.hpp>
 #include <raptor/strong_types.hpp>
-
-#include <hibf/hierarchical_interleaved_bloom_filter.hpp>
 
 namespace raptor
 {

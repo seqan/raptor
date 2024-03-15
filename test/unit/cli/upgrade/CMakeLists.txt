@@ -5,6 +5,6 @@
 # shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 # --------------------------------------------------------------------------------------------------
 
-cmake_minimum_required (VERSION 3.21)
+cmake_minimum_required (VERSION 3.25)
 
 # raptor_add_unit_test (upgrade_test.cpp)

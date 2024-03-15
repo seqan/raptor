@@ -26,7 +26,7 @@ reset_scripts() {
 trap reset_scripts EXIT
 
 # Run in a subshell `(...)` to `set -x` just for one command.
-(set -ex; cmake $SCRIPT_DIR/../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=$SCRIPT_DIR/g++.sh -DCMAKE_C_COMPILER=$SCRIPT_DIR/gcc.sh -DRAPTOR_USE_CCACHE=OFF -DHIBF_NATIVE_BUILD=ON)
+(set -ex; cmake $SCRIPT_DIR/../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=$SCRIPT_DIR/g++.sh -DCMAKE_C_COMPILER=$SCRIPT_DIR/gcc.sh -DUSE_CCACHE=OFF -DHIBF_NATIVE_BUILD=ON)
 
 # We need `DO_TIME=0` for the CMake configuration to work, but `DO_TIME=1` to actually measure time/RAM consumption.
 sed -i "s/DO_TIME=0/DO_TIME=1/" $SCRIPT_DIR/gcc.sh

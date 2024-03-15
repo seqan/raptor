@@ -12,6 +12,10 @@
 
 #include <cereal/archives/json.hpp>
 
+#include <yaml-cpp/yaml.h>
+
+#include <hibf/layout/prefixes.hpp>
+
 #include <chopper/configuration.hpp>
 
 #include <raptor/argument_parsing/build_parsing.hpp>
@@ -21,8 +25,6 @@
 #include <raptor/argument_parsing/shared.hpp>
 #include <raptor/argument_parsing/validators.hpp>
 #include <raptor/build/raptor_build.hpp>
-
-#include <hibf/layout/prefixes.hpp>
 
 namespace raptor
 {
