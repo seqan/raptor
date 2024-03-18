@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
+SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+SPDX-License-Identifier: CC-BY-4.0
+-->
+
 # Create a layout with Raptor {#tutorial_layout}
 
 You will learn how to construct a Raptor layout of large collections of nucleotide sequences.

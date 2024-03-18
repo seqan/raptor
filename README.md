@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2006-2024, Knut Reinert & Freie Universität Berlin
+SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
+SPDX-License-Identifier: CC-BY-4.0
+-->
+
 # Raptor [![build status][1]][2] [![codecov][3]][4] [![install with bioconda][5]][6]
 
 [1]: https://img.shields.io/github/actions/workflow/status/seqan/raptor/ci_linux.yml?branch=main&style=flat&logo=github&label=Raptor%20CI

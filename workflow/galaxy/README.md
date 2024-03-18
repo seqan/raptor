@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
+SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+SPDX-License-Identifier: CC0-1.0
+-->
+
 # raptor-galaxy
 
 This readme explains how to add a tool to bioconda and galaxy (by using planemo).
