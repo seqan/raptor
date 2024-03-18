@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2006-2024, Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
+# SPDX-License-Identifier: CC0-1.0
+
 # find . \( -iname CMakeLists.txt -o -iname *.cmake \) -a -not -path "./lib/*" -a -not -path "./build/*" | xargs cmake-format -c .cmake-format.yaml -i
 _help_parse: Options affecting listfile parsing
 parse:

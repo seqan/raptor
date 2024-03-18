@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
+SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+SPDX-License-Identifier: CC0-1.0
+-->
+
 <tool id="raptor-search" name="raptor search" version="2.0.0+8" python_template_version="3.5">
     <description>
         Queries an index to determine which fasta file the query can be found in.

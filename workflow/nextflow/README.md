@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
+SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+SPDX-License-Identifier: CC0-1.0
+-->
+
 # HIBF in Nextflow
 
 If you want to include the HIBF in Nextflow, you can adapt this sample workflow `hibf.nf`.
