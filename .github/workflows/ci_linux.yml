@@ -63,7 +63,7 @@ jobs:
             compiler: "intel"
             build: unit
             build_type: Release
-            cxx_flags: "-fp-model=strict -Wno-overriding-t-option" # Ignore that googletest sets -fp-model=precise
+            cxx_flags: "-fp-model=strict -Wno-overriding-option" # Ignore that googletest sets -fp-model=precise
 
     steps:
       - name: Checkout
