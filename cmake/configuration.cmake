@@ -42,6 +42,12 @@ CPMUsePackageLock (${Raptor_SOURCE_DIR}/cmake/package-lock.cmake)
 # Find or add dependencies
 # ----------------------------------------------------------------------------
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+    AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 18
+    AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19
+)
+    add_compile_definitions (_LIBCPP_CHAR_TRAITS_REMOVE_BASE_SPECIALIZATION)
+endif ()
 CPMGetPackage (use_ccache)
 CPMGetPackage (hibf)
 CPMGetPackage (sharg)

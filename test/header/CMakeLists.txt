@@ -22,7 +22,7 @@ include (seqan3_test_files)
 include (seqan3_test_component)
 
 add_library ("raptor_header_test_lib" INTERFACE)
-target_link_libraries ("raptor_header_test_lib" INTERFACE raptor::test::header)
+target_link_libraries ("raptor_header_test_lib" INTERFACE raptor::test raptor::test::header)
 set (target "header_test")
 
 set (header_base_path "${CMAKE_CURRENT_LIST_DIR}/../../include/")

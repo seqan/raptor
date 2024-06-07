@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: 2006-2024, Knut Reinert & Freie Universität Berlin
-# SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
+# SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: CC0-1.0
 
 name: License
@@ -23,8 +23,7 @@ env:
 jobs:
   check:
     name: REUSE Compliance
-    runs-on: ubuntu-22.04
-    timeout-minutes: 120
+    runs-on: ubuntu-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     steps:
       - name: Checkout

@@ -25,7 +25,7 @@ static constexpr size_t operator""_MiB(unsigned long long int number)
     return number << 23;
 }
 
-static constexpr size_t operator""_GiB(unsigned long long int number)
+[[maybe_unused]] static constexpr size_t operator""_GiB(unsigned long long int number)
 {
     return number << 33;
 }
@@ -155,7 +155,7 @@ static void bulk_count(benchmark::State & state, double && fpr)
     {
         try
         {
-            ibf = std::move(construct_ibf(bin_count, hash_adaptor, fpr));
+            ibf = construct_ibf(bin_count, hash_adaptor, fpr);
             std::ofstream os{index_path, std::ios::binary};
             cereal::BinaryOutputArchive oarchive{os};
             oarchive(ibf);

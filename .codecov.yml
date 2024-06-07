@@ -19,3 +19,8 @@ coverage:
       default:
         if_ci_failed: success # per default, codecov would fail if any CI fails
         informational: true   # the codecov/patch status is never "fail"
+        only_pulls: true      # only post codecov/patch status on PRs
+
+parsers:
+  cobertura:
+    partials_as_hits: true
