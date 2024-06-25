@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include <chrono>
-#include <future>
+#include <functional>
+#include <omp.h>
 #include <vector>
 
 namespace raptor
@@ -19,18 +19,15 @@ namespace raptor
 template <typename algorithm_t>
 void do_parallel(algorithm_t && worker, size_t const num_records, size_t const threads)
 {
-    std::vector<decltype(std::async(std::launch::async, worker, size_t{}, size_t{}))> tasks;
     size_t const records_per_thread = num_records / threads;
 
+#pragma omp parallel for schedule(static) num_threads(threads)
     for (size_t i = 0; i < threads; ++i)
     {
         size_t const start = records_per_thread * i;
         size_t const extent = i == (threads - 1) ? num_records - i * records_per_thread : records_per_thread;
-        tasks.emplace_back(std::async(std::launch::async, worker, start, extent));
+        std::invoke(worker, start, extent);
     }
-
-    for (auto && task : tasks)
-        task.get();
 }
 
 } // namespace raptor
