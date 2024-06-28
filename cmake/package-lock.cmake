@@ -76,3 +76,11 @@ CPMDeclarePackage (use_ccache
                    SYSTEM TRUE
                    EXCLUDE_FROM_ALL TRUE
 )
+# doxygen-awesome
+set (RAPTOR_DOXYGEN_AWESOME_VERSION 2.3.3)
+CPMDeclarePackage (doxygen_awesome
+                   NAME doxygen_awesome
+                   VERSION ${RAPTOR_DOXYGEN_AWESOME_VERSION}
+                   GITHUB_REPOSITORY jothepro/doxygen-awesome-css
+                   DOWNLOAD_ONLY TRUE
+)

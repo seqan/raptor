@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
-# Doxyfile 1.9.6
+# Doxyfile 1.10.0
 
 #---------------------------------------------------------------------------
 # Project related configuration options
@@ -12,6 +12,7 @@ PROJECT_NAME           = Raptor
 PROJECT_NUMBER         = ${PACKAGE_VERSION}
 PROJECT_BRIEF          = "A fast and space-efficient pre-filter"
 PROJECT_LOGO           =
+PROJECT_ICON           =
 ## PATHS
 OUTPUT_DIRECTORY       = ${RAPTOR_DOXYGEN_OUTPUT_DIR}
 CREATE_SUBDIRS         = NO
@@ -64,6 +65,7 @@ OPTIMIZE_OUTPUT_SLICE  = NO
 EXTENSION_MAPPING      = .no_extension=C++
 MARKDOWN_SUPPORT       = YES
 TOC_INCLUDE_HEADINGS   = 3
+MARKDOWN_ID_STYLE      = DOXYGEN
 AUTOLINK_SUPPORT       = YES
 BUILTIN_STL_SUPPORT    = NO
 CPP_CLI_SUPPORT        = NO
@@ -77,6 +79,7 @@ INLINE_SIMPLE_STRUCTS  = NO
 TYPEDEF_HIDES_STRUCT   = NO
 LOOKUP_CACHE_SIZE      = 0
 NUM_PROC_THREADS       = 1
+TIMESTAMP              = YES
 #---------------------------------------------------------------------------
 # Build related configuration options
 #---------------------------------------------------------------------------
@@ -191,24 +194,26 @@ HTML_FILE_EXTENSION    = .html
 HTML_HEADER            = ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/raptor_header.html
 HTML_FOOTER            = ${RAPTOR_DOXYGEN_OUTPUT_DIR}/raptor_footer.html
 HTML_STYLESHEET        =
-HTML_EXTRA_STYLESHEET  = ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome.css \
-                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-sidebar-only.css \
-                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-sidebar-only-darkmode-toggle.css
+HTML_EXTRA_STYLESHEET  = ${doxygen_awesome_SOURCE_DIR}/doxygen-awesome.css \
+                         ${doxygen_awesome_SOURCE_DIR}/doxygen-awesome-sidebar-only.css \
+                         ${doxygen_awesome_SOURCE_DIR}/doxygen-awesome-sidebar-only-darkmode-toggle.css
 ### Extra files that we can link to
-HTML_EXTRA_FILES       = ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-darkmode-toggle.js \
-                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-fragment-copy-button.js \
-                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-paragraph-link.js \
-                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-interactive-toc.js \
-                         ${RAPTOR_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-tabs.js \
+HTML_EXTRA_FILES       = ${doxygen_awesome_SOURCE_DIR}/doxygen-awesome-darkmode-toggle.js \
+                         ${doxygen_awesome_SOURCE_DIR}/doxygen-awesome-fragment-copy-button.js \
+                         ${doxygen_awesome_SOURCE_DIR}/doxygen-awesome-paragraph-link.js \
+                         ${doxygen_awesome_SOURCE_DIR}/doxygen-awesome-interactive-toc.js \
+                         ${doxygen_awesome_SOURCE_DIR}/doxygen-awesome-tabs.js \
                          ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/figures/fig_4_many_user_bins.svg \
                          ${RAPTOR_DOXYGEN_SOURCE_DIR}/doc/figures/fig_6_acc.svg
 HTML_COLORSTYLE        = LIGHT
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 100
 HTML_COLORSTYLE_GAMMA  = 80
-HTML_TIMESTAMP         = YES
 HTML_DYNAMIC_MENUS     = YES
 HTML_DYNAMIC_SECTIONS  = YES
+HTML_CODE_FOLDING      = YES
+HTML_COPY_CLIPBOARD    = YES
+HTML_PROJECT_COOKIE    =
 HTML_INDEX_NUM_ENTRIES = 100
 GENERATE_DOCSET        = NO
 DOCSET_FEEDNAME        = "Doxygen generated docs"
@@ -223,6 +228,7 @@ GENERATE_CHI           = NO
 CHM_INDEX_ENCODING     =
 BINARY_TOC             = NO
 TOC_EXPAND             = NO
+SITEMAP_URL            =
 GENERATE_QHP           = NO
 QCH_FILE               =
 QHP_NAMESPACE          = org.doxygen.Project
@@ -243,7 +249,7 @@ OBFUSCATE_EMAILS       = YES
 HTML_FORMULA_FORMAT    = png
 FORMULA_FONTSIZE       = 14
 FORMULA_MACROFILE      =
-USE_MATHJAX            = YES #${RAPTOR_DOXYGEN_USE_MATHJAX}
+USE_MATHJAX            = YES
 MATHJAX_VERSION        = MathJax_3
 MATHJAX_FORMAT         = HTML-CSS
 MATHJAX_RELPATH        = https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/
@@ -277,7 +283,6 @@ USE_PDFLATEX           = YES
 LATEX_BATCHMODE        = NO
 LATEX_HIDE_INDICES     = NO
 LATEX_BIB_STYLE        = plain
-LATEX_TIMESTAMP        = NO
 LATEX_EMOJI_DIRECTORY  =
 #---------------------------------------------------------------------------
 # Configuration options related to the RTF output
@@ -313,6 +318,12 @@ DOCBOOK_OUTPUT         = docbook
 #---------------------------------------------------------------------------
 GENERATE_AUTOGEN_DEF   = NO
 #---------------------------------------------------------------------------
+# Configuration options related to Sqlite3 output
+#---------------------------------------------------------------------------
+GENERATE_SQLITE3       = NO
+SQLITE3_OUTPUT         = sqlite3
+SQLITE3_RECREATE_DB    = YES
+#---------------------------------------------------------------------------
 # Configuration options related to the Perl module output
 #---------------------------------------------------------------------------
 GENERATE_PERLMOD       = NO
@@ -347,9 +358,8 @@ ALLEXTERNALS           = NO
 EXTERNAL_GROUPS        = YES
 EXTERNAL_PAGES         = YES
 #---------------------------------------------------------------------------
-# Configuration options related to the dot tool
+# Configuration options related to diagram generator tools
 #---------------------------------------------------------------------------
-DIA_PATH               =
 HIDE_UNDOC_RELATIONS   = YES
 ## DOT SUPPORT
 HAVE_DOT               = ${RAPTOR_DOXYGEN_HAVE_DOT}
@@ -377,7 +387,7 @@ DOT_IMAGE_FORMAT       = svg
 INTERACTIVE_SVG        = ${RAPTOR_DOXYGEN_HAVE_DOT}
 DOT_PATH               =
 DOTFILE_DIRS           =
-MSCFILE_DIRS           =
+DIA_PATH               =
 DIAFILE_DIRS           =
 PLANTUML_JAR_PATH      =
 PLANTUML_CFG_FILE      =
@@ -387,6 +397,8 @@ MAX_DOT_GRAPH_DEPTH    = 0
 DOT_MULTI_TARGETS      = NO
 GENERATE_LEGEND        = YES
 DOT_CLEANUP            = YES
+MSCGEN_TOOL            =
+MSCFILE_DIRS           =
 #---------------------------------------------------------------------------
 # Configuration options related to the deployment by Vercel
 #---------------------------------------------------------------------------
