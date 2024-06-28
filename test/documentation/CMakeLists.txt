@@ -10,6 +10,11 @@ get_filename_component (RAPTOR_CLONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../.." ABS
 
 include (${RAPTOR_CLONE_DIR}/cmake/version.cmake)
 
+set (CPM_INDENT "CMake Package Manager CPM: ")
+include (${RAPTOR_CLONE_DIR}/cmake/CPM.cmake)
+CPMUsePackageLock (${RAPTOR_CLONE_DIR}/cmake/package-lock.cmake)
+CPMGetPackage (doxygen_awesome)
+
 project (docs
          LANGUAGES NONE
          VERSION "${RAPTOR_PROJECT_VERSION}"

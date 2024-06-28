@@ -6,7 +6,7 @@
 
 set -euxo pipefail
 
-DOXYGEN_VERSION=1.9.6
+DOXYGEN_VERSION=1.10.0
 WORK_DIR=`pwd`
 CACHE_DIR="${WORK_DIR}/node_modules" # The node_modules directory is always cached.
 
