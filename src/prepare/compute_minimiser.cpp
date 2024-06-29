@@ -136,7 +136,7 @@ void compute_minimiser(prepare_arguments const & arguments)
                       | seqan::stl::views::chunk(chunk_size);
     size_t const number_of_chunks = std::ranges::size(chunked_view);
 
-#pragma omp parallel for schedule(static) num_threads(arguments.threads)
+#pragma omp parallel for schedule(dynamic) num_threads(arguments.threads)
     for (size_t i = 0; i < number_of_chunks; ++i)
     {
         std::invoke(worker, chunked_view[i]);
