@@ -12,6 +12,8 @@ if (TARGET raptor::raptor)
     return ()
 endif ()
 
+set (CMAKE_CXX_STANDARD 23)
+
 # ----------------------------------------------------------------------------
 # Greeter
 # ----------------------------------------------------------------------------
@@ -42,18 +44,9 @@ CPMUsePackageLock (${Raptor_SOURCE_DIR}/cmake/package-lock.cmake)
 # Find or add dependencies
 # ----------------------------------------------------------------------------
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-    AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 18
-    AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19
-)
-    add_compile_definitions (_LIBCPP_CHAR_TRAITS_REMOVE_BASE_SPECIALIZATION)
-endif ()
 CPMGetPackage (use_ccache)
 CPMGetPackage (hibf)
 CPMGetPackage (sharg)
-if (TARGET yaml-cpp)
-    set_target_properties (yaml-cpp PROPERTIES CXX_STANDARD 20)
-endif ()
 CPMGetPackage (seqan3)
 CPMGetPackage (chopper)
 
