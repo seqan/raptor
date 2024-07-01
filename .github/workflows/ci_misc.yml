@@ -85,16 +85,16 @@ jobs:
           mkdir build && cd build
           cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
           case "${{ matrix.build }}" in
-            snippet) make gtest_main;;
-            performance) make benchmark_main;;
-            header) make gtest_main benchmark_main;;
+            snippet) make VERBOSE=1 gtest_main;;
+            performance) make VERBOSE=1 benchmark_main;;
+            header) make VERBOSE=1 gtest_main benchmark_main;;
           esac
 
       - name: Build tests
         working-directory: build
         run: |
           ccache -z
-          make -k
+          make VERBOSE=1 -k
           ccache -sv
 
       - name: Run tests
