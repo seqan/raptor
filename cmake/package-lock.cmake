@@ -55,7 +55,7 @@ CPMDeclarePackage (benchmark
                    SYSTEM TRUE
                    EXCLUDE_FROM_ALL TRUE
                    OPTIONS "BENCHMARK_ENABLE_TESTING OFF" "BENCHMARK_ENABLE_WERROR OFF"
-                           "CMAKE_MESSAGE_LOG_LEVEL WARNING"
+                           "CMAKE_MESSAGE_LOG_LEVEL WARNING" "CMAKE_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
 )
 # googletest
 set (RAPTOR_GOOGLETEST_VERSION 1.14.0)
@@ -64,7 +64,7 @@ CPMDeclarePackage (googletest
                    VERSION ${RAPTOR_GOOGLETEST_VERSION}
                    GITHUB_REPOSITORY google/googletest
                    SYSTEM TRUE
-                   OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING"
+                   OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING" "CMAKE_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
 )
 # use_ccache
 set (USE_CCACHE_VERSION d2a54ef555b6fc2d496a4c9506dbeb7cf899ce37)

@@ -10,6 +10,9 @@ include (../raptor-test.cmake)
 include (GoogleTest OPTIONAL)
 
 CPMGetPackage (benchmark)
+if (benchmark_ADDED)
+    set_target_properties (benchmark PROPERTIES CXX_STANDARD ${CMAKE_CXX_STANDARD})
+endif ()
 CPMGetPackage (googletest)
 
 find_path (SEQAN3_TEST_CMAKE_MODULE_DIR
