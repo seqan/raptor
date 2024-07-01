@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <future>
 #include <random>
 
 #include <seqan3/search/views/minimiser_hash.hpp>

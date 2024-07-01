@@ -9,10 +9,15 @@
 
 #pragma once
 
-#include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
+#include <algorithm>
+#include <bit>
+#include <functional>
+#include <omp.h>
+#include <vector>
 
 #include <hibf/contrib/std/chunk_view.hpp>
 #include <hibf/contrib/std/zip_view.hpp>
+#include <hibf/misc/divide_and_ceil.hpp>
 
 namespace raptor
 {
@@ -22,12 +27,22 @@ void call_parallel_on_bins(algorithm_t && worker,
                            std::vector<std::vector<std::string>> const & bin_paths,
                            uint8_t const threads)
 {
-    // GCOVR_EXCL_START
-    size_t const chunk_size = std::clamp<size_t>(std::bit_ceil(bin_paths.size() / threads), 8u, 64u);
-    // GCOVR_EXCL_STOP
-    auto chunked_view = seqan::stl::views::zip(bin_paths, std::views::iota(0u)) | seqan::stl::views::chunk(chunk_size);
-    seqan3::detail::execution_handler_parallel executioner{threads};
-    executioner.bulk_execute(std::move(worker), std::move(chunked_view), []() {});
+    size_t const number_of_bins = bin_paths.size();
+    // clang-format off
+    size_t const chunk_size = std::clamp<size_t>(
+        std::bit_ceil(seqan::hibf::divide_and_ceil(number_of_bins, threads)),
+        8u,
+        64u);
+    auto chunked_view = seqan::stl::views::zip(bin_paths, std::views::iota(0u, number_of_bins))
+                      | seqan::stl::views::chunk(chunk_size);
+    // clang-format on
+    size_t const number_of_chunks = std::ranges::size(chunked_view);
+
+#pragma omp parallel for schedule(dynamic) num_threads(threads)
+    for (size_t i = 0; i < number_of_chunks; ++i)
+    {
+        std::invoke(worker, chunked_view[i]);
+    }
 }
 
 } // namespace raptor

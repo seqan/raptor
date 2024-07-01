@@ -38,7 +38,7 @@ std::vector<size_t> max_count_per_partition(partition_config const & cfg,
             kmers_per_partition[i] = std::max<size_t>(kmers_per_partition[i], kmer_counts[i]);
     };
 
-    auto worker = [&callback, &reader, &cfg](auto && zipped_view, auto &&)
+    auto worker = [&callback, &reader, &cfg](auto && zipped_view)
     {
         std::vector<size_t> max_kmer_counts(cfg.partitions);
         std::vector<size_t> kmer_counts(cfg.partitions);
