@@ -64,7 +64,7 @@ jobs:
       - name: Configure Raptor
         run: |
           mkdir build && cd build
-          cmake ../ -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-std=c++23 -Wno-interference-size"
+          cmake ../ -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wno-interference-size"
 
       - name: Build Raptor
         working-directory: build

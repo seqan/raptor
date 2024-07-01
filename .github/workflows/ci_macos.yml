@@ -35,11 +35,11 @@ jobs:
       matrix:
         compiler: ["clang-18", "clang-17", "gcc-14", "gcc-13", "gcc-12", "gcc-11"]
         include:
-          - cxx_flags: "-std=c++23 -Wno-interference-size"
+          - cxx_flags: "-Wno-interference-size"
           - compiler: "clang-18"
-            cxx_flags: "-std=c++23"
+            cxx_flags: ""
           - compiler: "clang-17"
-            cxx_flags: "-std=c++20"
+            cxx_flags: ""
     steps:
       - name: Checkout
         uses: actions/checkout@v4

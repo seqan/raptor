@@ -41,7 +41,7 @@ jobs:
           - name: "Snippet gcc11"
             compiler: "gcc-11"
             build: snippet
-            cxx_flags: "-std=c++23 -Wno-interference-size"
+            cxx_flags: "-Wno-interference-size"
 
           - name: "Performance clang17"
             compiler: "clang-17"
@@ -50,7 +50,7 @@ jobs:
           - name: "Performance gcc11"
             compiler: "gcc-11"
             build: performance
-            cxx_flags: "-std=c++23 -Wno-interference-size"
+            cxx_flags: "-Wno-interference-size"
 
           - name: "Header clang17"
             compiler: "clang-17"
@@ -59,12 +59,12 @@ jobs:
           - name: "Header gcc14"
             compiler: "gcc-14"
             build: header
-            cxx_flags: "-std=c++23 -Wno-interference-size"
+            cxx_flags: "-Wno-interference-size"
 
           - name: "Header gcc11"
             compiler: "gcc-11"
             build: header
-            cxx_flags: "-std=c++23 -Wno-interference-size"
+            cxx_flags: "-Wno-interference-size"
     container:
       image: ghcr.io/seqan/${{ matrix.compiler }}
       volumes:
@@ -73,28 +73,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # - name: Load ccache
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: /home/runner/.ccache
-      #     save-always: true
-      #     key: ccache-${{ runner.os }}-${{ github.workflow }}-${{ matrix.compiler }}-${{ github.ref }}
+      - name: Load ccache
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/.ccache
+          save-always: true
+          key: ccache-${{ runner.os }}-${{ github.workflow }}-${{ matrix.compiler }}-${{ github.ref }}
 
       - name: Configure tests
         run: |
           mkdir build && cd build
           cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
           case "${{ matrix.build }}" in
-            snippet) make VERBOSE=1 gtest_main;;
-            performance) make VERBOSE=1 benchmark_main;;
-            header) make VERBOSE=1 gtest_main benchmark_main;;
+            snippet) make gtest_main;;
+            performance) make benchmark_main;;
+            header) make gtest_main benchmark_main;;
           esac
 
       - name: Build tests
         working-directory: build
         run: |
           ccache -z
-          make VERBOSE=1 -k
+          make -k
           ccache -sv
 
       - name: Run tests
