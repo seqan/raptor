@@ -45,4 +45,4 @@ else ()
     message ("-- DREAM-Yara will not be built. Enable via 'cmake -DRAPTOR_UTILITY_BUILD_DREAM_YARA=1 .'")
 endif ()
 
-add_subdirectory ("${RAPTOR_ROOT_DIR}/util/applications/src" "${CMAKE_CURRENT_BINARY_DIR}/applications")
+add_subdirectory ("${Raptor_SOURCE_DIR}/util/applications/src" "${CMAKE_CURRENT_BINARY_DIR}/applications")
