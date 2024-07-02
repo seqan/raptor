@@ -27,59 +27,39 @@ defaults:
 
 jobs:
   build:
-    name: ${{ matrix.name }}
-    runs-on: ubuntu-22.04
-    timeout-minutes: 120
+    name: ${{ matrix.compiler }}
+    runs-on: ubuntu-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
       fail-fast: false
       matrix:
+        compiler: ["clang-18", "clang-17", "gcc-14", "gcc-13", "gcc-12", "gcc-11", "intel"]
         include:
-          - name: "gcc13"
-            compiler: "gcc-13"
-            build_type: Release
-            cxx_flags: "-std=c++23"
-
-          - name: "gcc12"
-            compiler: "gcc-12"
-            build_type: Release
-            cxx_flags: "-std=c++23"
-
-          - name: "gcc11"
-            compiler: "gcc-11"
-            build_type: Release
-            cxx_flags: "-std=c++23"
-
+          - cxx_flags: "-Wno-interference-size"
+          - compiler: "clang-18"
+            cxx_flags: ""
+          - compiler: "clang-17"
+            cxx_flags: ""
+          - compiler: "intel"
+            cxx_flags: "-fp-model=strict -Wno-overriding-option"
+    container:
+      image: ghcr.io/seqan/${{ matrix.compiler }}
+      volumes:
+        - /home/runner:/home/runner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: raptor
-          fetch-depth: 2
-          submodules: true
-
-      - name: Setup toolchain
-        uses: seqan/actions/setup-toolchain@main
-        with:
-          compiler: ${{ matrix.compiler }}
-          ccache_size: 150M
-
-      - name: Install CMake
-        uses: seqan/actions/setup-cmake@main
-        with:
-          cmake: 3.25.3
 
       - name: Configure tests
         run: |
-          mkdir build
-          cd build
-          cmake ../raptor/util/test -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                    -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size"
+          mkdir build && cd build
+          cmake ../util/test -DCMAKE_BUILD_TYPE=Release \
+                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
 
       - name: Build tests
+        working-directory: build
         run: |
           ccache -z
-          cd build
-          make -k -j2
+          make -k
           ccache -sv
 

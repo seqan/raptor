@@ -10,6 +10,7 @@
 #pragma once
 
 #include <chrono>
+#include <fstream>
 
 #include <raptor/argument_parsing/search_arguments.hpp>
 #include <raptor/index.hpp>

@@ -36,72 +36,54 @@ jobs:
       matrix:
         include:
           - name: "Nextflow"
-            compiler: "gcc-13"
-            build_type: Release
-            cxx_flags: "-std=c++23"
-
+            compiler: "gcc-14"
           - name: "CWL"
-            compiler: "gcc-13"
-            build_type: Release
-            cxx_flags: "-std=c++23"
+            compiler: "gcc-14"
+    container:
+      image: ghcr.io/seqan/${{ matrix.compiler }}
+      volumes:
+        - /home/runner:/home/runner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: raptor
-          fetch-depth: 2
-          submodules: true
-
-      - name: Setup toolchain
-        uses: seqan/actions/setup-toolchain@main
-        with:
-          compiler: ${{ matrix.compiler }}
-          ccache_size: 150M
-
-      - name: Install CMake
-        uses: seqan/actions/setup-cmake@main
-        with:
-          cmake: 3.25.3
 
       - name: Install Nextflow
         if: matrix.name == 'Nextflow'
-        uses: nf-core/setup-nextflow@v2
-        with:
-          version: latest-stable
+        working-directory: /usr/local/bin
+        run: |
+          apt-get update
+          apt-get install --yes default-jre-headless
+          curl -s https://get.nextflow.io | bash
 
       - name: Install cwltool
         if: matrix.name == 'CWL'
         run: |
-          install pipx
-          pipx install cwltool
+          apt-get update
+          apt-get install --yes cwltool
 
       - name: Configure Raptor
         run: |
-          mkdir build
-          cd build
-          cmake ../raptor -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                          -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size" \
-                          -DHIBF_NATIVE_BUILD=OFF
+          mkdir build && cd build
+          cmake ../ -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wno-interference-size"
 
       - name: Build Raptor
+        working-directory: build
         run: |
           ccache -z
-          cd build
-          make -k -j2
+          make -k
           make install
           ccache -sv
 
       - name: Run Nextflow
         if: matrix.name == 'Nextflow'
-        run: |
-          cd raptor/workflow/nextflow
-          nextflow hibf.nf
+        working-directory: workflow/nextflow
+        run: nextflow hibf.nf
 
       - name: Run cwltool
         if: matrix.name == 'CWL'
         run: |
           raptor build --export-help cwl > raptor.cwl
           cwltool --validate raptor.cwl
-          cwltool raptor.cwl raptor/workflow/cwl/tests/raptor-build-0_bins_window_19.yml
-          cwltool raptor.cwl raptor/workflow/cwl/tests/raptor-build-16_bins_window_19.yml
+          cwltool raptor.cwl workflow/cwl/tests/raptor-build-0_bins_window_19.yml
+          cwltool raptor.cwl workflow/cwl/tests/raptor-build-16_bins_window_19.yml
 

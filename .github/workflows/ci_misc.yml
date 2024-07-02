@@ -28,79 +28,75 @@ defaults:
 jobs:
   build:
     name: ${{ matrix.name }}
-    runs-on: ubuntu-22.04
-    timeout-minutes: 120
+    runs-on: ubuntu-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: "Snippet gcc13"
-            compiler: "gcc-13"
-            cxx_flags: "-std=c++23"
-            build_type: Release
+          - name: "Snippet clang17"
+            compiler: "clang-17"
             build: snippet
 
-          - name: "Performance gcc13"
-            compiler: "gcc-13"
-            cxx_flags: "-std=c++23"
-            build_type: Release
+          - name: "Snippet gcc11"
+            compiler: "gcc-11"
+            build: snippet
+            cxx_flags: "-Wno-interference-size"
+
+          - name: "Performance clang17"
+            compiler: "clang-17"
             build: performance
 
-          - name: "Header gcc13"
-            compiler: "gcc-13"
-            cxx_flags: "-std=c++23"
-            build_type: Release
+          - name: "Performance gcc11"
+            compiler: "gcc-11"
+            build: performance
+            cxx_flags: "-Wno-interference-size"
+
+          - name: "Header clang17"
+            compiler: "clang-17"
             build: header
+
+          - name: "Header gcc14"
+            compiler: "gcc-14"
+            build: header
+            cxx_flags: "-Wno-interference-size"
 
           - name: "Header gcc11"
             compiler: "gcc-11"
-            cxx_flags: "-std=c++23"
-            build_type: Release
             build: header
-
+            cxx_flags: "-Wno-interference-size"
+    container:
+      image: ghcr.io/seqan/${{ matrix.compiler }}
+      volumes:
+        - /home/runner:/home/runner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: raptor
-          fetch-depth: 2
-          submodules: true
 
-      - name: Setup toolchain
-        uses: seqan/actions/setup-toolchain@main
+      - name: Load ccache
+        uses: actions/cache@v4
         with:
-          compiler: ${{ matrix.compiler }}
-          ccache_size: 150M
-
-      - name: Install CMake
-        uses: seqan/actions/setup-cmake@main
-        with:
-          cmake: 3.25.3
+          path: /home/runner/.ccache
+          save-always: true
+          key: ccache-${{ runner.os }}-${{ github.workflow }}-${{ matrix.compiler }}-${{ github.ref }}
 
       - name: Configure tests
         run: |
-          mkdir build
-          cd build
-          cmake ../raptor/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                                   -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size" \
-                                                   -DHIBF_NATIVE_BUILD=OFF
+          mkdir build && cd build
+          cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
           case "${{ matrix.build }}" in
-            snippet) make -j${{ matrix.build_threads }} gtest_main;;
-            performance) make -j${{ matrix.build_threads }} benchmark_main;;
-            header) make -j${{ matrix.build_threads }} gtest_main benchmark_main;;
+            snippet) make gtest_main;;
+            performance) make benchmark_main;;
+            header) make gtest_main benchmark_main;;
           esac
 
       - name: Build tests
-        env:
-          CMAKE_BUILD_PARALLEL_LEVEL: 2
+        working-directory: build
         run: |
           ccache -z
-          cd build
-          make -k -j2
+          make -k
           ccache -sv
 
       - name: Run tests
-        run: |
-          cd build
-          ctest . -j2 --output-on-failure
+        working-directory: build
+        run: ctest . -j --output-on-failure
