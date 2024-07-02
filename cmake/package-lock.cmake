@@ -6,7 +6,7 @@
 # This file should be committed to version control
 
 # hibf
-set (RAPTOR_HIBF_VERSION 187a9121be5cb81ddfd9f3c72332382f401c28dc)
+set (RAPTOR_HIBF_VERSION 2ee8fa371f20cfc170ccf01bc3d50fce1ecd22fa)
 CPMDeclarePackage (hibf
                    NAME hibf
                    GIT_TAG ${RAPTOR_HIBF_VERSION}
