@@ -27,92 +27,65 @@ defaults:
 
 jobs:
   build:
-    name: ${{ matrix.name }}
-    runs-on: ubuntu-22.04
-    timeout-minutes: 120
+    runs-on: ubuntu-latest
+    name: ${{ matrix.compiler }}
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - name: "gcc13"
-            compiler: "gcc-13"
-            build: coverage
-            build_type: Coverage
-            cxx_flags: "-std=c++23"
-
+        compiler: ["gcc-14"]
+    container:
+      image: ghcr.io/seqan/${{ matrix.compiler }}
+      volumes:
+        - /home/runner:/home/runner
     steps:
-      # How many commits do we need to fetch to also fetch the branch point?
-      - name: Get fetch depth
-        id: fetch_depth
-        run: echo "depth=$(( ${{ github.event.pull_request.commits }} + 2 ))" >> $GITHUB_OUTPUT
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: raptor
-          fetch-depth: ${{ steps.fetch_depth.outputs.depth }}
-          submodules: true
+          fetch-depth: 0
 
-      - name: Setup toolchain
-        uses: seqan/actions/setup-toolchain@main
+      - name: Load ccache
+        uses: actions/cache@v4
         with:
-          compiler: ${{ matrix.compiler }}
-          ccache_size: 525M
-
-      - name: Install CMake
-        uses: seqan/actions/setup-cmake@main
-        with:
-          cmake: 3.25.3
-
-      - name: Install gcovr
-        env:
-          CC: ${{ matrix.compiler }}
-        run: |
-          sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/${CC/gcc/gcov} 100
-          pip install gcovr==6.0
+          path: /home/runner/.ccache
+          save-always: true
+          key: ccache-${{ runner.os }}-${{ github.workflow }}-${{ matrix.compiler }}-${{ github.ref }}
 
       - name: Configure tests
         run: |
-          mkdir build
-          cd build
-          cmake ../raptor/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                                   -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size" \
-                                                   -DHIBF_NATIVE_BUILD=OFF
-          make -j2 gtest_main
+          mkdir build && cd build
+          cmake ../test/coverage -DCMAKE_BUILD_TYPE=Coverage \
+                                                   -DCMAKE_CXX_FLAGS="-Wno-interference-size"
+          make gtest_main
 
       - name: Build tests
+        working-directory: build
         run: |
           ccache -z
-          cd build
-          make -k -j2
+          make -k
           ccache -sv
 
       - name: Run tests
-        run: |
-          cd build
-          ctest . -j2 --output-on-failure
+        working-directory: build
+        run: ctest . -j --output-on-failure
 
       - name: Generate coverage report
         run: |
-          gcovr --gcov-executable ${{ github.workspace }}/raptor/.github/workflows/scripts/gcov.sh \
-                --root ${{ github.workspace }}/raptor/test/coverage \
-                ${{ github.workspace }}/build \
-                --filter ${{ github.workspace }}/raptor/include \
-                --filter ${{ github.workspace }}/raptor/src \
+          gcovr --root ${GITHUB_WORKSPACE}/test/coverage \
+                ${GITHUB_WORKSPACE}/build \
+                --filter ${GITHUB_WORKSPACE}/raptor/include \
+                --filter ${GITHUB_WORKSPACE}/raptor/src \
                 --exclude-lines-by-pattern '^\s*$' \
                 --exclude-lines-by-pattern '^\s*};$' \
-                --exclude-lines-by-pattern '^.*GCOVR_EXCL_LINE.*$' \
                 --exclude-unreachable-branches \
                 --exclude-throw-branches \
                 --exclude-noncode-lines \
-                -j 2 \
-                --xml \
-                --output ${{ github.workspace }}/build/coverage_report.xml
+                -j \
+                --cobertura \
+                --output ${GITHUB_WORKSPACE}/build/coverage_report.xml
 
       - name: Submit coverage report
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v3.1.5
         with:
-          files: ${{ github.workspace }}/build/coverage_report.xml
-          root_dir: ${{ github.workspace }}/raptor
+          files: build/coverage_report.xml
           fail_ci_if_error: false

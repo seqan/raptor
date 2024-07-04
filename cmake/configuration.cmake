@@ -31,11 +31,26 @@ macro (raptor_config_error text)
 endmacro ()
 
 # ----------------------------------------------------------------------------
-# CPM
+# C++ standard
 # ----------------------------------------------------------------------------
 
+if (NOT DEFINED CMAKE_CXX_STANDARD)
+    set (CMAKE_CXX_STANDARD 23)
+endif ()
+
+if (NOT DEFINED CMAKE_CXX_STANDARD_REQUIRED)
+    set (CMAKE_CXX_STANDARD_REQUIRED OFF)
+endif ()
+
+if (NOT DEFINED CMAKE_CXX_EXTENSIONS)
+    set (CMAKE_CXX_EXTENSIONS OFF)
+endif ()
+
+# ----------------------------------------------------------------------------
+# CPM
+# ----------------------------------------------------------------------------
 set (CPM_INDENT "CMake Package Manager CPM: ")
-include (CPM)
+include (${Raptor_SOURCE_DIR}/cmake/CPM.cmake)
 CPMUsePackageLock (${Raptor_SOURCE_DIR}/cmake/package-lock.cmake)
 
 # ----------------------------------------------------------------------------

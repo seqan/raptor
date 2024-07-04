@@ -27,68 +27,48 @@ defaults:
 
 jobs:
   build:
-    name: ${{ matrix.name }}
+    name: ${{ matrix.compiler }}
     runs-on: macos-12
-    timeout-minutes: 120
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
       fail-fast: false
       matrix:
+        compiler: ["clang-18", "clang-17", "gcc-14", "gcc-13", "gcc-12", "gcc-11"]
         include:
-          - name: "gcc13"
-            compiler: "gcc-13"
-            build: unit
-            build_type: Release
-            cxx_flags: "-std=c++23"
-
-          - name: "gcc12"
-            compiler: "gcc-12"
-            build: unit
-            build_type: Release
-            cxx_flags: "-std=c++23"
-
-          - name: "gcc11"
-            compiler: "gcc-11"
-            build: unit
-            build_type: Release
-            cxx_flags: "-std=c++23"
-
+          - cxx_flags: "-Wno-interference-size"
+          - compiler: "clang-18"
+            cxx_flags: ""
+          - compiler: "clang-17"
+            cxx_flags: ""
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: raptor
-          fetch-depth: 2
-          submodules: true
 
       - name: Setup toolchain
         uses: seqan/actions/setup-toolchain@main
         with:
           compiler: ${{ matrix.compiler }}
-          ccache_size: 150M
+          ccache_size: 75M
 
       - name: Install CMake
         uses: seqan/actions/setup-cmake@main
         with:
-          cmake: 3.25.3
+          cmake: 3.28.5
 
       - name: Configure tests
         run: |
           mkdir build
           cd build
-          cmake ../raptor/test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                                   -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} -Wno-interference-size" \
-                                                   -DHIBF_NATIVE_BUILD=OFF
-          make -j2 gtest_main
+          cmake ../test/unit -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
+          make gtest_main
 
       - name: Build tests
+        working-directory: build
         run: |
           ccache -z
-          cd build
-          make -k -j3
+          make -k
           ccache -sv
 
       - name: Run tests
-        run: |
-          cd build
-          ctest . -j3 --output-on-failure
+        working-directory: build
+        run: ctest . -j --output-on-failure

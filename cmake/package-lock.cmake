@@ -6,7 +6,7 @@
 # This file should be committed to version control
 
 # hibf
-set (RAPTOR_HIBF_VERSION 95c686c2a4147a364231aaeae88adbe93ce83181)
+set (RAPTOR_HIBF_VERSION 2ee8fa371f20cfc170ccf01bc3d50fce1ecd22fa)
 CPMDeclarePackage (hibf
                    NAME hibf
                    GIT_TAG ${RAPTOR_HIBF_VERSION}
@@ -16,7 +16,7 @@ CPMDeclarePackage (hibf
                    OPTIONS "INSTALL_HIBF OFF"
 )
 # sharg
-set (RAPTOR_SHARG_VERSION 39f65a4890f8c5108af2b5c7974893ff6ed87e50)
+set (RAPTOR_SHARG_VERSION 467d5f7d460012e4b5e0970463fb9ddf9afafae1)
 CPMDeclarePackage (sharg
                    NAME sharg
                    GIT_TAG ${RAPTOR_SHARG_VERSION}
@@ -26,7 +26,7 @@ CPMDeclarePackage (sharg
                    OPTIONS "INSTALL_SHARG OFF" "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING"
 )
 # seqan3
-set (RAPTOR_SEQAN3_VERSION f489f67d9aaa6e72dc42c59a1e5ef8fc27fec9d6)
+set (RAPTOR_SEQAN3_VERSION 4f24e5e0bc06fab915b90b51bb8f61ff3f130cf7)
 CPMDeclarePackage (seqan3
                    NAME seqan3
                    GIT_TAG ${RAPTOR_SEQAN3_VERSION}
@@ -36,7 +36,7 @@ CPMDeclarePackage (seqan3
                    OPTIONS "INSTALL_SEQAN3 OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING"
 )
 # chopper
-set (RAPTOR_CHOPPER_VERSION 4ff191e21def35cfd69e0242046f4b5188017a53)
+set (RAPTOR_CHOPPER_VERSION 40b79a02a44d66bc0bd98d50e731a93ab38e96f5)
 CPMDeclarePackage (chopper
                    NAME chopper
                    GIT_TAG ${RAPTOR_CHOPPER_VERSION}
@@ -47,7 +47,7 @@ CPMDeclarePackage (chopper
                    EXCLUDE_FROM_ALL TRUE
 )
 # benchmark
-set (RAPTOR_BENCHMARK_VERSION 1.8.3)
+set (RAPTOR_BENCHMARK_VERSION 1.8.4)
 CPMDeclarePackage (benchmark
                    NAME benchmark
                    VERSION ${RAPTOR_BENCHMARK_VERSION}
@@ -55,7 +55,7 @@ CPMDeclarePackage (benchmark
                    SYSTEM TRUE
                    EXCLUDE_FROM_ALL TRUE
                    OPTIONS "BENCHMARK_ENABLE_TESTING OFF" "BENCHMARK_ENABLE_WERROR OFF"
-                           "CMAKE_MESSAGE_LOG_LEVEL WARNING"
+                           "CMAKE_MESSAGE_LOG_LEVEL WARNING" "CMAKE_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
 )
 # googletest
 set (RAPTOR_GOOGLETEST_VERSION 1.14.0)
@@ -65,6 +65,7 @@ CPMDeclarePackage (googletest
                    GITHUB_REPOSITORY google/googletest
                    SYSTEM TRUE
                    OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING"
+                           "CMAKE_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
 )
 # use_ccache
 set (USE_CCACHE_VERSION d2a54ef555b6fc2d496a4c9506dbeb7cf899ce37)

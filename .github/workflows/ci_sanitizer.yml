@@ -10,13 +10,12 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: sanitizer-${{ github.ref }}
+  group: sanitizer-actions
   cancel-in-progress: true
 
 env:
-  SHARG_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
-  ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1
+  ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1:detect_leaks=1
   TSAN_OPTIONS: ignore_noninstrumented_modules=1
   UBSAN_OPTIONS: print_stacktrace=1
 
@@ -26,72 +25,71 @@ defaults:
 
 jobs:
   build:
-    name: ${{ matrix.name }} ${{ matrix.build_type }}
-    runs-on: ubuntu-22.04
-    timeout-minutes: 240
+    name: ${{ matrix.name }} ${{ matrix.build_type }} ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
     strategy:
       fail-fast: false
       matrix:
-        name: [AddressSanitizer, ThreadSanitizer, UndefinedBehaviorSanitizer]
-        build_type: [Release, Debug]
+        name: [ASan, TSan, UBSan]
+        os: [ubuntu-latest, macos-12]
+        build_type: [Release, RelWithDebInfo, Debug]
+        exclude:
+          - name: "TSan"
+            os: macos-12
         include:
-          - name: "AddressSanitizer"
-            compiler: gcc-13
-            cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=address -Wno-maybe-uninitialized -Wno-interference-size"
+          - name: "ASan"
+            cxx_flags: "-fno-omit-frame-pointer -fsanitize=address"
 
-          - name: "ThreadSanitizer"
-            compiler: clang-17
-            cxx_flags: "-std=c++20 -fno-omit-frame-pointer -fsanitize=thread"
+          - name: "TSan"
+            cxx_flags: "-fno-omit-frame-pointer -fsanitize=thread"
 
-          - name: "UndefinedBehaviorSanitizer"
-            compiler: gcc-13
-            cxx_flags: "-std=c++23 -fno-omit-frame-pointer -fsanitize=undefined -Wno-interference-size"
+          - name: "UBSan"
+            os: macos-12
+            cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero,implicit-conversion,local-bounds,nullability -Wno-pass-failed"
 
+          - name: "UBSan"
+            os: ubuntu-latest
+            cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero"
+
+          - os: macos-12
+            compiler: clang-18
+
+          - os: ubuntu-latest
+            compiler: gcc-14
+            image: ghcr.io/seqan/gcc-14
+            cxx_ubuntu: "-Wno-interference-size"
+
+          - name: "TSan"
+            os: ubuntu-latest
+            compiler: clang-18
+            image: ghcr.io/seqan/clang-18
+    container:
+      image: ${{ matrix.image || '' }}
+      volumes:
+        - /home/runner:/home/runner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: raptor
-          fetch-depth: 1
-          submodules: true
 
       - name: Setup compiler
+        if: contains(matrix.os, 'macos')
         uses: seqan/actions/setup-compiler@main
         with:
           compiler: ${{ matrix.compiler }}
 
-      - name: Install OpenMP
-        if: contains(matrix.compiler, 'clang')
-        run: |
-          install libomp-17-dev
-          echo "OMP_TOOL_LIBRARIES=/usr/lib/llvm-17/lib/libarcher.so" >> "$GITHUB_ENV"
-
-      - name: Configure OS
-        run: |
-          sudo bash -c "echo 0 > /proc/sys/vm/overcommit_memory"
-          sudo bash -c "echo 2 >/proc/sys/kernel/randomize_va_space"
-
-      - name: Install CMake
-        uses: seqan/actions/setup-cmake@main
-        with:
-          cmake: 3.25.3
-
       - name: Configure tests
         run: |
-          mkdir build
-          cd build
-          cmake ../raptor/test/unit -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                    -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
-          make -j2 gtest_main
+          mkdir build && cd build
+          cmake ../test/unit -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} ${{ matrix.cxx_ubuntu }}"
+          make gtest_main
 
       - name: Build tests
-        run: |
-          cd build
-          make -k -j2
+        working-directory: build
+        run: make -k
 
       - name: Run tests
-        run: |
-          cd build
-          ctest . -j2 --output-on-failure
+        working-directory: build
+        run: ctest . -j --output-on-failure
 

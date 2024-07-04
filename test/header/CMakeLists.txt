@@ -10,6 +10,9 @@ include (../raptor-test.cmake)
 include (GoogleTest OPTIONAL)
 
 CPMGetPackage (benchmark)
+if (benchmark_ADDED)
+    set_target_properties (benchmark PROPERTIES CXX_STANDARD ${CMAKE_CXX_STANDARD})
+endif ()
 CPMGetPackage (googletest)
 
 find_path (SEQAN3_TEST_CMAKE_MODULE_DIR
@@ -22,7 +25,7 @@ include (seqan3_test_files)
 include (seqan3_test_component)
 
 add_library ("raptor_header_test_lib" INTERFACE)
-target_link_libraries ("raptor_header_test_lib" INTERFACE raptor::test::header)
+target_link_libraries ("raptor_header_test_lib" INTERFACE raptor::test raptor::test::header)
 set (target "header_test")
 
 set (header_base_path "${CMAKE_CURRENT_LIST_DIR}/../../include/")

@@ -105,7 +105,7 @@ void compute_minimiser(prepare_arguments const & arguments)
                 {
                     if (occurrences >= cutoff)
                     {
-                        outfile.write(reinterpret_cast<const char *>(&hash), sizeof(hash));
+                        outfile.write(reinterpret_cast<char const *>(&hash), sizeof(hash));
                         ++count;
                     }
                 }

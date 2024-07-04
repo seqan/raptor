@@ -14,11 +14,10 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: doc-${{ github.event.pull_request.number || github.ref }}
+  group: documentation-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name != 'push' }}
 
 env:
-  SHARG_NO_VERSION_CHECK: 1
   TZ: Europe/Berlin
 
 defaults:
@@ -28,21 +27,11 @@ defaults:
 jobs:
   build:
     name: Documentation
-    runs-on: ubuntu-22.04
-    timeout-minutes: 120
+    runs-on: ubuntu-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: raptor
-          fetch-depth: 2
-          submodules: true
-
-      - name: Install CMake
-        uses: seqan/actions/setup-cmake@main
-        with:
-          cmake: 3.25.3
 
       - name: Install Doxygen
         uses: seqan/actions/setup-doxygen@main
@@ -51,12 +40,10 @@ jobs:
 
       - name: Configure tests
         run: |
-          mkdir build
-          cd build
-          cmake ../raptor/test/documentation
-          make -j2 download-cppreference-doxygen-web-tag
+          mkdir build && cd build
+          cmake ../test/documentation
+          make download-cppreference-doxygen-web-tag
 
       - name: Run tests
-        run: |
-          cd build
-          ctest . -j2 --output-on-failure
+        working-directory: build
+        run: ctest . -j --output-on-failure

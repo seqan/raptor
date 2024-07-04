@@ -82,8 +82,16 @@ void run_program(cmd_arguments const & arguments)
 
     auto worker = [&](auto && zipped_view, auto &&)
     {
+    // https://godbolt.org/z/PeKnxzjn1
+#if defined(__clang__)
+        for (auto && zipped : zipped_view)
+        {
+            auto bin_file = std::move(std::get<0>(zipped));
+            auto bin_number = std::move(std::get<1>(zipped));
+#else
         for (auto && [bin_file, bin_number] : zipped_view)
         {
+#endif
             std::mt19937_64 rng(bin_number);
             uint32_t read_counter{bin_number * reads_per_bin};
             // Immediately invoked initialising lambda expession (IIILE).
