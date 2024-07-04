@@ -332,7 +332,7 @@ class thresholder
 {
 private:
     // size_t const destroyed_kmers{};
-    double const percentage{};
+    double percentage{};
 
 public:
     thresholder() = default;
@@ -342,7 +342,7 @@ public:
     thresholder & operator=(thresholder &&) = default;
     ~thresholder() = default;
 
-    explicit thresholder(double perc) : percentage(perc)
+    explicit thresholder(double const perc) : percentage(perc)
     {}
 
     [[nodiscard]] constexpr size_t get(size_t const kmer_count) const noexcept

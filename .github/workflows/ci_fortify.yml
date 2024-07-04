@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: fortify-${{ github.ref }}
+  group: fortify-actions
   cancel-in-progress: true
 
 env:
@@ -23,55 +23,38 @@ defaults:
 
 jobs:
   build:
-    name: ${{ matrix.name }} ${{ matrix.build_type }}
-    runs-on: ubuntu-22.04
-    timeout-minutes: 240
+    name: Fortify ${{ matrix.build_type }}
+    runs-on: ubuntu-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: "Fortify"
-            build_type: Release
+          - build_type: Release
             cxx_flags: "-fcf-protection=check"
 
-          - name: "Fortify"
-            build_type: Debug
+          - build_type: Debug
             cxx_flags: "-fcf-protection=full"
-
+    container:
+      image: ghcr.io/seqan/gcc-14
+      volumes:
+        - /home/runner:/home/runner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: raptor
-          fetch-depth: 1
-          submodules: true
-
-      - name: Setup compiler
-        uses: seqan/actions/setup-compiler@main
-        with:
-          compiler: gcc-13
-
-      - name: Install CMake
-        uses: seqan/actions/setup-cmake@main
-        with:
-          cmake: 3.25.3
 
       - name: Configure tests
         run: |
-          mkdir build
-          cd build
-          cmake ../raptor/test/unit -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                    -DCMAKE_CXX_FLAGS="-std=c++23 -fexceptions -g -grecord-gcc-switches -pipe -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -mtune=native -fasynchronous-unwind-tables -fstack-clash-protection -Wno-interference-size ${{ matrix.cxx_flags }}"
-          make -j2 gtest_main
+          mkdir build && cd build
+          cmake ../test/unit -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                             -DCMAKE_CXX_FLAGS="-fexceptions -g -grecord-gcc-switches -pipe -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -mtune=native -fasynchronous-unwind-tables -fstack-clash-protection -Wno-interference-size ${{ matrix.cxx_flags }}"
+          make gtest_main
 
       - name: Build tests
-        run: |
-          cd build
-          make -k -j2
+        working-directory: build
+        run: make -k
 
       - name: Run tests
-        run: |
-          cd build
-          ctest . -j2 --output-on-failure
+        working-directory: build
+        run: ctest . -j --output-on-failure
 

@@ -21,11 +21,8 @@ set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # Dependencies
-include (${CMAKE_CURRENT_LIST_DIR}/../../../cmake/CPM.cmake)
-CPMUsePackageLock (${CMAKE_CURRENT_LIST_DIR}/../../../cmake/package-lock.cmake)
-
-CPMGetPackage (sharg)
-CPMGetPackage (seqan3)
+get_filename_component (Raptor_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+include ("${Raptor_SOURCE_DIR}/cmake/configuration.cmake")
 
 add_library (common_thresholding INTERFACE)
 target_link_libraries ("common_thresholding" INTERFACE seqan3::seqan3 sharg::sharg)

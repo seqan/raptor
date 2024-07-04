@@ -4,10 +4,7 @@
 
 cmake_minimum_required (VERSION 3.25)
 
-find_path (RAPTOR_MODULE_PATH "configuration.cmake" HINTS "${CMAKE_CURRENT_LIST_DIR}/cmake/")
-list (APPEND CMAKE_MODULE_PATH "${RAPTOR_MODULE_PATH}")
-
-include (version)
+include (${CMAKE_CURRENT_LIST_DIR}/cmake/version.cmake)
 
 project (Raptor
          LANGUAGES CXX
@@ -23,7 +20,7 @@ if (NOT CMAKE_BUILD_TYPE)
     )
 endif ()
 
-include (configuration)
+include (${CMAKE_CURRENT_LIST_DIR}/cmake/configuration.cmake)
 
 add_subdirectory (src)
 

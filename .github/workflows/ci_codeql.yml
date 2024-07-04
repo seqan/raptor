@@ -30,15 +30,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-      with:
-        path: raptor
-        fetch-depth: 0
-        submodules: true
-
-    - name: Install CMake
-      uses: seqan/actions/setup-cmake@main
-      with:
-        cmake: 3.25.3
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3

@@ -8,8 +8,9 @@ set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-get_filename_component (RAPTOR_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
-add_subdirectory ("${RAPTOR_ROOT_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/raptor")
+get_filename_component (Raptor_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
+include ("${Raptor_SOURCE_DIR}/cmake/configuration.cmake")
+add_subdirectory ("${Raptor_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/raptor")
 
 # Define cmake configuration flags to configure and build external projects with the same flags as specified for
 # this project.
@@ -44,4 +45,4 @@ else ()
     message ("-- DREAM-Yara will not be built. Enable via 'cmake -DRAPTOR_UTILITY_BUILD_DREAM_YARA=1 .'")
 endif ()
 
-add_subdirectory ("${RAPTOR_ROOT_DIR}/util/applications/src" "${CMAKE_CURRENT_BINARY_DIR}/applications")
+add_subdirectory ("${Raptor_SOURCE_DIR}/util/applications/src" "${CMAKE_CURRENT_BINARY_DIR}/applications")

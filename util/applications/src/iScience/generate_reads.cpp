@@ -58,7 +58,6 @@ void run_program(config const & cfg)
         seqan3::sequence_file_input<my_traits, seqan3::fields<seqan3::field::seq>> fin{bin_file};
         seqan3::sequence_file_output fout{(cfg.out_dir / bin_file.filename()).replace_extension(".fastq")};
 
-        uint16_t haplotype_counter{};
         uint32_t reads_per_bin_counter{};
 
         for (auto && record : fin)
@@ -79,7 +78,6 @@ void run_program(config const & cfg)
 
                 fout.emplace_back(read, std::to_string(read_counter), quality);
             }
-            ++haplotype_counter;
         }
     }
 }
