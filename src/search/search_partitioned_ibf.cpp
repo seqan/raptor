@@ -7,6 +7,7 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
+#include <future>
 #include <random>
 
 #include <seqan3/search/views/minimiser_hash.hpp>

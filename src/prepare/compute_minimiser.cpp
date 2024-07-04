@@ -7,13 +7,15 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
+#include <omp.h>
+
 #include <seqan3/io/sequence_file/input.hpp>
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <hibf/contrib/robin_hood.hpp>
 #include <hibf/contrib/std/chunk_view.hpp>
 #include <hibf/contrib/std/zip_view.hpp>
+#include <hibf/misc/divide_and_ceil.hpp>
 
 #include <raptor/adjust_seed.hpp>
 #include <raptor/dna4_traits.hpp>
@@ -52,7 +54,7 @@ void compute_minimiser(prepare_arguments const & arguments)
     file_reader<file_types::sequence> const reader{arguments.shape, arguments.window_size};
     raptor::cutoff const cutoffs{arguments};
 
-    auto worker = [&](auto && zipped_view, auto &&)
+    auto worker = [&](auto && zipped_view)
     {
         seqan::hibf::serial_timer local_compute_minimiser_timer{};
         seqan::hibf::serial_timer local_write_minimiser_timer{};
@@ -128,12 +130,17 @@ void compute_minimiser(prepare_arguments const & arguments)
         arguments.write_header_timer += local_write_header_timer;
     };
 
-    size_t const chunk_size =
-        std::max<size_t>(1, std::floor(arguments.bin_path.size() / static_cast<double>(arguments.threads)));
-    auto chunked_view =
-        seqan::stl::views::zip(arguments.bin_path, std::views::iota(0u)) | seqan::stl::views::chunk(chunk_size);
-    seqan3::detail::execution_handler_parallel executioner{arguments.threads};
-    executioner.bulk_execute(std::move(worker), std::move(chunked_view), []() {});
+    size_t const number_of_bins = arguments.bin_path.size();
+    size_t const chunk_size = seqan::hibf::divide_and_ceil(number_of_bins, arguments.threads);
+    auto chunked_view = seqan::stl::views::zip(arguments.bin_path, std::views::iota(0u, number_of_bins))
+                      | seqan::stl::views::chunk(chunk_size);
+    size_t const number_of_chunks = std::ranges::size(chunked_view);
+
+#pragma omp parallel for schedule(dynamic) num_threads(arguments.threads)
+    for (size_t i = 0; i < number_of_chunks; ++i)
+    {
+        std::invoke(worker, chunked_view[i]);
+    }
 
     write_list_file(arguments);
 }

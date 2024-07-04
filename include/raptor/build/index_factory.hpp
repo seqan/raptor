@@ -68,7 +68,7 @@ private:
         raptor_index<> index{*arguments};
         arguments->index_allocation_timer.stop();
 
-        auto worker = [&](auto && zipped_view, auto &&)
+        auto worker = [&](auto && zipped_view)
         {
             seqan::hibf::serial_timer local_timer{};
             auto & ibf = index.ibf();

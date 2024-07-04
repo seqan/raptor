@@ -39,7 +39,7 @@ size_t kmer_count_from_minimiser_files(std::vector<std::vector<std::string>> con
         }
     };
 
-    auto worker = [&callback](auto && zipped_view, auto &&)
+    auto worker = [&callback](auto && zipped_view)
     {
         std::filesystem::path minimiser_file{};
         std::filesystem::path biggest_file{};
@@ -94,7 +94,7 @@ size_t kmer_count_from_sequence_files(std::vector<std::vector<std::string>> cons
         }
     };
 
-    auto worker = [&callback, &reader](auto && zipped_view, auto &&)
+    auto worker = [&callback, &reader](auto && zipped_view)
     {
         for (auto && [file_names, bin_number] : zipped_view)
             reader.on_hash(file_names, callback);
