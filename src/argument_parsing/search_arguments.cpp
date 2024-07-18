@@ -38,7 +38,7 @@ void search_arguments::print_timings() const
 
 void search_arguments::write_timings_to_file() const
 {
-    std::ofstream output_stream{timing_out};
+    std::ofstream output_stream{timing_out, std::ios_base::app};
     output_stream << std::fixed << std::setprecision(2);
     output_stream << "wall_clock_time_in_seconds\t"
                   << "peak_memory_usage_in_KiB\t"
