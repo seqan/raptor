@@ -35,11 +35,7 @@ endmacro ()
 # ----------------------------------------------------------------------------
 
 if (NOT DEFINED CMAKE_CXX_STANDARD)
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
-        set (CMAKE_CXX_STANDARD 20)
-    else ()
-        set (CMAKE_CXX_STANDARD 23)
-    endif ()
+    set (CMAKE_CXX_STANDARD 23)
 endif ()
 
 if (NOT DEFINED CMAKE_CXX_STANDARD_REQUIRED)
