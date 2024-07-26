@@ -66,3 +66,4 @@ add_test (NAME doc_no_warnings_test
           COMMAND bash -c "${RAPTOR_TEST_DOXYGEN_FAIL_ON_WARNINGS}"
           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
+set_tests_properties (doc_no_warnings_test PROPERTIES DEPENDS cppreference-doxygen-web-tag)

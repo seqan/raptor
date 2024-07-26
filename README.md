@@ -16,7 +16,7 @@ SPDX-License-Identifier: CC-BY-4.0
 ### A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences
 
 ## Download and Installation
-See the [documentation](https://seqan-raptor.vercel.app/setup.html) for detailed information on how to download,
+See the [documentation](https://docs.seqan.de/raptor/main/setup.html) for detailed information on how to download,
 install, and compile Raptor.
 
 There may be performance benefits when compiling from source, as Raptor can be optimized for the host system.
@@ -28,7 +28,7 @@ conda install -c bioconda -c conda-forge raptor
 ```
 
 ## Example Data and Usage
-See the [documentation](https://seqan-raptor.vercel.app/usage_quickstart.html) for usage.
+See the [documentation](https://docs.seqan.de/raptor/main/usage_quickstart.html) for usage.
 
 `raptor --help` will show available commands. Each command will have a respective help page that can be shown via, e.g.,
 `raptor build --help`.
@@ -63,13 +63,3 @@ The subdirectory `util` contains applications and scripts related to papers.
 ### License
 Raptor is open-source software. However, certain conditions apply when you (re-)distribute and/or modify Raptor,
 please see the [license](https://github.com/seqan/raptor/blob/main/LICENSE.md).
-
-## Sponsorships
-
-[![Vercel][vercel_badge]][vercel_website]
-
-[vercel_badge]: https://raw.githubusercontent.com/seqan/raptor/main/test/documentation/.vercel/powered-by-vercel.svg "Powered by Vercel"
-[vercel_website]: https://vercel.com/?utm_source=seqan&utm_campaign=oss
-
-We are grateful to Vercel for building and hosting our documentation, and they even provide preview builds within our
-pull requests. Check them out!
