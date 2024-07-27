@@ -55,7 +55,7 @@ jobs:
 
           - name: "UBSan"
             os: macos-12
-            cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero,local-bounds,nullability -Wno-pass-failed"
+            cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero,local-bounds,nullability -fno-sanitize=function -Wno-pass-failed"
 
           - os: macos-12
             compiler: clang-18
