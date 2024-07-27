@@ -39,10 +39,6 @@ jobs:
             os: macos-12
         include:
           - name: "ASan"
-            cxx_flags: "-fno-omit-frame-pointer -fsanitize=address"
-
-          - name: "ASan"
-            os: ubuntu-latest
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=address -Wno-maybe-uninitialized"
 
           - name: "TSan"
@@ -58,18 +54,18 @@ jobs:
 
           - os: macos-12
             compiler: clang-18
+            cxx_gcc: ""
 
           - os: ubuntu-latest
             compiler: gcc-14
             image: ghcr.io/seqan/gcc-14
-
-          - compiler: gcc-14
             cxx_gcc: "-Wno-interference-size"
 
           - name: "TSan"
             os: ubuntu-latest
             compiler: clang-18
             image: ghcr.io/seqan/clang-18
+            cxx_gcc: ""
     container:
       image: ${{ matrix.image || '' }}
       volumes:
