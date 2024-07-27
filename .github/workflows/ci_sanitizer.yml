@@ -39,33 +39,35 @@ jobs:
             os: macos-12
         include:
           - name: "ASan"
-            cxx_flags: "-fno-omit-frame-pointer -fsanitize=address -Wno-maybe-uninitialized"
+            os: ubuntu-latest
+            cxx_flags: "-fno-omit-frame-pointer -fsanitize=address -Wno-maybe-uninitialized -Wno-interference-size"
+
+          - name: "ASan"
+            os: macos-12
+            cxx_flags: "-fno-omit-frame-pointer -fsanitize=address"
 
           - name: "TSan"
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=thread"
 
           - name: "UBSan"
+            os: ubuntu-latest
+            cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero -Wno-interference-size"
+
+          - name: "UBSan"
             os: macos-12
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero,local-bounds,nullability -Wno-pass-failed"
 
-          - name: "UBSan"
-            os: ubuntu-latest
-            cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero"
-
           - os: macos-12
             compiler: clang-18
-            cxx_gcc: ""
 
           - os: ubuntu-latest
             compiler: gcc-14
             image: ghcr.io/seqan/gcc-14
-            cxx_gcc: "-Wno-interference-size"
 
           - name: "TSan"
             os: ubuntu-latest
             compiler: clang-18
             image: ghcr.io/seqan/clang-18
-            cxx_gcc: ""
     container:
       image: ${{ matrix.image || '' }}
       volumes:
@@ -84,7 +86,7 @@ jobs:
         run: |
           mkdir build && cd build
           cmake ../test/unit -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} ${{ matrix.cxx_gcc }}"
+                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
           make gtest_main
 
       - name: Build tests
