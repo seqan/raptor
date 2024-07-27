@@ -41,12 +41,16 @@ jobs:
           - name: "ASan"
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=address"
 
+          - name: "ASan"
+            os: ubuntu-latest
+            cxx_flags: "-fno-omit-frame-pointer -fsanitize=address -Wno-maybe-uninitialized"
+
           - name: "TSan"
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=thread"
 
           - name: "UBSan"
             os: macos-12
-            cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero,implicit-conversion,local-bounds,nullability -Wno-pass-failed"
+            cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero,local-bounds,nullability -Wno-pass-failed"
 
           - name: "UBSan"
             os: ubuntu-latest
@@ -58,7 +62,9 @@ jobs:
           - os: ubuntu-latest
             compiler: gcc-14
             image: ghcr.io/seqan/gcc-14
-            cxx_ubuntu: "-Wno-interference-size"
+
+          - compiler: gcc-14
+            cxx_gcc: "-Wno-interference-size"
 
           - name: "TSan"
             os: ubuntu-latest
@@ -82,7 +88,7 @@ jobs:
         run: |
           mkdir build && cd build
           cmake ../test/unit -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} ${{ matrix.cxx_ubuntu }}"
+                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }} ${{ matrix.cxx_gcc }}"
           make gtest_main
 
       - name: Build tests

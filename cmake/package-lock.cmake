@@ -26,7 +26,7 @@ CPMDeclarePackage (sharg
                    OPTIONS "INSTALL_SHARG OFF" "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING"
 )
 # seqan3
-set (RAPTOR_SEQAN3_VERSION 4f24e5e0bc06fab915b90b51bb8f61ff3f130cf7)
+set (RAPTOR_SEQAN3_VERSION 8dcf7e206d50ae8485697aa0835ceeba218a6c06)
 CPMDeclarePackage (seqan3
                    NAME seqan3
                    GIT_TAG ${RAPTOR_SEQAN3_VERSION}

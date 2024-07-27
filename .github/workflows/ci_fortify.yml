@@ -47,7 +47,7 @@ jobs:
         run: |
           mkdir build && cd build
           cmake ../test/unit -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                             -DCMAKE_CXX_FLAGS="-fexceptions -g -grecord-gcc-switches -pipe -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -mtune=native -fasynchronous-unwind-tables -fstack-clash-protection -Wno-interference-size ${{ matrix.cxx_flags }}"
+                             -DCMAKE_CXX_FLAGS="-fexceptions -g -grecord-gcc-switches -pipe -Werror=format -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -mtune=native -fasynchronous-unwind-tables -fstack-clash-protection -Wno-interference-size ${{ matrix.cxx_flags }}"
           make gtest_main
 
       - name: Build tests
