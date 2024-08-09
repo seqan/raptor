@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <future>
 #include <omp.h>
 #include <vector>
 
