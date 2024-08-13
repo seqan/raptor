@@ -24,6 +24,7 @@ add_library (raptor::raptor ALIAS raptor_lib)
 # Raptor executable
 add_executable ("raptor" raptor.cpp)
 target_link_libraries ("raptor" PUBLIC "raptor::raptor")
+set_property (TARGET raptor PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 add_subdirectory (argument_parsing)
 add_subdirectory (build)
