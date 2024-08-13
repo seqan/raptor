@@ -94,38 +94,45 @@ public:
         auto kmer_view = text | seqan3::views::kmer_hash(shape) | std::views::transform(apply_xor);
         forward_hashes.assign(kmer_view.begin(), kmer_view.end());
 
+        struct kmer
+        {
+            uint64_t hash{};
+            uint64_t position{};
+
+            constexpr auto operator<=>(kmer const & other) const = default;
+        };
+
         // Stores hash and begin for all k-mers in the window
-        std::deque<std::pair<uint64_t, uint64_t>> window_hashes;
+        std::deque<kmer> window_hashes;
 
         // Initialisation. We need to compute all hashes for the first window.
         for (uint64_t i = 0; i < kmers_per_window; ++i)
-            window_hashes.emplace_back(forward_hashes[i], i);
+            window_hashes.emplace_back(kmer{.hash = forward_hashes[i], .position = i});
 
         // The minimum hash is the minimiser. Store the begin position.
-        auto min = std::min_element(std::begin(window_hashes), std::end(window_hashes));
-        minimiser_begin.push_back(min->second);
+        auto min = std::ranges::min(window_hashes);
+        minimiser_begin.push_back(min.position);
 
         // For the following windows, we remove the first window k-mer (is now not in window) and add the new k-mer
         // that results from the window shifting.
         for (uint64_t i = kmers_per_window; i < max_number_of_minimiser; ++i)
         {
-            // Already store the new hash without removing the first one.
             uint64_t const new_hash{forward_hashes[i + kmers_per_window - 1]}; // Already did kmers_per_window - 1 many
-            window_hashes.emplace_back(new_hash, i);
 
-            if (new_hash < min->second) // New hash is the minimum.
-            {
-                min = std::prev(std::end(window_hashes));
-                minimiser_begin.push_back(min->second);
-            }
-            else if (min == std::begin(window_hashes)) // Minimum is the yet-to-be-removed begin of the window.
-            {
-                // The first hash will be removed, the last one is caught by the previous if.
-                min = std::min_element(++std::begin(window_hashes), std::prev(std::end(window_hashes)));
-                minimiser_begin.push_back(min->second);
-            }
+            // There are two conditions when we need to recompute the minimum:
+            bool const minimiser_leaves_window = window_hashes.front() == min;
+            bool const new_hash_is_min = new_hash < min.hash;
 
-            window_hashes.pop_front(); // Remove the first k-mer.
+            // Rolling hash / sliding window
+            window_hashes.pop_front();
+            window_hashes.emplace_back(kmer{.hash = new_hash, .position = i});
+
+            // Update the minimum
+            if (new_hash_is_min || minimiser_leaves_window)
+            {
+                min = new_hash_is_min ? window_hashes.back() : std::ranges::min(window_hashes);
+                minimiser_begin.push_back(min.position);
+            }
         }
         return;
     }
