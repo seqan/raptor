@@ -58,9 +58,9 @@ CPMDeclarePackage (benchmark
                            "CMAKE_MESSAGE_LOG_LEVEL WARNING" "CMAKE_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
 )
 # googletest
-set (RAPTOR_GOOGLETEST_VERSION 1.14.0)
+set (RAPTOR_GOOGLETEST_VERSION 1.15.2)
 CPMDeclarePackage (googletest
-                   NAME GTest
+                   NAME googletest
                    VERSION ${RAPTOR_GOOGLETEST_VERSION}
                    GITHUB_REPOSITORY google/googletest
                    SYSTEM TRUE
