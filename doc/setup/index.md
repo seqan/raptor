@@ -20,7 +20,8 @@ conda install -c bioconda -c conda-forge raptor
 
 ### Prerequisites
 * CMake >= 3.21
-* GCC 11, 12 or 13 (most recent minor version)
+* GCC 12, 13 or 14 (most recent minor version)
+* Clang 17 or 18 (most recent minor version)
 * git
 
 Refer to the [Seqan3 Setup Tutorial](https://docs.seqan.de/seqan/3-master-user/setup.html) for more in depth
