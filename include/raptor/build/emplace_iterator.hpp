@@ -32,13 +32,13 @@ public:
 
     explicit constexpr emplace_iterator(seqan::hibf::interleaved_bloom_filter & ibf, seqan::hibf::bin_index const idx) :
         ibf{std::addressof(ibf)},
-        index{std::move(idx)}
+        index{idx}
     {}
 
     /* constexpr */ emplace_iterator & operator=(uint64_t const value) noexcept
     {
         assert(ibf != nullptr);
-        ibf->emplace(std::move(value), index);
+        ibf->emplace(value, index);
         return *this;
     }
 
@@ -65,7 +65,7 @@ private:
 [[nodiscard]] inline constexpr emplace_iterator emplacer(seqan::hibf::interleaved_bloom_filter & ibf,
                                                          seqan::hibf::bin_index const idx)
 {
-    return emplace_iterator{ibf, std::move(idx)};
+    return emplace_iterator{ibf, idx};
 }
 
 } // namespace raptor

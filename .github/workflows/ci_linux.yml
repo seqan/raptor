@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: ["clang-18", "clang-17", "gcc-14", "gcc-13", "gcc-12", "gcc-11", "intel"]
+        compiler: ["clang-18", "clang-17", "gcc-14", "gcc-13", "gcc-12", "intel"]
         include:
           - cxx_flags: "-Wno-interference-size"
           - compiler: "clang-18"

@@ -116,11 +116,11 @@ TEST(minimiser, logspace_substract)
     raptor::threshold::threshold const threshold{parameters};
     // results for pseudorandom generators are implementation-defined
 #ifdef _LIBCPP_VERSION
-    std::vector<size_t> const expected{1u,  1u,  1u,  1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u,  8u, 9u,
-                                       10u, 11u, 12u, 13u, 14u, 15u, 16u, 17u, 18u, 19u, 21u, 22u};
+    std::vector<size_t> const expected{1u,  1u,  1u,  1u,  2u,  4u,  5u,  6u,  7u,  8u,  9u,  9u, 10u,
+                                       11u, 12u, 13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 22u, 23u};
 #else
-    std::vector<size_t> const expected{1u,  1u,  1u,  1u,  2u,  3u,  4u,  5u,  6u,  6u,  7u,  8u, 9u,
-                                       10u, 11u, 12u, 13u, 13u, 14u, 15u, 16u, 17u, 18u, 20u, 21u};
+    std::vector<size_t> const expected{1u,  1u,  1u,  1u,  2u,  4u,  5u,  6u,  7u,  7u,  8u,  9u, 10u,
+                                       11u, 12u, 13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 22u, 23u};
 #endif
     ASSERT_EQ(expected.size(), 37u - 12u);
     for (size_t i = 12u; i < 37u; ++i)

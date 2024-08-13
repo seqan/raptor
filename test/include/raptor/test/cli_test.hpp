@@ -384,18 +384,7 @@ struct raptor_base : public cli_test
 
             for (auto && hit : std::views::split(line_view.substr(query_prefix.size() + 2u), ','))
             {
-// GCC 11 does not implement P2210R2, hence GCC 11's split_view is actually a lazy_split_view.
-#if defined(__GNUC__) && !defined(__llvm__) && !defined(__INTEL_COMPILER) && (__GNUC__ > 10) && (__GNUC__ < 12)
-                std::stringstream buf;
-                for (auto const & inner_view : hit)
-                {
-                    buf << inner_view;
-                }
-                auto view = buf.view();
-                std::from_chars(view.data(), view.data() + view.size(), tmp);
-#else
                 std::from_chars(hit.data(), hit.data() + hit.size(), tmp);
-#endif
                 actual_hits.push_back(tmp);
             }
             std::ranges::sort(actual_hits);
