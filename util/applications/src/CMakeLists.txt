@@ -19,7 +19,7 @@ include ("${Raptor_SOURCE_DIR}/cmake/configuration.cmake")
 add_subdirectory ("${Raptor_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/raptor")
 
 add_library (utility_common INTERFACE)
-target_link_libraries ("utility_common" INTERFACE raptor::raptor)
+target_link_libraries ("utility_common" INTERFACE raptor::interface)
 target_include_directories ("utility_common" INTERFACE "../include")
 
 add_executable ("hibf_sizes" hibf_sizes.cpp)

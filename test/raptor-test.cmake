@@ -22,7 +22,7 @@ get_filename_component (Raptor_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUT
 include ("${Raptor_SOURCE_DIR}/cmake/configuration.cmake")
 add_subdirectory ("${Raptor_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/raptor")
 set_property (TARGET raptor PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-target_compile_options (raptor_raptor INTERFACE "-pedantic" "-Wall" "-Wextra" "-Werror")
+target_compile_options (raptor_interface INTERFACE "-pedantic" "-Wall" "-Wextra" "-Werror")
 
 # ----------------------------------------------------------------------------
 # CPM

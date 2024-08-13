@@ -4,7 +4,7 @@
 
 cmake_minimum_required (VERSION 3.25)
 
-if (TARGET raptor_threshold)
+if (TARGET raptor::threshold)
     return ()
 endif ()
 
@@ -18,4 +18,5 @@ add_library ("raptor_threshold" STATIC
              threshold.cpp
 )
 
-target_link_libraries ("raptor_threshold" PUBLIC "raptor::raptor")
+target_link_libraries ("raptor_threshold" PUBLIC "raptor::interface")
+add_library (raptor::threshold ALIAS raptor_threshold)
