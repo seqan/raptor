@@ -8,7 +8,7 @@ cmake_minimum_required (VERSION 3.25)
 # Short-circuit if Raptor is already configured
 # ----------------------------------------------------------------------------
 
-if (TARGET raptor::raptor)
+if (TARGET raptor::interface)
     return ()
 endif ()
 
@@ -82,22 +82,22 @@ endif ()
 # Export targets
 # ----------------------------------------------------------------------------
 
-add_library (raptor_raptor INTERFACE)
-target_link_libraries (raptor_raptor INTERFACE seqan::hibf sharg::sharg seqan3::seqan3)
-target_include_directories (raptor_raptor INTERFACE "${RAPTOR_INCLUDE_DIR}")
+add_library (raptor_interface INTERFACE)
+target_link_libraries (raptor_interface INTERFACE seqan::hibf sharg::sharg seqan3::seqan3)
+target_include_directories (raptor_interface INTERFACE "${RAPTOR_INCLUDE_DIR}")
 
 # !Workaround: Get chopper include dir from chopper_shared target
 find_path (CHOPPER_INCLUDE_DIR
            NAMES chopper/configuration.hpp
            HINTS "${chopper_SOURCE_DIR}/include"
 )
-target_include_directories (raptor_raptor SYSTEM INTERFACE "${CHOPPER_INCLUDE_DIR}")
+target_include_directories (raptor_interface SYSTEM INTERFACE "${CHOPPER_INCLUDE_DIR}")
 
 # !Workaround: Get seqan3 test include dir from seqan3 target
 find_path (SEQAN3_TEST_INCLUDE_DIR
            NAMES seqan3/test/tmp_directory.hpp
            HINTS "${seqan3_SOURCE_DIR}/test/include"
 )
-target_include_directories (raptor_raptor SYSTEM INTERFACE "${SEQAN3_TEST_INCLUDE_DIR}")
+target_include_directories (raptor_interface SYSTEM INTERFACE "${SEQAN3_TEST_INCLUDE_DIR}")
 
-add_library (raptor::raptor ALIAS raptor_raptor)
+add_library (raptor::interface ALIAS raptor_interface)

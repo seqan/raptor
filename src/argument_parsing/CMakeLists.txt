@@ -4,7 +4,7 @@
 
 cmake_minimum_required (VERSION 3.25)
 
-if (TARGET raptor_argument_parsing)
+if (TARGET raptor::argument_parsing)
     return ()
 endif ()
 
@@ -62,4 +62,5 @@ set_source_files_properties (init_shared_meta.cpp
                                         "RAPTOR_VERSION=\"${PACKAGE_VERSION} (${RAPTOR_COMMIT_HASH})\";RAPTOR_DATE=\"${RAPTOR_COMMIT_DATE}\""
 )
 
-target_link_libraries ("raptor_argument_parsing" PUBLIC "raptor::raptor")
+target_link_libraries ("raptor_argument_parsing" PUBLIC "raptor::interface")
+add_library (raptor::argument_parsing ALIAS raptor_argument_parsing)

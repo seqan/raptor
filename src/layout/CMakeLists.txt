@@ -4,9 +4,10 @@
 
 cmake_minimum_required (VERSION 3.15)
 
-if (TARGET raptor_layout)
+if (TARGET raptor::layout)
     return ()
 endif ()
 
 add_library ("raptor_layout" STATIC raptor_layout.cpp)
-target_link_libraries ("raptor_layout" PUBLIC "raptor::raptor" "chopper_lib")
+target_link_libraries ("raptor_layout" PUBLIC "raptor::interface" "chopper_lib")
+add_library (raptor::layout ALIAS raptor_layout)

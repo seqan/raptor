@@ -11,18 +11,20 @@ endif ()
 # Raptor library
 add_library ("raptor_lib" INTERFACE)
 target_link_libraries ("raptor_lib"
-                       INTERFACE "raptor_argument_parsing"
-                                 "raptor_build"
-                                 "raptor_prepare"
-                                 "raptor_search"
-                                 "raptor_threshold"
-                                 "raptor_upgrade"
-                                 "raptor_layout"
+                       INTERFACE "raptor::argument_parsing"
+                                 "raptor::build"
+                                 "raptor::prepare"
+                                 "raptor::search"
+                                 "raptor::threshold"
+                                 "raptor::upgrade"
+                                 "raptor::layout"
 )
+add_library (raptor::raptor ALIAS raptor_lib)
 
 # Raptor executable
 add_executable ("raptor" raptor.cpp)
-target_link_libraries ("raptor" PUBLIC "raptor_lib")
+target_link_libraries ("raptor" PUBLIC "raptor::raptor")
+set_property (TARGET raptor PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 add_subdirectory (argument_parsing)
 add_subdirectory (build)

@@ -4,9 +4,10 @@
 
 cmake_minimum_required (VERSION 3.25)
 
-if (TARGET raptor_upgrade)
+if (TARGET raptor::upgrade)
     return ()
 endif ()
 
 add_library ("raptor_upgrade" STATIC raptor_upgrade.cpp)
-target_link_libraries ("raptor_upgrade" PUBLIC "raptor::raptor")
+target_link_libraries ("raptor_upgrade" PUBLIC "raptor::interface")
+add_library (raptor::upgrade ALIAS raptor_upgrade)
