@@ -118,7 +118,7 @@ TEST_F(argparse_layout, no_bins_in_file)
 {
     cli_test_result const result = execute_app("raptor", "layout", "--input", tmp_bin_list_empty);
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{"[Error] The input file is empty.\n"});
+    EXPECT_EQ(result.err, "[Error] The file " + tmp_bin_list_empty.string() + " appears to be empty.\n");
     RAPTOR_ASSERT_FAIL_EXIT(result);
 }
 
