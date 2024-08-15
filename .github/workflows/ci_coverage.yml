@@ -55,7 +55,7 @@ jobs:
         run: |
           mkdir build && cd build
           cmake ../test/coverage -DCMAKE_BUILD_TYPE=Coverage \
-                                                   -DCMAKE_CXX_FLAGS="-Wno-interference-size"
+                                 -DCMAKE_CXX_FLAGS="-Wno-interference-size"
           make gtest_main
 
       - name: Build tests
@@ -63,7 +63,7 @@ jobs:
         run: |
           ccache -z
           make -k
-          ccache -sv
+          ccache -svvx
 
       - name: Run tests
         working-directory: build
@@ -73,8 +73,8 @@ jobs:
         run: |
           gcovr --root ${GITHUB_WORKSPACE}/test/coverage \
                 ${GITHUB_WORKSPACE}/build \
-                --filter ${GITHUB_WORKSPACE}/raptor/include \
-                --filter ${GITHUB_WORKSPACE}/raptor/src \
+                --filter ${GITHUB_WORKSPACE}/include \
+                --filter ${GITHUB_WORKSPACE}/src \
                 --exclude-lines-by-pattern '^\s*$' \
                 --exclude-lines-by-pattern '^\s*};$' \
                 --exclude-unreachable-branches \

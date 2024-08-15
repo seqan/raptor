@@ -61,5 +61,5 @@ jobs:
         run: |
           ccache -z
           make -k
-          ccache -sv
+          ccache -svvx
 
