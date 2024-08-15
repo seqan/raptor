@@ -72,7 +72,7 @@ jobs:
           ccache -z
           make -k
           make install
-          ccache -sv
+          ccache -svvx
 
       - name: Run Nextflow
         if: matrix.name == 'Nextflow'
