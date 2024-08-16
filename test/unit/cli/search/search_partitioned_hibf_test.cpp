@@ -7,7 +7,9 @@
 
 #include <raptor/test/cli_test.hpp>
 
-struct search_partitioned_hibf : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, size_t, size_t>>
+struct search_partitioned_hibf :
+    public raptor_base,
+    public testing::WithParamInterface<std::tuple<size_t, size_t, size_t, size_t>>
 {};
 
 TEST_P(search_partitioned_hibf, with_threshold)
@@ -53,13 +55,8 @@ TEST_P(search_partitioned_hibf, with_threshold)
     ASSERT_TRUE(std::filesystem::exists(layout_filename));
 
     { // build index
-        cli_test_result const result = execute_app("raptor",
-                                                   "build",
-                                                   "--output",
-                                                   index_filename,
-                                                   "--quiet",
-                                                   "--input",
-                                                   layout_filename);
+        cli_test_result const result =
+            execute_app("raptor", "build", "--output", index_filename, "--quiet", "--input", layout_filename);
 
         EXPECT_EQ(result.out, std::string{});
         EXPECT_EQ(result.err, std::string{});
@@ -130,13 +127,8 @@ TEST_P(search_partitioned_hibf, no_hits)
     ASSERT_TRUE(std::filesystem::exists(layout_filename));
 
     { // build index
-        cli_test_result const result = execute_app("raptor",
-                                                   "build",
-                                                   "--output",
-                                                   index_filename,
-                                                   "--quiet",
-                                                   "--input",
-                                                   layout_filename);
+        cli_test_result const result =
+            execute_app("raptor", "build", "--output", index_filename, "--quiet", "--input", layout_filename);
 
         EXPECT_EQ(result.out, std::string{});
         EXPECT_EQ(result.err, std::string{});
@@ -165,7 +157,10 @@ TEST_P(search_partitioned_hibf, no_hits)
 
 INSTANTIATE_TEST_SUITE_P(search_partitioned_hibf_suite,
                          search_partitioned_hibf,
-                         testing::Combine(testing::Values(16, 32), testing::Values(2, 4, 8), testing::Values(0, 1), testing::Values(0, 1, 2, 3, 4)),
+                         testing::Combine(testing::Values(16, 32),
+                                          testing::Values(2, 4, 8),
+                                          testing::Values(0, 1),
+                                          testing::Values(0, 1, 2, 3, 4)),
                          [](testing::TestParamInfo<search_partitioned_hibf::ParamType> const & info)
                          {
                              std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_"

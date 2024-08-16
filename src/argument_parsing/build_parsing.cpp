@@ -176,11 +176,14 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
                                     .description = "The number of hash functions to use.",
                                     .default_message = std::to_string(arguments.hash) + ", or read from layout file",
                                     .validator = sharg::arithmetic_range_validator{1, 5}});
-    parser.add_option(arguments.parts,
-                      sharg::config{.short_id = '\0',
-                                    .long_id = "parts",
-                                    .description = "Splits the index in this many parts. Not available for the HIBF. Needs to be set at layouting step.",
-                                    .validator = power_of_two_validator{}});
+    parser.add_option(
+        arguments.parts,
+        sharg::config{
+            .short_id = '\0',
+            .long_id = "parts",
+            .description =
+                "Splits the index in this many parts. Not available for the HIBF. Needs to be set at layouting step.",
+            .validator = power_of_two_validator{}});
 
     // GCOVR_EXCL_START
     // Adding additional cwl information that currently aren't supported by sharg and tdl.
