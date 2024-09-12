@@ -86,11 +86,7 @@ add_library (raptor_interface INTERFACE)
 target_link_libraries (raptor_interface INTERFACE seqan::hibf sharg::sharg seqan3::seqan3)
 target_include_directories (raptor_interface INTERFACE "${RAPTOR_INCLUDE_DIR}")
 
-# !Workaround: Get chopper include dir from chopper_shared target
-find_path (CHOPPER_INCLUDE_DIR
-           NAMES chopper/configuration.hpp
-           HINTS "${chopper_SOURCE_DIR}/include"
-)
+get_target_property (CHOPPER_INCLUDE_DIR chopper::interface INTERFACE_INCLUDE_DIRECTORIES)
 target_include_directories (raptor_interface SYSTEM INTERFACE "${CHOPPER_INCLUDE_DIR}")
 
 # !Workaround: Get seqan3 test include dir from seqan3 target

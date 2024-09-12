@@ -27,13 +27,14 @@ defaults:
 
 jobs:
   build:
-    name: ${{ matrix.compiler }}
+    name: ${{ matrix.compiler }} ${{ matrix.build_type }}
     runs-on: ubuntu-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
       fail-fast: false
       matrix:
         compiler: ["clang-18", "clang-17", "gcc-14", "gcc-13", "gcc-12", "intel"]
+        build_type: [Release, Debug]
         include:
           - cxx_flags: "-Wno-interference-size"
           - compiler: "clang-18"
@@ -53,7 +54,7 @@ jobs:
       - name: Configure tests
         run: |
           mkdir build && cd build
-          cmake ../util/test -DCMAKE_BUILD_TYPE=Release \
+          cmake ../util/test -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                              -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
 
       - name: Build tests
