@@ -15,6 +15,7 @@ concurrency:
 
 env:
   SHARG_NO_VERSION_CHECK: 1
+  CODEQL_EXTRACTOR_CPP_AUTOINSTALL_DEPENDENCIES: false
   TZ: Europe/Berlin
 
 defaults:
@@ -27,6 +28,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       security-events: write
+    container:
+      image: ghcr.io/seqan/gcc-14
+      volumes:
+        - /home/runner:/home/runner
     steps:
     - name: Checkout
       uses: actions/checkout@v4
