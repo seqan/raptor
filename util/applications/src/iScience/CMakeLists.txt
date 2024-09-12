@@ -16,7 +16,7 @@ endif ()
 
 if (NOT TARGET count_minimiser)
     add_executable ("count_minimiser" ${Raptor_SOURCE_DIR}/src/argument_parsing/parse_bin_path.cpp count_minimiser.cpp)
-    target_link_libraries ("count_minimiser" "utility_common")
+    target_link_libraries ("count_minimiser" "utility_common" chopper::layout)
 endif ()
 
 if (NOT TARGET threshold_info)

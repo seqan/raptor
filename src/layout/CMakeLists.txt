@@ -9,5 +9,5 @@ if (TARGET raptor::layout)
 endif ()
 
 add_library ("raptor_layout" STATIC raptor_layout.cpp)
-target_link_libraries ("raptor_layout" PUBLIC "raptor::interface" "chopper_lib")
+target_link_libraries ("raptor_layout" PUBLIC "raptor::interface" "chopper::chopper")
 add_library (raptor::layout ALIAS raptor_layout)
