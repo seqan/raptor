@@ -32,18 +32,18 @@ jobs:
       fail-fast: false
       matrix:
         name: [ASan, TSan, UBSan]
-        os: [ubuntu-latest, macos-12]
+        os: [ubuntu-latest, macos-14]
         build_type: [Release, RelWithDebInfo, Debug]
         exclude:
           - name: "TSan"
-            os: macos-12
+            os: macos-14
         include:
           - name: "ASan"
             os: ubuntu-latest
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=address -Wno-maybe-uninitialized -Wno-interference-size"
 
           - name: "ASan"
-            os: macos-12
+            os: macos-14
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=address"
 
           - name: "TSan"
@@ -54,10 +54,10 @@ jobs:
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero -Wno-interference-size"
 
           - name: "UBSan"
-            os: macos-12
+            os: macos-14
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero,local-bounds,nullability -fno-sanitize=function -Wno-pass-failed"
 
-          - os: macos-12
+          - os: macos-14
             compiler: clang-18
 
           - os: ubuntu-latest
@@ -79,6 +79,12 @@ jobs:
       - name: Setup compiler
         if: contains(matrix.os, 'macos')
         uses: seqan/actions/setup-compiler@main
+        with:
+          compiler: ${{ matrix.compiler }}
+
+      - name: Patch M1 GCC
+        if: contains(matrix.os, 'macos') && contains(matrix.compiler, 'gcc') && matrix.compiler != 'gcc-14'
+        uses: seqan/actions/patch-m1-gcc@main
         with:
           compiler: ${{ matrix.compiler }}
 
