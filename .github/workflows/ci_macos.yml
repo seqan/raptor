@@ -28,7 +28,7 @@ defaults:
 jobs:
   build:
     name: ${{ matrix.compiler }}
-    runs-on: macos-12
+    runs-on: macos-14
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
       fail-fast: false
@@ -50,10 +50,11 @@ jobs:
           compiler: ${{ matrix.compiler }}
           ccache_size: 75M
 
-      - name: Install CMake
-        uses: seqan/actions/setup-cmake@main
+      - name: Patch M1 GCC
+        if: contains(matrix.compiler, 'gcc') && matrix.compiler != 'gcc-14'
+        uses: seqan/actions/patch-m1-gcc@main
         with:
-          cmake: 3.28.5
+          compiler: ${{ matrix.compiler }}
 
       - name: Configure tests
         run: |
