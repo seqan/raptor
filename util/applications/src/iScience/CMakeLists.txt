@@ -38,7 +38,18 @@ if (NOT TARGET apply_taxsbp)
 endif ()
 
 if (NOT TARGET generate_reads_refseq)
-    add_executable ("generate_reads_refseq" generate_reads_refseq.cpp)
+    add_executable ("generate_reads_refseq"
+                    generate_reads/apply_weights.cpp
+                    generate_reads/infer_weights_from_file_size.cpp
+                    generate_reads/infer_weights_from_hll_sketches.cpp
+                    generate_reads/infer_weights_from_kmer_counts.cpp
+                    generate_reads/infer_weights_from_uniform_distribution.cpp
+                    generate_reads/initialise_argument_parser.cpp
+                    generate_reads/parse_input.cpp
+                    generate_reads/print_weights.cpp
+                    generate_reads/simulate_reads.cpp
+                    generate_reads_refseq.cpp
+    )
     target_link_libraries ("generate_reads_refseq" "utility_common")
 endif ()
 
