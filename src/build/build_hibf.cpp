@@ -61,7 +61,7 @@ void build_hibf(build_arguments const & arguments)
                                               arguments.shape,
                                               arguments.parts,
                                               arguments.bin_path,
-                                              arguments.fpr,
+                                              config,
                                               std::move(hibf)};
     arguments.index_allocation_timer.stop();
 

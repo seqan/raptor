@@ -23,6 +23,8 @@
 # CONFIGURE <true|false> (default=false):
 #    If true, replace "@data_dir@" inside files with the actual data directory.
 function (declare_internal_datasource)
+    # file(READ ../data/datasources.cmake FILE_CONTENTS)
+
     set (options "")
     set (one_value_args FILE URL_HASH URL CONFIGURE)
     set (multi_value_args "")
@@ -36,6 +38,9 @@ function (declare_internal_datasource)
     file ("${hash_algorithm}" "${ARG_URL}" actual_hash_value)
 
     if (NOT "${expected_hash_value}" STREQUAL "${actual_hash_value}")
+        # For bulk replacement of hash values in the file
+        # string(REPLACE "${expected_hash_value}" "${actual_hash_value}" FILE_CONTENTS "${FILE_CONTENTS}")
+        # file(WRITE ../data/datasources.cmake "${FILE_CONTENTS}")
         message (SEND_ERROR "DOWNLOAD HASH mismatch\n  for file: [${ARG_FILE}]\n"
                             "    expected hash: [${expected_hash_value}]\n"
                             "      actual hash: [${actual_hash_value}]\n"
