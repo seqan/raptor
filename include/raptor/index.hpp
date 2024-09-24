@@ -51,8 +51,9 @@ private:
     seqan3::shape shape_{};
     uint8_t parts_{};
     std::vector<std::vector<std::string>> bin_path_{};
-    double fpr_{};
     bool is_hibf_{index_structure::is_hibf<data_t>};
+    double fpr_{};
+    seqan::hibf::config config_{};
     data_t ibf_{};
 
 public:
@@ -69,17 +70,22 @@ public:
                           seqan3::shape const shape,
                           uint8_t const parts,
                           std::vector<std::vector<std::string>> const & bin_path,
-                          double const fpr,
-                          data_t && ibf) :
+                          seqan::hibf::config const & config,
+                          data_t && ibf)
+        requires index_structure::is_hibf<data_t>
+        :
         window_size_{window_size.v},
         shape_{shape},
         parts_{parts},
         bin_path_{bin_path},
-        fpr_{fpr},
+        fpr_{config.maximum_fpr},
+        config_{config},
         ibf_{std::move(ibf)}
     {}
 
-    explicit raptor_index(build_arguments const & arguments) :
+    explicit raptor_index(build_arguments const & arguments)
+        requires index_structure::is_ibf<data_t>
+        :
         window_size_{arguments.window_size},
         shape_{arguments.shape},
         parts_{arguments.parts},
@@ -113,6 +119,12 @@ public:
     double fpr() const
     {
         return fpr_;
+    }
+
+    auto const & config() const
+        requires index_structure::is_hibf<data_t>
+    {
+        return config_;
     }
 
     bool is_hibf() const
@@ -153,6 +165,7 @@ public:
                 archive(bin_path_);
                 archive(fpr_);
                 archive(is_hibf_);
+                archive(config_);
                 archive(ibf_);
             }
             // GCOVR_EXCL_START
@@ -191,6 +204,7 @@ public:
                 archive(bin_path_);
                 archive(fpr_);
                 archive(is_hibf_);
+                archive(config_);
             }
             // GCOVR_EXCL_START
             catch (std::exception const & e)
