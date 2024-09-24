@@ -16,7 +16,7 @@ CPMDeclarePackage (hibf
                    OPTIONS "INSTALL_HIBF OFF"
 )
 # sharg
-set (RAPTOR_SHARG_VERSION 7534545c5f5dca3876ca3d3b07c369131b185f92)
+set (RAPTOR_SHARG_VERSION c4367d1049322826e60c674b6bf24d3d0a8da999)
 CPMDeclarePackage (sharg
                    NAME sharg
                    GIT_TAG ${RAPTOR_SHARG_VERSION}
@@ -26,7 +26,7 @@ CPMDeclarePackage (sharg
                    OPTIONS "INSTALL_SHARG OFF" "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING" "BUILD_TESTING OFF"
 )
 # seqan3
-set (RAPTOR_SEQAN3_VERSION abcad130a70b86f2286ed0d80ef7bf3de3fc1e39)
+set (RAPTOR_SEQAN3_VERSION d4a7c88fde0311e12e98e7822da772b99c887cb5)
 CPMDeclarePackage (seqan3
                    NAME seqan3
                    GIT_TAG ${RAPTOR_SEQAN3_VERSION}
