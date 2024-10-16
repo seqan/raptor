@@ -75,19 +75,6 @@ public:
             std::ranges::copy_if(record.sequence() | minimiser_view, target, pred);
     }
 
-    void on_hash(std::vector<std::string> const & filenames, auto && callback) const
-    {
-        for (auto && filename : filenames)
-            on_hash(filename, callback);
-    }
-
-    void on_hash(std::string const & filename, auto && callback) const
-    {
-        sequence_file_t fin{filename};
-        for (auto && record : fin)
-            callback(record.sequence() | minimiser_view);
-    }
-
     void for_each_hash(std::vector<std::string> const & filenames, auto && callback) const
     {
         for (auto && filename : filenames)

@@ -16,6 +16,10 @@ declare_internal_datasource (FILE bin4.fa
                              URL ${CMAKE_CURRENT_LIST_DIR}/bin4.fa
                              URL_HASH SHA256=b4e3be3c001aac8481be2251aab110e4318996d26f2cdc91fb3061c35cbec4a1
 )
+declare_internal_datasource (FILE multi_record_bin.fa
+                             URL ${CMAKE_CURRENT_LIST_DIR}/multi_record_bin.fa
+                             URL_HASH SHA256=1647571eb3a9bde7212bed54ef5c323b9e02acbea40cbebcd8adee055ba20a6c
+)
 
 declare_internal_datasource (FILE bin1.fa.gz
                              URL ${CMAKE_CURRENT_LIST_DIR}/bin1.fa.gz
