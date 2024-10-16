@@ -10,6 +10,7 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <hibf/build/bin_size_in_bits.hpp>
+#include <hibf/contrib/robin_hood.hpp>
 
 #include <raptor/adjust_seed.hpp>
 #include <raptor/argument_parsing/compute_bin_size.hpp>
@@ -85,19 +86,23 @@ size_t kmer_count_from_sequence_files(std::vector<std::vector<std::string>> cons
     std::mutex callback_mutex{};
     file_reader<file_types::sequence> const reader{shape, window_size};
 
-    auto callback = [&callback_mutex, &max_count](auto && view)
+    auto callback = [&callback_mutex, &max_count](size_t const count)
     {
-        auto const count = std::ranges::distance(view);
-        {
-            std::lock_guard<std::mutex> guard{callback_mutex};
-            max_count = std::max<size_t>(max_count, count);
-        }
+        std::lock_guard<std::mutex> guard{callback_mutex};
+        max_count = std::max<size_t>(max_count, count);
     };
 
     auto worker = [&callback, &reader](auto && zipped_view)
     {
+        robin_hood::unordered_flat_set<uint64_t> kmers;
+        auto insert_it = std::inserter(kmers, kmers.end());
+
         for (auto && [file_names, bin_number] : zipped_view)
-            reader.on_hash(file_names, callback);
+        {
+            kmers.clear();
+            reader.hash_into(file_names, insert_it);
+            callback(kmers.size());
+        }
     };
 
     call_parallel_on_bins(worker, bin_path, threads);
