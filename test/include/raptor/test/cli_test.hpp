@@ -260,7 +260,8 @@ struct raptor_base : public cli_test
     template <typename data_t = raptor::index_structure::ibf>
     static inline void compare_index(std::filesystem::path const & expected_result,
                                      std::filesystem::path const & actual_result,
-                                     compare_extension const compare_ext = compare_extension::yes)
+                                     compare_extension const compare_ext = compare_extension::yes,
+                                     is_preprocessed const preprocessed = is_preprocessed::no)
     {
         constexpr bool is_ibf = std::same_as<data_t, raptor::index_structure::ibf>;
         constexpr bool is_hibf = std::same_as<data_t, raptor::index_structure::hibf>;
@@ -287,7 +288,29 @@ struct raptor_base : public cli_test
         if constexpr (is_ibf)
         {
             auto const &expected_ibf{expected_index.ibf()}, actual_ibf{actual_index.ibf()};
-            EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs(expected_ibf, actual_ibf);
+            if (!preprocessed)
+            {
+                EXPECT_TRUE(expected_ibf == actual_ibf) << debug_ibfs(expected_ibf, actual_ibf);
+            }
+            else
+            {
+                // Preprocessed IBFs use minimiser files. The counts are exact.
+                // Without minimiser files, HLL sketches are used, which are estimates.
+                auto check_diff = [](double const expected_value, double const actual_value) -> bool
+                {
+                    static constexpr double rel_error{0.005};
+                    double const diff = std::abs(expected_value - actual_value);
+                    double const abs_error = rel_error * expected_value;
+                    return diff < abs_error;
+                };
+
+                bool const is_same = expected_ibf.hash_function_count() == actual_ibf.hash_function_count()
+                                  && expected_ibf.bin_count() == actual_ibf.bin_count()
+                                  && check_diff(expected_ibf.bin_size(), actual_ibf.bin_size())
+                                  && check_diff(expected_ibf.bit_size(), actual_ibf.bit_size());
+
+                EXPECT_TRUE(is_same) << debug_ibfs(expected_ibf, actual_ibf);
+            }
         }
         else
         {

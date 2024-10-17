@@ -10,6 +10,8 @@
 #include <algorithm>
 #include <fstream>
 
+#include <hibf/sketch/hyperloglog.hpp>
+
 #include <raptor/build/max_count_per_partition.hpp>
 #include <raptor/call_parallel_on_bins.hpp>
 #include <raptor/file_reader.hpp>
@@ -41,17 +43,20 @@ std::vector<size_t> max_count_per_partition(partition_config const & cfg,
     auto worker = [&callback, &reader, &cfg](auto && zipped_view)
     {
         std::vector<size_t> max_kmer_counts(cfg.partitions);
-        std::vector<size_t> kmer_counts(cfg.partitions);
+        std::vector<seqan::hibf::sketch::hyperloglog> kmer_counts(cfg.partitions, 15u);
+
         for (auto && [file_names, bin_number] : zipped_view)
         {
             reader.for_each_hash(file_names,
                                  [&](auto && hash)
                                  {
-                                     ++kmer_counts[cfg.hash_partition(hash)];
+                                     kmer_counts[cfg.hash_partition(hash)].add(hash);
                                  });
             for (size_t i = 0; i < cfg.partitions; ++i)
-                max_kmer_counts[i] = std::max<size_t>(max_kmer_counts[i], kmer_counts[i]);
-            std::ranges::fill(kmer_counts, 0u);
+            {
+                max_kmer_counts[i] = std::max<size_t>(max_kmer_counts[i], kmer_counts[i].estimate());
+                kmer_counts[i].reset();
+            }
         }
         callback(max_kmer_counts);
     };
