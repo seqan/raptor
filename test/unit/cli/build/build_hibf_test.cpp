@@ -22,7 +22,7 @@ TEST_P(build_hibf, with_file)
                                                "--output raptor.index",
                                                "--quiet",
                                                "--input",
-                                               pack_path(number_of_repeated_bins));
+                                               layout_path(number_of_repeated_bins));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
@@ -46,7 +46,7 @@ TEST_P(build_hibf, with_shape)
                                                "--output raptor.index",
                                                "--quiet",
                                                "--input",
-                                               pack_path(number_of_repeated_bins));
+                                               layout_path(number_of_repeated_bins));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
@@ -78,7 +78,7 @@ TEST_F(build_hibf, three_levels)
                                                "--output raptor.index",
                                                "--quiet",
                                                "--input",
-                                               data("three_levels.pack"));
+                                               data("three_levels.layout"));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
@@ -96,7 +96,7 @@ TEST_F(build_hibf, verbose)
                                                "--output raptor.index",
                                                "--timing-output raptor.time",
                                                "--input",
-                                               data("three_levels.pack"));
+                                               data("three_levels.layout"));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_TRUE(result.err.starts_with("============= Timings ============="));
     EXPECT_TRUE(std::filesystem::exists("raptor.time"));

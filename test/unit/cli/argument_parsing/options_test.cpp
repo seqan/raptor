@@ -261,7 +261,7 @@ TEST_F(argparse_build, wrong_parts)
 TEST_F(argparse_build, partitioned_parts)
 {
     cli_test_result const result =
-        execute_app("raptor", "build", "--parts 4", "--output index.raptor", "--input", data("three_levels.pack"));
+        execute_app("raptor", "build", "--parts 4", "--output index.raptor", "--input", data("three_levels.layout"));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, std::string{"[Error] The HIBF cannot yet be partitioned.\n"});
     RAPTOR_ASSERT_FAIL_EXIT(result);

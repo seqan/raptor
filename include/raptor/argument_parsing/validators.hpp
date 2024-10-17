@@ -37,14 +37,19 @@ static inline std::vector<std::string> compression_extensions{[]()
 static inline std::vector<std::string> combined_extensions{
     []()
     {
-        if (compression_extensions.empty())
-            return sequence_extensions; // GCOVR_EXCL_LINE
         std::vector<std::string> result;
-        for (auto && sequence_extension : sequence_extensions)
+        if (compression_extensions.empty())
         {
-            result.push_back(sequence_extension);
-            for (auto && compression_extension : compression_extensions)
-                result.push_back(sequence_extension + std::string{'.'} + compression_extension);
+            result = sequence_extensions; // GCOVR_EXCL_LINE
+        }
+        else
+        {
+            for (auto && sequence_extension : sequence_extensions)
+            {
+                result.push_back(sequence_extension);
+                for (auto && compression_extension : compression_extensions)
+                    result.push_back(sequence_extension + std::string{'.'} + compression_extension);
+            }
         }
         return result;
     }()};

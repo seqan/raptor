@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
-cmake_minimum_required (VERSION 3.25)
+cmake_minimum_required (VERSION 3.25...3.30)
 
 include ("${CMAKE_CURRENT_LIST_DIR}/../cmake/raptor_path_longest_stem.cmake")
 

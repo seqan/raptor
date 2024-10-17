@@ -23,7 +23,7 @@ TEST_P(search_hibf_preprocessing, pipeline)
     }
 
     { // generate layout file
-        std::ifstream input{pack_path(number_of_repeated_bins)};
+        std::ifstream input{layout_path(number_of_repeated_bins)};
         std::string line{};
         std::ofstream file{"raptor_cli_test.layout"};
 
@@ -122,7 +122,7 @@ TEST_F(search_hibf_preprocessing, pipeline_with_continuation)
     }
 
     { // generate layout file
-        std::ifstream input{pack_path(number_of_repeated_bins)};
+        std::ifstream input{layout_path(number_of_repeated_bins)};
         std::string line{};
         std::ofstream file{"raptor_cli_test.layout"};
 

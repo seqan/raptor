@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
-cmake_minimum_required (VERSION 3.25)
+cmake_minimum_required (VERSION 3.25...3.30)
 
 # ----------------------------------------------------------------------------
 # Short-circuit if tests are already configured
@@ -21,7 +21,14 @@ message (STATUS "${ColourBold}Configuring tests${ColourReset}")
 get_filename_component (Raptor_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 include ("${Raptor_SOURCE_DIR}/cmake/configuration.cmake")
 add_subdirectory ("${Raptor_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/raptor")
-target_compile_options (raptor_interface INTERFACE "-pedantic" "-Wall" "-Wextra" "-Werror")
+target_compile_options (raptor_interface INTERFACE "-pedantic" "-Wall" "-Wextra")
+
+option (RAPTOR_WITH_WERROR "Report compiler warnings as errors." ON)
+
+if (RAPTOR_WITH_WERROR)
+    target_compile_options (raptor_interface INTERFACE "-Werror")
+    message (STATUS "Building tests with -Werror.")
+endif ()
 
 # ----------------------------------------------------------------------------
 # CPM
@@ -35,7 +42,7 @@ CPMUsePackageLock ("${CMAKE_CURRENT_LIST_DIR}/../cmake/package-lock.cmake")
 # ----------------------------------------------------------------------------
 
 find_path (RAPTOR_TEST_CMAKE_MODULE_DIR
-           NAMES app_datasources.cmake
+           NAMES declare_datasource.cmake
            HINTS "${CMAKE_CURRENT_LIST_DIR}/cmake/"
 )
 list (APPEND CMAKE_MODULE_PATH "${RAPTOR_TEST_CMAKE_MODULE_DIR}")
@@ -51,15 +58,26 @@ enable_testing ()
 # ----------------------------------------------------------------------------
 
 add_library (raptor_test INTERFACE)
-target_compile_options (raptor_test INTERFACE "-pedantic" "-Wall" "-Wextra" "-Werror")
-# GCC12 and above: Disable warning about std::hardware_destructive_interference_size not being ABI-stable.
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 12)
-    target_compile_options (raptor_test INTERFACE "-Wno-interference-size")
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    # GCC12 and above: Disable warning about std::hardware_destructive_interference_size not being ABI-stable.
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 12)
+        target_compile_options (raptor_test INTERFACE "-Wno-interference-size")
+    endif ()
+
+    # Warn about failed return value optimization.
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 14)
+        target_compile_options (raptor_interface INTERFACE "-Wnrvo")
+    endif ()
 endif ()
-# std::views::join is experimental in LLVM 17
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 18)
-    target_compile_definitions (raptor_test INTERFACE "_LIBCPP_ENABLE_EXPERIMENTAL")
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    # std::views::join is experimental in LLVM 17
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 18)
+        target_compile_definitions (raptor_test INTERFACE "_LIBCPP_ENABLE_EXPERIMENTAL")
+    endif ()
 endif ()
+
 target_link_libraries (raptor_test INTERFACE "raptor_lib")
 target_include_directories (raptor_test INTERFACE "${CMAKE_CURRENT_LIST_DIR}/include")
 add_library (raptor::test ALIAS raptor_test)
@@ -101,8 +119,6 @@ add_library (raptor::test::header ALIAS raptor_test_header)
 # Commonly used macros for the different test modules in seqan3.
 # ----------------------------------------------------------------------------
 
-include (app_datasources)
-include (app_internal_datasources)
 include (raptor_add_benchmark)
 include (raptor_add_unit_test)
 include (${CMAKE_CURRENT_LIST_DIR}/data/datasources.cmake)

@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 # Minimum cmake version
-cmake_minimum_required (VERSION 3.17)
+cmake_minimum_required (VERSION 3.17...3.30)
 
 set (RAPTOR_DOXYGEN_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 get_filename_component (RAPTOR_CLONE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../.." ABSOLUTE)

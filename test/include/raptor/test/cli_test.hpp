@@ -187,11 +187,11 @@ struct raptor_base : public cli_test
         return cli_test::data(name);
     }
 
-    static inline std::filesystem::path const pack_path(size_t const number_of_repetitions) noexcept
+    static inline std::filesystem::path const layout_path(size_t const number_of_repetitions) noexcept
     {
         std::string name{};
         name += std::to_string(std::max<int>(1, number_of_repetitions * 4));
-        name += "bins.pack";
+        name += "bins.layout";
         return cli_test::data(name);
     }
 
