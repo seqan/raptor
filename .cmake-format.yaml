@@ -8,12 +8,11 @@ parse:
   _help_additional_commands:
   - Specify structure for custom cmake functions
   additional_commands:
-    declare_internal_datasource:
+    declare_datasource:
       kwargs:
-        FILE: '*'
-        URL: '*'
-        URL_HASH: '*'
-        CONFIGURE: '*'
+        FILE: 1
+        URL: +
+        URL_HASH: 1
     cpmgetpackage:
       pargs: 1
       spelling: CPMGetPackage
