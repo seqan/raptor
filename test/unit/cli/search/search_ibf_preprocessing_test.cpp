@@ -57,7 +57,10 @@ TEST_P(search_ibf_preprocessing, pipeline)
     EXPECT_EQ(result2.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result2);
 
-    compare_index(ibf_path(number_of_repeated_bins, window_size), "raptor.index", compare_extension::no);
+    compare_index(ibf_path(number_of_repeated_bins, window_size),
+                  "raptor.index",
+                  compare_extension::no,
+                  is_preprocessed::yes);
 
     cli_test_result const result3 = execute_app("raptor",
                                                 "search",
@@ -126,7 +129,10 @@ TEST_P(search_ibf_preprocessing, pipeline_compressed_bins)
     EXPECT_EQ(result2.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result2);
 
-    compare_index(ibf_path(number_of_repeated_bins, window_size), "raptor.index", compare_extension::no);
+    compare_index(ibf_path(number_of_repeated_bins, window_size),
+                  "raptor.index",
+                  compare_extension::no,
+                  is_preprocessed::yes);
 
     cli_test_result const result3 = execute_app("raptor",
                                                 "search",

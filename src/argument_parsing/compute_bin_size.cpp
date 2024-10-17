@@ -10,7 +10,7 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <hibf/build/bin_size_in_bits.hpp>
-#include <hibf/contrib/robin_hood.hpp>
+#include <hibf/sketch/hyperloglog.hpp>
 
 #include <raptor/adjust_seed.hpp>
 #include <raptor/argument_parsing/compute_bin_size.hpp>
@@ -94,14 +94,17 @@ size_t kmer_count_from_sequence_files(std::vector<std::vector<std::string>> cons
 
     auto worker = [&callback, &reader](auto && zipped_view)
     {
-        robin_hood::unordered_flat_set<uint64_t> kmers;
-        auto insert_it = std::inserter(kmers, kmers.end());
+        seqan::hibf::sketch::hyperloglog sketch{15u};
 
         for (auto && [file_names, bin_number] : zipped_view)
         {
-            kmers.clear();
-            reader.hash_into(file_names, insert_it);
-            callback(kmers.size());
+            sketch.reset();
+            reader.for_each_hash(file_names,
+                                 [&sketch](auto && hash)
+                                 {
+                                     sketch.add(hash);
+                                 });
+            callback(sketch.estimate());
         }
     };
 
