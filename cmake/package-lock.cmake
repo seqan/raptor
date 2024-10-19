@@ -9,7 +9,7 @@
 set (RAPTOR_HIBF_VERSION 73dd737eb6a7e23df9b26e1445a28632b4c41753)
 CPMDeclarePackage (hibf
                    NAME hibf
-                   GIT_TAG ${RAPTOR_HIBF_VERSION}
+                   GIT_TAG ${RAPTOR_HIBF_VERSION} # main
                    GITHUB_REPOSITORY seqan/hibf
                    SYSTEM TRUE
                    EXCLUDE_FROM_ALL TRUE
@@ -19,7 +19,7 @@ CPMDeclarePackage (hibf
 set (RAPTOR_SHARG_VERSION c4367d1049322826e60c674b6bf24d3d0a8da999)
 CPMDeclarePackage (sharg
                    NAME sharg
-                   GIT_TAG ${RAPTOR_SHARG_VERSION}
+                   GIT_TAG ${RAPTOR_SHARG_VERSION} # main
                    GITHUB_REPOSITORY seqan/sharg-parser
                    SYSTEM TRUE
                    EXCLUDE_FROM_ALL TRUE
@@ -29,7 +29,7 @@ CPMDeclarePackage (sharg
 set (RAPTOR_SEQAN3_VERSION d4a7c88fde0311e12e98e7822da772b99c887cb5)
 CPMDeclarePackage (seqan3
                    NAME seqan3
-                   GIT_TAG ${RAPTOR_SEQAN3_VERSION}
+                   GIT_TAG ${RAPTOR_SEQAN3_VERSION} # main
                    GITHUB_REPOSITORY seqan/seqan3
                    SYSTEM TRUE
                    EXCLUDE_FROM_ALL TRUE
@@ -39,7 +39,7 @@ CPMDeclarePackage (seqan3
 set (RAPTOR_CHOPPER_VERSION f4770aa02fb4f356678cc51e0e126ecfc04ed06b)
 CPMDeclarePackage (chopper
                    NAME chopper
-                   GIT_TAG ${RAPTOR_CHOPPER_VERSION}
+                   GIT_TAG ${RAPTOR_CHOPPER_VERSION} # main
                    GITHUB_REPOSITORY seqan/chopper
                    SYSTEM TRUE
                    OPTIONS "CHOPPER_INSTALL OFF" "CHOPPER_BUILD_DOC OFF" "CHOPPER_BUILD_TEST OFF"
@@ -71,7 +71,7 @@ CPMDeclarePackage (googletest
 set (USE_CCACHE_VERSION d2a54ef555b6fc2d496a4c9506dbeb7cf899ce37)
 CPMDeclarePackage (use_ccache
                    NAME use_ccache
-                   GIT_TAG ${USE_CCACHE_VERSION}
+                   GIT_TAG ${USE_CCACHE_VERSION} # main
                    GITHUB_REPOSITORY seqan/cmake-scripts
                    SOURCE_SUBDIR ccache
                    SYSTEM TRUE
