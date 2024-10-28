@@ -59,8 +59,8 @@ CPMDeclarePackage (benchmark
 )
 # googletest
 set (RAPTOR_GOOGLETEST_VERSION 1.15.2)
-CPMDeclarePackage (googletest
-                   NAME googletest
+CPMDeclarePackage (GTest
+                   NAME GTest
                    VERSION ${RAPTOR_GOOGLETEST_VERSION}
                    GITHUB_REPOSITORY google/googletest
                    SYSTEM TRUE

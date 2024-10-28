@@ -9,7 +9,7 @@ project (raptor_test_unit LANGUAGES CXX C)
 include (../raptor-test.cmake)
 include (GoogleTest OPTIONAL)
 
-CPMGetPackage (googletest)
+CPMGetPackage (GTest)
 
 add_subdirectory (api)
 add_subdirectory (cli)

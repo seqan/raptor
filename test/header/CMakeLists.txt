@@ -13,7 +13,7 @@ CPMGetPackage (benchmark)
 if (benchmark_ADDED)
     set_target_properties (benchmark PROPERTIES CXX_STANDARD ${CMAKE_CXX_STANDARD})
 endif ()
-CPMGetPackage (googletest)
+CPMGetPackage (GTest)
 
 find_path (SEQAN3_TEST_CMAKE_MODULE_DIR
            NAMES seqan3_test_files.cmake
