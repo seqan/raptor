@@ -47,8 +47,19 @@ if (NOT DEFINED CMAKE_CXX_EXTENSIONS)
 endif ()
 
 # ----------------------------------------------------------------------------
+# LTO
+# ----------------------------------------------------------------------------
+
+include (CheckIPOSupported)
+check_ipo_supported (RESULT RAPTOR_HAS_LTO OUTPUT RAPTOR_HAS_LTO_OUTPUT)
+if (RAPTOR_HAS_LTO)
+    set (CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif ()
+
+# ----------------------------------------------------------------------------
 # CPM
 # ----------------------------------------------------------------------------
+
 set (CPM_INDENT "CMake Package Manager CPM: ")
 include (${Raptor_SOURCE_DIR}/cmake/CPM.cmake)
 CPMUsePackageLock (${Raptor_SOURCE_DIR}/cmake/package-lock.cmake)
@@ -83,7 +94,7 @@ endif ()
 # ----------------------------------------------------------------------------
 
 add_library (raptor_interface INTERFACE)
-target_link_libraries (raptor_interface INTERFACE seqan::hibf sharg::sharg seqan3::seqan3)
+target_link_libraries (raptor_interface INTERFACE sharg::sharg seqan3::seqan3 seqan::hibf)
 target_include_directories (raptor_interface INTERFACE "${RAPTOR_INCLUDE_DIR}")
 
 get_target_property (CHOPPER_INCLUDE_DIR chopper::interface INTERFACE_INCLUDE_DIRECTORIES)

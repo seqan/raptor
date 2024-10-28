@@ -10,6 +10,7 @@
 #include <seqan3/search/views/minimiser_hash.hpp>
 
 #include <hibf/build/bin_size_in_bits.hpp>
+#include <hibf/contrib/robin_hood.hpp>
 #include <hibf/sketch/hyperloglog.hpp>
 
 #include <raptor/adjust_seed.hpp>
@@ -83,13 +84,18 @@ size_t kmer_count_from_sequence_files(std::vector<std::vector<std::string>> cons
                                       uint32_t const window_size)
 {
     size_t max_count{};
+    size_t max_bin_id{};
     std::mutex callback_mutex{};
     file_reader<file_types::sequence> const reader{shape, window_size};
 
-    auto callback = [&callback_mutex, &max_count](size_t const count)
+    auto callback = [&](size_t const count, size_t const bin_id)
     {
         std::lock_guard<std::mutex> guard{callback_mutex};
-        max_count = std::max<size_t>(max_count, count);
+        if (count > max_count)
+        {
+            max_count = count;
+            max_bin_id = bin_id;
+        }
     };
 
     auto worker = [&callback, &reader](auto && zipped_view)
@@ -104,13 +110,19 @@ size_t kmer_count_from_sequence_files(std::vector<std::vector<std::string>> cons
                                  {
                                      sketch.add(hash);
                                  });
-            callback(sketch.estimate());
+            callback(sketch.estimate(), bin_number);
         }
     };
 
+    // Use sketches to determine biggest bin.
     call_parallel_on_bins(worker, bin_path, threads);
 
-    return max_count;
+    // Get exact count for biggest bin. Sketch estimate's accuracy depends on sketch_bits (here: 15).
+    robin_hood::unordered_flat_set<uint64_t> kmers{};
+    auto insert_it = std::inserter(kmers, kmers.end());
+    reader.hash_into(bin_path[max_bin_id], insert_it);
+
+    return kmers.size();
 }
 
 } // namespace detail
