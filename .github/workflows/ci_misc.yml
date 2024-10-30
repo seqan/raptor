@@ -33,12 +33,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: ["clang-18", "gcc-14", "gcc-12", "intel"]
+        compiler: ["clang-19", "gcc-14", "gcc-12", "intel"]
         build: ["snippet", "performance", "header"]
         build_type: [Release, Debug]
         include:
           - cxx_flags: "-Wno-interference-size"
-          - compiler: "clang-18"
+          - compiler: "clang-19"
             cxx_flags: ""
           - compiler: "intel"
             cxx_flags: "-fp-model=strict -Wno-overriding-option"
