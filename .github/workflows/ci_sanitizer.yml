@@ -59,7 +59,7 @@ jobs:
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero,local-bounds,nullability -fno-sanitize=function -Wno-pass-failed"
 
           - os: macos-14
-            compiler: clang-18
+            compiler: clang-19
 
           - os: ubuntu-latest
             compiler: gcc-14
@@ -67,8 +67,8 @@ jobs:
 
           - name: "TSan"
             os: ubuntu-latest
-            compiler: clang-18
-            image: ghcr.io/seqan/clang-18
+            compiler: clang-19
+            image: ghcr.io/seqan/clang-19
     container:
       image: ${{ matrix.image || '' }}
       volumes:
