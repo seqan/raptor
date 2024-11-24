@@ -18,7 +18,7 @@
 namespace raptor
 {
 
-enum class file_types
+enum class file_types : uint8_t
 {
     sequence,
     minimiser

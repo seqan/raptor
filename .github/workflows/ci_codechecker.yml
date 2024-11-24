@@ -1,0 +1,35 @@
+# SPDX-FileCopyrightText: 2006-2024, Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
+# SPDX-License-Identifier: CC0-1.0
+
+name: CodeChecker
+
+on:
+  schedule:
+    - cron: "0 4 * * THU"
+  workflow_dispatch:
+
+env:
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -Eexuo pipefail {0}
+
+jobs:
+  build:
+    name: CodeChecker
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
+    container:
+      image: ghcr.io/seqan/clang-19
+      volumes:
+        - /home/runner:/home/runner
+    steps:
+      - name: Run CodeChecker
+        uses: seqan/actions/codechecker@main
+        with:
+          deploy_host: ${{ secrets.DEPLOY_HOST }}
+          deploy_user: ${{ secrets.DEPLOY_USER }}
+          deploy_ssh_key: ${{ secrets.DEPLOY_SSH_KEY }}
+          deploy_path: ${{ secrets.DEPLOY_CODECHECKER_PATH }}

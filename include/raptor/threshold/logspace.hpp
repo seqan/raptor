@@ -15,7 +15,7 @@
 namespace raptor::logspace
 {
 
-constexpr double ln_2{0.693147180559945309417232121458176568L};
+constexpr double ln_2{0.693147180559945};
 constexpr double negative_inf{-std::numeric_limits<double>::infinity()};
 
 //!\brief The log of a sum of two log terms.
@@ -31,7 +31,7 @@ constexpr double negative_inf{-std::numeric_limits<double>::infinity()};
 template <typename... types>
 [[nodiscard]] double add(double const log_x, double const log_y, types... logs) noexcept
 {
-    return add(add(log_y, log_x), logs...);
+    return add(add(log_x, log_y), logs...);
 }
 
 //!\brief The log of a difference of two log terms. (log_x - log_y)

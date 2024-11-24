@@ -48,7 +48,7 @@ int main(int argc, char ** argv)
         if (sub_parser.info.app_name == std::string_view{"Raptor-upgrade"})
             raptor::upgrade_parsing(sub_parser);
     }
-    catch (sharg::parser_error const & ext)
+    catch (std::exception const & ext)
     {
         std::cerr << "[Error] " << ext.what() << '\n';
         std::exit(-1);

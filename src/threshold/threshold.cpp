@@ -14,7 +14,7 @@ namespace raptor::threshold
 
 threshold::threshold(threshold_parameters const & arguments)
 {
-    uint8_t const kmer_size{arguments.shape.size()};
+    size_t const kmer_size{arguments.shape.size()};
     size_t const kmers_per_window = arguments.window_size - kmer_size + 1;
 
     if (!std::isnan(arguments.percentage))
@@ -48,13 +48,18 @@ size_t threshold::get(size_t const minimiser_count) const noexcept
         return kmer_lemma;
     case threshold_kinds::percentage:
         return std::max<size_t>(1u, minimiser_count * threshold_percentage);
-    default:
+    case threshold_kinds::probabilistic:
     {
-        assert(threshold_kind == threshold_kinds::probabilistic);
         size_t const index = std::clamp(minimiser_count, minimal_number_of_minimizers, maximal_number_of_minimizers)
                            - minimal_number_of_minimizers;
         return std::max<size_t>(1u, precomp_thresholds[index] + precomp_correction[index]);
     }
+    default: // GCOVR_EXCL_LINE
+#ifndef NDEBUG
+        assert(false); // GCOVR_EXCL_LINE
+#else
+        __builtin_unreachable();
+#endif
     }
 }
 
