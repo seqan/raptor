@@ -48,7 +48,11 @@ static inline std::vector<std::string> combined_extensions{
             {
                 result.push_back(sequence_extension);
                 for (auto && compression_extension : compression_extensions)
-                    result.push_back(sequence_extension + std::string{'.'} + compression_extension);
+                {
+                    result.push_back(sequence_extension);
+                    result.back() += '.';
+                    result.back() += compression_extension;
+                }
             }
         }
         return result;

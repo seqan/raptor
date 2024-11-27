@@ -31,13 +31,13 @@ size_t kmer_count_from_minimiser_files(std::vector<std::vector<std::string>> con
     size_t max_filesize{};
     std::filesystem::path biggest_file{};
 
-    auto callback = [&callback_mutex, &biggest_file, &max_filesize](std::filesystem::path const path, size_t const size)
+    auto callback = [&callback_mutex, &biggest_file, &max_filesize](std::filesystem::path path, size_t const size)
     {
         std::lock_guard<std::mutex> guard{callback_mutex};
         if (size > max_filesize)
         {
             max_filesize = size;
-            biggest_file = path;
+            biggest_file = std::move(path);
         }
     };
 
@@ -61,7 +61,7 @@ size_t kmer_count_from_minimiser_files(std::vector<std::vector<std::string>> con
             }
         }
 
-        callback(biggest_file, max_filesize);
+        callback(std::move(biggest_file), max_filesize);
     };
 
     call_parallel_on_bins(worker, bin_path, threads);

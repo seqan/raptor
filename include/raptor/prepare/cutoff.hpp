@@ -44,22 +44,25 @@ public:
         {
         case cutoff_kinds::filesize_dependent:
             return impl(filename);
-        default:
-        {
-            assert(cutoff_kind == cutoff_kinds::fixed);
+        case cutoff_kinds::fixed:
             return fixed_cutoff;
-        }
+        default: // GCOVR_EXCL_LINE
+#ifndef NDEBUG
+            assert(false); // GCOVR_EXCL_LINE
+#else
+            __builtin_unreachable();
+#endif
         }
     }
 
-    static inline bool file_is_compressed(std::filesystem::path const & filepath)
+    static inline bool file_is_compressed(std::filesystem::path const & filepath) noexcept
     {
         std::filesystem::path const extension = filepath.extension();
         return extension == ".gz" || extension == ".bgzf" || extension == ".bz2";
     }
 
 private:
-    enum class cutoff_kinds
+    enum class cutoff_kinds : uint8_t
     {
         fixed,
         filesize_dependent
@@ -80,7 +83,7 @@ private:
                                                                  1'073'741'824ULL,
                                                                  3'221'225'472ULL};
 
-    uint8_t impl(std::filesystem::path const & filename) const
+    uint8_t impl(std::filesystem::path const & filename) const noexcept
     {
         bool const is_compressed = file_is_compressed(filename);
         bool const is_fasta = check_for_fasta_format(filename);
@@ -103,9 +106,10 @@ private:
         return cutoff;
     }
 
-    static inline bool
-    check_for_fasta_format(std::filesystem::path const & filepath,
-                           std::vector<std::string> const & valid_extensions = seqan3::format_fasta::file_extensions)
+    // NOLINTNEXTLINE(bugprone-exception-escape)
+    static inline bool check_for_fasta_format(
+        std::filesystem::path const & filepath,
+        std::vector<std::string> const & valid_extensions = seqan3::format_fasta::file_extensions) noexcept
     {
         std::string const extension = file_is_compressed(filepath) ? filepath.stem() : filepath.extension();
 

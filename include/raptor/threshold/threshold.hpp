@@ -30,7 +30,7 @@ public:
     size_t get(size_t const minimiser_count) const noexcept;
 
 private:
-    enum class threshold_kinds
+    enum class threshold_kinds : uint8_t
     {
         probabilistic,
         lemma,

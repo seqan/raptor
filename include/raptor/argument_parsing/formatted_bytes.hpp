@@ -39,8 +39,8 @@ namespace raptor
         decimal >>= (iterations - 1u) * 10u;                  // Shift to next smallest unit, e.g. 800MiB
         decimal = decimal * 1000u / 1024u;                    // Account for using decimal system, i.e. 800MiB != 0.8GiB
         size_t const diff{decimal - (decimal / 100u) * 100u}; // We want to round up to 1 decimal position
-        uint32_t const round_up{diff >= 50u};
-        decimal += round_up * 100u - diff;
+        bool const round_up{diff >= 50u};
+        decimal += static_cast<size_t>(round_up * 100u) - diff;
         decimal /= 100u;
         return decimal;
     };

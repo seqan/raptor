@@ -19,7 +19,7 @@
 namespace raptor
 {
 
-[[nodiscard]] inline size_t index_size_in_KiB(std::filesystem::path index_path, uint8_t const parts)
+[[nodiscard]] inline size_t index_size_in_KiB(std::filesystem::path const & index_path, uint8_t const parts)
 {
     size_t index_size_in_bytes{};
     if (parts == 1u)
@@ -37,7 +37,7 @@ namespace raptor
     return index_size_in_bytes >> 10;
 }
 
-[[nodiscard]] inline std::string formatted_index_size(std::filesystem::path index_path, uint8_t const parts)
+[[nodiscard]] inline std::string formatted_index_size(std::filesystem::path const & index_path, uint8_t const parts)
 {
     return formatted_bytes(index_size_in_KiB(index_path, parts) << 10);
 }
