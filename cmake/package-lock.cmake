@@ -6,7 +6,7 @@
 # This file should be committed to version control
 
 # hibf
-set (RAPTOR_HIBF_VERSION 28dc84475766aa768c9ed744a1570872361a5ec1)
+set (RAPTOR_HIBF_VERSION 8cf1c05b4743636bbbfae2f1470523f98965dca3)
 CPMDeclarePackage (hibf
                    NAME hibf
                    GIT_TAG ${RAPTOR_HIBF_VERSION} # main
@@ -26,7 +26,7 @@ CPMDeclarePackage (sharg
                    OPTIONS "INSTALL_SHARG OFF" "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING" "BUILD_TESTING OFF"
 )
 # seqan3
-set (RAPTOR_SEQAN3_VERSION f9ba6d63c9130ccdb68a4fc1674cf13289f39a4c)
+set (RAPTOR_SEQAN3_VERSION 8759edde146b2adebe9151d2390af499714811ca)
 CPMDeclarePackage (seqan3
                    NAME seqan3
                    GIT_TAG ${RAPTOR_SEQAN3_VERSION} # main
@@ -36,7 +36,7 @@ CPMDeclarePackage (seqan3
                    OPTIONS "INSTALL_SEQAN3 OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING"
 )
 # chopper
-set (RAPTOR_CHOPPER_VERSION 30c9acc4911b92daf40593e4a778a90d5a853592)
+set (RAPTOR_CHOPPER_VERSION 3c01d659ae84792fe8a6248960a79ea57633a20a)
 CPMDeclarePackage (chopper
                    NAME chopper
                    GIT_TAG ${RAPTOR_CHOPPER_VERSION} # main
@@ -47,7 +47,7 @@ CPMDeclarePackage (chopper
                    EXCLUDE_FROM_ALL TRUE
 )
 # benchmark
-set (RAPTOR_BENCHMARK_VERSION 1.9.0)
+set (RAPTOR_BENCHMARK_VERSION 1.9.1)
 CPMDeclarePackage (benchmark
                    NAME benchmark
                    VERSION ${RAPTOR_BENCHMARK_VERSION}
