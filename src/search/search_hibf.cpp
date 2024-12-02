@@ -8,6 +8,7 @@
  */
 
 #include <raptor/search/search_hibf.hpp>
+#include <raptor/search/search_partitioned_hibf.hpp>
 #include <raptor/search/search_singular_ibf.hpp>
 
 namespace raptor
@@ -16,7 +17,11 @@ namespace raptor
 void search_hibf(search_arguments const & arguments)
 {
     auto index = raptor_index<index_structure::hibf>{};
-    search_singular_ibf(arguments, std::move(index));
+
+    if (arguments.parts == 1)
+        search_singular_ibf(arguments, std::move(index));
+    else
+        search_partitioned_hibf(arguments, std::move(index));
 }
 
 } // namespace raptor
