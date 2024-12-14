@@ -6,7 +6,7 @@
 # This file should be committed to version control
 
 # hibf
-set (RAPTOR_HIBF_VERSION 8cf1c05b4743636bbbfae2f1470523f98965dca3)
+set (RAPTOR_HIBF_VERSION 06aaab39a3f5117c35d112e83241074178edab67)
 CPMDeclarePackage (hibf
                    NAME hibf
                    GIT_TAG ${RAPTOR_HIBF_VERSION} # main
@@ -16,7 +16,7 @@ CPMDeclarePackage (hibf
                    OPTIONS "INSTALL_HIBF OFF"
 )
 # sharg
-set (RAPTOR_SHARG_VERSION 02ed4f64d8ea5528a646e7693fdc5b939f1375f8)
+set (RAPTOR_SHARG_VERSION d30629065de5b2160aba261d93e170cbdd7a4e36)
 CPMDeclarePackage (sharg
                    NAME sharg
                    GIT_TAG ${RAPTOR_SHARG_VERSION} # main
@@ -26,7 +26,7 @@ CPMDeclarePackage (sharg
                    OPTIONS "INSTALL_SHARG OFF" "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING" "BUILD_TESTING OFF"
 )
 # seqan3
-set (RAPTOR_SEQAN3_VERSION 8759edde146b2adebe9151d2390af499714811ca)
+set (RAPTOR_SEQAN3_VERSION 7ee839814e168ab57c4401d46e6114a801cebc28)
 CPMDeclarePackage (seqan3
                    NAME seqan3
                    GIT_TAG ${RAPTOR_SEQAN3_VERSION} # main
@@ -36,7 +36,7 @@ CPMDeclarePackage (seqan3
                    OPTIONS "INSTALL_SEQAN3 OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING"
 )
 # chopper
-set (RAPTOR_CHOPPER_VERSION 3c01d659ae84792fe8a6248960a79ea57633a20a)
+set (RAPTOR_CHOPPER_VERSION b22ae4b8f32613d59810798f676a9a6cd9df151e)
 CPMDeclarePackage (chopper
                    NAME chopper
                    GIT_TAG ${RAPTOR_CHOPPER_VERSION} # main
