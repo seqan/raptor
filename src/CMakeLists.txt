@@ -18,6 +18,7 @@ target_link_libraries ("raptor_lib"
                                  "raptor::threshold"
                                  "raptor::upgrade"
                                  "raptor::layout"
+                                 "raptor::update"
 )
 add_library (raptor::raptor ALIAS raptor_lib)
 
@@ -36,3 +37,4 @@ add_subdirectory (search)
 add_subdirectory (prepare)
 add_subdirectory (threshold)
 add_subdirectory (upgrade)
+add_subdirectory (update)

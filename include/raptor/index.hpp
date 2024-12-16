@@ -111,6 +111,11 @@ public:
         return parts_;
     }
 
+    void append_bin_path(std::vector<std::string> const & path)
+    {
+        bin_path_.push_back(path);
+    }
+
     std::vector<std::vector<std::string>> const & bin_path() const
     {
         return bin_path_;
