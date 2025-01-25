@@ -16,38 +16,10 @@
 namespace raptor
 {
 
-void build_hibf(build_arguments const & arguments)
+void construct_hibf(build_arguments const & arguments,
+                    seqan::hibf::config & config,
+                    seqan::hibf::layout::layout const & layout)
 {
-    std::variant<file_reader<file_types::sequence>, file_reader<file_types::minimiser>> reader;
-    if (arguments.input_is_minimiser)
-        reader = file_reader<file_types::minimiser>{};
-    else
-        reader = file_reader<file_types::sequence>{arguments.shape, arguments.window_size};
-
-    auto input_lambda = [&arguments, &reader](size_t const user_bin_id, seqan::hibf::insert_iterator it)
-    {
-        std::visit(
-            [&](auto const & reader)
-            {
-                reader.hash_into(arguments.bin_path[user_bin_id], it);
-            },
-            reader);
-    };
-
-    // Parse config+layout
-    seqan::hibf::config config{};
-    seqan::hibf::layout::layout layout{};
-
-    {
-        std::ifstream layout_stream{arguments.bin_file};
-        config.read_from(layout_stream);
-        layout.read_from(layout_stream);
-    }
-
-    // Adapt config
-    config.input_fn = input_lambda;
-    config.threads = arguments.threads;
-
     // Call ctor
     seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config, layout};
 
@@ -68,6 +40,48 @@ void build_hibf(build_arguments const & arguments)
     arguments.store_index_timer.start();
     store_index(arguments.out_path, std::move(index));
     arguments.store_index_timer.stop();
+}
+
+void build_hibf(build_arguments const & arguments)
+{
+    std::variant<file_reader<file_types::sequence>, file_reader<file_types::minimiser>> reader;
+    if (arguments.input_is_minimiser)
+        reader = file_reader<file_types::minimiser>{};
+    else
+        reader = file_reader<file_types::sequence>{arguments.shape, arguments.window_size};
+
+    auto input_lambda = [&arguments, &reader](size_t const user_bin_id, seqan::hibf::insert_iterator it)
+    {
+        std::visit(
+            [&](auto const & reader)
+            {
+                reader.hash_into(arguments.bin_path[user_bin_id], it);
+            },
+            reader);
+    };
+
+    seqan::hibf::config config{};
+    seqan::hibf::layout::layout layout{};
+
+    std::ifstream layout_stream{arguments.bin_file};
+    config.read_from(layout_stream);
+
+    // update config and build_arguments
+    config.threads = arguments.threads;
+    config.input_fn = input_lambda;
+
+    for (size_t part = 0; part < arguments.parts; ++part)
+    {
+        layout.clear();
+        layout.read_from(layout_stream); // read current layout
+
+        // Inc ase of partitioned HIBF, replace out_path by appending `_[part]` for each index partition.
+        build_arguments local_arguments = arguments;
+        local_arguments.out_path = (arguments.parts > 1) ? arguments.out_path.string() + "_" + std::to_string(part)
+                                                         : arguments.out_path.string();
+
+        construct_hibf(local_arguments, config, layout);
+    }
 }
 
 } // namespace raptor
