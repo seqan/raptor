@@ -54,8 +54,8 @@ add_library ("raptor_argument_parsing" STATIC
              prepare_parsing.cpp
              search_arguments.cpp
              search_parsing.cpp
-             upgrade_parsing.cpp
              update_parsing.cpp
+             upgrade_parsing.cpp
 )
 
 set_source_files_properties (init_shared_meta.cpp
