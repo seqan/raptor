@@ -19,8 +19,10 @@
 namespace raptor::detail
 {
 
-inline bool
-is_fpr_exceeded_impl(raptor_index<index_structure::hibf> const & index, size_t const ibf_idx, size_t const bin_idx)
+inline bool is_fpr_exceeded_impl(raptor_index<index_structure::hibf> const & index,
+                                 size_t const ibf_idx,
+                                 size_t const bin_idx,
+                                 bool const is_toplevel)
 {
     auto & hibf = index.ibf();
     auto & ibf = hibf.ibf_vector[ibf_idx];
@@ -34,20 +36,20 @@ is_fpr_exceeded_impl(raptor_index<index_structure::hibf> const & index, size_t c
     }();
 
     bool const is_bin_merged = hibf.ibf_bin_to_user_bin_id[ibf_idx][bin_idx] == seqan::hibf::bin_kind::merged;
-    double const target_fpr = is_bin_merged ? index.config().relaxed_fpr : index.fpr();
+    double const target_fpr = is_bin_merged ? (index.config().relaxed_fpr * (is_toplevel ? 1.1 : 1.0)) : index.fpr();
 
-    return new_fpr > /* 1.1 * */ target_fpr; // TODO lenience?
+    return new_fpr > target_fpr;
 }
 
 inline bool is_fpr_exceeded(raptor_index<index_structure::hibf> const & index, insert_location const & insert_location)
 {
-    return is_fpr_exceeded_impl(index, insert_location.ibf_idx, insert_location.bin_idx);
+    return is_fpr_exceeded_impl(index, insert_location.ibf_idx, insert_location.bin_idx, false);
 }
 
 inline bool is_fpr_exceeded(raptor_index<index_structure::hibf> const & index,
                             rebuild_location const & rebuild_location)
 {
-    return is_fpr_exceeded_impl(index, rebuild_location.ibf_idx, rebuild_location.bin_idx);
+    return is_fpr_exceeded_impl(index, rebuild_location.ibf_idx, rebuild_location.bin_idx, true);
 }
 
 } // namespace raptor::detail
