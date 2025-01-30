@@ -33,7 +33,12 @@ void delete_user_bins(update_arguments const & arguments, raptor_index<index_str
         {
             uint64_t & user_bin_id = ibf_index_to_user_bin_id[bin_index];
             // This also ensures that invalid user bin IDs are not processed. TODO: Warning/Check?
+#ifdef __cpp_lib_ranges_contains
             if (std::ranges::contains(arguments.user_bins_to_delete, user_bin_id))
+#else
+            if (std::ranges::find(arguments.user_bins_to_delete, user_bin_id)
+                != std::ranges::end(arguments.user_bins_to_delete))
+#endif
             {
                 technical_bins_to_delete.push_back({bin_index});
                 user_bin_id = seqan::hibf::bin_kind::deleted;
