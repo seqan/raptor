@@ -35,8 +35,8 @@ TEST(index_size, ibf_partitioned)
 TEST(index_size, hibf)
 {
     size_t const size_in_KiB = raptor::index_size_in_KiB(helper::data("128bins23window.hibf"), 1u);
-    EXPECT_EQ(size_in_KiB, 208u);
+    EXPECT_EQ(size_in_KiB, 243u);
 
     std::string const formatted_size = raptor::formatted_index_size(helper::data("128bins23window.hibf"), 1u);
-    EXPECT_EQ(formatted_size, "[KiB]: 208.0");
+    EXPECT_EQ(formatted_size, "[KiB]: 243.0");
 }
