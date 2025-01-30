@@ -17,7 +17,7 @@
 namespace raptor::detail
 {
 
-void insert_into_ibf(robin_hood::unordered_flat_set<size_t> const & kmers,
+void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
                      insert_location const & insert_location,
                      raptor_index<index_structure::hibf> & index,
                      rebuild_location & rebuild_index_tuple)
@@ -62,7 +62,7 @@ void insert_into_ibf(robin_hood::unordered_flat_set<size_t> const & kmers,
     // }
 }
 
-rebuild_location insert_tb_and_parents(robin_hood::unordered_flat_set<size_t> const & kmers,
+rebuild_location insert_tb_and_parents(robin_hood::unordered_flat_set<uint64_t> const & kmers,
                                        insert_location insert_location,
                                        raptor_index<index_structure::hibf> & index)
 {

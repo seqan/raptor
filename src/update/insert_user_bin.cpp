@@ -24,7 +24,7 @@ insert_location get_location(std::vector<ibf_max> const & max_ibf_sizes,
                              size_t const kmer_count,
                              raptor_index<index_structure::hibf> & index);
 
-rebuild_location insert_tb_and_parents(robin_hood::unordered_flat_set<size_t> const & kmers,
+rebuild_location insert_tb_and_parents(robin_hood::unordered_flat_set<uint64_t> const & kmers,
                                        insert_location insert_location,
                                        raptor_index<index_structure::hibf> & index);
 
