@@ -4,11 +4,6 @@
 
 cmake_minimum_required (VERSION 3.25...3.30)
 
-if (NOT TARGET generate_reads)
-    add_executable ("generate_reads" generate_reads.cpp)
-    target_link_libraries ("generate_reads" "utility_common")
-endif ()
-
 if (NOT TARGET split_sequence)
     add_executable ("split_sequence" split_sequence.cpp)
     target_link_libraries ("split_sequence" "utility_common")
@@ -37,8 +32,9 @@ if (NOT TARGET apply_taxsbp)
     target_link_libraries ("apply_taxsbp" "utility_common")
 endif ()
 
-if (NOT TARGET generate_reads_refseq)
-    add_executable ("generate_reads_refseq"
+if (NOT TARGET generate_reads)
+    add_executable ("generate_reads"
+                    generate_reads.cpp
                     generate_reads/apply_weights.cpp
                     generate_reads/infer_weights_from_file_size.cpp
                     generate_reads/infer_weights_from_hll_sketches.cpp
@@ -48,9 +44,8 @@ if (NOT TARGET generate_reads_refseq)
                     generate_reads/parse_input.cpp
                     generate_reads/print_weights.cpp
                     generate_reads/simulate_reads.cpp
-                    generate_reads_refseq.cpp
     )
-    target_link_libraries ("generate_reads_refseq" "utility_common")
+    target_link_libraries ("generate_reads" "utility_common")
 endif ()
 
 if (NOT TARGET ibf_fpr)
