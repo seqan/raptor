@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <filesystem>
+#include <iomanip>
 #include <random>
 
 #include <sharg/all.hpp>
@@ -89,7 +90,7 @@ private:
     bool is_zero_positive{false};
 };
 
-std::vector<size_t> read_sample_file(std::filesystem::path const & filename)
+inline std::vector<size_t> read_sample_file(std::filesystem::path const & filename)
 {
     std::vector<size_t> values;
     std::ifstream file{filename};
@@ -99,6 +100,9 @@ std::vector<size_t> read_sample_file(std::filesystem::path const & filename)
     {
         while (std::getline(file, line))
         {
+            if (line.empty())
+                continue;
+
             size_t value;
             auto [ptr, ec] = std::from_chars(line.data(), line.data() + line.size(), value);
             if (ec == std::errc())
@@ -107,13 +111,13 @@ std::vector<size_t> read_sample_file(std::filesystem::path const & filename)
             }
             else
             {
-                std::cerr << "Invalid integer in file: " << line << std::endl;
+                std::cerr << "Invalid integer in file: " << std::quoted(line) << std::endl;
             }
         }
     }
     else
     {
-        std::cerr << "Unable to open file: " << filename << std::endl;
+        std::cerr << "Unable to open file: " << std::quoted(filename.c_str()) << std::endl;
     }
 
     return values;
@@ -131,11 +135,23 @@ inline void split_sequence_sampled(config const & cfg)
 
     std::vector<size_t> const sampled_values = [&cfg, reference_length]()
     {
-        std::vector<size_t> const sample_distribution = read_sample_file(cfg.sample_from);
+        std::vector<size_t> const sample_from = read_sample_file(cfg.sample_from);
         std::vector<size_t> sampled_values;
         sampled_values.reserve(cfg.parts);
         auto gen = std::mt19937_64{std::random_device{}()};
-        std::ranges::sample(sample_distribution, std::back_inserter(sampled_values), cfg.parts, gen);
+        // std::ranges::sample will sample at most sample_from.size() many values.
+        // If more parts are requested, we just append the sample_from values until there are less than cfg.parts left,
+        // and shuffle the sampled valued once before sampling the rest.
+        while (sampled_values.size() + sample_from.size() <= cfg.parts)
+        {
+#ifdef __cpp_lib_containers_ranges
+            sampled_values.append_range(sample_from);
+#else
+            sampled_values.insert(sampled_values.end(), sample_from.cbegin(), sample_from.cend());
+#endif
+        }
+        std::ranges::shuffle(sampled_values, gen);
+        std::ranges::sample(sample_from, std::back_inserter(sampled_values), cfg.parts - sampled_values.size(), gen);
         size_t const total_sample_length = std::reduce(sampled_values.begin(), sampled_values.end());
         double const factor = static_cast<double>(reference_length) / total_sample_length;
         std::ranges::for_each(sampled_values,
