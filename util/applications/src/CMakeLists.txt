@@ -25,6 +25,9 @@ target_include_directories ("utility_common" INTERFACE "../include")
 add_executable ("hibf_sizes" hibf_sizes.cpp)
 target_link_libraries ("hibf_sizes" "utility_common")
 
+add_executable ("simulate_sequence" simulate_sequence.cpp)
+target_link_libraries ("simulate_sequence" "utility_common")
+
 add_subdirectory (Genome_Biology)
 
 add_subdirectory (iScience)

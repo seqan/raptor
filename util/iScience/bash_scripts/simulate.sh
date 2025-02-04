@@ -6,6 +6,9 @@
 
 set -Eeuo pipefail
 
+echo "This script is no longer supported. Please use the new simulation scripts in the util/simulation directory."
+exit 1
+
 BINARY_DIR="<path to built binaries>" # Dir containing "mason_genome", "split_sequence", etc.
 OUT_DIR="<output path>" # Where simulated data should be stored
 LENGTH=4294967296 # 4*2^30 =  4GiB

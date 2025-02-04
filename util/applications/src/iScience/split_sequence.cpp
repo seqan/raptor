@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <filesystem>
+#include <random>
 
 #include <sharg/all.hpp>
 
@@ -56,6 +57,7 @@ struct config
 
     std::filesystem::path input_path{};
     std::filesystem::path output_path{};
+    std::filesystem::path sample_from{};
 };
 
 class positive_integer_validator
@@ -86,6 +88,102 @@ public:
 private:
     bool is_zero_positive{false};
 };
+
+std::vector<size_t> read_sample_file(std::filesystem::path const & filename)
+{
+    std::vector<size_t> values;
+    std::ifstream file{filename};
+    std::string line;
+
+    if (file.is_open())
+    {
+        while (std::getline(file, line))
+        {
+            size_t value;
+            auto [ptr, ec] = std::from_chars(line.data(), line.data() + line.size(), value);
+            if (ec == std::errc())
+            {
+                values.push_back(value);
+            }
+            else
+            {
+                std::cerr << "Invalid integer in file: " << line << std::endl;
+            }
+        }
+    }
+    else
+    {
+        std::cerr << "Unable to open file: " << filename << std::endl;
+    }
+
+    return values;
+}
+
+inline void split_sequence_sampled(config const & cfg)
+{
+    std::vector<seqan3::dna4> const reference = [](std::filesystem::path const & path)
+    {
+        seqan3::sequence_file_input<dna4_traits, seqan3::fields<seqan3::field::seq>> input_sequence{path};
+        return (*input_sequence.begin()).sequence();
+    }(cfg.input_path);
+
+    size_t const reference_length = reference.size();
+
+    std::vector<size_t> const sampled_values = [&cfg, reference_length]()
+    {
+        std::vector<size_t> const sample_distribution = read_sample_file(cfg.sample_from);
+        std::vector<size_t> sampled_values;
+        sampled_values.reserve(cfg.parts);
+        auto gen = std::mt19937_64{std::random_device{}()};
+        std::ranges::sample(sample_distribution, std::back_inserter(sampled_values), cfg.parts, gen);
+        size_t const total_sample_length = std::reduce(sampled_values.begin(), sampled_values.end());
+        double const factor = static_cast<double>(reference_length) / total_sample_length;
+        std::ranges::for_each(sampled_values,
+                              [factor](size_t & value)
+                              {
+                                  value = static_cast<size_t>(std::round(value * factor));
+                              });
+        size_t const total_new_sample_length = std::reduce(sampled_values.begin(), sampled_values.end());
+        if (total_new_sample_length > reference_length)
+            sampled_values.back() -= (total_new_sample_length - reference_length);
+        else
+            sampled_values.back() += (reference_length - total_new_sample_length);
+        return sampled_values;
+    }();
+
+    assert(sampled_values.size() == cfg.parts);
+    assert(std::reduce(sampled_values.begin(), sampled_values.end()) == reference_length);
+
+    std::string id;
+    size_t part{};
+    size_t const n_zero = std::to_string(cfg.parts).length();
+
+    auto it = reference.begin();
+    size_t cumulative_length{};
+    for (auto const part_size : sampled_values)
+    {
+        std::span<seqan3::dna4 const> split_sequence(it, part_size);
+        std::string part_as_string = std::to_string(part++);
+        std::string padded_parts = std::string(n_zero - part_as_string.length(), '0') + part_as_string;
+        std::string filename = "bin_" + padded_parts + ".fa";
+        std::filesystem::path out_path = cfg.output_path;
+        out_path /= filename;
+        seqan3::sequence_file_output output_sequence{out_path};
+        output_sequence.options.fasta_blank_before_id = false;
+
+        id = "bin_" + padded_parts;
+        size_t const start = cumulative_length;
+        cumulative_length += part_size;
+        size_t const end = cumulative_length;
+        id += "_[" + std::to_string(start) + ',' + std::to_string(end) + ')';
+
+        output_sequence.emplace_back(split_sequence, id);
+        it += part_size;
+    }
+
+    if (it != reference.end())
+        throw std::runtime_error{"The sum of the sampled values does not match the reference length."};
+}
 
 inline void split_sequence(config const & cfg)
 {
@@ -134,6 +232,12 @@ int main(int argc, char ** argv)
                       sharg::config{.short_id = '\0',
                                     .long_id = "output",
                                     .description = "Provide an output filepath. Default: directory of input."});
+    parser.add_option(cfg.sample_from,
+                      sharg::config{
+                          .short_id = '\0',
+                          .long_id = "sample",
+                          .description = "Sample distribution from a given file.",
+                      });
     parser.add_option(
         cfg.parts,
         sharg::config{.short_id = '\0',
@@ -160,6 +264,11 @@ int main(int argc, char ** argv)
     if (!parser.is_option_set("length") && !parser.is_option_set("parts"))
     {
         throw sharg::validation_error{"Set --length or --parts"};
+    }
+
+    if (parser.is_option_set("sample") && !parser.is_option_set("parts"))
+    {
+        throw sharg::validation_error{"Set --parts"};
     }
 
     // {
@@ -194,5 +303,12 @@ int main(int argc, char ** argv)
 
     sharg::output_directory_validator{}(cfg.output_path);
 
-    split_sequence(cfg);
+    if (parser.is_option_set("sample"))
+    {
+        split_sequence_sampled(cfg);
+    }
+    else
+    {
+        split_sequence(cfg);
+    }
 }
