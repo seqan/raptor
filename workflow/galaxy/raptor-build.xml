@@ -1,6 +1,6 @@
 <!--
-SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 SPDX-License-Identifier: CC0-1.0
 -->
 
@@ -124,7 +124,7 @@ LEGAL
     Raptor Copyright: BSD 3-Clause License
     Author: Enrico Seiler
     Contact: enrico.seiler@fu-berlin.de
-    SeqAn Copyright: 2006-2023 Knut Reinert, FU-Berlin; released under the
+    SeqAn Copyright: 2006-2025 Knut Reinert, FU-Berlin; released under the
     3-clause BSDL.
     In your academic works please cite: Raptor: A fast and space-efficient
     pre-filter for querying very large collections of nucleotide sequences;

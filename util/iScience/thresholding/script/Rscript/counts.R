@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-# SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+# SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
 library(ggplot2)
@@ -20,12 +20,12 @@ df <- data.frame(counts, heuristic, simple, indirect, overlap, both)
 colnames(df) <- c("counts", "Heuristic", "Simple", "Indirect", "Overlap", "Both")
 df2 <- melt(df, id = "counts", variable.name="Method")
 
-mini1 <- ggplot(df2, aes(x = counts, y = value, color = Method)) + 
-  geom_line(size = 1) + 
-  geom_point(size = 3) + 
+mini1 <- ggplot(df2, aes(x = counts, y = value, color = Method)) +
+  geom_line(size = 1) +
+  geom_point(size = 3) +
   labs(title=expression(bold("Threshold vs counts, p = 100")),
-       x = "Number of minimizers", 
-       y = "Threshold") + 
+       x = "Number of minimizers",
+       y = "Threshold") +
   theme_bw() +
   theme(text = element_text(size=30),
         plot.title = element_text(size=30, face="bold", hjust = 0.5),
@@ -47,12 +47,12 @@ df <- data.frame(counts, heuristic, simple, indirect, overlap, both)
 colnames(df) <- c("counts", "Heuristic", "Simple", "Indirect", "Overlap", "Both")
 df2 <- melt(df, id = "counts", variable.name="Method")
 
-mini2 <- ggplot(df2, aes(x = counts, y = value, color = Method)) + 
-  geom_line(size = 1) + 
-  geom_point(size = 3) + 
+mini2 <- ggplot(df2, aes(x = counts, y = value, color = Method)) +
+  geom_line(size = 1) +
+  geom_point(size = 3) +
   labs(title=expression(bold("Threshold vs counts, p = 150")),
-       x = "Number of minimizers", 
-       y = "Threshold") + 
+       x = "Number of minimizers",
+       y = "Threshold") +
   theme_bw() +
   theme(text = element_text(size=30),
         plot.title = element_text(size=30, face="bold", hjust = 0.5),
@@ -74,12 +74,12 @@ df <- data.frame(counts, heuristic, simple, indirect, overlap, both)
 colnames(df) <- c("counts", "Heuristic", "Simple", "Indirect", "Overlap", "Both")
 df2 <- melt(df, id = "counts", variable.name="Method")
 
-mini3 <- ggplot(df2, aes(x = counts, y = value, color = Method)) + 
-  geom_line(size = 1) + 
-  geom_point(size = 3) + 
+mini3 <- ggplot(df2, aes(x = counts, y = value, color = Method)) +
+  geom_line(size = 1) +
+  geom_point(size = 3) +
   labs(title=expression(bold("Threshold vs counts, p = 250")),
-       x = "Number of minimizers", 
-       y = "Threshold") + 
+       x = "Number of minimizers",
+       y = "Threshold") +
   theme_bw() +
   theme(text = element_text(size=30),
         plot.title = element_text(size=30, face="bold", hjust = 0.5),

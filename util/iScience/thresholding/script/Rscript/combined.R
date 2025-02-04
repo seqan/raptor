@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-# SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+# SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
 library(ggplot2)
@@ -12,7 +12,7 @@ grid_arrange_shared_legend <-
            ncol = length(list(...)),
            nrow = 1,
            position = c("bottom", "right")) {
-    
+
     plots <- list(...)
     position <- match.arg(position)
     g <-
@@ -24,7 +24,7 @@ grid_arrange_shared_legend <-
     gl <- lapply(plots, function(x)
       x + theme(legend.position = "none"))
     gl <- c(gl, ncol = ncol, nrow = nrow)
-    
+
     combined <- switch(
       position,
       "bottom" = arrangeGrob(
@@ -40,13 +40,13 @@ grid_arrange_shared_legend <-
         widths = unit.c(unit(1, "npc") - lwidth, lwidth)
       )
     )
-    
+
     grid.newpage()
     grid.draw(combined)
-    
+
     # return gtable invisibly
     invisible(combined)
-    
+
   }
 
 source("<DIR>/tpr.R")

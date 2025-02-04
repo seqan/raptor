@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-# SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+# SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
 TOOLCHAIN_PATH_DEFAULT=`pwd`/build/bin
 read -e -p "Please enter the folder contains SeqOthello toolchain [default: $TOOLCHAIN_PATH_DEFAULT]: " INPUT
 TOOLCHAIN_PATH="${INPUT:-$TOOLCHAIN_PATH_DEFAULT}"
-while [ ! -f ${TOOLCHAIN_PATH}/Build ]; do 
+while [ ! -f ${TOOLCHAIN_PATH}/Build ]; do
     echo ${TOOLCHAIN_PATH}'/Build not found.'
     read -e -p "Please enter the folder contains SeqOthello toolchain [default: $TOOLCHAIN_PATH_DEFAULT]: " INPUT
     TOOLCHAIN_PATH="${INPUT:-$TOOLCHAIN_PATH_DEFAULT}"
@@ -16,7 +16,7 @@ done
 KMER_PATH_DEFAULT=`pwd`/example/kmer
 read -e -p "Please enter the folder that contains all Jellyfish generated Kmer files [default: $KMER_PATH_DEFAULT]: " INPUT
 KMER_PATH="${INPUT:-$KMER_PATH_DEFAULT}"
-while [ ! -d ${KMER_PATH} ]; do 
+while [ ! -d ${KMER_PATH} ]; do
     echo ${KMER_PATH} 'not found.'
     read -e -p "Please enter the folder that contains all Jellyfish generated Kmer files [default: $KMER_PATH_DEFAULT]: " INPUT
     KMER_PATH="${INPUT:-$KMER_PATH_DEFAULT}"
@@ -26,7 +26,7 @@ KMER_FLIST_DEFAULT=${KMER_PATH}/flist
 read -e -p "Please enter a file that contains all filenames of the Kmer files [default: ${KMER_FLIST_DEFAULT}]: " INPUT
 KMER_FLIST="${INPUT:-$KMER_FLIST_DEFAULT}"
 
-while [ ! -f ${KMER_FLIST} ]; do 
+while [ ! -f ${KMER_FLIST} ]; do
     echo ${KMER_FLIST} 'does not exist.'
     read -e -p "Please enter a file that contains all filenames of the Kmer files [default: ${KMER_FLIST_DEFAULT}]: " INPUT
     KMER_FLIST="${INPUT:-$KMER_FLIST_DEFAULT}"
@@ -35,7 +35,7 @@ done
 read -e -p "Where can we keep some temporary files? [default: `pwd`/example]: " INPUT
 TEMP_FOLDER="${INPUT:-`pwd`/example}"
 
-if [ ! -d ${TEMP_FOLDER}/bin/ ]; then 
+if [ ! -d ${TEMP_FOLDER}/bin/ ]; then
     echo 'folder' ${TEMP_FOLDER}'/bin/ does not exist, creating.'
     mkdir -p ${TEMP_FOLDER}/bin
 fi
@@ -79,9 +79,9 @@ done
 
 split -l ${FILE_PER_GROUP} -d ${BINARY_LIST} ${TEMP_FOLDER}/${BINARY_LIST_PREFIX}
 echo '        Each group contains at most '$FILE_PER_GROUP 'files.'
-echo '        These group description files are' ${TEMP_FOLDER}/${BINARY_LIST_PREFIX}'*' 
+echo '        These group description files are' ${TEMP_FOLDER}/${BINARY_LIST_PREFIX}'*'
 
-if [ ! -d ${TEMP_FOLDER}/grp ]; then 
+if [ ! -d ${TEMP_FOLDER}/grp ]; then
     echo 'folder' ${TEMP_FOLDER}'/grp/ does not exist, creating.'
     mkdir  -p ${TEMP_FOLDER}/grp
 fi
@@ -99,7 +99,7 @@ if [ -d ${GRPLIST} ]; then
 fi
 GRP_CONVERTED=0
 echo ${TEMP_FOLDER}
-for flist in `ls -m1 ${TEMP_FOLDER}/${BINARY_LIST_PREFIX}*`; do 
+for flist in `ls -m1 ${TEMP_FOLDER}/${BINARY_LIST_PREFIX}*`; do
     echo ${TOOLCHAIN_PATH}/Group --flist=$flist --folder=${TEMP_FOLDER}/bin/ --output=${TEMP_FOLDER}/grp/Grp"${flist##*.}" >> ${MAKE_GROUP}
     echo Grp"${flist##*.}" >> ${GRPLIST}
     ((GRP_CONVERTED++))
@@ -117,12 +117,12 @@ EXPORT_FOLDER_DEFAULT=`pwd`/example/out
 read -e -p "Please enter the folder to put the SeqOthello files. [default: $EXPORT_FOLDER_DEFAULT]: " INPUT
 EXPORT_FOLDER="${INPUT:-$EXPORT_FOLDER_DEFAULT}"
 
-if [ ! -d ${EXPORT_FOLDER} ]; then 
+if [ ! -d ${EXPORT_FOLDER} ]; then
     echo 'folder' ${EXPORT_FOLDER} 'does not exist, creating.'
     mkdir -p ${EXPORT_FOLDER}
 fi
 
-while [ ! -d ${KMER_PATH} ]; do 
+while [ ! -d ${KMER_PATH} ]; do
     echo ${KMER_PATH} 'not found.'
     read -e -p "Please enter the folder that contains all Jellyfish generated Kmer files [default: $KMER_PATH_DEFAULT]: " INPUT
 done
