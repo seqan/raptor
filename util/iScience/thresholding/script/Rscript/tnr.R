@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-# SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+# SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
 library(ggplot2)
@@ -20,16 +20,16 @@ df <- data.frame(tau, simple, indirect, overlapping, indirect_overlapping)
 colnames(df) <- c("tau", "Simple", "Indirect", "Overlap", "Both")
 df2 <- melt(df, id = "tau", variable.name="Method")
 
-tnr1 <- ggplot(df2, aes(x = tau, y = value, color = Method)) + 
-  geom_line(size = 1) + 
-  geom_point(size = 3) + 
+tnr1 <- ggplot(df2, aes(x = tau, y = value, color = Method)) +
+  geom_line(size = 1) +
+  geom_point(size = 3) +
   ylim(0.999, 1) +
   labs(title=expression(bold("TNR vs "*tau*", p = 100")),
-       x =expression(tau), 
-       y ="TNR") + 
-  scale_colour_discrete(name = "Method", labels =c(expression("("*bar(italic("I"))*","*bar(italic("O"))*")"), 
-                                                   expression("("*italic("I")*","*bar(italic("O"))*")"), 
-                                                   expression("("*bar(italic("I"))*","*italic("O")*")"), 
+       x =expression(tau),
+       y ="TNR") +
+  scale_colour_discrete(name = "Method", labels =c(expression("("*bar(italic("I"))*","*bar(italic("O"))*")"),
+                                                   expression("("*italic("I")*","*bar(italic("O"))*")"),
+                                                   expression("("*bar(italic("I"))*","*italic("O")*")"),
                                                    expression("("*italic("I")*","*italic("O")*")"))) +
   theme_bw() +
   theme(text = element_text(size=30),
@@ -51,16 +51,16 @@ df <- data.frame(tau, simple, indirect, overlapping, indirect_overlapping)
 colnames(df) <- c("tau", "Simple", "Indirect", "Overlap", "Both")
 df2 <- melt(df, id = "tau", variable.name="Method")
 
-tnr2 <- ggplot(df2, aes(x = tau, y = value, color = Method)) + 
-  geom_line(size = 1) + 
-  geom_point(size = 3) + 
+tnr2 <- ggplot(df2, aes(x = tau, y = value, color = Method)) +
+  geom_line(size = 1) +
+  geom_point(size = 3) +
   ylim(0.999, 1) +
   labs(title=expression(bold("TNR vs "*tau*", p = 150")),
-       x =expression(tau), 
-       y ="TNR") + 
-  scale_colour_discrete(name = "Method", labels =c(expression("("*bar(italic("I"))*","*bar(italic("O"))*")"), 
-                                                   expression("("*italic("I")*","*bar(italic("O"))*")"), 
-                                                   expression("("*bar(italic("I"))*","*italic("O")*")"), 
+       x =expression(tau),
+       y ="TNR") +
+  scale_colour_discrete(name = "Method", labels =c(expression("("*bar(italic("I"))*","*bar(italic("O"))*")"),
+                                                   expression("("*italic("I")*","*bar(italic("O"))*")"),
+                                                   expression("("*bar(italic("I"))*","*italic("O")*")"),
                                                    expression("("*italic("I")*","*italic("O")*")"))) +
   theme_bw() +
   theme(text = element_text(size=30),
@@ -82,16 +82,16 @@ df <- data.frame(tau, simple, indirect, overlapping, indirect_overlapping)
 colnames(df) <- c("tau", "Simple", "Indirect", "Overlap", "Both")
 df2 <- melt(df, id = "tau", variable.name="Method")
 
-tnr3 <- ggplot(df2, aes(x = tau, y = value, color = Method)) + 
-  geom_line(size = 1) + 
-  geom_point(size = 3) + 
+tnr3 <- ggplot(df2, aes(x = tau, y = value, color = Method)) +
+  geom_line(size = 1) +
+  geom_point(size = 3) +
   ylim(0.999, 1) +
   labs(title=expression(bold("TNR vs "*tau*", p = 250")),
-       x =expression(tau), 
-       y ="TNR") + 
-  scale_colour_discrete(name = "Method", labels =c(expression("("*bar(italic("I"))*","*bar(italic("O"))*")"), 
-                                                   expression("("*italic("I")*","*bar(italic("O"))*")"), 
-                                                   expression("("*bar(italic("I"))*","*italic("O")*")"), 
+       x =expression(tau),
+       y ="TNR") +
+  scale_colour_discrete(name = "Method", labels =c(expression("("*bar(italic("I"))*","*bar(italic("O"))*")"),
+                                                   expression("("*italic("I")*","*bar(italic("O"))*")"),
+                                                   expression("("*bar(italic("I"))*","*italic("O")*")"),
                                                    expression("("*italic("I")*","*italic("O")*")"))) +
   theme_bw() +
   theme(text = element_text(size=30),
