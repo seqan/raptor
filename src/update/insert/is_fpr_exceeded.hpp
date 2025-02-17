@@ -19,44 +19,43 @@
 namespace raptor::detail
 {
 
-inline double leniency_factor(bool const is_toplevel, bool const is_merged)
-{
-    constexpr double leniency_constant{1.5};
-    enum class leniency_type : uint8_t
-    {
-        none = 0b00,
-        toplevel = 0b01,
-        merged = 0b10,
-        toplevel_merged = toplevel | merged
-    };
+// inline double leniency_factor(bool const is_toplevel, bool const is_merged)
+// {
+//     constexpr double leniency_constant{1.5};
+//     enum class leniency_type : uint8_t
+//     {
+//         none = 0b00,
+//         toplevel = 0b01,
+//         merged = 0b10,
+//         toplevel_merged = toplevel | merged
+//     };
 
-    leniency_type const leniency =
-        static_cast<leniency_type>(static_cast<uint8_t>(is_merged) + 2 * static_cast<uint8_t>(is_toplevel));
+//     leniency_type const leniency =
+//         static_cast<leniency_type>(static_cast<uint8_t>(is_merged) + 2 * static_cast<uint8_t>(is_toplevel));
 
-    switch (leniency)
-    {
-        using enum leniency_type;
-    case none:
-    case merged:
-    case toplevel:
-        return 1.0;
-    case toplevel_merged:
-        return leniency_constant;
-    default: // GCOVR_EXCL_LINE
-#ifndef NDEBUG
-        assert(false); // GCOVR_EXCL_LINE
-#else
-        __builtin_unreachable();
-#endif
-    }
-}
+//     switch (leniency)
+//     {
+//         using enum leniency_type;
+//     case none:
+//     case merged:
+//     case toplevel:
+//         return 1.0;
+//     case toplevel_merged:
+//         return leniency_constant;
+//     default: // GCOVR_EXCL_LINE
+// #ifndef NDEBUG
+//         assert(false); // GCOVR_EXCL_LINE
+// #else
+//         __builtin_unreachable();
+// #endif
+//     }
+// }
 
 inline bool is_fpr_exceeded_impl(raptor_index<index_structure::hibf> const & index,
                                  size_t const ibf_idx,
                                  size_t const bin_idx,
                                  bool const is_toplevel)
 {
-    static constexpr double leniency_factor = 1.5;
     auto & hibf = index.ibf();
     auto & ibf = hibf.ibf_vector[ibf_idx];
 
