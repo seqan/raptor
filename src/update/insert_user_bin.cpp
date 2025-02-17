@@ -255,9 +255,8 @@ void full_rebuild(update_arguments const & arguments, raptor_index<index_structu
     };
 
     seqan::hibf::config config{index.config()};
-    // TODO: Should this accept a user given tmax?
-    // TODO: Partial!
-    // config.tmax = 0u; //seqan::hibf::next_multiple_of_64(config.tmax + 64u);
+    // Force auto-tmax, overriding user tmax. It should always perform better, especially when inserting many bins.
+    config.tmax = 0u;
     config.input_fn = std::move(input_fn);
     config.number_of_user_bins = bin_path.size();
     config.threads = arguments.threads;
