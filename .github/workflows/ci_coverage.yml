@@ -88,3 +88,4 @@ jobs:
         with:
           files: build/coverage_report.xml
           fail_ci_if_error: false
+          flags: current

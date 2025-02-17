@@ -15,11 +15,15 @@ coverage:
       default:
         if_ci_failed: success # per default, codecov would fail if any CI fails
         informational: true   # the codecov/patch status is never "fail"
+        flags:
+          - current
     patch:  # patch is the code-coverage of the changed lines in the PR and often reports false positives
       default:
         if_ci_failed: success # per default, codecov would fail if any CI fails
         informational: true   # the codecov/patch status is never "fail"
         only_pulls: true      # only post codecov/patch status on PRs
+        flags:
+          - current
 
 parsers:
   cobertura:
