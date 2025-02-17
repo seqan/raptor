@@ -24,3 +24,12 @@ coverage:
 parsers:
   cobertura:
     partials_as_hits: true
+
+flags:
+  experimental:
+    joined: false
+    paths:
+      - include/raptor/argument_parsing/update*
+      - include/raptor/update
+      - src/raptor/update
+      - src/raptor/argument_parsing/update_parsing.cpp
