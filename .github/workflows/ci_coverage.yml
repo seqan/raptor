@@ -53,7 +53,7 @@ jobs:
         working-directory: build
         run: |
           ccache -z
-          make -k
+          make VERBOSE=1 -k
           ccache -svvx
 
       - name: Run tests
