@@ -22,15 +22,15 @@ jobs:
       matrix:
         workflow: ["coverage,", "documentation", "lint", "linux", "macos", "misc", "util", "workflows"]
     concurrency:
-      group: ${{ matrix.workflow }}-${{ github.ref }}
+      group: ${{ matrix.workflow }}-${{ github.event.pull_request.number }}
       cancel-in-progress: true
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Cancelling ${{ matrix.workflow }}"
+      - run: echo "Cancelling ${{ matrix.workflow }}-${{ github.event.pull_request.number }}"
   lint:
     name: Lint
     concurrency:
-      group: lint-${{ github.ref }}
+      group: lint-${{ github.event.pull_request.number }}
       cancel-in-progress: true
     needs: cancel_running_workflows
     runs-on: ubuntu-latest

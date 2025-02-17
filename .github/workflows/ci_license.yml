@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: license-${{ github.ref }}
+  group: license-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name != 'push' }}
 
 env:
