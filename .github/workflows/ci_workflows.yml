@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: workflows-${{ github.event.pull_request.number || github.ref }}
+  group: workflows-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name != 'push' }}
 
 env:
