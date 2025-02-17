@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        workflow: ["coverage,", "documentation", "lint", "linux", "macos", "misc", "util", "workflows"]
+        workflow: ["coverage", "documentation", "lint", "linux", "macos", "misc", "util", "workflows"]
     concurrency:
       group: ${{ matrix.workflow }}-${{ github.event.pull_request.number }}
       cancel-in-progress: true
