@@ -15,76 +15,24 @@ defaults:
     shell: bash -Eeuxo pipefail {0}
 
 jobs:
-  # Cancel other workflows that are dependent on this workflow by adding jobs that have the same concurrency group.
-  cancel_linux:
-    name: Cancel running Workflows
+  cancel_running_workflows:
+    name: Cancel ${{ matrix.workflow}}
+    strategy:
+      fail-fast: false
+      matrix:
+        workflow: ["coverage,", "documentation", "lint", "linux", "macos", "misc", "util", "workflows"]
     concurrency:
-      group: linux-${{ github.event.pull_request.number }}
+      group: ${{ matrix.workflow }}-${{ github.ref }}
       cancel-in-progress: true
     runs-on: ubuntu-latest
     steps:
-      - name: "Cancel Linux"
-        run: echo "Cancelling Linux"
-  cancel_macos:
-    name: Cancel running Workflows
-    concurrency:
-      group: macos-${{ github.event.pull_request.number }}
-      cancel-in-progress: true
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Cancel macOS"
-        run: echo "Cancelling macOS"
-  cancel_misc:
-    name: Cancel running Workflows
-    concurrency:
-      group: misc-${{ github.event.pull_request.number }}
-      cancel-in-progress: true
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Cancel Misc"
-        run: echo "Cancelling Misc"
-  cancel_util:
-    name: Cancel running Workflows
-    concurrency:
-      group: util-${{ github.event.pull_request.number }}
-      cancel-in-progress: true
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Cancel Util"
-        run: echo "Cancelling Util"
-  cancel_coverage:
-    name: Cancel running Workflows
-    concurrency:
-      group: coverage-${{ github.event.pull_request.number }}
-      cancel-in-progress: true
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Cancel Coverage"
-        run: echo "Cancelling Coverage"
-  cancel_nextflow:
-    name: Cancel running Workflows
-    concurrency:
-      group: workflows-${{ github.event.pull_request.number }}
-      cancel-in-progress: true
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Cancel Nextflow"
-        run: echo "Cancelling Nextflow"
-  cancel_doc:
-    name: Cancel running Workflows
-    concurrency:
-      group: doc-${{ github.event.pull_request.number }}
-      cancel-in-progress: true
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Cancel Documentation"
-        run: echo "Cancelling Documentation"
+      - run: echo "Cancelling ${{ matrix.workflow }}"
   lint:
     name: Lint
     concurrency:
-      group: lint-${{ github.event.pull_request.number }}
+      group: lint-${{ github.ref }}
       cancel-in-progress: true
-    needs: [cancel_linux, cancel_macos, cancel_misc, cancel_util, cancel_coverage, cancel_nextflow, cancel_doc]
+    needs: cancel_running_workflows
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

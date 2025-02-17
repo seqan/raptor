@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: codeql-${{ github.ref }}
+  group: codeql-actions
   cancel-in-progress: true
 
 env:

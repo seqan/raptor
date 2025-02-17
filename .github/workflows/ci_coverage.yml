@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: coverage-${{ github.event.pull_request.number || github.ref }}
+  group: coverage-${{ github.ref }}
   cancel-in-progress: false
 
 env:
