@@ -7,6 +7,8 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
+#include <hibf/platform.hpp>
+
 #include <raptor/threshold/threshold.hpp>
 
 namespace raptor::threshold
@@ -55,11 +57,7 @@ size_t threshold::get(size_t const minimiser_count) const noexcept
         return std::max<size_t>(1u, precomp_thresholds[index] + precomp_correction[index]);
     }
     default: // GCOVR_EXCL_LINE
-#ifndef NDEBUG
-        assert(false); // GCOVR_EXCL_LINE
-#else
-        __builtin_unreachable();
-#endif
+        HIBF_UNREACHABLE;
     }
 }
 

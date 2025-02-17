@@ -47,11 +47,7 @@ public:
         case cutoff_kinds::fixed:
             return fixed_cutoff;
         default: // GCOVR_EXCL_LINE
-#ifndef NDEBUG
-            assert(false); // GCOVR_EXCL_LINE
-#else
-            __builtin_unreachable();
-#endif
+            HIBF_UNREACHABLE;
         }
     }
 
