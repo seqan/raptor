@@ -265,6 +265,9 @@ public:
     output_file_validator & operator=(output_file_validator &&) = default;
     ~output_file_validator() = default;
 
+    output_file_validator(sharg::output_file_open_options mode) : validator{mode}
+    {}
+
     void operator()(option_value_type const & value) const
     {
         std::filesystem::path const out_path{value};

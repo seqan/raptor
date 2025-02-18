@@ -41,8 +41,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Load ccache
         uses: actions/cache@v4
@@ -74,6 +72,11 @@ jobs:
                 ${GITHUB_WORKSPACE}/build \
                 --filter ${GITHUB_WORKSPACE}/include \
                 --filter ${GITHUB_WORKSPACE}/src \
+                --exclude ${GITHUB_WORKSPACE}/include/raptor/argument_parsing/update_arguments.hpp \
+                --exclude ${GITHUB_WORKSPACE}/include/raptor/argument_parsing/update_parsing.hpp \
+                --exclude ${GITHUB_WORKSPACE}/include/raptor/update \
+                --exclude ${GITHUB_WORKSPACE}/src/argument_parsing/update_parsing.cpp \
+                --exclude ${GITHUB_WORKSPACE}/src/update \
                 --exclude-lines-by-pattern '^\s*}|^\s*};|^\s*HIBF_UNREACHABLE;|^\s*\.[^\s]+ = \".*\"' \
                 --exclude-noncode-lines \
                 --exclude-throw-branches \
@@ -88,4 +91,30 @@ jobs:
         with:
           files: build/coverage_report.xml
           fail_ci_if_error: false
-          flags: current
+          flags: stable
+
+      - name: Generate coverage report
+        run: |
+          rm ${GITHUB_WORKSPACE}/build/coverage_report.xml
+          gcovr --root ${GITHUB_WORKSPACE}/test/coverage \
+                ${GITHUB_WORKSPACE}/build \
+                --filter ${GITHUB_WORKSPACE}/include/raptor/argument_parsing/update_arguments.hpp \
+                --filter ${GITHUB_WORKSPACE}/include/raptor/argument_parsing/update_parsing.hpp \
+                --filter ${GITHUB_WORKSPACE}/include/raptor/update \
+                --filter ${GITHUB_WORKSPACE}/src/argument_parsing/update_parsing.cpp \
+                --filter ${GITHUB_WORKSPACE}/src/update \
+                --exclude-lines-by-pattern '^\s*}|^\s*};|^\s*HIBF_UNREACHABLE;|^\s*\.[^\s]+ = \".*\"' \
+                --exclude-noncode-lines \
+                --exclude-throw-branches \
+                --exclude-unreachable-branches \
+                --merge-mode-functions separate \
+                -j \
+                --cobertura \
+                --output ${GITHUB_WORKSPACE}/build/coverage_report.xml
+
+      - name: Submit coverage report
+        uses: codecov/codecov-action@v3.1.5
+        with:
+          files: build/coverage_report.xml
+          fail_ci_if_error: false
+          flags: experimental

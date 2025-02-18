@@ -16,26 +16,23 @@ coverage:
         if_ci_failed: success # per default, codecov would fail if any CI fails
         informational: true   # the codecov/patch status is never "fail"
         flags:
-          - current
+          - stable
     patch:  # patch is the code-coverage of the changed lines in the PR and often reports false positives
       default:
         if_ci_failed: success # per default, codecov would fail if any CI fails
         informational: true   # the codecov/patch status is never "fail"
         only_pulls: true      # only post codecov/patch status on PRs
         flags:
-          - current
+          - stable
 
 parsers:
   cobertura:
     partials_as_hits: true
 
 flags:
+  stable:
+    carryforward: false
+    joined: true
   experimental:
     carryforward: false
     joined: false
-    paths:
-      - include/raptor/argument_parsing/update_arguments.hpp
-      - include/raptor/argument_parsing/update_parsing.hpp
-      - include/raptor/update
-      - src/argument_parsing/update_parsing.cpp
-      - src/update
