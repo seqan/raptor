@@ -8,7 +8,7 @@ SPDX-License-Identifier: CC-BY-4.0
 
 [1]: https://img.shields.io/github/actions/workflow/status/seqan/raptor/ci_linux.yml?branch=main&style=flat&logo=github&label=Raptor%20CI
 [2]: https://github.com/seqan/raptor/actions?query=branch%3Amain
-[3]: https://codecov.io/gh/seqan/raptor/branch/main/graph/badge.svg?token=SJVMYRUKW2
+[3]: https://codecov.io/gh/seqan/raptor/branch/main/graph/badge.svg?token=SJVMYRUKW2&flag=stable
 [4]: https://codecov.io/gh/seqan/raptor
 [5]: https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat
 [6]: #install-with-bioconda-linux
