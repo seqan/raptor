@@ -69,8 +69,7 @@ jobs:
       - name: Get CodeCov token
         id: token
         run: |
-          apt-get update 1>/dev/null
-          apt-get install --yes --no-install-recommends yq 1>/dev/null
+          set +x
           token=$(yq '.codecov.token' .codecov.yml)
           echo "::add-mask::${token}"
           echo "token=${token}" >> "${GITHUB_OUTPUT}"
