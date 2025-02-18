@@ -25,6 +25,9 @@ coverage:
         flags:
           - stable
 
+fixes:
+  - "/__w/raptor/raptor/::"
+
 parsers:
   cobertura:
     partials_as_hits: true

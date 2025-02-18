@@ -66,6 +66,15 @@ jobs:
         working-directory: build
         run: ctest . -j --output-on-failure
 
+      - name: Get CodeCov token
+        id: token
+        run: |
+          apt-get update 1>/dev/null
+          apt-get install --yes --no-install-recommends yq 1>/dev/null
+          token=$(yq '.codecov.token' .codecov.yml)
+          echo "::add-mask::${token}"
+          echo "token=${token}" >> "${GITHUB_OUTPUT}"
+
       - name: Generate coverage report
         run: |
           gcovr --root ${GITHUB_WORKSPACE}/test/coverage \
@@ -87,11 +96,14 @@ jobs:
                 --output ${GITHUB_WORKSPACE}/build/coverage_report.xml
 
       - name: Submit coverage report
-        uses: codecov/codecov-action@v3.1.5
+        uses: codecov/codecov-action@v5.3.1
         with:
-          files: build/coverage_report.xml
+          disable_search: true
           fail_ci_if_error: false
+          files: build/coverage_report.xml
           flags: stable
+          plugins: noop
+          token: ${{ steps.token.outputs.token }}
 
       - name: Generate coverage report
         run: |
@@ -113,8 +125,11 @@ jobs:
                 --output ${GITHUB_WORKSPACE}/build/coverage_report.xml
 
       - name: Submit coverage report
-        uses: codecov/codecov-action@v3.1.5
+        uses: codecov/codecov-action@v5.3.1
         with:
-          files: build/coverage_report.xml
+          disable_search: true
           fail_ci_if_error: false
+          files: build/coverage_report.xml
           flags: experimental
+          plugins: noop
+          token: ${{ steps.token.outputs.token }}
