@@ -7,7 +7,7 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <hibf/platform.hpp>
+#include <hibf/misc/unreachable.hpp>
 
 #include <raptor/threshold/threshold.hpp>
 
@@ -57,7 +57,7 @@ size_t threshold::get(size_t const minimiser_count) const noexcept
         return std::max<size_t>(1u, precomp_thresholds[index] + precomp_correction[index]);
     }
     default: // GCOVR_EXCL_LINE
-        HIBF_UNREACHABLE;
+        seqan::hibf::unreachable();
     }
 }
 
