@@ -11,6 +11,8 @@
 
 #include <seqan3/io/sequence_file/format_fasta.hpp>
 
+#include <hibf/misc/unreachable.hpp>
+
 #include <raptor/argument_parsing/prepare_arguments.hpp>
 
 namespace raptor
@@ -47,7 +49,7 @@ public:
         case cutoff_kinds::fixed:
             return fixed_cutoff;
         default: // GCOVR_EXCL_LINE
-            HIBF_UNREACHABLE;
+            seqan::hibf::unreachable();
         }
     }
 
