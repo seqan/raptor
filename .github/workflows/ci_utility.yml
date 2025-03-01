@@ -53,6 +53,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup cache
+        uses: seqan/actions/setup-actions-cache@main
+
       - name: Configure tests
         run: |
           mkdir build && cd build
