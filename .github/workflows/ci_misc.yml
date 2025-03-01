@@ -44,17 +44,12 @@ jobs:
             cxx_flags: "-fp-model=strict -Wno-overriding-option"
     container:
       image: ghcr.io/seqan/${{ matrix.compiler }}
-      volumes:
-        - /home/runner:/home/runner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Load ccache
-        uses: actions/cache@v4
-        with:
-          path: /home/runner/.ccache
-          key: ccache-${{ runner.os }}-${{ github.workflow }}-${{ matrix.compiler }}-${{ matrix.build_type }}-${{ github.ref }}
+      - name: Setup cache
+        uses: seqan/actions/setup-actions-cache@main
 
       - name: Configure tests
         run: |

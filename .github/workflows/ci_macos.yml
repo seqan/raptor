@@ -52,12 +52,6 @@ jobs:
           compiler: ${{ matrix.compiler }}
           ccache_size: 75M
 
-      - name: Patch M1 GCC
-        if: contains(matrix.compiler, 'gcc') && matrix.compiler != 'gcc-14'
-        uses: seqan/actions/patch-m1-gcc@main
-        with:
-          compiler: ${{ matrix.compiler }}
-
       - name: Configure tests
         run: |
           mkdir build

@@ -71,8 +71,6 @@ jobs:
             image: ghcr.io/seqan/clang-19
     container:
       image: ${{ matrix.image || '' }}
-      volumes:
-        - /home/runner:/home/runner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -80,12 +78,6 @@ jobs:
       - name: Setup compiler
         if: contains(matrix.os, 'macos')
         uses: seqan/actions/setup-compiler@main
-        with:
-          compiler: ${{ matrix.compiler }}
-
-      - name: Patch M1 GCC
-        if: contains(matrix.os, 'macos') && contains(matrix.compiler, 'gcc') && matrix.compiler != 'gcc-14'
-        uses: seqan/actions/patch-m1-gcc@main
         with:
           compiler: ${{ matrix.compiler }}
 
