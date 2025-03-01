@@ -81,12 +81,6 @@ jobs:
         with:
           compiler: ${{ matrix.compiler }}
 
-      - name: Patch M1 GCC
-        if: contains(matrix.os, 'macos') && contains(matrix.compiler, 'gcc') && matrix.compiler != 'gcc-14'
-        uses: seqan/actions/patch-m1-gcc@main
-        with:
-          compiler: ${{ matrix.compiler }}
-
       - name: Configure tests
         run: |
           mkdir build && cd build
