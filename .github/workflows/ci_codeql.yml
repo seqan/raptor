@@ -30,8 +30,6 @@ jobs:
       security-events: write
     container:
       image: ghcr.io/seqan/gcc-14
-      volumes:
-        - /home/runner:/home/runner
     steps:
     - name: Checkout
       uses: actions/checkout@v4

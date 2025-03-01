@@ -71,8 +71,6 @@ jobs:
             image: ghcr.io/seqan/clang-19
     container:
       image: ${{ matrix.image || '' }}
-      volumes:
-        - /home/runner:/home/runner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
