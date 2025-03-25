@@ -55,6 +55,7 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
         auto agent = index.ibf().membership_agent();
 
         std::string result_string{};
+        std::array<char, std::numeric_limits<uint64_t>::digits10 + 1> buffer{};
         std::vector<uint64_t> minimiser;
 
         auto hash_adaptor = seqan3::views::minimiser_hash(arguments.shape,
@@ -76,12 +77,15 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
             size_t const threshold = thresholder.get(minimiser_count);
 
             local_query_ibf_timer.start();
-            auto & result = agent.membership_for(minimiser, threshold);
+            auto & user_bin_ids = agent.membership_for(minimiser, threshold);
             local_query_ibf_timer.stop();
             local_generate_results_timer.start();
-            for (auto && count : result)
+            for (auto && user_bin : user_bin_ids)
             {
-                result_string += std::to_string(count);
+                auto conv = std::to_chars(buffer.data(), buffer.data() + buffer.size(), user_bin);
+                assert(conv.ec == std::errc{});
+                std::string_view sv{buffer.data(), conv.ptr};
+                result_string += sv;
                 result_string += ',';
             }
 
