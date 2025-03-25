@@ -134,6 +134,7 @@ void search_partitioned_ibf(search_arguments const & arguments)
             auto counter = ibf.template counting_agent<uint16_t>();
             size_t counter_id = start;
             std::string result_string{};
+            std::array<char, std::numeric_limits<uint64_t>::digits10 + 1> buffer{};
             std::vector<uint64_t> minimiser;
 
             auto hash_adaptor = seqan3::views::minimiser_hash(arguments.shape,
@@ -172,7 +173,10 @@ void search_partitioned_ibf(search_arguments const & arguments)
                 {
                     if (count >= threshold)
                     {
-                        result_string += std::to_string(current_bin);
+                        auto conv = std::to_chars(buffer.data(), buffer.data() + buffer.size(), current_bin);
+                        assert(conv.ec == std::errc{});
+                        std::string_view sv{buffer.data(), conv.ptr};
+                        result_string += sv;
                         result_string += ',';
                     }
                     ++current_bin;
