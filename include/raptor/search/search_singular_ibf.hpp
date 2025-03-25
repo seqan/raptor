@@ -52,17 +52,8 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
         seqan::hibf::serial_timer local_query_ibf_timer{};
         seqan::hibf::serial_timer local_generate_results_timer{};
 
-#if defined(__clang__)
-        auto counter = [&index]()
-#else
-        auto counter = [&index, is_ibf]()
-#endif
-        {
-            if constexpr (is_ibf)
-                return index.ibf().template counting_agent<uint16_t>();
-            else
-                return index.ibf().membership_agent();
-        }();
+        auto agent = index.ibf().membership_agent();
+
         std::string result_string{};
         std::vector<uint64_t> minimiser;
 
@@ -84,34 +75,14 @@ void search_singular_ibf(search_arguments const & arguments, index_t && index)
             size_t const minimiser_count{minimiser.size()};
             size_t const threshold = thresholder.get(minimiser_count);
 
-            if constexpr (is_ibf)
+            local_query_ibf_timer.start();
+            auto & result = agent.membership_for(minimiser, threshold);
+            local_query_ibf_timer.stop();
+            local_generate_results_timer.start();
+            for (auto && count : result)
             {
-                local_query_ibf_timer.start();
-                auto & result = counter.bulk_count(minimiser);
-                local_query_ibf_timer.stop();
-                size_t current_bin{0};
-                local_generate_results_timer.start();
-                for (auto && count : result)
-                {
-                    if (count >= threshold)
-                    {
-                        result_string += std::to_string(current_bin);
-                        result_string += ',';
-                    }
-                    ++current_bin;
-                }
-            }
-            else
-            {
-                local_query_ibf_timer.start();
-                auto & result = counter.membership_for(minimiser, threshold); // Results contains user bin IDs
-                local_query_ibf_timer.stop();
-                local_generate_results_timer.start();
-                for (auto && count : result)
-                {
-                    result_string += std::to_string(count);
-                    result_string += ',';
-                }
+                result_string += std::to_string(count);
+                result_string += ',';
             }
 
             if (auto & last_char = result_string.back(); last_char == ',')
