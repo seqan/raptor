@@ -5,8 +5,10 @@
 # CPM Package Lock
 # This file should be committed to version control
 
+# cmake-format: off
+
 # hibf
-set (RAPTOR_HIBF_VERSION 4fd141e48d2977da9603e67fcdab61c9a32084d8)
+set (RAPTOR_HIBF_VERSION 8bb24c8d21d039413d55c6f17645c9199706281f CACHE STRING "" FORCE)
 CPMDeclarePackage (hibf
                    NAME hibf
                    GIT_TAG ${RAPTOR_HIBF_VERSION} # main
@@ -16,7 +18,7 @@ CPMDeclarePackage (hibf
                    OPTIONS "INSTALL_HIBF OFF"
 )
 # sharg
-set (RAPTOR_SHARG_VERSION c4fa5130c986acd6f85ab6df476de2447b6dff1c)
+set (RAPTOR_SHARG_VERSION c4fa5130c986acd6f85ab6df476de2447b6dff1c CACHE STRING "" FORCE)
 CPMDeclarePackage (sharg
                    NAME sharg
                    GIT_TAG ${RAPTOR_SHARG_VERSION} # main
@@ -26,7 +28,7 @@ CPMDeclarePackage (sharg
                    OPTIONS "INSTALL_SHARG OFF" "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING" "BUILD_TESTING OFF"
 )
 # seqan3
-set (RAPTOR_SEQAN3_VERSION 6765a463e1038758d92c37362185bcdde9a7eb23)
+set (RAPTOR_SEQAN3_VERSION 6765a463e1038758d92c37362185bcdde9a7eb23 CACHE STRING "" FORCE)
 CPMDeclarePackage (seqan3
                    NAME seqan3
                    GIT_TAG ${RAPTOR_SEQAN3_VERSION} # main
@@ -36,7 +38,7 @@ CPMDeclarePackage (seqan3
                    OPTIONS "INSTALL_SEQAN3 OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING"
 )
 # chopper
-set (RAPTOR_CHOPPER_VERSION 282c7f41ed8c19cda084641e31091bac483eb032)
+set (RAPTOR_CHOPPER_VERSION 282c7f41ed8c19cda084641e31091bac483eb032 CACHE STRING "" FORCE)
 CPMDeclarePackage (chopper
                    NAME chopper
                    GIT_TAG ${RAPTOR_CHOPPER_VERSION} # main
@@ -47,7 +49,7 @@ CPMDeclarePackage (chopper
                    EXCLUDE_FROM_ALL TRUE
 )
 # benchmark
-set (RAPTOR_BENCHMARK_VERSION 1.9.1)
+set (RAPTOR_BENCHMARK_VERSION 1.9.1 CACHE STRING "" FORCE)
 CPMDeclarePackage (benchmark
                    NAME benchmark
                    VERSION ${RAPTOR_BENCHMARK_VERSION}
@@ -58,7 +60,7 @@ CPMDeclarePackage (benchmark
                            "CMAKE_MESSAGE_LOG_LEVEL WARNING" "CMAKE_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
 )
 # googletest
-set (RAPTOR_GOOGLETEST_VERSION 1.16.0)
+set (RAPTOR_GOOGLETEST_VERSION 1.16.0 CACHE STRING "" FORCE)
 CPMDeclarePackage (GTest
                    NAME GTest
                    VERSION ${RAPTOR_GOOGLETEST_VERSION}
@@ -68,7 +70,7 @@ CPMDeclarePackage (GTest
                            "CMAKE_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
 )
 # use_ccache
-set (USE_CCACHE_VERSION d2a54ef555b6fc2d496a4c9506dbeb7cf899ce37)
+set (USE_CCACHE_VERSION d2a54ef555b6fc2d496a4c9506dbeb7cf899ce37 CACHE STRING "" FORCE)
 CPMDeclarePackage (use_ccache
                    NAME use_ccache
                    GIT_TAG ${USE_CCACHE_VERSION} # main
@@ -78,10 +80,12 @@ CPMDeclarePackage (use_ccache
                    EXCLUDE_FROM_ALL TRUE
 )
 # doxygen-awesome
-set (RAPTOR_DOXYGEN_AWESOME_VERSION 2.3.4)
+set (RAPTOR_DOXYGEN_AWESOME_VERSION 2.3.4 CACHE STRING "" FORCE)
 CPMDeclarePackage (doxygen_awesome
                    NAME doxygen_awesome
                    VERSION ${RAPTOR_DOXYGEN_AWESOME_VERSION}
                    GITHUB_REPOSITORY jothepro/doxygen-awesome-css
                    DOWNLOAD_ONLY TRUE
 )
+
+# cmake-format: on
