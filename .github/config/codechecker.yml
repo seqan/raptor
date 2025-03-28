@@ -4,8 +4,8 @@
 
 analyze:
   - --enable=performance
-  - --cppcheckargs=${GITHUB_WORKSPACE}/.github/config/cppcheck
   - --enable=bugprone
+  - --enable=prefix:clang-diagnostic-shadow
   - --disable=bugprone-easily-swappable-parameters
   - --disable=bugprone-narrowing-conversions
   - --disable=clang-diagnostic-implicit-int-float-conversion
