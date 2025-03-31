@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: 2006-2025, Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2025, Knut Reinert & MPI für molekulare Genetik
+# SPDX-License-Identifier: CC0-1.0
+
+name: IWYU
+
+on:
+  schedule:
+    - cron: "0 4 * * MON"
+  workflow_dispatch:
+
+concurrency:
+  group: iwyu-actions
+  cancel-in-progress: true
+
+env:
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -Eexuo pipefail {0}
+
+jobs:
+  build:
+    name: IWYU
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
+    container:
+      image: ghcr.io/seqan/clang-19
+    steps:
+      - name: Run IWYU
+        uses: seqan/actions/iwyu@main
+        with:
+          configure_path: test/analyse
+          additional_mapping: .github/config/custom.imp
+          token: ${{ secrets.SEQAN_ACTIONS_PAT }}
+          gpg_key: ${{ secrets.SEQAN_ACTIONS_GPG_KEY }}
+          gpg_passphrase: ${{ secrets.SEQAN_ACTIONS_GPG_PASSPHRASE }}
