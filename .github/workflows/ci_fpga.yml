@@ -1,0 +1,73 @@
+# SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
+# SPDX-License-Identifier: CC0-1.0
+
+name: FPGA
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    types:
+      - unlabeled
+  workflow_dispatch:
+
+concurrency:
+  group: fpga-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
+
+env:
+  SHARG_NO_VERSION_CHECK: 1
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -Eeuxo pipefail {0}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: intel
+    container:
+      image: ghcr.io/seqan/intel
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup cache
+        uses: seqan/actions/setup-actions-cache@main
+
+      - name: Install Intel FPGA support package
+        run: |
+          apt-get update 1>/dev/null
+          apt-get install --yes --no-install-recommends intel-oneapi-compiler-fpga 1>/dev/null
+
+      - name: Update environment variables
+        run: |
+          echo "ACL_BOARD_VENDOR_PATH=/opt/Intel/OpenCLFPGA/oneAPI/Boards" >> "${GITHUB_ENV}"
+          echo "CPATH=${CPATH}:/opt/intel/oneapi/compiler/2025.0/opt/oclfpga/include" >> "${GITHUB_ENV}"
+          echo "FPGA_VARS_ARGS=" >> "${GITHUB_ENV}"
+          echo "FPGA_VARS_DIR=/opt/intel/oneapi/compiler/2025.0/opt/oclfpga" >> "${GITHUB_ENV}"
+          echo "INTELFPGAOCLSDKROOT=/opt/intel/oneapi/compiler/2025.0/opt/oclfpga" >> "${GITHUB_ENV}"
+          echo "LD_LIBRARY_PATH=/opt/intel/oneapi/compiler/2025.0/opt/oclfpga/host/linux64/lib:${LD_LIBRARY_PATH}" >> "${GITHUB_ENV}"
+          echo "OCL_ICD_FILENAMES=libintelocl_emu.so:libalteracl.so:${OCL_ICD_FILENAMES}" >> "${GITHUB_ENV}"
+          echo "PATH=/opt/intel/oneapi/compiler/2025.0/opt/oclfpga/bin:${PATH}" >> "${GITHUB_ENV}"
+
+      - name: Configure tests
+        run: |
+          mkdir build && cd build
+          cmake ../test/unit -DCMAKE_BUILD_TYPE=Release -DRAPTOR_FPGA=ON -DCMAKE_CXX_FLAGS="-fp-model=strict -Wno-overriding-option"
+          make gtest_main
+
+      - name: Build tests
+        working-directory: build
+        run: |
+          ccache -z
+          make -k
+          ccache -svvx
+
+      - name: Run tests
+        working-directory: build
+        run: ctest . -j --output-on-failure
+
