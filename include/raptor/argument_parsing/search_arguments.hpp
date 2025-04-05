@@ -54,6 +54,11 @@ struct search_arguments
     bool quiet{false};
     std::filesystem::path timing_out{};
 
+    // FPGA
+    bool use_fpga{false};
+    uint8_t buffer{1u};
+    uint8_t kernels{1u};
+
     // Timers do not copy the stored duration upon copy construction/assignment
     mutable seqan::hibf::concurrent_timer wall_clock_timer{};
     mutable seqan::hibf::concurrent_timer query_length_timer{};

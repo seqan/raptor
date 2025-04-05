@@ -10,4 +10,10 @@ endif ()
 
 add_library ("raptor_search" STATIC raptor_search.cpp search_hibf.cpp search_ibf.cpp search_partitioned_ibf.cpp)
 target_link_libraries ("raptor_search" PUBLIC "raptor::interface")
+
+if (RAPTOR_FPGA)
+    add_subdirectory (fpga)
+    target_link_libraries ("raptor_search" PUBLIC "raptor::search::fpga")
+endif ()
+
 add_library (raptor::search ALIAS raptor_search)

@@ -8,3 +8,7 @@ raptor_add_unit_test (search_hibf_test.cpp)
 raptor_add_unit_test (search_hibf_preprocessing_test.cpp)
 raptor_add_unit_test (search_ibf_preprocessing_test.cpp)
 raptor_add_unit_test (search_ibf_test.cpp)
+
+if (RAPTOR_FPGA)
+    raptor_add_unit_test (search_ibf_fpga_test.cpp)
+endif ()
