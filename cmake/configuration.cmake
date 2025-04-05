@@ -60,7 +60,7 @@ endif ()
 # CPM
 # ----------------------------------------------------------------------------
 
-set (CPM_INDENT "CMake Package Manager CPM: ")
+set (CPM_INDENT "  CMake Package Manager CPM: ")
 include (${Raptor_SOURCE_DIR}/cmake/CPM.cmake)
 CPMUsePackageLock (${Raptor_SOURCE_DIR}/cmake/package-lock.cmake)
 
@@ -108,3 +108,9 @@ find_path (SEQAN3_TEST_INCLUDE_DIR
 target_include_directories (raptor_interface SYSTEM INTERFACE "${SEQAN3_TEST_INCLUDE_DIR}")
 
 add_library (raptor::interface ALIAS raptor_interface)
+
+# ----------------------------------------------------------------------------
+# FPGA
+# ----------------------------------------------------------------------------
+
+include (${Raptor_SOURCE_DIR}/cmake/fpga_config.cmake)

@@ -180,7 +180,6 @@ public:
             return;
 
         uint64_t possible_minimizers = text_length > w ? text_length - w + 1u : 1u;
-        uint64_t possible_kmers = text_length - k + 1;
         assert(w >= k);
         uint64_t kmers_per_window = w - k + 1u;
 

@@ -25,7 +25,7 @@ get_filename_component (Raptor_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../.." A
 include ("${Raptor_SOURCE_DIR}/cmake/configuration.cmake")
 
 add_library (common_thresholding INTERFACE)
-target_link_libraries ("common_thresholding" INTERFACE seqan3::seqan3 sharg::sharg)
+target_link_libraries ("common_thresholding" INTERFACE raptor::interface)
 target_include_directories ("common_thresholding" INTERFACE include)
 
 add_executable (query src/query.cpp)

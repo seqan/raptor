@@ -29,7 +29,7 @@ public:
 
     size_t get(size_t const minimiser_count) const noexcept;
 
-private:
+protected:
     enum class threshold_kinds : uint8_t
     {
         probabilistic,

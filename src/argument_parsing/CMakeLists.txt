@@ -58,6 +58,11 @@ add_library ("raptor_argument_parsing" STATIC
              upgrade_parsing.cpp
 )
 
+set_source_files_properties (search_parsing.cpp
+                             PROPERTIES COMPILE_DEFINITIONS
+                                        "FPGA_WINDOWS=${WINDOW_SIZE_STRING};FPGA_KMERS=${MIN_IBF_K_STRING};FPGA_BINS=${BIN_COUNT_STRING};FPGA_KERNELS=${KERNEL_COPYS_STRING}"
+)
+
 set_source_files_properties (init_shared_meta.cpp
                              PROPERTIES COMPILE_DEFINITIONS
                                         "RAPTOR_VERSION=\"${PACKAGE_VERSION} (${RAPTOR_COMMIT_HASH})\";RAPTOR_DATE=\"${RAPTOR_COMMIT_DATE}\""

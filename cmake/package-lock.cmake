@@ -87,5 +87,12 @@ CPMDeclarePackage (doxygen_awesome
                    GITHUB_REPOSITORY jothepro/doxygen-awesome-css
                    DOWNLOAD_ONLY TRUE
 )
+# ibf-fpga
+set (RAPTOR_IBF_FPGA_VERSION 01533444a8f640cf043a369a855be082dd569dff CACHE STRING "" FORCE)
+CPMDeclarePackage (ibf-fpga
+                   NAME ibf-fpga
+                   URL https://github.com/seqan/ibf-fpga/archive/${RAPTOR_IBF_FPGA_VERSION}.tar.gz # master
+                   DOWNLOAD_ONLY YES
+                   QUIET YES)
 
 # cmake-format: on

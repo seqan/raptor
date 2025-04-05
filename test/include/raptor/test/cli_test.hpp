@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 
+#include <bitset>
 #include <charconv>
 #include <fstream>
 
@@ -401,17 +402,32 @@ struct raptor_base : public cli_test
 
         ASSERT_EQ(line, "#QUERY_NAME\tUSER_BINS");
 
-        std::string const query_prefix{"query"};
-        for (char i : {'3', '1', '2'})
+        constexpr std::string_view query_prefix{"query"};
+        constexpr size_t query_id_length{query_prefix.size() + 2u};
+        std::bitset<3> query_ids{};
+        for (size_t i{}; i < 3; ++i)
         {
             ASSERT_TRUE(std::getline(search_result, line));
             std::string_view line_view{line};
 
-            ASSERT_EQ(line_view.substr(0, query_prefix.size() + 2u), query_prefix + i + '\t');
+            // Line is, e.g., query1\t0,1,2
+            std::string_view query_id_view{line_view.substr(0, query_id_length)};
+            ASSERT_TRUE(query_id_view.starts_with(query_prefix));
+            ASSERT_TRUE(query_id_view.ends_with('\t'));
+            ASSERT_EQ(query_id_view.size(), query_id_length);
+            // Get the number after "query"
+            std::from_chars(query_id_view.data() + query_id_length - 2u,
+                            query_id_view.data() + query_id_length - 1u,
+                            tmp);
+            ASSERT_GT(tmp, 0u);
+            ASSERT_LE(tmp, query_ids.size());
+            --tmp;
+            ASSERT_FALSE(query_ids[tmp]);
+            query_ids.set(tmp);
 
             actual_hits.clear();
 
-            for (auto && hit : std::views::split(line_view.substr(query_prefix.size() + 2u), ','))
+            for (auto && hit : std::views::split(line_view.substr(query_id_length), ','))
             {
                 std::from_chars(hit.data(), hit.data() + hit.size(), tmp);
                 actual_hits.push_back(tmp);
@@ -421,5 +437,6 @@ struct raptor_base : public cli_test
         }
 
         EXPECT_FALSE(std::getline(search_result, line));
+        EXPECT_TRUE(query_ids.all());
     }
 };

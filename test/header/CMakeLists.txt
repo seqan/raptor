@@ -35,7 +35,9 @@ file (GLOB_RECURSE header_files
       "${header_base_path}/*.hpp"
 )
 
-list (FILTER header_files EXCLUDE REGEX "raptor/version.hpp|hibf/contrib/std")
+list (FILTER header_files EXCLUDE REGEX
+      "raptor/version.hpp|hibf/contrib/std|raptor/search/fpga/min_ibf_fpga_oneapi.hpp"
+)
 
 file (WRITE "${PROJECT_BINARY_DIR}/${target}.cpp" "")
 add_executable (${target} ${PROJECT_BINARY_DIR}/${target}.cpp)
