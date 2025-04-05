@@ -57,7 +57,7 @@ jobs:
       - name: Configure tests
         run: |
           mkdir build && cd build
-          cmake ../test/unit -DCMAKE_BUILD_TYPE=Release -DRAPTOR_FPGA=ON -DCMAKE_CXX_FLAGS="-fp-model=strict -Wno-overriding-option"
+          cmake ../test/unit -DCMAKE_BUILD_TYPE=Release -DRAPTOR_FPGA=ON
           make gtest_main
 
       - name: Build tests

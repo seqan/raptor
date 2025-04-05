@@ -36,12 +36,6 @@ jobs:
         compiler: ["clang-19", "gcc-14", "gcc-12", "intel"]
         build: ["snippet", "performance", "header"]
         build_type: [Release, Debug]
-        include:
-          - cxx_flags: "-Wno-interference-size"
-          - compiler: "clang-19"
-            cxx_flags: ""
-          - compiler: "intel"
-            cxx_flags: "-fp-model=strict -Wno-overriding-option"
     container:
       image: ghcr.io/seqan/${{ matrix.compiler }}
     steps:
@@ -54,9 +48,7 @@ jobs:
       - name: Configure tests
         run: |
           mkdir build && cd build
-          cmake ../test/${{ matrix.build }} \
-                -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
+          cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
           case "${{ matrix.build }}" in
             snippet) make gtest_main;;
             performance) make benchmark_main;;
