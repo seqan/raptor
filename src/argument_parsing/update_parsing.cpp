@@ -7,12 +7,34 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <raptor/argument_parsing/init_shared_meta.hpp>
-#include <raptor/argument_parsing/parse_bin_path.hpp>
-#include <raptor/argument_parsing/update_parsing.hpp>
-#include <raptor/argument_parsing/validators.hpp>
-#include <raptor/index.hpp>
-#include <raptor/update/update.hpp>
+#include <algorithm>   // for find_if
+#include <charconv>    // for from_chars
+#include <filesystem>  // for operator<<, operator>>, path
+#include <fstream>     // for operator<<, basic_ifstream, basic_ios, basic_istream
+#include <iomanip>     // for operator<<, quoted
+#include <string>      // for operator+, basic_string, char_traits, to_string
+#include <string_view> // for basic_string_view, operator==, string_view
+#include <vector>      // for vector
+
+#include <cereal/archives/binary.hpp> // for BinaryInputArchive
+#include <cereal/specialize.hpp>      // for specialization
+
+#include <sharg/auxiliary.hpp>        // for parser_meta_data
+#include <sharg/config.hpp>           // for config
+#include <sharg/detail/to_string.hpp> // for to_string
+#include <sharg/parser.hpp>           // for parser
+#include <sharg/validators.hpp>       // for input_file_validator, output_file_open_options
+
+#include <seqan3/search/kmer_index/shape.hpp> // for shape
+
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
+
+#include <raptor/argument_parsing/init_shared_meta.hpp> // for init_shared_meta
+#include <raptor/argument_parsing/update_arguments.hpp> // for update_arguments
+#include <raptor/argument_parsing/update_parsing.hpp>   // for update_parsing
+#include <raptor/argument_parsing/validators.hpp>       // for output_file_validator, positive_integer_validator
+#include <raptor/index.hpp>                             // for raptor_index
+#include <raptor/update/update.hpp>                     // for raptor_update
 
 namespace raptor
 {
