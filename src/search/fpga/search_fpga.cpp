@@ -67,7 +67,7 @@ void search_fpga(search_arguments const & arguments)
     size_t const technical_bins{seqan::hibf::next_multiple_of_64(bins)};
     assert(bins == technical_bins); // Todo: Important?
 
-    constexpr bool profile = true;
+    constexpr bool profile = false;
 
     // size_t const chunk_bits = std::min<size_t>(technical_bins, MAX_BUS_WIDTH);
     // assert(MAX_BUS_WIDTH <= 512);
