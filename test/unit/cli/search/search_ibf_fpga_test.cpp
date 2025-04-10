@@ -4,7 +4,6 @@
 
 #include <raptor/test/cli_test.hpp>
 
-// Todo 128 bins (32 in test suite at the end) does currently not work
 // Same as search_ibf_test.cpp, but
 // * `--fpga` as option
 // * Expection result.err to be non-empty (profiling)
@@ -64,7 +63,7 @@ TEST_P(search_ibf_fpga, no_hits)
 
 INSTANTIATE_TEST_SUITE_P(search_ibf_fpga_suite,
                          search_ibf_fpga,
-                         testing::Combine(testing::Values(16 /*, 32*/), testing::Values(23), testing::Values(0, 1)),
+                         testing::Combine(testing::Values(16, 32), testing::Values(23), testing::Values(0, 1)),
                          [](testing::TestParamInfo<search_ibf_fpga::ParamType> const & info)
                          {
                              std::string name = std::to_string(std::max<int>(1, std::get<0>(info.param) * 4)) + "_bins_"

@@ -75,7 +75,8 @@ foreach (WINDOW_SIZE IN LISTS WINDOW_SIZE_LIST)
                     generate_target ("" DEVICE_TARGET)
                     add_library (${DEVICE_TARGET} SHARED "${ibf-fpga_SOURCE_DIR}/src/fpga_device.cpp")
                     add_common_target_options (${DEVICE_TARGET})
-                    target_link_libraries (raptor_search_fpga PRIVATE ${DEVICE_TARGET})
+                    add_dependencies (raptor_search_fpga ${DEVICE_TARGET})
+                    target_link_directories (raptor_search_fpga PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
                     # For hardware only
                     if (RAPTOR_FPGA_HARDWARE)
                         ## Report
