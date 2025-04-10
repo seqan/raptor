@@ -6,7 +6,6 @@
 
 // Same as search_ibf_test.cpp, but
 // * `--fpga` as option
-// * Expection result.err to be non-empty (profiling)
 // * Not running w==k
 // * Not running 1 bin
 // * Not running threshold
@@ -33,7 +32,7 @@ TEST_P(search_ibf_fpga, with_error)
                                                "--query ",
                                                data("query.fq"));
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_NE(result.err, std::string{});
+    EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
 
     compare_search(number_of_repeated_bins, number_of_errors, "search.out");
@@ -55,7 +54,7 @@ TEST_P(search_ibf_fpga, no_hits)
                                                "--query ",
                                                data("query_empty.fq"));
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_NE(result.err, std::string{});
+    EXPECT_EQ(result.err, std::string{});
     RAPTOR_ASSERT_ZERO_EXIT(result);
 
     compare_search(number_of_repeated_bins, number_of_errors, "search.out", is_empty::yes);
