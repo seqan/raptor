@@ -9,14 +9,26 @@
 
 #pragma once
 
-#include <cereal/types/string.hpp>
+#include <concepts>  // for same_as
+#include <cstdint>   // for uint32_t, uint8_t, uint64_t
+#include <exception> // for exception
+#include <string>    // for basic_string, string, operator+
+#include <utility>   // for move
+#include <vector>    // for vector
 
-#include <sharg/exceptions.hpp>
+#include <cereal/macros.hpp> // for CEREAL_SERIALIZE_FUNCTION_NAME
 
-#include <hibf/hierarchical_interleaved_bloom_filter.hpp>
+#include <sharg/exceptions.hpp> // for parser_error
 
-#include <raptor/argument_parsing/build_arguments.hpp>
-#include <raptor/strong_types.hpp>
+#include <seqan3/core/concept/cereal.hpp>     // for cereal_archive, cereal_input_archive
+#include <seqan3/search/kmer_index/shape.hpp> // for shape
+
+#include <hibf/config.hpp>                                // for config
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
+#include <hibf/interleaved_bloom_filter.hpp>              // for bin_count, bin_size, hash_function_count, interlea...
+
+#include <raptor/argument_parsing/build_arguments.hpp> // for build_arguments
+#include <raptor/strong_types.hpp>                     // for window
 
 namespace raptor
 {
@@ -37,8 +49,6 @@ template <typename index_t>
 concept is_valid = is_ibf<index_t> || is_hibf<index_t>;
 
 } // namespace index_structure
-
-class index_upgrader;
 
 template <index_structure::is_valid data_t = index_structure::ibf>
 class raptor_index

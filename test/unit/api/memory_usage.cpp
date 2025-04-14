@@ -2,9 +2,11 @@
 // SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Test, Message, AssertionResult, TestInfo, TestPartResult
 
-#include <raptor/argument_parsing/memory_usage.hpp>
+#include <string> // for basic_string, string
+
+#include <raptor/argument_parsing/memory_usage.hpp> // for formatted_peak_ram, peak_ram_in_KiB
 
 #if __has_include(<sys/resource.h>)
 TEST(peak_ram, as_KiB)
