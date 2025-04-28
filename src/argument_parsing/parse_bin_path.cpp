@@ -7,10 +7,19 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <chopper/layout/input.hpp>
+#include <filesystem> // for path, operator==
+#include <fstream>    // for basic_istream, basic_ifstream, basic_ios, getline
+#include <sstream>    // for basic_stringstream
+#include <string>     // for basic_string, char_traits, string
+#include <utility>    // for move
+#include <vector>     // for vector
 
-#include <raptor/argument_parsing/parse_bin_path.hpp>
-#include <raptor/argument_parsing/validators.hpp>
+#include <chopper/layout/input.hpp> // for read_filenames_from
+
+#include <raptor/argument_parsing/build_arguments.hpp>   // for build_arguments
+#include <raptor/argument_parsing/parse_bin_path.hpp>    // for parse_bin_path
+#include <raptor/argument_parsing/prepare_arguments.hpp> // for prepare_arguments
+#include <raptor/argument_parsing/validators.hpp>        // for bin_validator
 
 namespace raptor
 {
