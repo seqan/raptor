@@ -38,7 +38,7 @@ CPMDeclarePackage (seqan3
                    OPTIONS "INSTALL_SEQAN3 OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING"
 )
 # chopper
-set (RAPTOR_CHOPPER_VERSION efcb414cd37c14b8afc3e1cfeff9cd355b8a2420 CACHE STRING "" FORCE)
+set (RAPTOR_CHOPPER_VERSION 917cdb60ad48c8ad6965e04eebc9ff73b4df053f CACHE STRING "" FORCE)
 CPMDeclarePackage (chopper
                    NAME chopper
                    GIT_TAG ${RAPTOR_CHOPPER_VERSION} # main
@@ -60,7 +60,7 @@ CPMDeclarePackage (benchmark
                            "CMAKE_MESSAGE_LOG_LEVEL WARNING" "CMAKE_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
 )
 # googletest
-set (RAPTOR_GOOGLETEST_VERSION 1.16.0 CACHE STRING "" FORCE)
+set (RAPTOR_GOOGLETEST_VERSION 1.17.0 CACHE STRING "" FORCE)
 CPMDeclarePackage (GTest
                    NAME GTest
                    VERSION ${RAPTOR_GOOGLETEST_VERSION}
