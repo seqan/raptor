@@ -9,12 +9,12 @@
 
 #pragma once
 
-#include <cassert>
-#include <cstddef>
-#include <filesystem>
-#include <string>
+#include <cstddef>    // for size_t
+#include <cstdint>    // for uint8_t
+#include <filesystem> // for file_size, path
+#include <string>     // for char_traits, allocator, basic_string, operator+, to_s...
 
-#include <raptor/argument_parsing/formatted_bytes.hpp>
+#include <raptor/argument_parsing/formatted_bytes.hpp> // for formatted_bytes
 
 namespace raptor
 {

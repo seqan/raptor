@@ -7,8 +7,13 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <raptor/search/search_ibf.hpp>
-#include <raptor/search/search_singular_ibf.hpp>
+#include <ranges>  // for views
+#include <utility> // for move
+
+#include <raptor/argument_parsing/search_arguments.hpp> // for search_arguments
+#include <raptor/index.hpp>                             // for raptor_index, ibf
+#include <raptor/search/search_ibf.hpp>                 // for search_ibf
+#include <raptor/search/search_singular_ibf.hpp>        // for search_singular_ibf
 
 namespace raptor
 {

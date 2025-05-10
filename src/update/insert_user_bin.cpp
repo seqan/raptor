@@ -7,15 +7,38 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <hibf/contrib/robin_hood.hpp>
+#include <algorithm>  // for __fn, for_each, is_sorted, sort
+#include <cmath>      // for log, ceil, exp
+#include <cstddef>    // for size_t
+#include <cstdint>    // for uint64_t, uint32_t
+#include <filesystem> // for path
+#include <functional> // for equal_to, function
+#include <iostream>   // for basic_ostream, operator<<, cout, basic_ios
+#include <iterator>   // for insert_iterator, inserter
+#include <limits>     // for numeric_limits
+#include <ranges>     // for operator==
+#include <string>     // for basic_string, string
+#include <vector>     // for vector
 
-#include <raptor/argument_parsing/update_arguments.hpp>
-#include <raptor/file_reader.hpp>
-#include <raptor/index.hpp>
-#include <raptor/update/dump_index.hpp> // DEBUG
+#include <seqan3/search/kmer_index/shape.hpp>          // for shape
+#include <seqan3/search/views/kmer_hash.hpp>           // for operator-, operator==
+#include <seqan3/search/views/minimiser.hpp>           // for operator!=
+#include <seqan3/utility/container/dynamic_bitset.hpp> // for operator==
 
-#include "insert/is_fpr_exceeded.hpp"
-#include "insert/strong_types.hpp"
+#include <hibf/config.hpp>                                // for insert_iterator, config
+#include <hibf/contrib/robin_hood.hpp>                    // for Table, hash, unordered_flat_set
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter, deleted
+#include <hibf/interleaved_bloom_filter.hpp>              // for interleaved_bloom_filter
+#include <hibf/misc/next_multiple_of_64.hpp>              // for next_multiple_of_64
+#include <hibf/misc/unreachable.hpp>                      // for move, assert
+
+#include <raptor/argument_parsing/update_arguments.hpp> // for update_arguments
+#include <raptor/file_reader.hpp>                       // for file_types, file_reader
+#include <raptor/index.hpp>                             // for raptor_index, hibf
+#include <raptor/strong_types.hpp>                      // for window
+
+#include "insert/is_fpr_exceeded.hpp" // for is_fpr_exceeded
+#include "insert/strong_types.hpp"    // for ibf_max, max_elements_parameters, rebuild_location
 
 namespace raptor::detail
 {
