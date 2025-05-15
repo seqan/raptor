@@ -27,5 +27,5 @@ SPDX-License-Identifier: CC-BY-4.0
   <li>\ref usage_layout</li>
   <li>\ref usage_build</li>
   <li>\ref usage_search</li>
+  <li>\ref usage_search_fpga</li>
 </ul>
-
