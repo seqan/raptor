@@ -86,10 +86,10 @@ void init_fpga_parser(sharg::parser & parser, search_arguments & arguments)
                     sharg::config{.short_id = '\0', .long_id = "fpga", .description = "Use the FPGA."});
     parser.add_option(
         arguments.buffer,
-        sharg::config{.short_id = '\0', .long_id = "buffers", .description = "The number of buffers to use."});
+        sharg::config{.short_id = '\0', .long_id = "buffers", .description = "The size (in MiB) of the host side double buffer to use."});
     parser.add_option(
         arguments.kernels,
-        sharg::config{.short_id = '\0', .long_id = "kernels", .description = "The number of kernels to use."});
+        sharg::config{.short_id = '\0', .long_id = "kernels", .description = "The number of kernel copys to use."});
 }
 #endif
 
