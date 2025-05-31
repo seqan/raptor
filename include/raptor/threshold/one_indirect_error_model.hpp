@@ -9,7 +9,10 @@
 
 #pragma once
 
-#include <seqan3/search/kmer_index/shape.hpp>
+#include <cstddef> // for size_t
+#include <vector>  // for vector
+
+#include <seqan3/search/kmer_index/shape.hpp> // for shape
 
 namespace raptor::threshold
 {

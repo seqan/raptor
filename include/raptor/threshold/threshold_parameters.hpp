@@ -9,9 +9,11 @@
 
 #pragma once
 
-#include <filesystem>
+#include <cstdint>    // for uint32_t, uint64_t, uint8_t
+#include <filesystem> // for path
+#include <limits>     // for numeric_limits
 
-#include <seqan3/search/kmer_index/shape.hpp>
+#include <seqan3/search/kmer_index/shape.hpp> // for shape
 
 namespace raptor::threshold
 {
