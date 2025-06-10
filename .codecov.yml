@@ -4,7 +4,6 @@
 
 # See https://docs.codecov.io/docs/codecovyml-reference
 codecov:
-  token: 493cd34e-2543-4e61-b7a8-da2c0bc62fb9
   require_ci_to_pass: no  # codecov reports its results independent of whether CI passed
   notify:
     wait_for_ci: no       # codecov has not to wait until the CI is finished to post its results

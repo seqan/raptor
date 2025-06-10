@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: ["clang-19", "gcc-14", "gcc-12", "intel"]
+        compiler: ["clang-latest", "gcc-latest", "gcc-third-latest", "intel"]
         build: ["snippet", "performance", "header"]
         build_type: [Release, Debug]
     container:
