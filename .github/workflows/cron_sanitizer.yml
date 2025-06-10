@@ -33,18 +33,18 @@ jobs:
       fail-fast: false
       matrix:
         name: [ASan, TSan, UBSan]
-        os: [ubuntu-latest, macos-14]
+        os: [ubuntu-latest, macos-latest]
         build_type: [Release, RelWithDebInfo, Debug]
         exclude:
           - name: "TSan"
-            os: macos-14
+            os: macos-latest
         include:
           - name: "ASan"
             os: ubuntu-latest
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=address -Wno-maybe-uninitialized -Wno-interference-size"
 
           - name: "ASan"
-            os: macos-14
+            os: macos-latest
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=address"
 
           - name: "TSan"
@@ -55,20 +55,20 @@ jobs:
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero -Wno-interference-size"
 
           - name: "UBSan"
-            os: macos-14
+            os: macos-latest
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero,local-bounds,nullability -fno-sanitize=function -Wno-pass-failed"
 
-          - os: macos-14
-            compiler: clang-19
+          - os: macos-latest
+            compiler: clang-latest
 
           - os: ubuntu-latest
-            compiler: gcc-14
-            image: ghcr.io/seqan/gcc-14
+            compiler: gcc-latest
+            image: ghcr.io/seqan/gcc-latest
 
           - name: "TSan"
             os: ubuntu-latest
-            compiler: clang-19
-            image: ghcr.io/seqan/clang-19
+            compiler: clang-latest
+            image: ghcr.io/seqan/clang-latest
     container:
       image: ${{ matrix.image || '' }}
     steps:

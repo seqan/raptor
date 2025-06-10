@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
     container:
-      image: ghcr.io/seqan/clang-19
+      image: ghcr.io/seqan/clang-latest
     steps:
       - name: Run IWYU
         uses: seqan/actions/iwyu@main

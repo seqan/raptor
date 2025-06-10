@@ -36,7 +36,7 @@ jobs:
           - build_type: Debug
             cxx_flags: "-fcf-protection=full"
     container:
-      image: ghcr.io/seqan/gcc-14
+      image: ghcr.io/seqan/gcc-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: ["gcc-14"]
+        compiler: ["gcc-latest"]
     container:
       image: ghcr.io/seqan/${{ matrix.compiler }}
     steps:
@@ -60,14 +60,6 @@ jobs:
       - name: Run tests
         working-directory: build
         run: ctest . -j --output-on-failure
-
-      - name: Get CodeCov token
-        id: token
-        run: |
-          set +x
-          token=$(yq '.codecov.token' .codecov.yml)
-          echo "::add-mask::${token}"
-          echo "token=${token}" >> "${GITHUB_OUTPUT}"
 
       - name: Generate coverage report
         run: |
@@ -97,8 +89,7 @@ jobs:
           files: build/coverage_report.xml
           flags: stable
           plugins: noop
-          token: ${{ steps.token.outputs.token }}
-
+          token: ${{ secrets.CODECOV_TOKEN }}
       - name: Generate coverage report
         run: |
           rm ${GITHUB_WORKSPACE}/build/coverage_report.xml
@@ -126,4 +117,4 @@ jobs:
           files: build/coverage_report.xml
           flags: experimental
           plugins: noop
-          token: ${{ steps.token.outputs.token }}
+          token: ${{ secrets.CODECOV_TOKEN }}

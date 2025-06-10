@@ -28,7 +28,7 @@ defaults:
 jobs:
   build:
     name: ${{ matrix.name }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     timeout-minutes: 120
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
@@ -36,9 +36,9 @@ jobs:
       matrix:
         include:
           - name: "Nextflow"
-            compiler: "gcc-14"
+            compiler: "gcc-latest"
           - name: "CWL"
-            compiler: "gcc-14"
+            compiler: "gcc-latest"
     container:
       image: ghcr.io/seqan/${{ matrix.compiler }}
     steps:
