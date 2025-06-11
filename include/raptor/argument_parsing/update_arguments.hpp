@@ -36,7 +36,7 @@ struct update_arguments
     double fpr{0.05};
 
     std::vector<size_t> user_bins_to_delete{};
-    std::filesystem::path user_bin_to_insert{};
+    std::vector<std::vector<std::string>> user_bins_to_insert{};
 };
 
 } // namespace raptor

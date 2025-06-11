@@ -26,13 +26,13 @@ void init_update_parser(sharg::parser & parser, update_arguments & arguments)
     parser.add_option(arguments.index_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "index",
-                                    .description = "Path to an index.",
+                                    .description = "Path to an index",
                                     .required = true,
                                     .validator = sharg::input_file_validator{}});
     parser.add_option(arguments.out_path,
                       sharg::config{.short_id = '\0',
                                     .long_id = "output",
-                                    .description = "",
+                                    .description = "Path to the output index file",
                                     .required = true,
                                     .validator = output_file_validator{sharg::output_file_open_options::create_new}});
     parser.add_option(arguments.threads,
@@ -59,12 +59,32 @@ void init_insert_parser(sharg::parser & parser, update_arguments & arguments)
 {
     init_update_parser(parser, arguments);
     parser.add_subsection("Insertion options");
-    parser.add_option(arguments.user_bin_to_insert,
+    parser.add_option(arguments.bin_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "insert",
-                                    .description = "UB to insert",
+                                    .description = "A single sequence file, or a file contaning file names: " +
+                                                   []()
+                                                   {
+                                                       std::string str = bin_validator{}.get_help_page_message();
+                                                       str.erase(201, 73);
+                                                       str.erase(str.size() - 2, 2); // remove trailing space and dot
+                                                       return str;
+                                                   }(),
                                     .required = true,
                                     .validator = sharg::input_file_validator{}});
+}
+
+bool is_sequence_file(std::filesystem::path const & file_path)
+{
+    try
+    {
+        bin_validator{}.sequence_file_validator(file_path);
+        return true;
+    }
+    catch (...)
+    {
+        return false;
+    }
 }
 
 void update_parsing(sharg::parser & parser)
@@ -83,6 +103,21 @@ void update_parsing(sharg::parser & parser)
         init_insert_parser(sub_parser, arguments);
 
     sub_parser.parse();
+
+    if (sub_parser.info.app_name == std::string_view{"Raptor-update-insert"})
+    {
+        if (std::filesystem::is_empty(arguments.bin_file))
+            throw sharg::parser_error{"The input file is empty."};
+
+        if (is_sequence_file(arguments.bin_file))
+        {
+            arguments.user_bins_to_insert.emplace_back(std::vector<std::string>{arguments.bin_file});
+        }
+        else
+        {
+            detail::parse_bin_path(arguments.bin_file, arguments.user_bins_to_insert, false);
+        }
+    }
 
     // ==========================================
     // Read window and kmer size, and the bin paths.
