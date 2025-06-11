@@ -116,6 +116,11 @@ public:
         bin_path_.push_back(path);
     }
 
+    void replace_bin_path(std::vector<std::vector<std::string>> path)
+    {
+        bin_path_ = std::move(path);
+    }
+
     std::vector<std::vector<std::string>> const & bin_path() const
     {
         return bin_path_;

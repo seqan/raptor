@@ -272,59 +272,88 @@ void full_rebuild(update_arguments const & arguments, raptor_index<index_structu
                                                 std::move(hibf)};
 }
 
-bool check_tmax_rebuild(update_arguments const & arguments,
-                        raptor_index<index_structure::hibf> & index,
-                        size_t const ibf_idx)
+enum class tmax_check : uint8_t
+{
+    no_rebuild = 0u,
+    full_rebuild = 1u,
+    partial_rebuild = 2u
+};
+
+tmax_check check_tmax_rebuild(update_arguments const & arguments,
+                              raptor_index<index_structure::hibf> & index,
+                              size_t const ibf_idx)
 {
     if (index.ibf().ibf_vector[ibf_idx].bin_count() > seqan::hibf::next_multiple_of_64(index.config().tmax))
     {
         if (ibf_idx == 0u)
         {
-            full_rebuild(arguments, index);
+            return tmax_check::full_rebuild;
         }
         else if constexpr (consider_lower_level_tmax)
         {
             auto const parent = index.ibf().prev_ibf_id[ibf_idx];
             partial_rebuild(arguments, detail::rebuild_location{parent.ibf_idx, parent.bin_idx}, index);
+            return tmax_check::partial_rebuild;
         }
 
-        return true;
+        return tmax_check::no_rebuild;
     }
 
-    return false;
+    return tmax_check::no_rebuild;
 }
 
 void insert_user_bin(update_arguments const & arguments, raptor_index<index_structure::hibf> & index)
 {
-    auto const kmers = detail::compute_kmers(arguments.user_bin_to_insert, index);
-    size_t const kmer_count = kmers.size();
+    auto full_rebuild_bin_path = index.bin_path();
+    full_rebuild_bin_path.insert(full_rebuild_bin_path.end(),
+                                 arguments.user_bins_to_insert.begin(),
+                                 arguments.user_bins_to_insert.end());
 
-    std::vector<detail::ibf_max> const max_kmers = detail::max_ibf_sizes(index);
-    assert(std::ranges::is_sorted(max_kmers));
-
-    auto const insert_location = detail::get_location(max_kmers, kmer_count, index);
-    index.append_bin_path({arguments.user_bin_to_insert}); // TODO: update_bookkeeping, but it doesn't have the args
-    auto const rebuild_location = detail::insert_tb_and_parents(kmers, insert_location, index);
-
-    if (rebuild_location.ibf_idx != std::numeric_limits<size_t>::max())
+    for (auto const & ub : arguments.user_bins_to_insert)
     {
-        if (!check_tmax_rebuild(arguments, index, rebuild_location.ibf_idx))
+        if (ub.size() > 1u)
+            throw std::runtime_error{"Currently not supporting multiple files per UB for insert."};
+
+        for (auto const & path : ub)
         {
-            if (rebuild_location.ibf_idx == 0u && is_fpr_exceeded(index, rebuild_location))
+            auto const kmers = detail::compute_kmers(path, index);
+            size_t const kmer_count = kmers.size();
+
+            std::vector<detail::ibf_max> const max_kmers = detail::max_ibf_sizes(index);
+            assert(std::ranges::is_sorted(max_kmers));
+
+            auto const insert_location = detail::get_location(max_kmers, kmer_count, index);
+            index.append_bin_path({path}); // TODO: update_bookkeeping, but it doesn't have the args
+            auto const rebuild_location = detail::insert_tb_and_parents(kmers, insert_location, index);
+
+            if (rebuild_location.ibf_idx != std::numeric_limits<size_t>::max())
             {
-                full_rebuild(arguments, index);
+                if (check_tmax_rebuild(arguments, index, rebuild_location.ibf_idx) == tmax_check::no_rebuild)
+                {
+                    if (rebuild_location.ibf_idx == 0u && is_fpr_exceeded(index, rebuild_location))
+                    {
+                        index.replace_bin_path(std::move(full_rebuild_bin_path));
+                        full_rebuild(arguments, index);
+                        return;
+                    }
+                    else
+                    {
+                        // some downstream fpr too high
+                        partial_rebuild(arguments, rebuild_location, index);
+                    }
+                }
             }
             else
             {
-                // some downstream fpr too high
-                partial_rebuild(arguments, rebuild_location, index);
+                // tmax too high
+                if (check_tmax_rebuild(arguments, index, insert_location.ibf_idx) == tmax_check::full_rebuild)
+                {
+                    index.replace_bin_path(std::move(full_rebuild_bin_path));
+                    full_rebuild(arguments, index);
+                    return;
+                }
             }
         }
-    }
-    else
-    {
-        // tmax too high
-        check_tmax_rebuild(arguments, index, insert_location.ibf_idx);
     }
 
     // TODO: If possible, check whether a full rebuild is needed before doing the partial rebuild.
