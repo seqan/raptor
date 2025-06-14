@@ -28,7 +28,7 @@ CPMDeclarePackage (sharg
                    OPTIONS "INSTALL_SHARG OFF" "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING" "BUILD_TESTING OFF"
 )
 # seqan3
-set (RAPTOR_SEQAN3_VERSION 74a7ed6bb63b06b126b6fb753ac71da409cf6f7d CACHE STRING "" FORCE)
+set (RAPTOR_SEQAN3_VERSION a63abbb4b01bf6dedf14f2a61eeca28ca6e4994a CACHE STRING "" FORCE)
 CPMDeclarePackage (seqan3
                    NAME seqan3
                    GIT_TAG ${RAPTOR_SEQAN3_VERSION} # main
