@@ -9,14 +9,13 @@
 
 #pragma once
 
-#include <cassert>
-#include <cstdint>
-#include <string>
+#include <cstddef> // for size_t
+#include <string>  // for basic_string, string
 
-#include <raptor/argument_parsing/formatted_bytes.hpp>
+#include <raptor/argument_parsing/formatted_bytes.hpp> // for formatted_bytes
 
 #if __has_include(<sys/resource.h>)
-#    include <sys/resource.h>
+#    include <sys/resource.h> // for rusage, getrusage, RUSAGE_SELF
 #endif
 
 namespace raptor

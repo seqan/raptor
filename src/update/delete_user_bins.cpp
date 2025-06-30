@@ -7,7 +7,19 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <raptor/update/delete_user_bins.hpp>
+#include <algorithm> // for __all_of, __contains, all_of, contains
+#include <cstddef>   // for size_t
+#include <cstdint>   // for uint64_t
+#include <iostream>  // for basic_ostream, operator<<, cerr, basic_ios
+#include <vector>    // for vector
+#include <version>   // for __cpp_lib_ranges_contains
+
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter, deleted
+#include <hibf/interleaved_bloom_filter.hpp>              // for bin_index, interleaved_bloom_filter
+
+#include <raptor/argument_parsing/update_arguments.hpp> // for update_arguments
+#include <raptor/index.hpp>                             // for raptor_index, hibf
+#include <raptor/update/delete_user_bins.hpp>           // for delete_user_bins
 
 namespace raptor
 {

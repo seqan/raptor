@@ -7,9 +7,10 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <raptor/build/build_hibf.hpp>
-#include <raptor/build/build_ibf.hpp>
-#include <raptor/build/raptor_build.hpp>
+#include <raptor/argument_parsing/build_arguments.hpp> // for build_arguments
+#include <raptor/build/build_hibf.hpp>                 // for build_hibf
+#include <raptor/build/build_ibf.hpp>                  // for build_ibf
+#include <raptor/build/raptor_build.hpp>               // for raptor_build
 
 namespace raptor
 {

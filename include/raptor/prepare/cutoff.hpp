@@ -9,11 +9,21 @@
 
 #pragma once
 
-#include <seqan3/io/sequence_file/format_fasta.hpp>
+#include <algorithm>   // for __equal, __find_if, equal, find_if
+#include <array>       // for array
+#include <cctype>      // for tolower
+#include <cstddef>     // for size_t
+#include <cstdint>     // for uint8_t, uint64_t
+#include <filesystem>  // for path, operator==, file_size
+#include <string>      // for basic_string, string
+#include <string_view> // for basic_string_view, string_view
+#include <vector>      // for vector
 
-#include <hibf/misc/unreachable.hpp>
+#include <seqan3/io/sequence_file/format_fasta.hpp> // for format_fasta
 
-#include <raptor/argument_parsing/prepare_arguments.hpp>
+#include <hibf/misc/unreachable.hpp> // for unreachable
+
+#include <raptor/argument_parsing/prepare_arguments.hpp> // for prepare_arguments
 
 namespace raptor
 {
