@@ -9,19 +9,50 @@
 
 #pragma once
 
-#include <future>
-#include <random>
+#include <algorithm>    // for __move, __shuffle, move, shuffle
+#include <array>        // for array
+#include <cassert>      // for assert
+#include <charconv>     // for to_chars
+#include <cmath>        // for log2
+#include <concepts>     // for same_as
+#include <cstddef>      // for size_t
+#include <cstdint>      // for uint64_t
+#include <filesystem>   // for path
+#include <future>       // for launch, async
+#include <iterator>     // for back_insert_iterator, back_inserter, operator==
+#include <limits>       // for numeric_limits
+#include <random>       // for mt19937_64
+#include <ranges>       // for operator==, reverse_view, transform_view, common_view
+#include <span>         // for span
+#include <string>       // for basic_string, string
+#include <string_view>  // for basic_string_view, string_view
+#include <system_error> // for errc
+#include <tuple>        // for get
+#include <vector>       // for vector
 
-#include <seqan3/search/views/minimiser_hash.hpp>
+#include <seqan3/alphabet/nucleotide/dna4.hpp>         // for dna4
+#include <seqan3/contrib/std/chunk_view.hpp>           // for chunk, chunk_fn, chunk_view, iter_move, operator==
+#include <seqan3/contrib/std/detail/adaptor_base.hpp>  // for operator|
+#include <seqan3/core/range/detail/adaptor_base.hpp>   // for operator|
+#include <seqan3/io/detail/misc.hpp>                   // for set_format
+#include <seqan3/io/record.hpp>                        // for fields, field
+#include <seqan3/io/sequence_file/input.hpp>           // for sequence_file_input
+#include <seqan3/io/sequence_file/record.hpp>          // for sequence_record
+#include <seqan3/search/views/kmer_hash.hpp>           // for operator-, operator==
+#include <seqan3/search/views/minimiser.hpp>           // for minimiser_view, operator==
+#include <seqan3/search/views/minimiser_hash.hpp>      // for seed, window_size, minimiser_hash, minimiser_hash_fn
+#include <seqan3/utility/container/dynamic_bitset.hpp> // for operator==
 
-#include <hibf/contrib/std/chunk_view.hpp>
+#include <hibf/misc/timer.hpp> // for serial_timer, concurrent_timer
 
-#include <raptor/adjust_seed.hpp>
-#include <raptor/dna4_traits.hpp>
-#include <raptor/search/do_parallel.hpp>
-#include <raptor/search/load_index.hpp>
-#include <raptor/search/sync_out.hpp>
-#include <raptor/threshold/threshold.hpp>
+#include <raptor/adjust_seed.hpp>                       // for adjust_seed
+#include <raptor/argument_parsing/search_arguments.hpp> // for search_arguments
+#include <raptor/dna4_traits.hpp>                       // for dna4_traits
+#include <raptor/index.hpp>                             // for ibf, raptor_index
+#include <raptor/search/do_parallel.hpp>                // for do_parallel
+#include <raptor/search/load_index.hpp>                 // for load_index
+#include <raptor/search/sync_out.hpp>                   // for sync_out
+#include <raptor/threshold/threshold.hpp>               // for threshold
 
 namespace raptor
 {
