@@ -7,17 +7,34 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <seqan3/search/views/minimiser_hash.hpp>
+#include <cassert>    // for assert
+#include <cstddef>    // for size_t
+#include <cstdint>    // for uint64_t, uint8_t, uint16_t, uint32_t
+#include <filesystem> // for path, file_size
+#include <fstream>    // for basic_ifstream, basic_istream, operator>>, basic_ios
+#include <functional> // for equal_to
+#include <iterator>   // for insert_iterator, inserter
+#include <mutex>      // for mutex, lock_guard
+#include <ranges>     // for operator==, views
+#include <string>     // for basic_string, char_traits, string
+#include <utility>    // for move
+#include <vector>     // for vector
 
-#include <hibf/build/bin_size_in_bits.hpp>
-#include <hibf/contrib/robin_hood.hpp>
-#include <hibf/sketch/hyperloglog.hpp>
+#include <seqan3/search/kmer_index/shape.hpp>          // for shape
+#include <seqan3/search/views/kmer_hash.hpp>           // for operator-, operator==
+#include <seqan3/search/views/minimiser.hpp>           // for operator!=
+#include <seqan3/utility/container/dynamic_bitset.hpp> // for operator==
 
-#include <raptor/adjust_seed.hpp>
-#include <raptor/argument_parsing/compute_bin_size.hpp>
-#include <raptor/call_parallel_on_bins.hpp>
-#include <raptor/dna4_traits.hpp>
-#include <raptor/file_reader.hpp>
+#include <hibf/build/bin_size_in_bits.hpp> // for bin_size_in_bits
+#include <hibf/contrib/robin_hood.hpp>     // for Table, hash, unordered_flat_set
+#include <hibf/contrib/std/pair.hpp>       // for get
+#include <hibf/misc/timer.hpp>             // for concurrent_timer
+#include <hibf/sketch/hyperloglog.hpp>     // for hyperloglog
+
+#include <raptor/argument_parsing/build_arguments.hpp>  // for build_arguments
+#include <raptor/argument_parsing/compute_bin_size.hpp> // for compute_bin_size
+#include <raptor/call_parallel_on_bins.hpp>             // for call_parallel_on_bins
+#include <raptor/file_reader.hpp>                       // for file_types, file_reader
 
 namespace raptor
 {

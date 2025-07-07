@@ -2,10 +2,17 @@
 // SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <chopper/prefixes.hpp>
+#include <gtest/gtest.h> // for Message, TestPartResult, CmpHelperEQ, CmpHelperEQFailure, EXPECT_EQ
 
-#include <raptor/test/cli_test.hpp>
-#include <raptor/test/tmp_test_file.hpp>
+#include <filesystem>  // for path, operator/
+#include <fstream>     // for basic_ofstream, operator<<, basic_ostream, ofstream
+#include <string>      // for basic_string, string, char_traits, operator+, allocator
+#include <string_view> // for basic_string_view
+
+#include <chopper/prefixes.hpp> // for meta_chopper_user_bins_end, meta_chopper_user_bins_start
+
+#include <raptor/test/cli_test.hpp>      // for RAPTOR_ASSERT_FAIL_EXIT, raptor_base, RAPTOR_ASSERT_ZERO_EXIT
+#include <raptor/test/tmp_test_file.hpp> // for tmp_test_file
 
 struct argparse_build : public raptor_base
 {};
