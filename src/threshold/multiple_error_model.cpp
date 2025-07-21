@@ -7,10 +7,12 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <algorithm>
+#include <algorithm> // for clamp
+#include <cstddef>   // for size_t
+#include <vector>    // for vector
 
-#include <raptor/threshold/logspace.hpp>
-#include <raptor/threshold/multiple_error_model.hpp>
+#include <raptor/threshold/logspace.hpp>             // for add, negative_inf
+#include <raptor/threshold/multiple_error_model.hpp> // for multiple_error_model
 
 namespace raptor::threshold
 {

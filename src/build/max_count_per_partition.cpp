@@ -7,15 +7,31 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <algorithm>
-#include <fstream>
+#include <cstddef>    // for size_t
+#include <cstdint>    // for uint64_t, uint32_t, uint8_t
+#include <functional> // for equal_to
+#include <iterator>   // for inserter
+#include <mutex>      // for mutex, lock_guard
+#include <ranges>     // for operator==, views
+#include <string>     // for basic_string, string
+#include <vector>     // for vector
 
-#include <hibf/contrib/robin_hood.hpp>
-#include <hibf/sketch/hyperloglog.hpp>
+#include <seqan3/io/record.hpp>                        // for field
+#include <seqan3/search/kmer_index/shape.hpp>          // for shape
+#include <seqan3/search/views/kmer_hash.hpp>           // for operator-, operator==
+#include <seqan3/search/views/minimiser.hpp>           // for operator!=
+#include <seqan3/utility/container/dynamic_bitset.hpp> // for operator==
 
-#include <raptor/build/max_count_per_partition.hpp>
-#include <raptor/call_parallel_on_bins.hpp>
-#include <raptor/file_reader.hpp>
+#include <hibf/contrib/robin_hood.hpp> // for hash, unordered_flat_set
+#include <hibf/contrib/std/pair.hpp>   // for get
+#include <hibf/misc/timer.hpp>         // for concurrent_timer
+#include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
+
+#include <raptor/argument_parsing/build_arguments.hpp> // for build_arguments
+#include <raptor/build/max_count_per_partition.hpp>    // for max_count_per_partition
+#include <raptor/build/partition_config.hpp>           // for partition_config
+#include <raptor/call_parallel_on_bins.hpp>            // for call_parallel_on_bins
+#include <raptor/file_reader.hpp>                      // for file_types, file_reader
 
 namespace raptor
 {

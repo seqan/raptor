@@ -7,14 +7,19 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <fstream>
+#include <fstream> // for basic_ifstream, ifstream
+#include <string>  // for basic_string
+#include <utility> // for move
+#include <vector>  // for vector
 
-#include <raptor/build/store_index.hpp>
-#include <raptor/index.hpp>
-#include <raptor/update/delete_user_bins.hpp>
-#include <raptor/update/dump_index.hpp>
-#include <raptor/update/insert_user_bin.hpp>
-#include <raptor/update/update.hpp>
+#include <cereal/archives/binary.hpp> // for BinaryInputArchive
+
+#include <raptor/argument_parsing/update_arguments.hpp> // for update_arguments
+#include <raptor/build/store_index.hpp>                 // for store_index
+#include <raptor/index.hpp>                             // for raptor_index, hibf
+#include <raptor/update/delete_user_bins.hpp>           // for delete_user_bins
+#include <raptor/update/insert_user_bin.hpp>            // for insert_user_bin
+#include <raptor/update/update.hpp>                     // for raptor_update
 
 namespace raptor
 {

@@ -9,8 +9,10 @@
 
 #pragma once
 
-#include <algorithm>
-#include <cmath>
+#include <algorithm> // for max
+#include <cmath>     // for exp, log1p, expm1, log, abs
+#include <cstdlib>   // for abs
+#include <limits>    // for numeric_limits
 
 namespace raptor::logspace
 {

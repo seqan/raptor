@@ -9,15 +9,17 @@
 
 #pragma once
 
-#include <algorithm>
-#include <bit>
-#include <functional>
-#include <omp.h>
-#include <vector>
+#include <algorithm>  // for clamp
+#include <bit>        // for bit_ceil
+#include <cstddef>    // for size_t
+#include <cstdint>    // for uint8_t
+#include <functional> // for invoke
+#include <ranges>     // for iota_view, __fn, iota, size, views
+#include <string>     // for basic_string, string
+#include <vector>     // for vector
 
-#include <hibf/contrib/std/chunk_view.hpp>
-#include <hibf/contrib/std/zip_view.hpp>
-#include <hibf/misc/divide_and_ceil.hpp>
+#include <hibf/contrib/std/zip_view.hpp> // for zip_view, operator-, operator+, operator==, zip, zip_fn
+#include <hibf/misc/divide_and_ceil.hpp> // for divide_and_ceil
 
 namespace raptor
 {
