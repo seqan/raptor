@@ -2,7 +2,20 @@
 // SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <raptor/test/cli_test.hpp>
+#include <gtest/gtest.h> // for Message, TestParamInfo, TestPartResult, AssertionResult
+
+#include <algorithm>  // for max
+#include <cstddef>    // for size_t
+#include <filesystem> // for path, exists
+#include <ranges>     // for operator|, operator==, views
+#include <string>     // for basic_string, operator+, string, to_string, allocator
+#include <tuple>      // for get, tuple
+
+#include <seqan3/test/pretty_printing.hpp>             // for PrintTo
+#include <seqan3/utility/container/dynamic_bitset.hpp> // for operator==
+
+#include <raptor/index.hpp>         // for hibf
+#include <raptor/test/cli_test.hpp> // for RAPTOR_ASSERT_ZERO_EXIT, raptor_base, raptor_base::st...
 
 struct build_hibf : public raptor_base, public testing::WithParamInterface<std::tuple<size_t, size_t, bool>>
 {};

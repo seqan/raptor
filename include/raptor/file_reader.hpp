@@ -9,11 +9,25 @@
 
 #pragma once
 
-#include <seqan3/io/sequence_file/input.hpp>
-#include <seqan3/search/views/minimiser_hash.hpp>
+#include <algorithm>  // for copy, copy_if, for_each
+#include <cmath>      // for log2
+#include <cstdint>    // for uint64_t, uint32_t, uint8_t
+#include <filesystem> // for path
+#include <fstream>    // for basic_ifstream, basic_istream, basic_ios, ifstream
+#include <iterator>   // for output_iterator
+#include <string>     // for basic_string, string
+#include <vector>     // for vector
 
-#include <raptor/adjust_seed.hpp>
-#include <raptor/dna4_traits.hpp>
+#include <seqan3/core/range/detail/adaptor_base.hpp>         // for operator|
+#include <seqan3/core/range/detail/adaptor_from_functor.hpp> // for adaptor_from_functor
+#include <seqan3/io/detail/misc.hpp>                         // for set_format
+#include <seqan3/io/record.hpp>                              // for fields, field
+#include <seqan3/io/sequence_file/input.hpp>                 // for sequence_file_input
+#include <seqan3/search/kmer_index/shape.hpp>                // for shape
+#include <seqan3/search/views/minimiser_hash.hpp>            // for seed, window_size, minimiser_hash, minimiser_ha...
+
+#include <raptor/adjust_seed.hpp> // for adjust_seed
+#include <raptor/dna4_traits.hpp> // for dna4_traits
 
 namespace raptor
 {
