@@ -2,11 +2,20 @@
 // SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Message, TestPartResult, Test, TestParamInfo, CmpHelperEQ
 
-#include <seqan3/test/expect_throw_msg.hpp>
+#include <array>        // for array
+#include <charconv>     // for to_chars
+#include <cstddef>      // for size_t
+#include <stdexcept>    // for invalid_argument, out_of_range
+#include <string>       // for basic_string, operator+, char_traits, allocator, string
+#include <string_view>  // for basic_string_view, string_view
+#include <system_error> // for errc
+#include <utility>      // for move
 
-#include <raptor/argument_parsing/to_bytes.hpp>
+#include <seqan3/test/expect_throw_msg.hpp> // for EXPECT_THROW_MSG
+
+#include <raptor/argument_parsing/to_bytes.hpp> // for to_bytes
 
 enum class unit
 {

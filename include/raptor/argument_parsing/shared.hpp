@@ -9,10 +9,18 @@
 
 #pragma once
 
-#include <sharg/parser.hpp>
+#include <charconv> // for from_chars
+#include <concepts> // for same_as
+#include <cstdint>  // for uint64_t
+#include <string>   // for basic_string
 
-#include <raptor/argument_parsing/build_arguments.hpp>
-#include <raptor/argument_parsing/prepare_arguments.hpp>
+#include <sharg/exceptions.hpp> // for parser_error
+#include <sharg/parser.hpp>     // for parser
+
+#include <seqan3/search/kmer_index/shape.hpp> // for shape, bin_literal, ungapped
+
+#include <raptor/argument_parsing/build_arguments.hpp>   // for build_arguments
+#include <raptor/argument_parsing/prepare_arguments.hpp> // for prepare_arguments
 
 namespace raptor
 {
