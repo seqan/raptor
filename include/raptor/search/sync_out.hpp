@@ -9,13 +9,21 @@
 
 #pragma once
 
-#include <filesystem>
-#include <fstream>
-#include <mutex>
+#include <cstddef>    // for size_t
+#include <cstdint>    // for uint16_t
+#include <filesystem> // for operator<<
+#include <fstream>    // for basic_ofstream, operator<<, char_traits, basic_ostream
+#include <mutex>      // for mutex, lock_guard
+#include <ranges>     // for single_view, views
+#include <string>     // for basic_string
+#include <utility>    // for forward
+#include <vector>     // for vector
 
-#include <hibf/contrib/std/join_with_view.hpp>
+#include <seqan3/search/kmer_index/shape.hpp> // for shape
 
-#include <raptor/argument_parsing/search_arguments.hpp>
+#include <hibf/contrib/std/join_with_view.hpp> // for join_with, join_with_fn, join_with_view
+
+#include <raptor/argument_parsing/search_arguments.hpp> // for search_arguments
 
 namespace raptor
 {

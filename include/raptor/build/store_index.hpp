@@ -9,11 +9,12 @@
 
 #pragma once
 
-#include <filesystem>
-#include <fstream>
+#include <filesystem> // for path
+#include <fstream>    // for basic_ofstream, basic_ios, ios, ofstream
 
-#include <raptor/index.hpp>
-#include <raptor/strong_types.hpp>
+#include <cereal/archives/binary.hpp> // for BinaryOutputArchive
+
+#include <raptor/index.hpp> // for raptor_index
 
 namespace raptor
 {

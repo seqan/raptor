@@ -7,11 +7,21 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <hibf/misc/divide_and_ceil.hpp>
+#include <algorithm> // for __lower_bound, __search_n, lower_bound, search_n
+#include <cmath>     // for exp, log, log1p
+#include <cstddef>   // for size_t
+#include <cstdint>   // for uint64_t
+#include <iterator>  // for __distance, distance
+#include <limits>    // for numeric_limits
+#include <vector>    // for vector
 
-#include <raptor/index.hpp>
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
+#include <hibf/interleaved_bloom_filter.hpp>              // for interleaved_bloom_filter, bin_count
+#include <hibf/misc/divide_and_ceil.hpp>                  // for divide_and_ceil
 
-#include "strong_types.hpp"
+#include <raptor/index.hpp> // for raptor_index, hibf
+
+#include "strong_types.hpp" // for ibf_max, required_technical_bins_parameters, bookk...
 
 namespace raptor::detail
 {

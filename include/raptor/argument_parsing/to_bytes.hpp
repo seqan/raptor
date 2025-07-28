@@ -9,12 +9,18 @@
 
 #pragma once
 
-#include <cmath>
-#include <cstddef>
-#include <stdexcept>
-#include <string_view>
+#include <algorithm>    // for min
+#include <charconv>     // for from_chars
+#include <cmath>        // for modf
+#include <concepts>     // for same_as
+#include <cstddef>      // for size_t
+#include <memory>       // for allocator, addressof
+#include <stdexcept>    // for invalid_argument, out_of_range
+#include <string>       // for char_traits, operator+, basic_string, string
+#include <string_view>  // for basic_string_view, operator==, string_view
+#include <system_error> // for errc
 
-#include <seqan3/std/charconv>
+#include <seqan3/std/charconv> // for from_chars
 
 namespace raptor
 {
