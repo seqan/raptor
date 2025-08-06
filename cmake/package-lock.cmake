@@ -8,7 +8,7 @@
 # cmake-format: off
 
 # hibf
-set (RAPTOR_HIBF_VERSION 79191baa50cd1282e95335a121e538be2281aa40 CACHE STRING "" FORCE)
+set (RAPTOR_HIBF_VERSION 79191baa50cd1282e95335a121e538be2281aa40 CACHE STRING "")
 CPMDeclarePackage (hibf
                    NAME hibf
                    GIT_TAG ${RAPTOR_HIBF_VERSION} # main
@@ -18,7 +18,7 @@ CPMDeclarePackage (hibf
                    OPTIONS "INSTALL_HIBF OFF"
 )
 # sharg
-set (RAPTOR_SHARG_VERSION 044a18c088fa521c2e40197498f508ba38f5319e CACHE STRING "" FORCE)
+set (RAPTOR_SHARG_VERSION 044a18c088fa521c2e40197498f508ba38f5319e CACHE STRING "")
 CPMDeclarePackage (sharg
                    NAME sharg
                    GIT_TAG ${RAPTOR_SHARG_VERSION} # main
@@ -28,7 +28,7 @@ CPMDeclarePackage (sharg
                    OPTIONS "INSTALL_SHARG OFF" "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING" "BUILD_TESTING OFF"
 )
 # seqan3
-set (RAPTOR_SEQAN3_VERSION 2e509dfa4412caa4d316aa5cd27e653e570b41d3 CACHE STRING "" FORCE)
+set (RAPTOR_SEQAN3_VERSION 2e509dfa4412caa4d316aa5cd27e653e570b41d3 CACHE STRING "")
 CPMDeclarePackage (seqan3
                    NAME seqan3
                    GIT_TAG ${RAPTOR_SEQAN3_VERSION} # main
@@ -38,7 +38,7 @@ CPMDeclarePackage (seqan3
                    OPTIONS "INSTALL_SEQAN3 OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING"
 )
 # chopper
-set (RAPTOR_CHOPPER_VERSION 5c68814aa167a2c8e27b4d917596f8da119c01ed CACHE STRING "" FORCE)
+set (RAPTOR_CHOPPER_VERSION 5c68814aa167a2c8e27b4d917596f8da119c01ed CACHE STRING "")
 CPMDeclarePackage (chopper
                    NAME chopper
                    GIT_TAG ${RAPTOR_CHOPPER_VERSION} # main
@@ -49,7 +49,7 @@ CPMDeclarePackage (chopper
                    EXCLUDE_FROM_ALL TRUE
 )
 # benchmark
-set (RAPTOR_BENCHMARK_VERSION 1.9.4 CACHE STRING "" FORCE)
+set (RAPTOR_BENCHMARK_VERSION 1.9.4 CACHE STRING "")
 CPMDeclarePackage (benchmark
                    NAME benchmark
                    VERSION ${RAPTOR_BENCHMARK_VERSION}
@@ -60,7 +60,7 @@ CPMDeclarePackage (benchmark
                            "CMAKE_MESSAGE_LOG_LEVEL WARNING" "CMAKE_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
 )
 # googletest
-set (RAPTOR_GOOGLETEST_VERSION 1.17.0 CACHE STRING "" FORCE)
+set (RAPTOR_GOOGLETEST_VERSION 1.17.0 CACHE STRING "")
 CPMDeclarePackage (GTest
                    NAME GTest
                    VERSION ${RAPTOR_GOOGLETEST_VERSION}
@@ -70,7 +70,7 @@ CPMDeclarePackage (GTest
                            "CMAKE_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
 )
 # use_ccache
-set (USE_CCACHE_VERSION d2a54ef555b6fc2d496a4c9506dbeb7cf899ce37 CACHE STRING "" FORCE)
+set (USE_CCACHE_VERSION d2a54ef555b6fc2d496a4c9506dbeb7cf899ce37 CACHE STRING "")
 CPMDeclarePackage (use_ccache
                    NAME use_ccache
                    GIT_TAG ${USE_CCACHE_VERSION} # main
@@ -80,7 +80,7 @@ CPMDeclarePackage (use_ccache
                    EXCLUDE_FROM_ALL TRUE
 )
 # doxygen-awesome
-set (RAPTOR_DOXYGEN_AWESOME_VERSION 2.3.4 CACHE STRING "" FORCE)
+set (RAPTOR_DOXYGEN_AWESOME_VERSION 2.3.4 CACHE STRING "")
 CPMDeclarePackage (doxygen_awesome
                    NAME doxygen_awesome
                    VERSION ${RAPTOR_DOXYGEN_AWESOME_VERSION}
@@ -88,7 +88,7 @@ CPMDeclarePackage (doxygen_awesome
                    DOWNLOAD_ONLY TRUE
 )
 # ibf-fpga
-set (RAPTOR_IBF_FPGA_VERSION 228112e4074e3a1b687a059c27cfbf7e70f378ca CACHE STRING "" FORCE)
+set (RAPTOR_IBF_FPGA_VERSION 228112e4074e3a1b687a059c27cfbf7e70f378ca CACHE STRING "")
 CPMDeclarePackage (ibf-fpga
                    NAME ibf-fpga
                    URL https://github.com/seqan/ibf-fpga/archive/${RAPTOR_IBF_FPGA_VERSION}.tar.gz # master
