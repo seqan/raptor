@@ -8,7 +8,7 @@
 # cmake-format: off
 
 # hibf
-set (RAPTOR_HIBF_VERSION 36c223527d7d4eb2bcdcd88d47c71984f50a00a3 CACHE STRING "" FORCE)
+set (RAPTOR_HIBF_VERSION 79191baa50cd1282e95335a121e538be2281aa40 CACHE STRING "" FORCE)
 CPMDeclarePackage (hibf
                    NAME hibf
                    GIT_TAG ${RAPTOR_HIBF_VERSION} # main
@@ -18,7 +18,7 @@ CPMDeclarePackage (hibf
                    OPTIONS "INSTALL_HIBF OFF"
 )
 # sharg
-set (RAPTOR_SHARG_VERSION be113bcffe49c0d62cbd65a191820f05386aa8da CACHE STRING "" FORCE)
+set (RAPTOR_SHARG_VERSION 044a18c088fa521c2e40197498f508ba38f5319e CACHE STRING "" FORCE)
 CPMDeclarePackage (sharg
                    NAME sharg
                    GIT_TAG ${RAPTOR_SHARG_VERSION} # main
@@ -28,7 +28,7 @@ CPMDeclarePackage (sharg
                    OPTIONS "INSTALL_SHARG OFF" "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING" "BUILD_TESTING OFF"
 )
 # seqan3
-set (RAPTOR_SEQAN3_VERSION 6dfa1b442d1fabd07024edcc37a29b61d5beae8f CACHE STRING "" FORCE)
+set (RAPTOR_SEQAN3_VERSION 2e509dfa4412caa4d316aa5cd27e653e570b41d3 CACHE STRING "" FORCE)
 CPMDeclarePackage (seqan3
                    NAME seqan3
                    GIT_TAG ${RAPTOR_SEQAN3_VERSION} # main
