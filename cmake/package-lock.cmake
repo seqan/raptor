@@ -18,7 +18,7 @@ CPMDeclarePackage (hibf
                    OPTIONS "INSTALL_HIBF OFF"
 )
 # sharg
-set (RAPTOR_SHARG_VERSION 044a18c088fa521c2e40197498f508ba38f5319e CACHE STRING "")
+set (RAPTOR_SHARG_VERSION 7a1eb39d6c0cc839b5470574f7ac549418f87b94 CACHE STRING "")
 CPMDeclarePackage (sharg
                    NAME sharg
                    GIT_TAG ${RAPTOR_SHARG_VERSION} # main
