@@ -9,7 +9,9 @@
 
 #pragma once
 
-#include <raptor/index.hpp>
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
+
+#include <raptor/index.hpp> // for hibf, raptor_index
 
 namespace raptor
 {

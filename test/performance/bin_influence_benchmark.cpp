@@ -2,21 +2,42 @@
 // SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <benchmark/benchmark.h>
+#include <benchmark/benchmark.h> // for Benchmark, State, ClobberMemory, BENC...
 
-#include <filesystem>
-#include <fstream>
+#include <algorithm>  // for clamp, max
+#include <bit>        // for bit_ceil
+#include <cmath>      // for log, ceil, exp
+#include <cstddef>    // for size_t
+#include <cstdint>    // for uint16_t, uint64_t
+#include <filesystem> // for path, temp_directory_path, exists
+#include <fstream>    // for char_traits, basic_ifstream, basic_of...
+#include <iterator>   // for operator==, distance
+#include <ranges>     // for iota_view, views, operator==, reverse...
+#include <span>       // for span
+#include <stdexcept>  // for runtime_error
+#include <string>     // for basic_string, allocator, operator+
+#include <utility>    // for move
+#include <vector>     // for vector
 
-#include <seqan3/alphabet/nucleotide/dna4.hpp>
-#include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
-#include <seqan3/search/views/minimiser_hash.hpp>
-#include <seqan3/test/performance/sequence_generator.hpp>
+#include <cereal/archives/binary.hpp> // for BinaryInputArchive, BinaryOutputArchive
 
-#include <hibf/contrib/std/chunk_view.hpp>
-#include <hibf/contrib/std/zip_view.hpp>
-#include <hibf/interleaved_bloom_filter.hpp>
+#include <seqan3/alphabet/nucleotide/dna4.hpp>                         // for dna4
+#include <seqan3/contrib/std/chunk_view.hpp>                           // for chunk_view, chunk, chunk_fn
+#include <seqan3/contrib/std/detail/adaptor_base.hpp>                  // for operator|
+#include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp> // for execution_handler_parallel
+#include <seqan3/core/range/detail/adaptor_base.hpp>                   // for operator|
+#include <seqan3/search/kmer_index/shape.hpp>                          // for ungapped
+#include <seqan3/search/views/kmer_hash.hpp>                           // for operator-, operator==
+#include <seqan3/search/views/minimiser.hpp>                           // for minimiser_view, operator==, operator!=
+#include <seqan3/search/views/minimiser_hash.hpp>                      // for seed, window_size, minimiser_hash
+#include <seqan3/test/performance/sequence_generator.hpp>              // for generate_numeric_sequence, generate_s...
+#include <seqan3/utility/container/dynamic_bitset.hpp>                 // for operator==
 
-#include <raptor/adjust_seed.hpp>
+#include <hibf/contrib/std/pair.hpp>         // for get
+#include <hibf/contrib/std/zip_view.hpp>     // for zip_view, zip, zip_fn, operator==
+#include <hibf/interleaved_bloom_filter.hpp> // for bin_count, bin_index, bin_size, hash_...
+
+#include <raptor/adjust_seed.hpp> // for adjust_seed
 
 #define USE_UNIT_TEST_PARAMETERS 1
 

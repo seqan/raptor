@@ -7,7 +7,12 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <raptor/argument_parsing/init_shared_meta.hpp>
+#include <string> // for basic_string
+
+#include <sharg/auxiliary.hpp> // for parser_meta_data, vector_of_string
+#include <sharg/parser.hpp>    // for parser
+
+#include <raptor/argument_parsing/init_shared_meta.hpp> // for init_shared_meta
 
 namespace raptor
 {
