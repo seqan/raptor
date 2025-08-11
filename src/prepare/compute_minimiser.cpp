@@ -7,21 +7,33 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <omp.h>
+#include <algorithm>  // for min
+#include <cstddef>    // for size_t
+#include <cstdint>    // for uint8_t, uint64_t, uint16_t
+#include <filesystem> // for path, exists, remove
+#include <fstream>    // for basic_ofstream, basic_ostream, operator<<, basic_ios
+#include <functional> // for invoke
+#include <ranges>     // for iota_view, __fn, operator==, views, iota, size
+#include <string>     // for basic_string, char_traits
+#include <vector>     // for vector
 
-#include <seqan3/io/sequence_file/input.hpp>
-#include <seqan3/search/views/minimiser_hash.hpp>
+#include <seqan3/contrib/std/chunk_view.hpp>           // for chunk_view, chunk, chunk_fn
+#include <seqan3/contrib/std/detail/adaptor_base.hpp>  // for operator|
+#include <seqan3/contrib/std/pair.hpp>                 // for get
+#include <seqan3/contrib/std/zip_view.hpp>             // for zip_view, operator-, operator+, operator==, zip
+#include <seqan3/search/kmer_index/shape.hpp>          // for shape
+#include <seqan3/search/views/kmer_hash.hpp>           // for operator-, operator==
+#include <seqan3/search/views/minimiser.hpp>           // for operator!=
+#include <seqan3/utility/container/dynamic_bitset.hpp> // for operator==
 
-#include <hibf/contrib/robin_hood.hpp>
-#include <hibf/contrib/std/chunk_view.hpp>
-#include <hibf/contrib/std/zip_view.hpp>
-#include <hibf/misc/divide_and_ceil.hpp>
+#include <hibf/contrib/robin_hood.hpp>   // for pair, unordered_map
+#include <hibf/misc/divide_and_ceil.hpp> // for divide_and_ceil
+#include <hibf/misc/timer.hpp>           // for serial_timer, concurrent_timer
 
-#include <raptor/adjust_seed.hpp>
-#include <raptor/dna4_traits.hpp>
-#include <raptor/file_reader.hpp>
-#include <raptor/prepare/compute_minimiser.hpp>
-#include <raptor/prepare/cutoff.hpp>
+#include <raptor/argument_parsing/prepare_arguments.hpp> // for prepare_arguments
+#include <raptor/file_reader.hpp>                        // for file_types, file_reader
+#include <raptor/prepare/compute_minimiser.hpp>          // for compute_minimiser
+#include <raptor/prepare/cutoff.hpp>                     // for cutoff
 
 namespace raptor
 {

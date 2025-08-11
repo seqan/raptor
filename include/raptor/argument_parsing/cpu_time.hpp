@@ -9,12 +9,13 @@
 
 #pragma once
 
-#include <algorithm>
-#include <cassert>
-#include <chrono>
+#include <algorithm> // for min
+#include <cassert>   // for assert
+#include <chrono>    // for duration, operator+, microseconds, seconds
+#include <cstdint>   // for uint8_t
 
 #if __has_include(<sys/resource.h>)
-#    include <sys/resource.h>
+#    include <sys/resource.h> // for rusage, timeval, getrusage, RUSAGE_SELF
 #endif
 
 namespace raptor
