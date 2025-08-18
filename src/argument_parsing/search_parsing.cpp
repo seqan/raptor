@@ -9,7 +9,6 @@
 
 #include <seqan3/io/views/async_input_buffer.hpp>
 
-#include <raptor/argument_parsing/init_shared_meta.hpp>
 #include <raptor/argument_parsing/search_parsing.hpp>
 #include <raptor/argument_parsing/validators.hpp>
 #include <raptor/dna4_traits.hpp>
@@ -96,7 +95,7 @@ void init_fpga_parser(sharg::parser & parser, search_arguments & arguments)
 
 void init_search_parser(sharg::parser & parser, search_arguments & arguments)
 {
-    init_shared_meta(parser);
+    parser.info.short_description = "Queries a Raptor index";
     parser.info.description.emplace_back("Queries a Raptor index.");
     parser.info.examples.emplace_back(
         "raptor search --index raptor.index --query queries.fastq --output search.output");

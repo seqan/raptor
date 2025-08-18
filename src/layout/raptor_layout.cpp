@@ -10,8 +10,6 @@
 #include <chopper/chopper_layout.hpp>
 #include <chopper/set_up_parser.hpp>
 
-#include <raptor/argument_parsing/init_shared_meta.hpp>
-
 namespace raptor
 {
 
@@ -19,7 +17,6 @@ void chopper_layout(sharg::parser & parser)
 {
     chopper::configuration config;
     set_up_parser(parser, config);
-    init_shared_meta(parser);
     parser.info.synopsis.front().insert(0, "raptor layout");
     parser.info.author = "Svenja Mehringer";
     parser.info.email = "svenja.mehringer@fu-berlin.de";
