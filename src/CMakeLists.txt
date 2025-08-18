@@ -68,7 +68,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif ()
 set_source_files_properties (raptor.cpp
                              PROPERTIES COMPILE_DEFINITIONS
-                                        "RAPTOR_VERSION=\"${PACKAGE_VERSION} (${RAPTOR_COMMIT_HASH})\";RAPTOR_DATE=\"${RAPTOR_COMMIT_DATE}\""
+                                        "RAPTOR_VERSION=\"${RAPTOR_VERSION} (${RAPTOR_COMMIT_HASH})\";RAPTOR_DATE=\"${RAPTOR_COMMIT_DATE}\""
 )
 
 add_subdirectory (argument_parsing)

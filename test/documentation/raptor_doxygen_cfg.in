@@ -9,7 +9,7 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = Raptor
-PROJECT_NUMBER         = ${PACKAGE_VERSION}
+PROJECT_NUMBER         = ${RAPTOR_VERSION}
 PROJECT_BRIEF          = "A fast and space-efficient pre-filter"
 PROJECT_LOGO           =
 PROJECT_ICON           =

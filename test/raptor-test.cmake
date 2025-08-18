@@ -19,6 +19,7 @@ message (STATUS "${ColourBold}Configuring tests${ColourReset}")
 # ----------------------------------------------------------------------------
 
 get_filename_component (Raptor_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
+include ("${Raptor_SOURCE_DIR}/cmake/version.cmake")
 include ("${Raptor_SOURCE_DIR}/cmake/configuration.cmake")
 add_subdirectory ("${Raptor_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/raptor")
 target_compile_options (raptor_interface INTERFACE "-pedantic" "-Wall" "-Wextra")

@@ -22,6 +22,7 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # Dependencies
 get_filename_component (Raptor_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+include ("${Raptor_SOURCE_DIR}/cmake/version.cmake")
 include ("${Raptor_SOURCE_DIR}/cmake/configuration.cmake")
 
 add_library (common_thresholding INTERFACE)
