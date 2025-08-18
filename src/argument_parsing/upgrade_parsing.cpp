@@ -7,7 +7,6 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <raptor/argument_parsing/init_shared_meta.hpp>
 #include <raptor/argument_parsing/parse_bin_path.hpp>
 #include <raptor/argument_parsing/upgrade_parsing.hpp>
 #include <raptor/argument_parsing/validators.hpp>
@@ -20,7 +19,7 @@ namespace raptor
 
 void init_upgrade_parser(sharg::parser & /* parser */, upgrade_arguments & /* arguments */) // GCOVR_EXCL_LINE
 {
-    // init_shared_meta(parser);
+    // parser.info.short_description = "Upgrades a Raptor index created with Raptor 3.0 to be compatible with Raptor 4.0";
     // parser.info.description.emplace_back("Upgrades a Raptor index created with Raptor 3.0 to be"
     //                                      " compatible with Raptor 4.0.");
     // parser.info.description.emplace_back("The only new parameter need is the false positive rate. The false positive"

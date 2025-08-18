@@ -42,8 +42,8 @@ TEST_F(argparse_main, no_options)
 {
     cli_test_result const result = execute_app("raptor");
     std::string const expected{
-        "Raptor - A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences.\n"
-        "===========================================================================================================\n"
+        "Raptor - A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences\n"
+        "==========================================================================================================\n"
         "    Try -h or --help for more information.\n"};
     EXPECT_EQ(result.out, expected);
     EXPECT_EQ(result.err, std::string{});
@@ -54,9 +54,8 @@ TEST_F(argparse_build, no_options)
 {
     cli_test_result const result = execute_app("raptor", "build");
     std::string const expected{
-        "Raptor-build - A fast and space-efficient pre-filter for querying very large collections of nucleotide sequen"
-        "ces.\n======================================================================================================="
-        "==========\n    raptor build --input <file> --output <file> [--threads <number>] [--quiet]\n    [--kmer <numb"
+        "Raptor-build - Constructs a Raptor index\n========================================\n"
+        "    raptor build --input <file> --output <file> [--threads <number>] [--quiet]\n    [--kmer <numb"
         "er>|--shape <01-pattern>] [--window <number>] [--fpr\n    <number>] [--hash <number>] [--parts <number>]\n   "
         " Try -h or --help for more information.\n"};
     EXPECT_EQ(result.out, expected);
@@ -68,9 +67,8 @@ TEST_F(argparse_search, no_options)
 {
     cli_test_result const result = execute_app("raptor", "search");
     std::string const expected{
-        "Raptor-search - A fast and space-efficient pre-filter for querying very large collections of nucleotide seque"
-        "nces.\n======================================================================================================"
-        "============\n    raptor search --index <file> --query <file> --output <file> [--threads\n    <number>] [--qu"
+        "Raptor-search - Queries a Raptor index\n======================================\n"
+        "    raptor search --index <file> --query <file> --output <file> [--threads\n    <number>] [--qu"
         "iet] [--error <number>|--threshold <number>]\n    [--query_length <number>] [--tau <number>] [--pmax <number>"
         "]\n    [--cache-thresholds]\n    Try -h or --help for more information.\n"};
     EXPECT_EQ(result.out, expected);
@@ -104,10 +102,8 @@ TEST_F(argparse_layout, no_options)
 {
     cli_test_result const result = execute_app("raptor", "layout");
     std::string const expected{
-        "Raptor-layout - A fast and space-efficient pre-filter for querying very large "
-        "collections of nucleotide "
-        "sequences.\n=================================================================================================="
-        "================\n    raptor layout --input <file> [--output <file>] [--threads <number>]\n    [--kmer "
+        "Raptor-layout - Compute an HIBF layout\n======================================\n"
+        "    raptor layout --input <file> [--output <file>] [--threads <number>]\n    [--kmer "
         "<number>] [--fpr <number>] [--hash <number>]\n    [--disable-estimate-union] [--disable-rearrangement]\n    "
         "Try -h or --help for more information.\n"};
     EXPECT_EQ(result.out, expected);
@@ -557,9 +553,9 @@ TEST_F(argparse_prepare, no_options)
 {
     cli_test_result const result = execute_app("raptor", "prepare");
     std::string const expected{
-        "Raptor-prepare - A fast and space-efficient pre-filter for querying very large collections of nucleotide sequ"
-        "ences.\n====================================================================================================="
-        "==============\n    raptor prepare --input <file> --output <directory> [--threads <number>]\n    [--quiet] [-"
+        "Raptor-prepare - Computes minimisers for the use with raptor layout and raptor "
+        "build\n====================================================================================\n"
+        "    raptor prepare --input <file> --output <directory> [--threads <number>]\n    [--quiet] [-"
         "-kmer <number>|--shape <01-pattern>] [--window <number>]\n    [--kmer-count-cutoff <number>|--use-filesize-de"
         "pendent-cutoff]\n    Try -h or --help for more information.\n"};
     EXPECT_EQ(result.out, expected);

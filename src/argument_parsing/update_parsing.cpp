@@ -7,7 +7,6 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <raptor/argument_parsing/init_shared_meta.hpp>
 #include <raptor/argument_parsing/parse_bin_path.hpp>
 #include <raptor/argument_parsing/update_parsing.hpp>
 #include <raptor/argument_parsing/validators.hpp>
@@ -19,7 +18,6 @@ namespace raptor
 
 void init_update_parser(sharg::parser & parser, update_arguments & arguments)
 {
-    init_shared_meta(parser);
     parser.info.description.emplace_back("Updates a Raptor index.");
 
     parser.add_subsection("General options");
@@ -89,7 +87,7 @@ bool is_sequence_file(std::filesystem::path const & file_path)
 
 void update_parsing(sharg::parser & parser)
 {
-    init_shared_meta(parser);
+    parser.info.short_description = "Updates a Raptor index";
     parser.info.description.emplace_back("Updates a Raptor index.");
     parser.add_subcommands({"delete", "insert"});
     parser.parse();

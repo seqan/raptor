@@ -8,6 +8,43 @@ if (TARGET raptor)
     return ()
 endif ()
 
+# Fallback to these values if there is no git or no git repository
+set (RAPTOR_COMMIT_DATE
+     "Unavailable"
+     CACHE STRING
+           "Set to provide a commit date if git is not available or the source directory is not a git repository."
+)
+set (RAPTOR_COMMIT_HASH
+     "commit unavailable"
+     CACHE STRING
+           "Set to provide a commit hash if git is not available or the source directory is not a git repository."
+)
+
+# Extract git commit hash and date
+find_package (Git QUIET)
+
+if (GIT_FOUND)
+    execute_process (COMMAND "${GIT_EXECUTABLE}" -C "${CMAKE_CURRENT_LIST_DIR}" rev-parse
+                     WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
+                     RESULT_VARIABLE is_no_git_repository
+                     ERROR_QUIET
+    )
+
+    if (NOT is_no_git_repository)
+        execute_process (COMMAND "${GIT_EXECUTABLE}" describe --always --abbrev=40 --dirty
+                         WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
+                         OUTPUT_VARIABLE RAPTOR_COMMIT_HASH
+                         ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+
+        execute_process (COMMAND "${GIT_EXECUTABLE}" log -1 --format=%ad --date=short
+                         WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
+                         OUTPUT_VARIABLE RAPTOR_COMMIT_DATE
+                         ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+    endif ()
+endif ()
+
 # Raptor library
 add_library ("raptor_lib" INTERFACE)
 target_link_libraries ("raptor_lib"
@@ -29,6 +66,10 @@ set_property (TARGET raptor PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DI
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     target_compile_options (raptor PUBLIC "-fwhole-program")
 endif ()
+set_source_files_properties (raptor.cpp
+                             PROPERTIES COMPILE_DEFINITIONS
+                                        "RAPTOR_VERSION=\"${PACKAGE_VERSION} (${RAPTOR_COMMIT_HASH})\";RAPTOR_DATE=\"${RAPTOR_COMMIT_DATE}\""
+)
 
 add_subdirectory (argument_parsing)
 add_subdirectory (build)

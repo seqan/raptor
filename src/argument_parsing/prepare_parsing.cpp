@@ -7,7 +7,6 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <raptor/argument_parsing/init_shared_meta.hpp>
 #include <raptor/argument_parsing/parse_bin_path.hpp>
 #include <raptor/argument_parsing/prepare_arguments.hpp>
 #include <raptor/argument_parsing/prepare_parsing.hpp>
@@ -20,7 +19,7 @@ namespace raptor
 
 void init_prepare_parser(sharg::parser & parser, prepare_arguments & arguments)
 {
-    init_shared_meta(parser);
+    parser.info.short_description = "Computes minimisers for the use with raptor layout and raptor build";
     parser.info.description.emplace_back(
         "Computes minimisers for the use with \\fBraptor layout\\fP and \\fBraptor build\\fP.");
     parser.info.description.emplace_back("Can continue where it left off after a crash or in multiple runs.");

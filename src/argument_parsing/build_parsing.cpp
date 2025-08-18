@@ -17,7 +17,6 @@
 
 #include <raptor/argument_parsing/build_parsing.hpp>
 #include <raptor/argument_parsing/compute_bin_size.hpp>
-#include <raptor/argument_parsing/init_shared_meta.hpp>
 #include <raptor/argument_parsing/parse_bin_path.hpp>
 #include <raptor/argument_parsing/shared.hpp>
 #include <raptor/argument_parsing/validators.hpp>
@@ -92,7 +91,7 @@ inline void parse_shape_from_minimiser(sharg::parser & parser, build_arguments &
 
 void init_build_parser(sharg::parser & parser, build_arguments & arguments)
 {
-    init_shared_meta(parser);
+    parser.info.short_description = "Constructs a Raptor index";
     parser.info.description.emplace_back("Constructs a Raptor index.");
     parser.info.description.emplace_back("The input may be a layout file from \\fBraptor layout\\fP, a list of "
                                          "minimiser files produced from \\fBraptor prepare\\fP, or a file with a list "
