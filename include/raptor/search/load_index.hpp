@@ -9,11 +9,16 @@
 
 #pragma once
 
-#include <chrono>
-#include <fstream>
+#include <cstddef>    // for size_t
+#include <filesystem> // for path
+#include <fstream>    // for basic_ifstream, basic_ios, ifstream, ios
+#include <string>     // for operator+, to_string, basic_string
 
-#include <raptor/argument_parsing/search_arguments.hpp>
-#include <raptor/index.hpp>
+#include <cereal/archives/binary.hpp> // for BinaryInputArchive
+
+#include <hibf/misc/timer.hpp> // for concurrent_timer
+
+#include <raptor/argument_parsing/search_arguments.hpp> // for search_arguments
 
 namespace raptor
 {
