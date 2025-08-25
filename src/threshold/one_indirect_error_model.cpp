@@ -7,10 +7,20 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <random>
+#include <algorithm> // for __fill, fill, __generate, generate
+#include <cmath>     // for log
+#include <cstddef>   // for size_t
+#include <cstdint>   // for uint8_t, uint32_t
+#include <random>    // for uniform_int_distribution, mt19937_64
+#include <vector>    // for vector
 
-#include <raptor/threshold/forward_strand_minimiser.hpp>
-#include <raptor/threshold/one_indirect_error_model.hpp>
+#include <seqan3/alphabet/concept.hpp>         // for assign_rank_to_cpo, to_rank_cpo, assign_rank_to
+#include <seqan3/alphabet/nucleotide/dna4.hpp> // for dna4
+#include <seqan3/search/kmer_index/shape.hpp>  // for shape
+
+#include <raptor/strong_types.hpp>                       // for window
+#include <raptor/threshold/forward_strand_minimiser.hpp> // for forward_strand_minimiser
+#include <raptor/threshold/one_indirect_error_model.hpp> // for one_indirect_error_model
 
 namespace raptor::threshold
 {

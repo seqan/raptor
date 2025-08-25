@@ -9,11 +9,26 @@
 
 #pragma once
 
-#include <sharg/parser.hpp>
+#include <algorithm>    // for for_each
+#include <bit>          // for has_single_bit
+#include <concepts>     // for convertible_to
+#include <cstddef>      // for size_t
+#include <filesystem>   // for path, create_directories, operator==, exists, file_...
+#include <ranges>       // for range_value_t, forward_range
+#include <regex>        // for regex_match, basic_regex, regex
+#include <string>       // for basic_string, string, operator+
+#include <system_error> // for error_code
+#include <vector>       // for vector
 
-#include <seqan3/io/sequence_file/input.hpp>
+#include <sharg/detail/to_string.hpp> // for to_string
+#include <sharg/exceptions.hpp>       // for validation_error
+#include <sharg/validators.hpp>       // for input_file_validator, output_file_open_options, out...
 
-#include <raptor/strong_types.hpp>
+#include <seqan3/core/debug_stream/detail/to_string.hpp> // for to_string
+#include <seqan3/core/platform.hpp>                      // for SEQAN3_HAS_BZIP2, SEQAN3_HAS_ZLIB
+#include <seqan3/io/detail/misc.hpp>                     // for valid_file_extensions
+#include <seqan3/io/record.hpp>                          // for fields
+#include <seqan3/io/sequence_file/input.hpp>             // for sequence_file_input
 
 namespace raptor::detail
 {
