@@ -28,10 +28,11 @@ CPMDeclarePackage (sharg
                    OPTIONS "INSTALL_SHARG OFF" "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING" "BUILD_TESTING OFF"
 )
 # seqan3
-set (RAPTOR_SEQAN3_VERSION c67fe131cfe639c5fc5695bac0d41bfff2c9b93f CACHE STRING "")
+set (RAPTOR_SEQAN3_VERSION 3.4.0 CACHE STRING "")
 CPMDeclarePackage (seqan3
                    NAME seqan3
-                   GIT_TAG ${RAPTOR_SEQAN3_VERSION} # main
+                   VERSION ${RAPTOR_SEQAN3_VERSION}
+                   GIT_TAG ${RAPTOR_SEQAN3_VERSION}
                    GITHUB_REPOSITORY seqan/seqan3
                    SYSTEM TRUE
                    EXCLUDE_FROM_ALL TRUE
