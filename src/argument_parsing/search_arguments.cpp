@@ -56,15 +56,16 @@ void search_arguments::print_timings() const
     else
         std::cerr << "        ├── CPU usage [%]: Not available\n"; // GCOVR_EXCL_LINE
 
+    // Each thread does `thread` many chunks; see `do_parallel()`.
     std::cerr << "        ├── Compute minimiser\n";
-    std::cerr << "        │   ├── Max [s]: " << compute_minimiser_timer.max_in_seconds() << '\n';
-    std::cerr << "        │   └── Avg [s]: " << compute_minimiser_timer.avg_in_seconds() << '\n';
+    std::cerr << "        │   ├── Max [s]: " << compute_minimiser_timer.max_in_seconds() * threads << '\n';
+    std::cerr << "        │   └── Avg [s]: " << compute_minimiser_timer.avg_in_seconds() * threads << '\n';
     std::cerr << "        ├── Query IBF\n";
-    std::cerr << "        │   ├── Max [s]: " << query_ibf_timer.max_in_seconds() << '\n';
-    std::cerr << "        │   └── Avg [s]: " << query_ibf_timer.avg_in_seconds() << '\n';
+    std::cerr << "        │   ├── Max [s]: " << query_ibf_timer.max_in_seconds() * threads << '\n';
+    std::cerr << "        │   └── Avg [s]: " << query_ibf_timer.avg_in_seconds() * threads << '\n';
     std::cerr << "        └── Generate results\n";
-    std::cerr << "            ├── Max [s]: " << generate_results_timer.max_in_seconds() << '\n';
-    std::cerr << "            └── Avg [s]: " << generate_results_timer.avg_in_seconds() << '\n';
+    std::cerr << "            ├── Max [s]: " << generate_results_timer.max_in_seconds() * threads << '\n';
+    std::cerr << "            └── Avg [s]: " << generate_results_timer.avg_in_seconds() * threads << '\n';
 }
 
 void search_arguments::write_timings_to_file() const
@@ -130,12 +131,13 @@ void search_arguments::write_timings_to_file() const
     else
         output_stream << "NA\t"; // GCOVR_EXCL_LINE
 
-    output_stream << compute_minimiser_timer.max_in_seconds() << '\t';
-    output_stream << compute_minimiser_timer.avg_in_seconds() << '\t';
-    output_stream << query_ibf_timer.max_in_seconds() << '\t';
-    output_stream << query_ibf_timer.avg_in_seconds() << '\t';
-    output_stream << generate_results_timer.max_in_seconds() << '\t';
-    output_stream << generate_results_timer.avg_in_seconds() << '\n';
+    // Each thread does `thread` many chunks; see `do_parallel()`.
+    output_stream << compute_minimiser_timer.max_in_seconds() * threads << '\t';
+    output_stream << compute_minimiser_timer.avg_in_seconds() * threads << '\t';
+    output_stream << query_ibf_timer.max_in_seconds() * threads << '\t';
+    output_stream << query_ibf_timer.avg_in_seconds() * threads << '\t';
+    output_stream << generate_results_timer.max_in_seconds() * threads << '\t';
+    output_stream << generate_results_timer.avg_in_seconds() * threads << '\n';
 }
 
 } // namespace raptor
