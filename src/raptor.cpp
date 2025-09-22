@@ -7,13 +7,22 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <raptor/argument_parsing/build_parsing.hpp>
-#include <raptor/argument_parsing/prepare_parsing.hpp>
-#include <raptor/argument_parsing/search_parsing.hpp>
-#include <raptor/argument_parsing/update_parsing.hpp>
-#include <raptor/argument_parsing/upgrade_parsing.hpp>
-#include <raptor/layout/raptor_layout.hpp>
-#include <raptor/raptor.hpp>
+#include <cstdlib>     // for exit
+#include <exception>   // for exception
+#include <iostream>    // for basic_ostream, operator<<, basic_ios, cerr
+#include <string>      // for basic_string, char_traits
+#include <string_view> // for basic_string_view, operator==, string_view
+#include <vector>      // for vector
+
+#include <sharg/auxiliary.hpp> // for parser_meta_data, update_notifications, vector_of_string
+#include <sharg/parser.hpp>    // for parser
+
+#include <raptor/argument_parsing/build_parsing.hpp>   // for build_parsing
+#include <raptor/argument_parsing/prepare_parsing.hpp> // for prepare_parsing
+#include <raptor/argument_parsing/search_parsing.hpp>  // for search_parsing
+#include <raptor/argument_parsing/update_parsing.hpp>  // for update_parsing
+#include <raptor/argument_parsing/upgrade_parsing.hpp> // for upgrade_parsing
+#include <raptor/layout/raptor_layout.hpp>             // for chopper_layout
 
 inline void set_metadata(sharg::parser_meta_data & info)
 {

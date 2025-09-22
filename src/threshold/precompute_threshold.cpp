@@ -7,15 +7,28 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <fstream>
+#include <algorithm>  // for __find, find
+#include <cassert>    // for assert
+#include <cmath>      // for log, isnan
+#include <cstddef>    // for size_t
+#include <cstdint>    // for uint16_t, uint8_t
+#include <filesystem> // for path, operator/, exists
+#include <fstream>    // for char_traits, basic_ostream, operator<<, basic_ifstream
+#include <sstream>    // for basic_stringstream
+#include <string>     // for basic_string, string, allocator
+#include <vector>     // for vector
 
-#include <cereal/types/vector.hpp>
+#include <cereal/archives/binary.hpp> // for BinaryInputArchive, BinaryOutputArchive
+#include <cereal/specialize.hpp>      // for specialization
 
-#include <raptor/threshold/logspace.hpp>
-#include <raptor/threshold/multiple_error_model.hpp>
-#include <raptor/threshold/one_error_model.hpp>
-#include <raptor/threshold/one_indirect_error_model.hpp>
-#include <raptor/threshold/precompute_threshold.hpp>
+#include <seqan3/search/kmer_index/shape.hpp> // for shape
+
+#include <raptor/threshold/logspace.hpp>                 // for add, negative_inf
+#include <raptor/threshold/multiple_error_model.hpp>     // for multiple_error_model
+#include <raptor/threshold/one_error_model.hpp>          // for one_error_model
+#include <raptor/threshold/one_indirect_error_model.hpp> // for one_indirect_error_model
+#include <raptor/threshold/precompute_threshold.hpp>     // for precompute_threshold
+#include <raptor/threshold/threshold_parameters.hpp>     // for threshold_parameters
 
 namespace raptor::threshold
 {

@@ -7,12 +7,13 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <raptor/argument_parsing/parse_bin_path.hpp>
-#include <raptor/argument_parsing/upgrade_parsing.hpp>
-#include <raptor/argument_parsing/validators.hpp>
-#include <raptor/build/partition_config.hpp>
-#include <raptor/index.hpp>
-#include <raptor/upgrade/upgrade.hpp>
+#include <string> // for basic_string
+
+#include <sharg/exceptions.hpp> // for parser_error
+#include <sharg/parser.hpp>     // for parser
+
+#include <raptor/argument_parsing/upgrade_arguments.hpp> // for upgrade_arguments
+#include <raptor/argument_parsing/upgrade_parsing.hpp>   // for upgrade_parsing
 
 namespace raptor
 {
