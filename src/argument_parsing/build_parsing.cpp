@@ -7,20 +7,46 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <cereal/archives/json.hpp>
+#include <algorithm>   // for find_if
+#include <charconv>    // for from_chars
+#include <cstdint>     // for uint64_t
+#include <filesystem>  // for path, operator<<, operator>>, is_empty
+#include <fstream>     // for basic_ifstream, operator<<, operator>>, basic_ostream
+#include <functional>  // for function
+#include <iomanip>     // for operator<<, quoted
+#include <iostream>    // for cerr
+#include <string>      // for operator+, basic_string, char_traits, to_string, ope...
+#include <string_view> // for basic_string_view
+#include <vector>      // for vector
 
-#include <yaml-cpp/yaml.h>
+#include <yaml-cpp/node/detail/impl.h> // for node_data::get, node_data::remove
+#include <yaml-cpp/node/impl.h>        // for Node::operator[], Node::operator=, Node::remove
+#include <yaml-cpp/node/node.h>        // for Node
+#include <yaml-cpp/node/parse.h>       // for Load
 
-#include <hibf/layout/prefixes.hpp>
+#include <sharg/auxiliary.hpp>        // for parser_meta_data
+#include <sharg/config.hpp>           // for config
+#include <sharg/detail/to_string.hpp> // for to_string
+#include <sharg/exceptions.hpp>       // for parser_error
+#include <sharg/parser.hpp>           // for parser
+#include <sharg/validators.hpp>       // for arithmetic_range_validator, input_file_validator
 
-#include <chopper/configuration.hpp>
+#include <seqan3/search/kmer_index/shape.hpp> // for shape, bin_literal
 
-#include <raptor/argument_parsing/build_parsing.hpp>
-#include <raptor/argument_parsing/compute_bin_size.hpp>
-#include <raptor/argument_parsing/parse_bin_path.hpp>
-#include <raptor/argument_parsing/shared.hpp>
-#include <raptor/argument_parsing/validators.hpp>
-#include <raptor/build/raptor_build.hpp>
+#include <hibf/layout/prefixes.hpp> // for meta_header
+#include <hibf/misc/timer.hpp>      // for concurrent_timer
+
+#include <chopper/configuration.hpp> // for configuration
+
+#include <raptor/argument_parsing/build_arguments.hpp>  // for build_arguments
+#include <raptor/argument_parsing/build_parsing.hpp>    // for build_parsing
+#include <raptor/argument_parsing/compute_bin_size.hpp> // for compute_bin_size
+#include <raptor/argument_parsing/parse_bin_path.hpp>   // for parse_bin_path
+#include <raptor/argument_parsing/shared.hpp>           // for validate_shape
+#include <raptor/argument_parsing/validators.hpp>       // for output_file_validator, positive_integer_validator
+#include <raptor/build/raptor_build.hpp>                // for raptor_build
+
+#include <tdl/convertToCWL.h> // for post_process_cwl
 
 namespace raptor
 {

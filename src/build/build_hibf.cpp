@@ -7,11 +7,32 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <hibf/hierarchical_interleaved_bloom_filter.hpp>
+#include <cstddef>    // for size_t
+#include <fstream>    // for basic_ifstream, ifstream
+#include <functional> // for function
+#include <ranges>     // for operator==
+#include <string>     // for basic_string
+#include <utility>    // for move
+#include <variant>    // for variant, visit
+#include <vector>     // for vector
 
-#include <raptor/build/build_hibf.hpp>
-#include <raptor/build/store_index.hpp>
-#include <raptor/file_reader.hpp>
+#include <seqan3/io/record.hpp>                        // for field
+#include <seqan3/search/kmer_index/shape.hpp>          // for shape
+#include <seqan3/search/views/kmer_hash.hpp>           // for operator-, operator==
+#include <seqan3/search/views/minimiser.hpp>           // for operator!=
+#include <seqan3/utility/container/dynamic_bitset.hpp> // for operator==
+
+#include <hibf/config.hpp>                                // for config, insert_iterator
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
+#include <hibf/layout/layout.hpp>                         // for layout
+#include <hibf/misc/timer.hpp>                            // for concurrent_timer
+
+#include <raptor/argument_parsing/build_arguments.hpp> // for build_arguments
+#include <raptor/build/build_hibf.hpp>                 // for build_hibf
+#include <raptor/build/store_index.hpp>                // for store_index
+#include <raptor/file_reader.hpp>                      // for file_types, file_reader
+#include <raptor/index.hpp>                            // for raptor_index, hibf
+#include <raptor/strong_types.hpp>                     // for window
 
 namespace raptor
 {

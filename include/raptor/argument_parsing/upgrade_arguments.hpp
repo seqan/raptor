@@ -9,10 +9,13 @@
 
 #pragma once
 
-#include <filesystem>
-#include <vector>
+#include <cstdint>    // for uint8_t, uint32_t
+#include <filesystem> // for path
+#include <limits>     // for numeric_limits
+#include <string>     // for basic_string, string
+#include <vector>     // for vector
 
-#include <seqan3/search/kmer_index/shape.hpp>
+#include <seqan3/search/kmer_index/shape.hpp> // for shape
 
 namespace raptor
 {
