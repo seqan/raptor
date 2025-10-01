@@ -80,8 +80,8 @@ private:
         size_t numberOfQueries;
         std::vector<std::string> ids;
 
-        unique_utilities_ptr<char> queries_host;            // size: currentBufferSize
-        unique_utilities_ptr<HostSizeType> querySizes_host; // size: numberOfQueries
+        unique_utilities_ptr<char> queries_host;
+        unique_utilities_ptr<HostSizeType> querySizes_host;
         unique_utilities_ptr<Chunk> results_host;
 
         std::vector<sycl::event> kernelEvents;
@@ -240,12 +240,14 @@ public:
         std::ofstream outputStream(output_path, std::ios::app);
         std::string result_string{};
 
+        const size_t max_numberOfQueries = bufferSizeBytes / MIN_QUERY_LENGTH;
+        const size_t chunks_per_result = technical_bins / chunk_bits;
+
         for (buffer_data & state : double_buffer)
         {
-            // TODO bufferSizeBytes is a way too high upper bound
             state.queries_host = malloc_host_utilities<char>(bufferSizeBytes);
-            state.querySizes_host = malloc_host_utilities<HostSizeType>(bufferSizeBytes);
-            state.results_host = malloc_host_utilities<Chunk>(bufferSizeBytes);
+            state.querySizes_host = malloc_host_utilities<HostSizeType>(max_numberOfQueries);
+            state.results_host = malloc_host_utilities<Chunk>(max_numberOfQueries * chunks_per_result);
 
             state.kernelEvents.reserve(numberOfKernelCopys * 2 + 2); // +2: Distributor, Collector
             state.numberOfQueries = 0;
@@ -308,21 +310,20 @@ public:
 
             result_string.clear();
 
-            size_t const elements_per_query = technical_bins / 64;
-            size_t const chunks_per_query = seqan::hibf::divide_and_ceil(technical_bins, chunk_bits);
+            size_t const elements_per_result = technical_bins / 64;
             size_t const elements_per_chunk = chunk_bits / 64;
 
-            if (elements_per_chunk * chunks_per_query != elements_per_query)
-                throw std::runtime_error("outputResults: elements_per_query/chunks_per_query mismatch");
+            if (elements_per_chunk * chunks_per_result != elements_per_result)
+                throw std::runtime_error("outputResults: elements_per_result/chunks_per_result mismatch");
 
             for (size_t queryIndex = 0; queryIndex < state.ids.size(); queryIndex++)
             {
                 // TODO: Use string view?
                 result_string += state.ids.at(queryIndex).substr(1, std::string::npos) + '\t';
 
-                for (size_t chunkOffset = 0; chunkOffset < chunks_per_query; ++chunkOffset)
+                for (size_t chunkOffset = 0; chunkOffset < chunks_per_result; ++chunkOffset)
                 {
-                    Chunk & chunk = state.results_host.get()[queryIndex * chunks_per_query + chunkOffset];
+                    Chunk & chunk = state.results_host.get()[queryIndex * chunks_per_result + chunkOffset];
 
                     for (size_t elementOffset = 0; elementOffset < elements_per_chunk; ++elementOffset)
                     {
