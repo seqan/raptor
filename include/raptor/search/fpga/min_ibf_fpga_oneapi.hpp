@@ -240,8 +240,8 @@ public:
         std::ofstream outputStream(output_path, std::ios::app);
         std::string result_string{};
 
-        const size_t max_numberOfQueries = bufferSizeBytes / MIN_QUERY_LENGTH;
-        const size_t chunks_per_result = technical_bins / chunk_bits;
+        size_t const max_numberOfQueries = bufferSizeBytes / MIN_QUERY_LENGTH;
+        size_t const chunks_per_result = technical_bins / chunk_bits;
 
         for (buffer_data & state : double_buffer)
         {
