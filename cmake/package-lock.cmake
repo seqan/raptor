@@ -18,7 +18,7 @@ CPMDeclarePackage (hibf
                    OPTIONS "INSTALL_HIBF OFF"
 )
 # sharg
-set (RAPTOR_SHARG_VERSION ecb48e16b24b835286ba6b1ebe5e7317e88012ae CACHE STRING "")
+set (RAPTOR_SHARG_VERSION 11ef167fff401be4c78b862ed65d4f385d1b66fa CACHE STRING "")
 CPMDeclarePackage (sharg
                    NAME sharg
                    GIT_TAG ${RAPTOR_SHARG_VERSION} # main
@@ -39,7 +39,7 @@ CPMDeclarePackage (seqan3
                    OPTIONS "INSTALL_SEQAN3 OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING"
 )
 # chopper
-set (RAPTOR_CHOPPER_VERSION 5db0e66c39841ea8e155cb860522240b83ad83b3 CACHE STRING "")
+set (RAPTOR_CHOPPER_VERSION 68a0920efd05a1dcc3d3a3b169af157f28a5a3b7 CACHE STRING "")
 CPMDeclarePackage (chopper
                    NAME chopper
                    GIT_TAG ${RAPTOR_CHOPPER_VERSION} # main
