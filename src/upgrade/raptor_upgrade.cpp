@@ -7,11 +7,8 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <raptor/argument_parsing/compute_bin_size.hpp>
-#include <raptor/argument_parsing/validators.hpp>
-#include <raptor/build/max_count_per_partition.hpp>
-#include <raptor/upgrade/index_upgrader.hpp>
-#include <raptor/upgrade/upgrade.hpp>
+#include <raptor/argument_parsing/upgrade_arguments.hpp> // for upgrade_arguments
+#include <raptor/upgrade/upgrade.hpp>                    // for raptor_upgrade
 
 namespace raptor
 {

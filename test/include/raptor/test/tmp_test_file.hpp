@@ -4,7 +4,12 @@
 
 #pragma once
 
-#include <seqan3/test/tmp_directory.hpp>
+#include <filesystem>  // for path
+#include <ostream>     // for basic_ios, basic_ostream, ofstream
+#include <string_view> // for basic_string_view, string_view
+
+#include <seqan3/test/sandboxed_path.hpp> // for sandboxed_path, operator/
+#include <seqan3/test/tmp_directory.hpp>  // for tmp_directory
 
 namespace raptor::test
 {

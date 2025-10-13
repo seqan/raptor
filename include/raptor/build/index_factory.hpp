@@ -9,15 +9,29 @@
 
 #pragma once
 
-#include <seqan3/search/views/minimiser_hash.hpp>
+#include <cassert> // for assert
+#include <cstddef> // for size_t
+#include <cstdint> // for uint64_t
+#include <memory>  // for addressof
+#include <ranges>  // for operator==, views
+#include <variant> // for variant, visit
 
-#include <raptor/adjust_seed.hpp>
-#include <raptor/build/emplace_iterator.hpp>
-#include <raptor/build/partition_config.hpp>
-#include <raptor/call_parallel_on_bins.hpp>
-#include <raptor/dna4_traits.hpp>
-#include <raptor/file_reader.hpp>
-#include <raptor/index.hpp>
+#include <seqan3/io/record.hpp>                        // for field
+#include <seqan3/search/kmer_index/shape.hpp>          // for shape
+#include <seqan3/search/views/kmer_hash.hpp>           // for operator-, operator==
+#include <seqan3/search/views/minimiser.hpp>           // for operator!=
+#include <seqan3/utility/container/dynamic_bitset.hpp> // for operator==
+
+#include <hibf/contrib/std/pair.hpp>         // for get
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index
+#include <hibf/misc/timer.hpp>               // for serial_timer, concurrent_timer
+
+#include <raptor/argument_parsing/build_arguments.hpp> // for build_arguments
+#include <raptor/build/emplace_iterator.hpp>           // for emplacer
+#include <raptor/build/partition_config.hpp>           // for partition_config
+#include <raptor/call_parallel_on_bins.hpp>            // for call_parallel_on_bins
+#include <raptor/file_reader.hpp>                      // for file_types, file_reader
+#include <raptor/index.hpp>                            // for raptor_index
 
 namespace raptor
 {

@@ -7,12 +7,13 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <cstddef>
-#include <numeric>
+#include <cstddef> // for size_t
+#include <numeric> // for accumulate
+#include <vector>  // for vector
 
-#include <raptor/threshold/logspace.hpp>
-#include <raptor/threshold/one_error_model.hpp>
-#include <raptor/threshold/pascal_row.hpp>
+#include <raptor/threshold/logspace.hpp>        // for substract, add_fn, add, negative_inf
+#include <raptor/threshold/one_error_model.hpp> // for one_error_model
+#include <raptor/threshold/pascal_row.hpp>      // for pascal_row
 
 namespace raptor::threshold
 {

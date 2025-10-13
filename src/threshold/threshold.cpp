@@ -7,9 +7,19 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <hibf/misc/unreachable.hpp>
+#include <algorithm> // for max, clamp
+#include <cmath>     // for isnan
+#include <cstddef>   // for size_t
+#include <vector>    // for vector
 
-#include <raptor/threshold/threshold.hpp>
+#include <seqan3/search/kmer_index/shape.hpp> // for shape
+
+#include <hibf/misc/unreachable.hpp> // for unreachable
+
+#include <raptor/threshold/precompute_correction.hpp> // for precompute_correction
+#include <raptor/threshold/precompute_threshold.hpp>  // for precompute_threshold
+#include <raptor/threshold/threshold.hpp>             // for threshold
+#include <raptor/threshold/threshold_parameters.hpp>  // for threshold_parameters
 
 namespace raptor::threshold
 {

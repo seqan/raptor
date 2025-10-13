@@ -9,15 +9,18 @@
 
 #pragma once
 
-#include <filesystem>
-#include <vector>
+#include <cstdint>    // for uint8_t, uint32_t
+#include <filesystem> // for path
+#include <iomanip>    // for operator<<, setprecision
+#include <iostream>   // for basic_ostream, operator<<, cerr, fixed
+#include <string>     // for basic_string, char_traits, string
+#include <vector>     // for vector
 
-#include <seqan3/search/kmer_index/shape.hpp>
+#include <seqan3/search/kmer_index/shape.hpp> // for shape, ungapped
 
-#include <hibf/misc/timer.hpp>
+#include <hibf/misc/timer.hpp> // for concurrent_timer
 
-#include <raptor/argument_parsing/memory_usage.hpp>
-#include <raptor/strong_types.hpp>
+#include <raptor/argument_parsing/memory_usage.hpp> // for formatted_peak_ram
 
 namespace raptor
 {

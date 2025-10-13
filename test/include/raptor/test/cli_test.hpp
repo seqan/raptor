@@ -4,18 +4,38 @@
 
 #pragma once
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Message, AssertionResult, TestPartResult, ASSERT_EQ
 
-#include <bitset>
-#include <charconv>
-#include <fstream>
+#include <algorithm>   // for max, __sort, sort, find
+#include <bitset>      // for bitset
+#include <charconv>    // for from_chars
+#include <cmath>       // for abs
+#include <concepts>    // for same_as
+#include <cstdint>     // for uint64_t
+#include <cstdlib>     // for size_t, system, abs
+#include <exception>   // for exception
+#include <filesystem>  // for path, current_path, create_directories, operator<<
+#include <fstream>     // for char_traits, basic_ifstream, operator<<, basic_ios
+#include <iterator>    // for distance
+#include <ranges>      // for single_view, operator|, views, __fn, join, split
+#include <sstream>     // for basic_stringstream, basic_ostringstream
+#include <stdexcept>   // for logic_error
+#include <string>      // for basic_string, allocator, string, operator+, to_string
+#include <string_view> // for basic_string_view, string_view
+#include <vector>      // for vector, swap
 
-#include <seqan3/test/expect_range_eq.hpp>
-#include <seqan3/utility/views/repeat_n.hpp>
+#include <cereal/archives/binary.hpp> // for BinaryInputArchive
 
-#include <hibf/contrib/std/zip_view.hpp>
+#include <seqan3/core/range/detail/adaptor_base.hpp>    // for operator|
+#include <seqan3/io/views/detail/take_exactly_view.hpp> // for view_take_exactly
+#include <seqan3/test/expect_range_eq.hpp>              // for EXPECT_RANGE_EQ
+#include <seqan3/utility/views/repeat.hpp>              // for repeat_view
+#include <seqan3/utility/views/repeat_n.hpp>            // for repeat_n, repeat_n_fn
 
-#include <raptor/index.hpp>
+#include <hibf/contrib/std/zip_view.hpp>     // for zip
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
+
+#include <raptor/index.hpp> // for ibf, raptor_index, hibf
 
 #ifndef RAPTOR_ASSERT_ZERO_EXIT
 #    define RAPTOR_ASSERT_ZERO_EXIT(arg)                                                                               \

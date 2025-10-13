@@ -2,9 +2,17 @@
 // SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Test, Message, TestPartResult, CmpHelperEQ, CmpHelperEQ...
 
-#include <raptor/threshold/threshold.hpp>
+#include <cstddef> // for size_t
+#include <string>  // for basic_string
+#include <vector>  // for vector
+#include <version> // for _LIBCPP_VERSION
+
+#include <seqan3/search/kmer_index/shape.hpp> // for shape, ungapped
+
+#include <raptor/threshold/threshold.hpp>            // for threshold
+#include <raptor/threshold/threshold_parameters.hpp> // for threshold_parameters
 
 static inline raptor::threshold::threshold_parameters const default_parameters{.window_size = 32,
                                                                                .shape = seqan3::ungapped{32u},

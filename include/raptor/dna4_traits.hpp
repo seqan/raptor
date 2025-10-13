@@ -9,7 +9,8 @@
 
 #pragma once
 
-#include <seqan3/io/sequence_file/input.hpp>
+#include <seqan3/alphabet/nucleotide/dna4.hpp> // for dna4
+#include <seqan3/io/sequence_file/input.hpp>   // for sequence_file_input_default_traits_dna
 
 namespace raptor
 {

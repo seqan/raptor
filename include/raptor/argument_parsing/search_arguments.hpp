@@ -9,16 +9,17 @@
 
 #pragma once
 
-#include <filesystem>
-#include <vector>
+#include <cstdint>    // for uint8_t, uint32_t, uint64_t
+#include <filesystem> // for path
+#include <limits>     // for numeric_limits
+#include <string>     // for basic_string, string
+#include <vector>     // for vector
 
-#include <seqan3/search/kmer_index/shape.hpp>
+#include <seqan3/search/kmer_index/shape.hpp> // for shape, ungapped
 
-#include <hibf/misc/timer.hpp>
+#include <hibf/misc/timer.hpp> // for concurrent_timer
 
-#include <raptor/argument_parsing/formatted_index_size.hpp>
-#include <raptor/argument_parsing/memory_usage.hpp>
-#include <raptor/threshold/threshold_parameters.hpp>
+#include <raptor/threshold/threshold_parameters.hpp> // for threshold_parameters
 
 namespace raptor
 {

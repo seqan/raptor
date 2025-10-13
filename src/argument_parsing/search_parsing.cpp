@@ -7,13 +7,47 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <seqan3/io/views/async_input_buffer.hpp>
+#include <algorithm>   // for find_if, __sort, sort
+#include <cassert>     // for assert
+#include <charconv>    // for from_chars
+#include <cstddef>     // for size_t
+#include <cstdint>     // for uint16_t, uint64_t
+#include <filesystem>  // for path, operator<<, exists, operator>>, is_empty
+#include <fstream>     // for operator<<, basic_ostream, operator>>, basic_ifstream
+#include <iomanip>     // for operator<<, quoted
+#include <iostream>    // for cerr
+#include <limits>      // for numeric_limits
+#include <ranges>      // for __fn, size, views
+#include <string>      // for basic_string, operator+, char_traits, to_string, ope...
+#include <string_view> // for basic_string_view, string_view
+#include <vector>      // for vector
 
-#include <raptor/argument_parsing/search_parsing.hpp>
-#include <raptor/argument_parsing/validators.hpp>
-#include <raptor/dna4_traits.hpp>
-#include <raptor/index.hpp>
-#include <raptor/search/search.hpp>
+#include <cereal/archives/binary.hpp> // for BinaryInputArchive
+#include <cereal/specialize.hpp>      // for specialization
+
+#include <sharg/auxiliary.hpp>        // for parser_meta_data
+#include <sharg/config.hpp>           // for config
+#include <sharg/detail/to_string.hpp> // for to_string
+#include <sharg/exceptions.hpp>       // for parser_error, validation_error
+#include <sharg/parser.hpp>           // for parser
+#include <sharg/validators.hpp>       // for arithmetic_range_validator, input_file_validator
+
+#include <seqan3/core/range/detail/adaptor_base.hpp> // for operator|
+#include <seqan3/io/detail/misc.hpp>                 // for set_format
+#include <seqan3/io/record.hpp>                      // for fields, field
+#include <seqan3/io/sequence_file/input.hpp>         // for sequence_file_input
+#include <seqan3/io/views/async_input_buffer.hpp>    // for async_input_buffer, async_input_buffer_fn, async_inp...
+#include <seqan3/search/kmer_index/shape.hpp>        // for shape
+
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
+#include <hibf/misc/timer.hpp>               // for concurrent_timer
+
+#include <raptor/argument_parsing/search_arguments.hpp> // for search_arguments
+#include <raptor/argument_parsing/search_parsing.hpp>   // for search_parsing
+#include <raptor/argument_parsing/validators.hpp>       // for output_file_validator, positive_integer_validator
+#include <raptor/dna4_traits.hpp>                       // for dna4_traits
+#include <raptor/index.hpp>                             // for raptor_index
+#include <raptor/search/search.hpp>                     // for raptor_search
 
 namespace raptor
 {

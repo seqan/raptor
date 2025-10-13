@@ -9,9 +9,13 @@
 
 #pragma once
 
-#include <raptor/argument_parsing/build_arguments.hpp>
-#include <raptor/argument_parsing/prepare_arguments.hpp>
-#include <raptor/argument_parsing/upgrade_arguments.hpp>
+#include <filesystem> // for path
+#include <string>     // for string
+#include <vector>     // for vector
+
+#include <raptor/argument_parsing/build_arguments.hpp>   // for build_arguments
+#include <raptor/argument_parsing/prepare_arguments.hpp> // for prepare_arguments
+#include <raptor/argument_parsing/upgrade_arguments.hpp> // for upgrade_arguments
 
 namespace raptor
 {

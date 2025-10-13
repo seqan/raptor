@@ -2,9 +2,20 @@
 // SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Test, Message, CmpHelperNE, TestPartResult, CmpHelperEQ
 
-#include <raptor/argument_parsing/shared.hpp>
+#include <algorithm> // for find_if
+#include <array>     // for array
+#include <charconv>  // for from_chars
+#include <ostream>   // for operator<<
+#include <string>    // for operator+, basic_string, to_string, operator==, string
+
+#include <sharg/config.hpp>           // for config
+#include <sharg/detail/to_string.hpp> // for to_string
+#include <sharg/parser.hpp>           // for parser
+
+#include <raptor/argument_parsing/build_arguments.hpp> // for build_arguments
+#include <raptor/argument_parsing/shared.hpp>          // for validate_shape
 
 TEST(validate_shape, set_window_to_kmer)
 {

@@ -2,9 +2,13 @@
 // SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Test, Message, CmpHelperEQ, CmpHelperEQFailure
 
-#include <raptor/argument_parsing/formatted_index_size.hpp>
+#include <cstddef>    // for size_t
+#include <filesystem> // for path
+#include <string>     // for basic_string, string
+
+#include <raptor/argument_parsing/formatted_index_size.hpp> // for formatted_index_size, index_size_in_KiB
 
 struct helper
 {

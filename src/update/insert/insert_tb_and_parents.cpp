@@ -7,12 +7,20 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <hibf/build/insert_into_ibf.hpp>
+#include <cstddef> // for size_t
+#include <cstdint> // for uint64_t
+#include <limits>  // for numeric_limits
+#include <vector>  // for vector
 
-#include <raptor/index.hpp>
+#include <hibf/build/insert_into_ibf.hpp>                 // for insert_into_ibf
+#include <hibf/contrib/robin_hood.hpp>                    // for unordered_flat_set
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
+#include <hibf/interleaved_bloom_filter.hpp>              // for interleaved_bloom_filter
 
-#include "is_fpr_exceeded.hpp"
-#include "strong_types.hpp"
+#include <raptor/index.hpp> // for raptor_index, hibf
+
+#include "is_fpr_exceeded.hpp" // for is_fpr_exceeded
+#include "strong_types.hpp"    // for insert_location, rebuild_location
 
 namespace raptor::detail
 {

@@ -7,8 +7,15 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <chopper/chopper_layout.hpp>
-#include <chopper/set_up_parser.hpp>
+#include <string> // for basic_string
+#include <vector> // for vector
+
+#include <sharg/auxiliary.hpp> // for parser_meta_data
+#include <sharg/parser.hpp>    // for parser
+
+#include <chopper/chopper_layout.hpp> // for chopper_layout
+#include <chopper/configuration.hpp>  // for configuration
+#include <chopper/set_up_parser.hpp>  // for set_up_parser
 
 namespace raptor
 {

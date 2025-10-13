@@ -9,12 +9,10 @@
 
 #pragma once
 
-#include <algorithm>
-#include <functional>
-#include <omp.h>
-#include <vector>
+#include <cstddef>    // for size_t
+#include <functional> // for invoke
 
-#include <hibf/misc/divide_and_ceil.hpp>
+#include <hibf/misc/divide_and_ceil.hpp> // for divide_and_ceil
 
 namespace raptor
 {

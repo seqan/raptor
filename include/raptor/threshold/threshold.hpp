@@ -9,8 +9,11 @@
 
 #pragma once
 
-#include <raptor/threshold/precompute_correction.hpp>
-#include <raptor/threshold/precompute_threshold.hpp>
+#include <cstddef> // for size_t
+#include <cstdint> // for uint8_t
+#include <vector>  // for vector
+
+#include <raptor/threshold/threshold_parameters.hpp> // for threshold_parameters
 
 namespace raptor::threshold
 {

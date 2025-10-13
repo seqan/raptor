@@ -7,9 +7,15 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <hibf/contrib/std/enumerate_view.hpp>
+#include <iostream> // for basic_ostream, operator<<, char_traits, cerr, basi...
+#include <tuple>    // for get
+#include <vector>   // for vector
 
-#include <raptor/update/dump_index.hpp>
+#include <hibf/contrib/std/enumerate_view.hpp>            // for enumerate, enumerate_fn, enumerate_view
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter, deleted
+
+#include <raptor/index.hpp>             // for raptor_index, hibf
+#include <raptor/update/dump_index.hpp> // for dump_index
 
 namespace raptor
 {

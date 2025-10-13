@@ -7,12 +7,19 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <fstream>
+#include <cstddef>    // for size_t
+#include <filesystem> // for path
+#include <fstream>    // for operator<<, basic_ostream, basic_ofstream, char_...
+#include <iomanip>    // for operator<<, setprecision
+#include <iostream>   // for cerr
+#include <string>     // for basic_string
 
-#include <raptor/argument_parsing/cpu_time.hpp>
-#include <raptor/argument_parsing/formatted_index_size.hpp>
-#include <raptor/argument_parsing/memory_usage.hpp>
-#include <raptor/argument_parsing/search_arguments.hpp>
+#include <hibf/misc/timer.hpp> // for concurrent_timer
+
+#include <raptor/argument_parsing/cpu_time.hpp>             // for cpu_time_t, get_cpu_time
+#include <raptor/argument_parsing/formatted_index_size.hpp> // for formatted_index_size, index_size_in_KiB
+#include <raptor/argument_parsing/memory_usage.hpp>         // for formatted_peak_ram, peak_ram_in_KiB
+#include <raptor/argument_parsing/search_arguments.hpp>     // for search_arguments
 
 namespace raptor
 {

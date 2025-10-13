@@ -9,13 +9,23 @@
 
 #pragma once
 
-#include <deque>
+#include <algorithm> // for __min, min
+#include <cassert>   // for assert
+#include <compare>   // for strong_ordering, operator==, _CmpUnspecifiedParam
+#include <cstddef>   // for size_t
+#include <cstdint>   // for uint64_t, uint8_t
+#include <deque>     // for deque, operator==
+#include <ranges>    // for __pipeable, operator==, operator|, transform_view, __fn
+#include <vector>    // for vector
 
-#include <seqan3/alphabet/nucleotide/dna4.hpp>
-#include <seqan3/search/views/kmer_hash.hpp>
+#include <seqan3/alphabet/nucleotide/dna4.hpp>         // for dna4
+#include <seqan3/core/range/detail/adaptor_base.hpp>   // for operator|
+#include <seqan3/search/kmer_index/shape.hpp>          // for shape
+#include <seqan3/search/views/kmer_hash.hpp>           // for kmer_hash_view, operator==, kmer_hash, kmer_hash_fn
+#include <seqan3/utility/container/dynamic_bitset.hpp> // for operator==
 
-#include <raptor/adjust_seed.hpp>
-#include <raptor/strong_types.hpp>
+#include <raptor/adjust_seed.hpp>  // for adjust_seed
+#include <raptor/strong_types.hpp> // for window
 
 namespace raptor::threshold
 {

@@ -9,7 +9,10 @@
 
 #pragma once
 
-#include <raptor/threshold/threshold_parameters.hpp>
+#include <cstddef> // for size_t
+#include <vector>  // for vector
+
+#include <raptor/threshold/threshold_parameters.hpp> // for threshold_parameters
 
 namespace raptor::threshold
 {

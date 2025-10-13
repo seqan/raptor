@@ -9,12 +9,12 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
+#include <cstddef> // for size_t
+#include <vector>  // for vector
 
-#include <raptor/argument_parsing/build_arguments.hpp>
-#include <raptor/argument_parsing/upgrade_arguments.hpp>
-#include <raptor/build/partition_config.hpp>
+#include <raptor/argument_parsing/build_arguments.hpp>   // for build_arguments
+#include <raptor/argument_parsing/upgrade_arguments.hpp> // for upgrade_arguments
+#include <raptor/build/partition_config.hpp>             // for partition_config
 
 namespace raptor
 {

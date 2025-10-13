@@ -7,11 +7,35 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <raptor/argument_parsing/parse_bin_path.hpp>
-#include <raptor/argument_parsing/update_parsing.hpp>
-#include <raptor/argument_parsing/validators.hpp>
-#include <raptor/index.hpp>
-#include <raptor/update/update.hpp>
+#include <algorithm>   // for find_if
+#include <charconv>    // for from_chars
+#include <filesystem>  // for operator<<, path, operator>>, is_empty
+#include <fstream>     // for operator>>, operator<<, basic_ifstream, basic_ios
+#include <iomanip>     // for operator<<, quoted
+#include <string>      // for operator+, basic_string, string, operator==, char_tr...
+#include <string_view> // for basic_string_view, operator==, string_view
+#include <vector>      // for vector
+
+#include <cereal/archives/binary.hpp> // for BinaryInputArchive
+#include <cereal/specialize.hpp>      // for specialization
+
+#include <sharg/auxiliary.hpp>        // for parser_meta_data
+#include <sharg/config.hpp>           // for config
+#include <sharg/detail/to_string.hpp> // for to_string
+#include <sharg/exceptions.hpp>       // for parser_error
+#include <sharg/parser.hpp>           // for parser
+#include <sharg/validators.hpp>       // for input_file_validator, output_file_open_options
+
+#include <seqan3/search/kmer_index/shape.hpp> // for shape
+
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
+
+#include <raptor/argument_parsing/parse_bin_path.hpp>   // for parse_bin_path
+#include <raptor/argument_parsing/update_arguments.hpp> // for update_arguments
+#include <raptor/argument_parsing/update_parsing.hpp>   // for update_parsing
+#include <raptor/argument_parsing/validators.hpp>       // for bin_validator, output_file_validator, positive_integ...
+#include <raptor/index.hpp>                             // for raptor_index
+#include <raptor/update/update.hpp>                     // for raptor_update
 
 namespace raptor
 {

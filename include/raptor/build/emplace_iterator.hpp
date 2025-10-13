@@ -9,7 +9,13 @@
 
 #pragma once
 
-#include <hibf/interleaved_bloom_filter.hpp>
+#include <cassert>  // for assert
+#include <cstddef>  // for ptrdiff_t
+#include <cstdint>  // for uint64_t
+#include <iterator> // for output_iterator_tag
+#include <memory>   // for addressof
+
+#include <hibf/interleaved_bloom_filter.hpp> // for bin_index, interleaved_bloom_filter
 
 namespace raptor
 {

@@ -7,10 +7,11 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <cmath>
-#include <cstddef>
+#include <cmath>   // for log
+#include <cstddef> // for size_t
+#include <vector>  // for vector
 
-#include <raptor/threshold/pascal_row.hpp>
+#include <raptor/threshold/pascal_row.hpp> // for pascal_row
 
 namespace raptor::threshold
 {

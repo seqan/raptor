@@ -7,12 +7,22 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <hibf/build/bin_size_in_bits.hpp>
+#include <cstddef>    // for size_t
+#include <filesystem> // for path
+#include <string>     // for operator+, to_string, basic_string
+#include <utility>    // for move
+#include <vector>     // for vector
 
-#include <raptor/build/index_factory.hpp>
-#include <raptor/build/max_count_per_partition.hpp>
-#include <raptor/build/partition_config.hpp>
-#include <raptor/build/store_index.hpp>
+#include <hibf/build/bin_size_in_bits.hpp>   // for bin_size_in_bits
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
+#include <hibf/misc/timer.hpp>               // for concurrent_timer
+#include <hibf/platform.hpp>                 // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
+
+#include <raptor/argument_parsing/build_arguments.hpp> // for build_arguments
+#include <raptor/build/index_factory.hpp>              // for index_factory
+#include <raptor/build/max_count_per_partition.hpp>    // for max_count_per_partition
+#include <raptor/build/partition_config.hpp>           // for partition_config
+#include <raptor/build/store_index.hpp>                // for store_index
 
 namespace raptor
 {
