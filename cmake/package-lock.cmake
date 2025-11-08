@@ -89,7 +89,7 @@ CPMDeclarePackage (doxygen_awesome
                    DOWNLOAD_ONLY TRUE
 )
 # ibf-fpga
-set (RAPTOR_IBF_FPGA_VERSION 5454645ac0f322165d6be13ef154d093a23e026b CACHE STRING "")
+set (RAPTOR_IBF_FPGA_VERSION 121ae76213bc7927efc62fbfbee78c6210d476f2 CACHE STRING "")
 CPMDeclarePackage (ibf-fpga
                    NAME ibf-fpga
                    URL https://github.com/seqan/ibf-fpga/archive/${RAPTOR_IBF_FPGA_VERSION}.tar.gz # master
