@@ -39,7 +39,7 @@ CPMDeclarePackage (seqan3
                    OPTIONS "INSTALL_SEQAN3 OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING"
 )
 # chopper
-set (RAPTOR_CHOPPER_VERSION 83ca83acf6b505df9f1c6abb97e2243c874a7fd4 CACHE STRING "")
+set (RAPTOR_CHOPPER_VERSION b87592afddbaea70b88c4f6d52f63555a8b8c16c CACHE STRING "")
 CPMDeclarePackage (chopper
                    NAME chopper
                    GIT_TAG ${RAPTOR_CHOPPER_VERSION} # main
