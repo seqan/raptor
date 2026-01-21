@@ -53,7 +53,7 @@ void fpga_check_kernel(search_arguments const & arguments)
 #    undef RAPTOR_TOSTRING
 }
 
-void fpga_checks(search_arguments const & arguments, size_t const max_query_length)
+void fpga_checks(search_arguments const & arguments, size_t const max_query_length, size_t const min_query_length)
 {
     if (!arguments.use_fpga)
         return;
@@ -75,6 +75,9 @@ void fpga_checks(search_arguments const & arguments, size_t const max_query_leng
 
     if (max_query_length > 250u)
         throw sharg::parser_error{"The query length is too long. The maximum is 250."};
+
+    if (min_query_length < 50u)
+        throw sharg::parser_error{"The query length is too short. The minimum is 50."};
 
     fpga_check_kernel(arguments);
 }
@@ -319,7 +322,7 @@ void search_parsing(sharg::parser & parser)
     }
 
 #if RAPTOR_FPGA
-    fpga_checks(arguments, max_query_length);
+    fpga_checks(arguments, max_query_length, min_query_length);
 #endif
 
     // ==========================================
