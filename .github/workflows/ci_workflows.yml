@@ -84,4 +84,7 @@ jobs:
           cwltool --validate raptor.cwl
           cwltool raptor.cwl workflow/cwl/tests/raptor-build-0_bins_window_19.yml
           cwltool raptor.cwl workflow/cwl/tests/raptor-build-16_bins_window_19.yml
+          raptor search --export-help cwl > raptor.cwl
+          cwltool --validate raptor.cwl
+          cwltool raptor.cwl workflow/cwl/tests/raptor-search-0_bins_19_window_0_errors.yml
 
