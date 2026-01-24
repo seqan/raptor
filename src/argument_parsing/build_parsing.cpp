@@ -223,6 +223,8 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
                                             - --input
                                             - input_bins_filepaths.txt
                                           )-");
+        for (auto const elem : {"kmer", "window", "shape", "timing-output"})
+            inputs[elem].remove("default");
     };
     // GCOVR_EXCL_STOP
 }

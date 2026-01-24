@@ -18,10 +18,11 @@ CPMDeclarePackage (hibf
                    OPTIONS "INSTALL_HIBF OFF"
 )
 # sharg
-set (RAPTOR_SHARG_VERSION 983dc3dc415d9fc193fb4dac110cc2ecac2ca4bc CACHE STRING "")
+set (RAPTOR_SHARG_VERSION 1.2.1 CACHE STRING "")
 CPMDeclarePackage (sharg
                    NAME sharg
-                   GIT_TAG ${RAPTOR_SHARG_VERSION} # main
+                   VERSION ${RAPTOR_SHARG_VERSION}
+                   GIT_TAG ${RAPTOR_SHARG_VERSION}
                    GITHUB_REPOSITORY seqan/sharg-parser
                    SYSTEM TRUE
                    EXCLUDE_FROM_ALL TRUE
