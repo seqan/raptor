@@ -65,6 +65,9 @@ inline void parse_chopper_config(sharg::parser & parser, build_arguments & argum
         arguments.kmer_size = config.k;
     }
 
+    if (!parser.is_option_set("window"))
+        arguments.window_size = config.window_size;
+
     validate_shape(parser, arguments);
 }
 
