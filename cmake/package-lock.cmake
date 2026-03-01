@@ -18,7 +18,7 @@ CPMDeclarePackage (hibf
                    OPTIONS "INSTALL_HIBF OFF"
 )
 # sharg
-set (RAPTOR_SHARG_VERSION 1.2.1 CACHE STRING "")
+set (RAPTOR_SHARG_VERSION 1.2.2 CACHE STRING "")
 CPMDeclarePackage (sharg
                    NAME sharg
                    VERSION ${RAPTOR_SHARG_VERSION}
@@ -29,7 +29,7 @@ CPMDeclarePackage (sharg
                    OPTIONS "INSTALL_SHARG OFF" "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING" "BUILD_TESTING OFF"
 )
 # seqan3
-set (RAPTOR_SEQAN3_VERSION 3.4.0 CACHE STRING "")
+set (RAPTOR_SEQAN3_VERSION 3.4.1 CACHE STRING "")
 CPMDeclarePackage (seqan3
                    NAME seqan3
                    VERSION ${RAPTOR_SEQAN3_VERSION}
