@@ -28,7 +28,7 @@ namespace raptor
 
 std::filesystem::path get_output_path(std::filesystem::path const & output_dir, std::filesystem::path const & file_name)
 {
-    std::filesystem::path result{output_dir};
+    std::filesystem::path result{std::filesystem::absolute(output_dir)};
     bool const is_compressed = raptor::cutoff::file_is_compressed(file_name);
     result /= is_compressed ? file_name.stem().stem() : file_name.stem();
     result += ".dummy_extension"; // https://github.com/seqan/raptor/issues/355
@@ -37,7 +37,7 @@ std::filesystem::path get_output_path(std::filesystem::path const & output_dir, 
 
 void write_list_file(prepare_arguments const & arguments)
 {
-    std::filesystem::path list_file = arguments.out_dir;
+    std::filesystem::path list_file = std::filesystem::absolute(arguments.out_dir);
     list_file /= "minimiser.list";
     std::ofstream file{list_file};
 
