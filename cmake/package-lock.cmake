@@ -40,7 +40,7 @@ CPMDeclarePackage (seqan3
                    OPTIONS "INSTALL_SEQAN3 OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING"
 )
 # chopper
-set (RAPTOR_CHOPPER_VERSION 58560ca3230fe2790f2ea7445b329e20513a7389 CACHE STRING "")
+set (RAPTOR_CHOPPER_VERSION 4d897e412cb9d85c7d3f977ce4498f14a4cdc30e CACHE STRING "")
 CPMDeclarePackage (chopper
                    NAME chopper
                    GIT_TAG ${RAPTOR_CHOPPER_VERSION} # main
@@ -82,7 +82,7 @@ CPMDeclarePackage (use_ccache
                    EXCLUDE_FROM_ALL TRUE
 )
 # doxygen-awesome
-set (RAPTOR_DOXYGEN_AWESOME_VERSION 2.4.1 CACHE STRING "")
+set (RAPTOR_DOXYGEN_AWESOME_VERSION 2.4.2 CACHE STRING "")
 CPMDeclarePackage (doxygen_awesome
                    NAME doxygen_awesome
                    VERSION ${RAPTOR_DOXYGEN_AWESOME_VERSION}
