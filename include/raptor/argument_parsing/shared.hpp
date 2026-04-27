@@ -40,7 +40,15 @@ void validate_shape(sharg::parser & parser, argument_t & arguments)
         arguments.shape = seqan3::shape{seqan3::ungapped{arguments.kmer_size}};
     }
 
-    if (!parser.is_option_set("window"))
+    bool const is_hibf = [&]()
+    {
+        if constexpr (std::same_as<argument_t, build_arguments>)
+            return arguments.is_hibf;
+        else
+            return false;
+    }();
+
+    if (!is_hibf && !parser.is_option_set("window"))
         arguments.window_size = arguments.shape.size();
     else if (arguments.shape.size() > arguments.window_size)
         throw sharg::parser_error{"The k-mer size cannot be bigger than the window size."};

@@ -5,6 +5,7 @@
 cmake_minimum_required (VERSION 3.25...3.30)
 
 raptor_add_unit_test (compute_bin_size.cpp)
+raptor_add_unit_test (file_reader.cpp)
 raptor_add_unit_test (formatted_bytes.cpp)
 raptor_add_unit_test (index_size.cpp)
 raptor_add_unit_test (issue_142.cpp)

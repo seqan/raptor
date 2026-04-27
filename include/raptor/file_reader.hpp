@@ -97,6 +97,13 @@ private:
 template <>
 class file_reader<file_types::minimiser>
 {
+    [[noreturn]] void io_error(std::string const & filepath, int const err = errno) const
+    {
+        std::ostringstream oss;
+        oss << "Failed to open file: " << std::quoted(filepath);
+        throw std::system_error(err, std::generic_category(), oss.str());
+    }
+
 public:
     file_reader() = default;
     file_reader(file_reader const &) = default;
@@ -119,6 +126,9 @@ public:
     void hash_into(std::string const & filename, it_t target) const
     {
         std::ifstream fin{filename, std::ios::binary};
+        if (!fin.is_open()) [[unlikely]]
+            io_error(filename);
+
         uint64_t value;
         while (fin.read(reinterpret_cast<char *>(&value), sizeof(value)))
         {
@@ -138,6 +148,9 @@ public:
     void hash_into_if(std::string const & filename, it_t target, auto && pred) const
     {
         std::ifstream fin{filename, std::ios::binary};
+        if (!fin.is_open()) [[unlikely]]
+            io_error(filename);
+
         uint64_t value;
         while (fin.read(reinterpret_cast<char *>(&value), sizeof(value)))
             if (pred(value))
@@ -156,6 +169,9 @@ public:
     void for_each_hash(std::string const & filename, auto && callback) const
     {
         std::ifstream fin{filename, std::ios::binary};
+        if (!fin.is_open()) [[unlikely]]
+            io_error(filename);
+
         uint64_t value;
         while (fin.read(reinterpret_cast<char *>(&value), sizeof(value)))
             callback(value);

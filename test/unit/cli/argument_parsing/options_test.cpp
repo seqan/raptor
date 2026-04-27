@@ -303,6 +303,26 @@ TEST_F(argparse_build, layout_and_kmer)
     RAPTOR_ASSERT_ZERO_EXIT(result);
 }
 
+TEST_F(argparse_build, layout_and_window)
+{
+    cli_test_result const result =
+        execute_app("raptor", "build", "--output index.raptor", "--quiet", "--input", data("test.layout"));
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err, std::string{});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
+
+    raptor::raptor_index<raptor::index_structure::hibf> index{};
+
+    {
+        std::ifstream is{"index.raptor", std::ios::binary};
+        cereal::BinaryInputArchive iarchive{is};
+        iarchive(index);
+    }
+
+    EXPECT_EQ(index.window_size(), 28u);
+    EXPECT_EQ(index.shape(), seqan3::shape{seqan3::ungapped{19u}});
+}
+
 TEST_F(argparse_build, layout_and_shape)
 {
     cli_test_result const result = execute_app("raptor",

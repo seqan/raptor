@@ -7,6 +7,8 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
+#include <yaml-cpp/yaml.h>
+
 #include <seqan3/io/views/async_input_buffer.hpp>
 
 #include <raptor/argument_parsing/search_parsing.hpp>
@@ -53,7 +55,7 @@ void fpga_check_kernel(search_arguments const & arguments)
 #    undef RAPTOR_TOSTRING
 }
 
-void fpga_checks(search_arguments const & arguments, size_t const max_query_length)
+void fpga_checks(search_arguments const & arguments, size_t const max_query_length, size_t const min_query_length)
 {
     if (!arguments.use_fpga)
         return;
@@ -75,6 +77,9 @@ void fpga_checks(search_arguments const & arguments, size_t const max_query_leng
 
     if (max_query_length > 250u)
         throw sharg::parser_error{"The query length is too long. The maximum is 250."};
+
+    if (min_query_length < 50u)
+        throw sharg::parser_error{"The query length is too short. The minimum is 50."};
 
     fpga_check_kernel(arguments);
 }
@@ -195,6 +200,25 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                 "using this option, the stored thresholds are re-used. Two files are stored:"});
     parser.add_list_item("", "\\fBthreshold_*.bin\\fP: Depends on query_length, window, kmer/shape, errors, and tau.");
     parser.add_list_item("", "\\fBcorrection_*.bin\\fP: Depends on query_length, window, kmer/shape, p_max, and fpr.");
+
+    // GCOVR_EXCL_START
+    // Adding additional cwl information that currently aren't supported by sharg and tdl.
+    tdl::post_process_cwl = [](YAML::Node & node)
+    {
+        auto inputs = node["inputs"];
+        inputs["index"]["type"] = "File";
+        inputs["output_name"] = inputs["output"];
+        inputs.remove("output");
+        node["outputs"] = YAML::Load(R"-(
+                                         output:
+                                           type: File
+                                           outputBinding:
+                                             glob: $(inputs.output_name)
+                                       )-");
+        for (auto const elem : {"error", "threshold", "query_length", "timing-output"})
+            inputs[elem].remove("default");
+    };
+    // GCOVR_EXCL_STOP
 }
 
 void search_parsing(sharg::parser & parser)
@@ -320,7 +344,7 @@ void search_parsing(sharg::parser & parser)
     }
 
 #if RAPTOR_FPGA
-    fpga_checks(arguments, max_query_length);
+    fpga_checks(arguments, max_query_length, min_query_length);
 #endif
 
     // ==========================================
