@@ -19,9 +19,6 @@ params.fpr = 0.05
 params.errors = 2
 params.outdir = "hibf_result"
 
-println "\nResult files will be written to $params.outdir\n"
-
-
 workflow {
     def query_ch = Channel.fromPath(params.reads)
 
