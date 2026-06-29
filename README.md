@@ -63,3 +63,9 @@ The subdirectory `util` contains applications and scripts related to papers.
 ### License
 Raptor is open-source software. However, certain conditions apply when you (re-)distribute and/or modify Raptor,
 please see the [license](https://github.com/seqan/raptor/blob/main/LICENSE.md).
+
+<br>
+<p align="center">
+  <a target="_blank" rel="noopener noreferrer" href="#">
+  <img src="doc/figures/BMFTR_logo_foerderung.svg" alt="Funded by the BMFTR" width="280">
+</p>
