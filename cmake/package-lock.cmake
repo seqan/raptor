@@ -8,7 +8,7 @@
 # cmake-format: off
 
 # hibf
-set (RAPTOR_HIBF_VERSION 78869bcb3c43247af2be68a3a883993e475009c9 CACHE STRING "")
+set (RAPTOR_HIBF_VERSION 4ac75220ba1cc76ce586b2129a0d847493fd59a9 CACHE STRING "")
 CPMDeclarePackage (hibf
                    NAME hibf
                    GIT_TAG ${RAPTOR_HIBF_VERSION} # main
