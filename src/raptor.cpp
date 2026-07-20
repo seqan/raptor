@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2026 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2026 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 /*!\file
@@ -27,8 +27,8 @@ inline void set_metadata(sharg::parser_meta_data & info)
     info.short_copyright = "BSD 3-Clause License";
     info.long_copyright = R"(BSD 3-Clause License
 
-Copyright (c) 2006-2025, Knut Reinert & Freie Universität Berlin
-Copyright (c) 2016-2025, Knut Reinert & MPI für molekulare Genetik
+Copyright (c) 2006-2026, Knut Reinert & Freie Universität Berlin
+Copyright (c) 2016-2026, Knut Reinert & MPI für molekulare Genetik
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
