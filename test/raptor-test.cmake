@@ -79,6 +79,11 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     endif ()
 endif ()
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM")
+    # "invalid feature combination:  +avx10.1-256; will be promoted to avx10.1-512"
+    target_compile_options (raptor_interface INTERFACE "-Wno-invalid-feature-combination")
+endif ()
+
 target_link_libraries (raptor_test INTERFACE "raptor_lib")
 target_include_directories (raptor_test INTERFACE "${CMAKE_CURRENT_LIST_DIR}/include")
 add_library (raptor::test ALIAS raptor_test)
