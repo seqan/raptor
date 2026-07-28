@@ -97,6 +97,11 @@ add_library (raptor_interface INTERFACE)
 target_link_libraries (raptor_interface INTERFACE sharg::sharg seqan3::seqan3 seqan::hibf)
 target_include_directories (raptor_interface INTERFACE "${RAPTOR_INCLUDE_DIR}")
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM")
+    # "invalid feature combination:  +avx10.1-256; will be promoted to avx10.1-512"
+    target_compile_options (raptor_interface INTERFACE "-Wno-invalid-feature-combination")
+endif ()
+
 get_target_property (CHOPPER_INCLUDE_DIR chopper::interface INTERFACE_INCLUDE_DIRECTORIES)
 target_include_directories (raptor_interface SYSTEM INTERFACE "${CHOPPER_INCLUDE_DIR}")
 

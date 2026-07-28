@@ -24,6 +24,12 @@ include ("${Raptor_SOURCE_DIR}/cmake/configuration.cmake")
 add_subdirectory ("${Raptor_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/raptor")
 target_compile_options (raptor_interface INTERFACE "-pedantic" "-Wall" "-Wextra")
 
+# Re-add to ensure it overrides `-Wall`.
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM")
+    # "invalid feature combination:  +avx10.1-256; will be promoted to avx10.1-512"
+    target_compile_options (raptor_interface INTERFACE "-Wno-invalid-feature-combination")
+endif ()
+
 option (RAPTOR_WITH_WERROR "Report compiler warnings as errors." ON)
 
 if (RAPTOR_WITH_WERROR)
@@ -77,11 +83,6 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 18)
         target_compile_definitions (raptor_test INTERFACE "_LIBCPP_ENABLE_EXPERIMENTAL")
     endif ()
-endif ()
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM")
-    # "invalid feature combination:  +avx10.1-256; will be promoted to avx10.1-512"
-    target_compile_options (raptor_interface INTERFACE "-Wno-invalid-feature-combination")
 endif ()
 
 target_link_libraries (raptor_test INTERFACE "raptor_lib")
