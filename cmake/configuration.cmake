@@ -100,6 +100,7 @@ target_include_directories (raptor_interface INTERFACE "${RAPTOR_INCLUDE_DIR}")
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM")
     # "invalid feature combination:  +avx10.1-256; will be promoted to avx10.1-512"
     target_compile_options (raptor_interface INTERFACE "-Wno-invalid-feature-combination")
+    target_compile_options (hibf PUBLIC "-Wno-invalid-feature-combination")
 endif ()
 
 get_target_property (CHOPPER_INCLUDE_DIR chopper::interface INTERFACE_INCLUDE_DIRECTORIES)
