@@ -61,6 +61,7 @@ struct required_technical_bins_parameters
 struct ibf_location
 {
     size_t ibf_idx;
+    size_t bin_idx;
     size_t max_elements;
 };
 

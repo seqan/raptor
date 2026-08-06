@@ -35,6 +35,8 @@ struct update_arguments
     bool is_hibf{false};
     double fpr{0.05};
 
+    bool disable_partial_rebuild{false};
+
     std::vector<size_t> user_bins_to_delete{};
     std::vector<std::vector<std::string>> user_bins_to_insert{};
 };

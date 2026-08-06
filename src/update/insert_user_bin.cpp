@@ -32,8 +32,19 @@ robin_hood::unordered_flat_set<uint64_t> compute_kmers(std::filesystem::path con
                                                        raptor_index<index_structure::hibf> const & index)
 {
     robin_hood::unordered_flat_set<uint64_t> kmers{};
-    raptor::file_reader<raptor::file_types::sequence> reader{index.shape(), static_cast<uint32_t>(index.window_size())};
-    reader.hash_into(ub_file, std::inserter(kmers, kmers.begin()));
+
+    std::variant<file_reader<file_types::sequence>, file_reader<file_types::minimiser>> reader;
+    if (ub_file.extension() == ".minimiser")
+        reader = file_reader<file_types::minimiser>{};
+    else
+        reader = file_reader<file_types::sequence>{index.shape(), static_cast<uint32_t>(index.window_size())};
+
+    std::visit(
+        [&](auto const & reader)
+        {
+            reader.hash_into(ub_file, std::inserter(kmers, kmers.begin()));
+        },
+        reader);
     return kmers;
 }
 
@@ -58,9 +69,14 @@ std::vector<ibf_max> max_ibf_sizes(raptor_index<index_structure::hibf> const & i
     auto const & ibf_vector = index.ibf().ibf_vector;
     std::vector<ibf_max> max_sizes{};
     max_sizes.reserve(ibf_vector.size());
+    seqan::hibf::hierarchical_interleaved_bloom_filter::previous_ibf_id_pair const invalid{
+        seqan::hibf::bin_kind::deleted,
+        seqan::hibf::bin_kind::deleted};
 
     for (size_t i = 0; i < ibf_vector.size(); ++i)
     {
+        if (index.ibf().prev_ibf_id[i] == invalid)
+            continue;
         auto const & ibf = ibf_vector[i];
         size_t const max_kmers = max_elements({.fpr = index.fpr(), //
                                                .hash_count = ibf.hash_function_count(),
@@ -113,7 +129,6 @@ void partial_rebuild(update_arguments const & arguments,
                      detail::rebuild_location const & rebuild_location,
                      raptor_index<index_structure::hibf> & index)
 {
-    std::cout << "Partial Rebuild\n";
     assert(index.ibf().ibf_bin_to_user_bin_id[rebuild_location.ibf_idx][rebuild_location.bin_idx]
            == seqan::hibf::bin_kind::merged);
     size_t const child_ibf_id = index.ibf().next_ibf_id[rebuild_location.ibf_idx][rebuild_location.bin_idx];
@@ -132,11 +147,34 @@ void partial_rebuild(update_arguments const & arguments,
         return result;
     }();
 
+    auto get_file_reader = [&index](std::filesystem::path const & path)
+    {
+        std::variant<file_reader<file_types::sequence>, file_reader<file_types::minimiser>> reader;
+        if (path.extension() == ".minimiser")
+            reader = file_reader<file_types::minimiser>{};
+        else
+            reader = file_reader<file_types::sequence>{index.shape(), static_cast<uint32_t>(index.window_size())};
+        return reader;
+    };
+
     auto input_fn = [&](size_t const user_bin_id, seqan::hibf::insert_iterator it)
     {
-        raptor::file_reader<raptor::file_types::sequence> reader{index.shape(),
-                                                                 static_cast<uint32_t>(index.window_size())};
-        reader.hash_into(index.bin_path()[ub_ids[user_bin_id]], it);
+        assert(std::ranges::all_of(index.bin_path()[ub_ids[user_bin_id]],
+                                   [](std::filesystem::path const & path)
+                                   {
+                                       return path.extension() == ".minimiser";
+                                   })
+               || std::ranges::none_of(index.bin_path()[ub_ids[user_bin_id]],
+                                       [](std::filesystem::path const & path)
+                                       {
+                                           return path.extension() == ".minimiser";
+                                       }));
+        std::visit(
+            [&](auto const & reader)
+            {
+                reader.hash_into(index.bin_path()[ub_ids[user_bin_id]], it);
+            },
+            get_file_reader(index.bin_path()[ub_ids[user_bin_id]].front()));
     };
 
     seqan::hibf::config config{index.config()};
@@ -164,6 +202,9 @@ void partial_rebuild(update_arguments const & arguments,
 
     // Handle the first IBF
     original_hibf.ibf_vector[child_ibf_id] = std::move(subindex.ibf_vector[0]);
+    index.is_resized[child_ibf_id] = true; // false
+
+    index.is_resized.resize(index.is_resized.size() + subindex.ibf_vector.size(), true);
 
     auto & first_ibf_next_ibf_id = subindex.next_ibf_id[0];
     std::ranges::for_each(first_ibf_next_ibf_id,
@@ -239,19 +280,43 @@ void partial_rebuild(update_arguments const & arguments,
     }
 }
 
-static constexpr bool consider_lower_level_tmax{false};
+static constexpr bool consider_lower_level_tmax{true};
 
 void full_rebuild(update_arguments const & arguments, raptor_index<index_structure::hibf> & index)
 {
-    std::cout << "Full Rebuild\n";
+    // std::cout << "Full Rebuild\n";
     auto bin_path = index.bin_path();
     auto const shape = index.shape();
     auto const window_size = static_cast<uint32_t>(index.window_size());
 
+    auto get_file_reader = [shape, window_size](std::filesystem::path const & path)
+    {
+        std::variant<file_reader<file_types::sequence>, file_reader<file_types::minimiser>> reader;
+        if (path.extension() == ".minimiser")
+            reader = file_reader<file_types::minimiser>{};
+        else
+            reader = file_reader<file_types::sequence>{shape, window_size};
+        return reader;
+    };
+
     auto input_fn = [&](size_t const user_bin_id, seqan::hibf::insert_iterator it)
     {
-        raptor::file_reader<raptor::file_types::sequence> reader{shape, window_size};
-        reader.hash_into(bin_path[user_bin_id], it);
+        assert(std::ranges::all_of(bin_path[user_bin_id],
+                                   [](std::filesystem::path const & path)
+                                   {
+                                       return path.extension() == ".minimiser";
+                                   })
+               || std::ranges::none_of(bin_path[user_bin_id],
+                                       [](std::filesystem::path const & path)
+                                       {
+                                           return path.extension() == ".minimiser";
+                                       }));
+        std::visit(
+            [&](auto const & reader)
+            {
+                reader.hash_into(bin_path[user_bin_id], it);
+            },
+            get_file_reader(bin_path[user_bin_id].front()));
     };
 
     seqan::hibf::config config{index.config()};
@@ -261,6 +326,9 @@ void full_rebuild(update_arguments const & arguments, raptor_index<index_structu
     config.number_of_user_bins = bin_path.size();
     config.threads = arguments.threads;
     config.validate_and_set_defaults();
+    // std::cout << '\n';
+    // config.write_to(std::cout);
+    // std::cout << '\n';
 
     index = {};
     seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
@@ -283,20 +351,18 @@ tmax_check check_tmax_rebuild(update_arguments const & arguments,
                               raptor_index<index_structure::hibf> & index,
                               size_t const ibf_idx)
 {
-    if (index.ibf().ibf_vector[ibf_idx].bin_count() > seqan::hibf::next_multiple_of_64(index.config().tmax))
-    {
-        if (ibf_idx == 0u)
-        {
-            return tmax_check::full_rebuild;
-        }
-        else if constexpr (consider_lower_level_tmax)
-        {
-            auto const parent = index.ibf().prev_ibf_id[ibf_idx];
-            partial_rebuild(arguments, detail::rebuild_location{parent.ibf_idx, parent.bin_idx}, index);
-            return tmax_check::partial_rebuild;
-        }
+    (void)arguments;
+    auto const bin_count = index.ibf().ibf_vector[ibf_idx].bin_count();
 
-        return tmax_check::no_rebuild;
+    if (ibf_idx == 0)
+    {
+        if (bin_count > index.config().tmax)
+            return tmax_check::full_rebuild;
+    }
+    else if constexpr (consider_lower_level_tmax)
+    {
+        if (bin_count > index.config().tmax + 64uz)
+            return tmax_check::partial_rebuild;
     }
 
     return tmax_check::no_rebuild;
@@ -308,6 +374,9 @@ void insert_user_bin(update_arguments const & arguments, raptor_index<index_stru
     full_rebuild_bin_path.insert(full_rebuild_bin_path.end(),
                                  arguments.user_bins_to_insert.begin(),
                                  arguments.user_bins_to_insert.end());
+
+    // std::cerr << "[DEBUG] Current bins[1]: " << index.ibf().ibf_vector[1].bin_count() << '\n';
+    // std::cerr << "[DEBUG] Current tb[1]: " << index.ibf().ibf_vector[1].technical_bins << '\n';
 
     for (auto const & ub : arguments.user_bins_to_insert)
     {
@@ -323,34 +392,61 @@ void insert_user_bin(update_arguments const & arguments, raptor_index<index_stru
             assert(std::ranges::is_sorted(max_kmers));
 
             auto const insert_location = detail::get_location(max_kmers, kmer_count, index);
+            // TODO full rebuild already here? Don't need to insert it first...
+            // Let above return a std::optional. If valueless, do full rebuild
             index.append_bin_path({path}); // TODO: update_bookkeeping, but it doesn't have the args
             auto const rebuild_location = detail::insert_tb_and_parents(kmers, insert_location, index);
-
+            // Also make above a std::optional
+            // If valueless, FPR wasn't exceeded...can the root-ibf check be incorporated?
             if (rebuild_location.ibf_idx != std::numeric_limits<size_t>::max())
             {
                 if (check_tmax_rebuild(arguments, index, rebuild_location.ibf_idx) == tmax_check::no_rebuild)
                 {
                     if (rebuild_location.ibf_idx == 0u && is_fpr_exceeded(index, rebuild_location))
                     {
+                        // std::cout << "Full Rebuild FPR\n";
+                        index.replace_bin_path(std::move(full_rebuild_bin_path));
+                        full_rebuild(arguments, index);
+                        return;
+                    }
+                    else if (arguments.disable_partial_rebuild)
+                    {
+                        // std::cout << "Full Rebuild FPR No Partial\n";
                         index.replace_bin_path(std::move(full_rebuild_bin_path));
                         full_rebuild(arguments, index);
                         return;
                     }
                     else
                     {
-                        // some downstream fpr too high
+                        // std::cout << "Partial Rebuild FPR\n";
                         partial_rebuild(arguments, rebuild_location, index);
                     }
                 }
             }
             else
             {
+                auto result = check_tmax_rebuild(arguments, index, insert_location.ibf_idx);
                 // tmax too high
-                if (check_tmax_rebuild(arguments, index, insert_location.ibf_idx) == tmax_check::full_rebuild)
+                if (result == tmax_check::full_rebuild)
                 {
+                    // std::cout << "Full Rebuild tmax\n";
                     index.replace_bin_path(std::move(full_rebuild_bin_path));
                     full_rebuild(arguments, index);
                     return;
+                }
+
+                if (result == tmax_check::partial_rebuild)
+                {
+                    if (arguments.disable_partial_rebuild)
+                    {
+                        // std::cout << "Full Rebuild tmax No Partial\n";
+                        index.replace_bin_path(std::move(full_rebuild_bin_path));
+                        full_rebuild(arguments, index);
+                        return;
+                    }
+                    auto const parent = index.ibf().prev_ibf_id[insert_location.ibf_idx];
+                    // std::cout << "Partial Rebuild tmax\n";
+                    partial_rebuild(arguments, detail::rebuild_location{parent.ibf_idx, parent.bin_idx}, index);
                 }
             }
         }

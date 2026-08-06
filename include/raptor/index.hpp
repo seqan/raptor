@@ -65,6 +65,7 @@ public:
     raptor_index & operator=(raptor_index const &) = default;
     raptor_index & operator=(raptor_index &&) = default;
     ~raptor_index() = default;
+    seqan::hibf::bit_vector is_resized{};
 
     explicit raptor_index(window const window_size,
                           seqan3::shape const shape,
@@ -80,7 +81,8 @@ public:
         bin_path_{bin_path},
         fpr_{config.maximum_fpr},
         config_{config},
-        ibf_{std::move(ibf)}
+        ibf_{std::move(ibf)},
+        is_resized(ibf_.ibf_vector.size())
     {}
 
     explicit raptor_index(build_arguments const & arguments)
@@ -177,6 +179,7 @@ public:
                 archive(is_hibf_);
                 archive(config_);
                 archive(ibf_);
+                archive(is_resized);
             }
             // GCOVR_EXCL_START
             catch (std::exception const & e)

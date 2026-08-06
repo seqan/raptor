@@ -60,16 +60,14 @@ void init_insert_parser(sharg::parser & parser, update_arguments & arguments)
     parser.add_option(arguments.bin_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "insert",
-                                    .description = "A single sequence file, or a file contaning file names: " +
-                                                   []()
-                                                   {
-                                                       std::string str = bin_validator{}.get_help_page_message();
-                                                       str.erase(201, 73);
-                                                       str.erase(str.size() - 2, 2); // remove trailing space and dot
-                                                       return str;
-                                                   }(),
+                                    .description = "A single sequence file, or a file containing file names: "
+                                                 + bin_validator{}.get_help_page_message(),
                                     .required = true,
                                     .validator = sharg::input_file_validator{}});
+    parser.add_flag(arguments.disable_partial_rebuild,
+                    sharg::config{.short_id = '\0',
+                                  .long_id = "no-partial-rebuild",
+                                  .description = "Do not perform partial rebuilds, only full rebuilds."});
 }
 
 bool is_sequence_file(std::filesystem::path const & file_path)
