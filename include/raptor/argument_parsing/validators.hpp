@@ -18,36 +18,54 @@
 namespace raptor::detail
 {
 
-static inline std::vector<std::string> sequence_extensions{
-    seqan3::detail::valid_file_extensions<typename seqan3::sequence_file_input<>::valid_formats>()};
+/*!\brief The valid extensions of a sequence file.
+ * \details
+ * Initialised on first use, not during static initialisation: seqan3 stores the extensions of each format in a
+ * `static inline` class member, which is dynamically initialised. The relative order of dynamic initialisation
+ * across translation units is unspecified, so initialising a namespace-scope variable from these members may copy
+ * vectors that are still empty. An empty extension list makes sharg::input_file_validator accept any extension.
+ */
+inline std::vector<std::string> const & sequence_extensions()
+{
+    static std::vector<std::string> const result{
+        seqan3::detail::valid_file_extensions<typename seqan3::sequence_file_input<>::valid_formats>()};
+    return result;
+}
 
-static inline std::vector<std::string> compression_extensions{[]()
-                                                              {
-                                                                  std::vector<std::string> result;
-#ifdef SEQAN3_HAS_BZIP2
-                                                                  result.push_back("bz2");
-#endif
-#ifdef SEQAN3_HAS_ZLIB
-                                                                  result.push_back("gz");
-                                                                  result.push_back("bgzf");
-#endif
-                                                                  return result;
-                                                              }()}; // GCOVR_EXCL_LINE
-
-static inline std::vector<std::string> combined_extensions{
-    []()
+//!\brief The valid extensions of a compressed file.
+inline std::vector<std::string> const & compression_extensions()
+{
+    static std::vector<std::string> const result = []()
     {
         std::vector<std::string> result;
-        if (compression_extensions.empty())
+#ifdef SEQAN3_HAS_BZIP2
+        result.push_back("bz2");
+#endif
+#ifdef SEQAN3_HAS_ZLIB
+        result.push_back("gz");
+        result.push_back("bgzf");
+#endif
+        return result;
+    }(); // GCOVR_EXCL_LINE
+    return result;
+}
+
+//!\brief The valid extensions of a sequence file, including compressed ones.
+inline std::vector<std::string> const & combined_extensions()
+{
+    static std::vector<std::string> const result = []()
+    {
+        std::vector<std::string> result;
+        if (compression_extensions().empty())
         {
-            result = sequence_extensions; // GCOVR_EXCL_LINE
+            result = sequence_extensions(); // GCOVR_EXCL_LINE
         }
         else
         {
-            for (auto && sequence_extension : sequence_extensions)
+            for (auto && sequence_extension : sequence_extensions())
             {
                 result.push_back(sequence_extension);
-                for (auto && compression_extension : compression_extensions)
+                for (auto && compression_extension : compression_extensions())
                 {
                     result.push_back(sequence_extension);
                     result.back() += '.';
@@ -56,7 +74,9 @@ static inline std::vector<std::string> combined_extensions{
             }
         }
         return result;
-    }()};
+    }();
+    return result;
+}
 
 } // namespace raptor::detail
 
@@ -203,10 +223,10 @@ public:
                                          "being separated by a whitespace. Each line in the file corresponds to one "
                                          "bin. Valid extensions for the paths in the file are [minimiser] when "
                                          "using preprocessed input from \\fBraptor prepare\\fP, and ",
-                                         raptor::detail::sequence_extensions,
+                                         raptor::detail::sequence_extensions(),
 #if defined(SEQAN3_HAS_BZIP2) || defined(SEQAN3_HAS_ZLIB)
                                          ", possibly followed by ",
-                                         raptor::detail::compression_extensions,
+                                         raptor::detail::compression_extensions(),
 #endif
                                          ". ");
     }
@@ -215,7 +235,7 @@ private:
     sharg::input_file_validator minimiser_file_validator{{"minimiser"}};
 
 public:
-    sharg::input_file_validator sequence_file_validator{raptor::detail::combined_extensions};
+    sharg::input_file_validator sequence_file_validator{raptor::detail::combined_extensions()};
 };
 
 class output_directory_validator
@@ -307,10 +327,10 @@ public:
     {
         return seqan3::detail::to_string(
             "The input file must exist and read permissions must be granted. Valid file extensions are ",
-            raptor::detail::sequence_extensions,
+            raptor::detail::sequence_extensions(),
 #if defined(SEQAN3_HAS_BZIP2) || defined(SEQAN3_HAS_ZLIB)
             ", possibly followed by ",
-            raptor::detail::compression_extensions,
+            raptor::detail::compression_extensions(),
 #endif
             ". ");
     }

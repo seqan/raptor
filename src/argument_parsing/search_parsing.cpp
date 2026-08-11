@@ -125,7 +125,7 @@ void init_search_parser(sharg::parser & parser, search_arguments & arguments)
                                     .long_id = "query",
                                     .description = "Provide a path to the query file.",
                                     .required = true,
-                                    .validator = sequence_file_validator{raptor::detail::combined_extensions}});
+                                    .validator = sequence_file_validator{raptor::detail::combined_extensions()}});
     parser.add_option(arguments.out_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "output",

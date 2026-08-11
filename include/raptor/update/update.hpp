@@ -14,6 +14,13 @@
 namespace raptor
 {
 
+/*!\brief Updates an existing HIBF index and stores the result.
+ * \param[in] arguments The update arguments.
+ * \details
+ * Loads the index from `arguments.index_file`, applies `arguments.user_bins_to_delete` and
+ * `arguments.user_bins_to_insert` in that order, and stores the result at `arguments.out_path`. The input index is
+ * left untouched.
+ */
 void raptor_update(update_arguments const & arguments);
 
 } // namespace raptor

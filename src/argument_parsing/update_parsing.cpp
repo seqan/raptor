@@ -60,16 +60,14 @@ void init_insert_parser(sharg::parser & parser, update_arguments & arguments)
     parser.add_option(arguments.bin_file,
                       sharg::config{.short_id = '\0',
                                     .long_id = "insert",
-                                    .description = "A single sequence file, or a file contaning file names: " +
-                                                   []()
-                                                   {
-                                                       std::string str = bin_validator{}.get_help_page_message();
-                                                       str.erase(201, 73);
-                                                       str.erase(str.size() - 2, 2); // remove trailing space and dot
-                                                       return str;
-                                                   }(),
+                                    .description = "A single sequence file, or a file containing file names: "
+                                                 + bin_validator{}.get_help_page_message(),
                                     .required = true,
                                     .validator = sharg::input_file_validator{}});
+    parser.add_flag(arguments.disable_partial_rebuild,
+                    sharg::config{.short_id = '\0',
+                                  .long_id = "no-partial-rebuild",
+                                  .description = "Do not perform partial rebuilds, only full rebuilds."});
 }
 
 bool is_sequence_file(std::filesystem::path const & file_path)
@@ -123,7 +121,7 @@ void update_parsing(sharg::parser & parser)
     {
         std::ifstream is{arguments.index_file, std::ios::binary};
         cereal::BinaryInputArchive iarchive{is};
-        raptor_index<> tmp{};
+        raptor_index<index_structure::hibf> tmp{};
         tmp.load_parameters(iarchive);
         arguments.shape = tmp.shape();
         arguments.shape_size = arguments.shape.size();
@@ -133,6 +131,16 @@ void update_parsing(sharg::parser & parser)
         // arguments.bin_path = tmp.bin_path();
         arguments.fpr = tmp.fpr();
         arguments.is_hibf = tmp.is_hibf();
+
+        if (!arguments.is_hibf)
+            throw sharg::parser_error{"Only an HIBF can be updated."};
+
+        // Insertion and deletion locate free technical bins via the occupancy. seqan::hibf only maintains the
+        // occupancy if the layout reserved empty bins, i.e. if the empty bin fraction is greater than 0.
+        if (!tmp.config().track_occupancy)
+            throw sharg::parser_error{"The index does not track the occupancy of its technical bins and hence "
+                                      "cannot be updated. Recompute the layout using 'raptor layout' with "
+                                      "--empty-bin-fraction greater than 0, and rebuild the index."};
     }
 
     raptor_update(arguments);
