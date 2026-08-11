@@ -4,8 +4,6 @@
 
 cmake_minimum_required (VERSION 3.25...3.30)
 
-add_subdirectory (argument_parsing)
-add_subdirectory (build)
-add_subdirectory (search)
-add_subdirectory (update)
-add_subdirectory (upgrade)
+raptor_add_unit_test (update_delete_test.cpp)
+raptor_add_unit_test (update_insert_test.cpp)
+raptor_add_unit_test (update_options_test.cpp)

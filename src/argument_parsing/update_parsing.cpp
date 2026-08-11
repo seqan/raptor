@@ -121,7 +121,7 @@ void update_parsing(sharg::parser & parser)
     {
         std::ifstream is{arguments.index_file, std::ios::binary};
         cereal::BinaryInputArchive iarchive{is};
-        raptor_index<> tmp{};
+        raptor_index<index_structure::hibf> tmp{};
         tmp.load_parameters(iarchive);
         arguments.shape = tmp.shape();
         arguments.shape_size = arguments.shape.size();
@@ -131,6 +131,16 @@ void update_parsing(sharg::parser & parser)
         // arguments.bin_path = tmp.bin_path();
         arguments.fpr = tmp.fpr();
         arguments.is_hibf = tmp.is_hibf();
+
+        if (!arguments.is_hibf)
+            throw sharg::parser_error{"Only an HIBF can be updated."};
+
+        // Insertion and deletion locate free technical bins via the occupancy. seqan::hibf only maintains the
+        // occupancy if the layout reserved empty bins, i.e. if the empty bin fraction is greater than 0.
+        if (!tmp.config().track_occupancy)
+            throw sharg::parser_error{"The index does not track the occupancy of its technical bins and hence "
+                                      "cannot be updated. Recompute the layout using 'raptor layout' with "
+                                      "--empty-bin-fraction greater than 0, and rebuild the index."};
     }
 
     raptor_update(arguments);
