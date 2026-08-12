@@ -17,6 +17,7 @@
 #include <vector>
 
 #include <hibf/misc/divide_and_ceil.hpp>
+#include <hibf/misc/iota_vector.hpp>
 
 #include <raptor/index.hpp>
 
@@ -53,7 +54,9 @@ size_t required_technical_bins(required_technical_bins_parameters const & params
 
     size_t number_of_bins = seqan::hibf::divide_and_ceil(params.elements, params.max_elements);
 
-    while (compute_split_fpr(number_of_bins) > params.fpr)
+    // Splitting further does not always bring the combined FPR within budget, e.g. when the bins are so small that
+    // each one is saturated on its own. `params.limit` bounds the search in such cases.
+    while (number_of_bins <= params.limit && compute_split_fpr(number_of_bins) > params.fpr)
         ++number_of_bins;
 
     return number_of_bins;
@@ -66,15 +69,16 @@ enum class growth_policy : uint8_t
     none,
     //!\brief Grow, but at most to `tmax + tmax_slack` technical bins.
     limited,
-    //!\brief Grow without a limit. The IBF is marked as resized, hence it is grown at most once.
+    //!\brief Grow without a limit.
     unlimited
 };
 
 /*!\brief Claims `number_of_bins` consecutive technical bins in the IBF at `ibf_idx`.
  * \returns The index of the first claimed bin, or `std::nullopt` if `policy` does not permit claiming any.
  * \details
- * Growing the IBF is a side effect of claiming bins; `policy` decides whether that is permitted. The top-level IBF
- * is never grown here, because doing so requires a full rebuild; raptor::detail::find_insert_location handles it.
+ * Growing the IBF is a side effect of claiming bins; `policy` decides whether that is permitted. Any growth marks
+ * the IBF as resized, so every IBF is grown at most once before the index is rebuilt. The top-level IBF is never
+ * grown here, because doing so requires a full rebuild; raptor::detail::find_insert_location handles it.
  */
 std::optional<size_t> try_claim_bins(raptor_index<index_structure::hibf> & index,
                                      size_t const ibf_idx,
@@ -115,20 +119,17 @@ std::optional<size_t> try_claim_bins(raptor_index<index_structure::hibf> & index
     if (policy == growth_policy::limited && new_bin_count > index.config().tmax + tmax_slack)
         return std::nullopt;
 
-    if (policy == growth_policy::unlimited)
-        index.mark_resized(ibf_idx);
-
+    index.mark_resized(ibf_idx);
     ibf.increase_bin_number_to(seqan::hibf::bin_count{new_bin_count});
     return bin_idx;
 }
 
 /*!\brief Determines where a user bin with `kmer_count` k-mers should be inserted.
  * \details
- * Candidates are visited in order of increasing difference between their maximum number of elements and
- * `kmer_count`, first without growing any IBF, then allowing growth up to `tmax + tmax_slack`, and finally allowing
- * unrestricted growth. If no IBF can take the user bin, the top-level IBF is grown.
- * \returns Where to insert the user bin, or `std::nullopt` if not even the top-level IBF can be grown to take it
- *          without exceeding `tmax`, i.e. if a full rebuild is unavoidable.
+ * Candidates are visited in order of how well the user bin fits into them, first without growing any IBF, then
+ * allowing growth up to `tmax + tmax_slack`, and finally allowing unrestricted growth.
+ * \returns Where to insert the user bin, or `std::nullopt` if no IBF can take it, or if the index has been resized
+ *          too often already. Both mean that a full rebuild is unavoidable.
  */
 std::optional<insert_location> find_insert_location(std::vector<ibf_max> const & max_ibf_sizes,
                                                     size_t const kmer_count,
@@ -137,14 +138,20 @@ std::optional<insert_location> find_insert_location(std::vector<ibf_max> const &
     assert(!max_ibf_sizes.empty());
     assert(std::ranges::is_sorted(max_ibf_sizes));
 
-    auto try_candidate = [&](ibf_max const & candidate, growth_policy const policy) -> std::optional<insert_location>
+    auto bins_needed = [&](ibf_max const & candidate)
     {
         auto const & ibf = index.ibf().ibf_vector[candidate.ibf_idx];
-        size_t const number_of_bins = required_technical_bins({.bin_size = ibf.bin_size(),
-                                                               .elements = kmer_count,
-                                                               .fpr = index.fpr(),
-                                                               .hash_count = ibf.hash_function_count(),
-                                                               .max_elements = candidate.max_elements});
+        return required_technical_bins({.bin_size = ibf.bin_size(),
+                                        .elements = kmer_count,
+                                        .fpr = index.fpr(),
+                                        .hash_count = ibf.hash_function_count(),
+                                        .max_elements = candidate.max_elements,
+                                        .limit = index.config().tmax});
+    };
+
+    auto try_candidate = [&](ibf_max const & candidate, growth_policy const policy) -> std::optional<insert_location>
+    {
+        size_t const number_of_bins = bins_needed(candidate);
 
         if (auto const bin_idx = try_claim_bins(index, candidate.ibf_idx, number_of_bins, policy); bin_idx.has_value())
             return insert_location{.ibf_idx = candidate.ibf_idx,
@@ -154,64 +161,67 @@ std::optional<insert_location> find_insert_location(std::vector<ibf_max> const &
         return std::nullopt;
     };
 
-    // `max_ibf_sizes` is sorted by `max_elements`, hence visiting candidates in order of increasing
-    // `|max_elements - kmer_count|` is an outward expansion around the first IBF that can hold `kmer_count`.
-    size_t const split = static_cast<size_t>(
-        std::ranges::distance(max_ibf_sizes.begin(),
-                              std::ranges::lower_bound(max_ibf_sizes, kmer_count, {}, &ibf_max::max_elements)));
+    // How poorly a user bin fits into a candidate. Smaller is better.
+    // The capacity the claimed technical bins offer, minus what is actually stored in them, is the space the
+    // placement wastes. Splitting a user bin additionally costs a query in each of its technical bins, which the
+    // penalty of `sqrt(number_of_bins)` accounts for.
+    auto weight_of = [&](ibf_max const & candidate)
+    {
+        size_t const number_of_bins = bins_needed(candidate);
+        size_t const capacity = number_of_bins * candidate.max_elements;
+        // `number_of_bins` is at least `ceil(kmer_count / max_elements)`, hence the capacity suffices.
+        assert(capacity >= kmer_count);
+        return std::ceil(static_cast<double>(capacity - kmer_count) * std::sqrt(number_of_bins));
+    };
+
+    // The weight is not monotonic in `max_elements`, so the candidates have to be sorted by it. `stable_sort` keeps
+    // equally weighted candidates in the order of `max_ibf_sizes`, which makes the choice deterministic.
+    std::vector<size_t> candidates = seqan::hibf::iota_vector(max_ibf_sizes.size());
+    std::vector<double> const weights = [&]()
+    {
+        std::vector<double> result{};
+        result.reserve(max_ibf_sizes.size());
+        for (ibf_max const & candidate : max_ibf_sizes)
+            result.push_back(weight_of(candidate));
+        return result;
+    }();
+    std::ranges::stable_sort(candidates,
+                             {},
+                             [&](size_t const candidate_idx)
+                             {
+                                 return weights[candidate_idx];
+                             });
 
     auto search = [&](growth_policy const policy) -> std::optional<insert_location>
     {
-        size_t too_small{split};    // Candidates in [0, too_small) have not been visited yet.
-        size_t large_enough{split}; // Candidates in [large_enough, size) have not been visited yet.
-
-        while (too_small != 0u || large_enough != max_ibf_sizes.size())
-        {
-            bool take_larger{};
-            if (too_small == 0u)
-                take_larger = true;
-            else if (large_enough == max_ibf_sizes.size())
-                take_larger = false;
-            else
-                take_larger = (max_ibf_sizes[large_enough].max_elements - kmer_count)
-                            < (kmer_count - max_ibf_sizes[too_small - 1u].max_elements);
-
-            ibf_max const & candidate = take_larger ? max_ibf_sizes[large_enough++] : max_ibf_sizes[--too_small];
-
-            if (auto const result = try_candidate(candidate, policy); result.has_value())
+        for (size_t const candidate_idx : candidates)
+            if (auto const result = try_candidate(max_ibf_sizes[candidate_idx], policy); result.has_value())
                 return result;
-        }
 
         return std::nullopt;
     };
 
-    for (growth_policy const policy : {growth_policy::none, growth_policy::limited, growth_policy::unlimited})
-        if (auto const result = search(policy); result.has_value())
-            return result;
+    // Every resize moves the index further away from a proper layout. Once too many IBFs have been resized, stop
+    // placing user bins into them and force a full rebuild instead.
+    if (index.number_of_resized_ibfs() < 2u * index.original_number_of_ibfs())
+    {
+        for (growth_policy const policy : {growth_policy::none, growth_policy::limited, growth_policy::unlimited})
+            if (auto const result = search(policy); result.has_value())
+                return result;
+    }
 
-    // No IBF has space and none of them may be grown any further: grow the top-level IBF.
-    auto const top_level = std::ranges::find(max_ibf_sizes, 0uz, &ibf_max::ibf_idx);
+    // No IBF has space and none of them may be grown any further. Growing the top-level IBF would be the last
+    // resort, but a layout sizes it such that adding bins exceeds `tmax`, which requires a full rebuild anyway.
+    // Report that instead, so that the caller can rebuild right away rather than inserting the user bin into an
+    // index that is about to be discarded.
     // `max_ibf_sizes` omits deleted IBFs, but the top-level IBF is never deleted: it is not reachable from any
     // merged bin, and hibf initialises its `prev_ibf_id` to `{.ibf_idx = 0, .bin_idx = 0}`.
+    [[maybe_unused]] auto const top_level = std::ranges::find(max_ibf_sizes, 0uz, &ibf_max::ibf_idx);
     assert(top_level != max_ibf_sizes.end());
+    assert(index.ibf().ibf_vector[0].bin_count() + bins_needed(*top_level) > index.config().tmax
+           && "The top-level IBF could take the user bin, which a layout should not allow.");
 
-    auto & ibf = index.ibf().ibf_vector[0];
-    size_t const number_of_bins = required_technical_bins({.bin_size = ibf.bin_size(),
-                                                           .elements = kmer_count,
-                                                           .fpr = index.fpr(),
-                                                           .hash_count = ibf.hash_function_count(),
-                                                           .max_elements = top_level->max_elements});
-    size_t const bin_idx = ibf.bin_count();
-
-    // Growing the top-level IBF past tmax means the whole index has to be rebuilt. Report that instead of growing,
-    // so that the caller can rebuild right away rather than inserting the user bin into a discarded index first.
-    if (bin_idx + number_of_bins > index.config().tmax)
-        return std::nullopt;
-
-    index.mark_resized(0u);
-    ibf.increase_bin_number_to(seqan::hibf::bin_count{bin_idx + number_of_bins});
-
-    return insert_location{.ibf_idx = 0u, .bin_idx = bin_idx, .number_of_bins = number_of_bins};
+    return std::nullopt;
 }
 
 /*!\brief Registers a newly placed user bin in the bookkeeping of its IBF.

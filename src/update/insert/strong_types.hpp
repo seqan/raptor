@@ -10,6 +10,7 @@
 #pragma once
 
 #include <cstddef>
+#include <limits>
 
 namespace raptor::detail
 {
@@ -86,6 +87,12 @@ struct required_technical_bins_parameters
     size_t hash_count{};
     //!\brief The number of elements a single technical bin of this IBF can hold.
     size_t max_elements{};
+    /*!\brief The number of technical bins to stop at. Defaults to no limit.
+     * \details
+     * The number of bins is raised until the combined FPR is within budget, which may not happen for every
+     * combination of parameters. The limit bounds that search.
+     */
+    size_t limit{std::numeric_limits<size_t>::max()};
 };
 
 } // namespace raptor::detail

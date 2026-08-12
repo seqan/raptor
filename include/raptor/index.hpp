@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cassert>
 
 #include <cereal/types/string.hpp>
@@ -57,6 +58,13 @@ private:
     double fpr_{};
     seqan::hibf::config config_{};
     data_t ibf_{};
+    /*!\brief The number of IBFs the index had when it was built from a layout.
+     * \details
+     * Updating grows the index beyond the layout it was built from. Comparing the current state against this value
+     * gives a measure of how far the index has drifted from a proper layout. Must be declared after `ibf_`, because
+     * the constructor reads `ibf_.ibf_vector`. Reset whenever the index is rebuilt in full.
+     */
+    size_t original_number_of_ibfs_{};
     /*!\brief Whether an IBF has already been grown beyond the size its layout assigned to it. Indexed by IBF index.
      * \details
      * Only meaningful for the HIBF; empty for a plain IBF index. Must be declared after `ibf_`, because the
@@ -90,6 +98,7 @@ public:
         fpr_{config.maximum_fpr},
         config_{config},
         ibf_{std::move(ibf)},
+        original_number_of_ibfs_{ibf_.ibf_vector.size()},
         was_resized_(ibf_.ibf_vector.size())
     {}
 
@@ -162,6 +171,25 @@ public:
         return ibf_;
     }
 
+    //!\brief The number of IBFs the index had when it was built from a layout.
+    size_t original_number_of_ibfs() const
+        requires index_structure::is_hibf<data_t>
+    {
+        return original_number_of_ibfs_;
+    }
+
+    //!\brief The number of IBFs that have been grown beyond the size their layout assigned to them.
+    size_t number_of_resized_ibfs() const
+        requires index_structure::is_hibf<data_t>
+    {
+        size_t const host_size = seqan::hibf::divide_and_ceil(was_resized_.size(), 64ull);
+        uint64_t const * const ptr = was_resized_.data();
+        size_t result{};
+        for (size_t i = 0; i < host_size; ++i)
+            result += std::popcount(*(ptr + i));
+        return result;
+    }
+
     //!\brief Whether the IBF at `ibf_idx` has already been grown beyond the size its layout assigned to it.
     bool was_resized(size_t const ibf_idx) const
         requires index_structure::is_hibf<data_t>
@@ -213,6 +241,7 @@ public:
                 archive(is_hibf_);
                 archive(config_);
                 archive(ibf_);
+                archive(original_number_of_ibfs_);
                 archive(was_resized_);
             }
             // GCOVR_EXCL_START
