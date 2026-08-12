@@ -32,10 +32,16 @@ SPDX-License-Identifier: CC-BY-4.0
 - <b class="tab-title">HIBF</b>
 [`raptor prepare`] -> `raptor layout` -> `raptor build` -> `raptor search`
 
+- <b class="tab-title">DHIBF</b>
+[`raptor prepare`] -> `raptor layout --empty-bin-fraction (0.0,1.0)` -> `raptor build` -> `raptor search`
+
 - <b class="tab-title">IBF</b>
 [`raptor prepare`] -> `raptor build` -> `raptor search`
 
 </div>
+
+A DHIBF can additionally be updated after it has been built, i.e. user bins can be added and removed without
+rebuilding the index from all input data. This requires the layout to reserve empty bins, see \ref usage_update.
 
 # General decisions
 

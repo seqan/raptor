@@ -76,6 +76,17 @@ rounded to the next multiple of 64. Note that your tmax will always be rounded t
 At the expense of a longer runtime, you can enable the statistic mode that determines the best tmax for your
 data set. See the advanced option --determine-best-tmax Default: ≈sqrt(samples).
 
+## -​-empty-bin-fraction
+Sets the fraction of `tmax` that is kept empty in each IBF of the layout. Default: 0.
+
+Empty technical bins are what `raptor update` inserts new user bins into, so a value greater than `0` is required to
+build an index that can be updated later, see \ref usage_update_requirements. The reserved bins increase the size of
+the index, but the more of them there are, the more user bins can be inserted before the index has to be rebuilt.
+
+\note
+This parameter will be used by `raptor build`. An index built from a layout with the default value of `0` cannot be
+updated, and there is no way to change this without recomputing the layout.
+
 ## -​-alpha
 The layout algorithm optimizes the space consumption of the resulting HIBF but currently has no means of
 optimizing the runtime for querying such an HIBF. In general, the ratio of merged bins and split bins
