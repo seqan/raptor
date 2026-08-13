@@ -182,12 +182,7 @@ public:
     size_t number_of_resized_ibfs() const
         requires index_structure::is_hibf<data_t>
     {
-        size_t const host_size = seqan::hibf::divide_and_ceil(was_resized_.size(), 64ull);
-        uint64_t const * const ptr = was_resized_.data();
-        size_t result{};
-        for (size_t i = 0; i < host_size; ++i)
-            result += std::popcount(*(ptr + i));
-        return result;
+        return was_resized_.count();
     }
 
     //!\brief Whether the IBF at `ibf_idx` has already been grown beyond the size its layout assigned to it.
@@ -240,9 +235,9 @@ public:
                 archive(fpr_);
                 archive(is_hibf_);
                 archive(config_);
-                archive(ibf_);
                 archive(original_number_of_ibfs_);
                 archive(was_resized_);
+                archive(ibf_);
             }
             // GCOVR_EXCL_START
             catch (std::exception const & e)
