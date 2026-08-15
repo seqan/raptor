@@ -8,7 +8,7 @@
 # cmake-format: off
 
 # hibf
-set (RAPTOR_HIBF_VERSION 4efd36df3fa677bf2a521c17377eba2eacb26219 CACHE STRING "")
+set (RAPTOR_HIBF_VERSION 160a80994dd822fc70f01ae270bf3bde6f0ba458 CACHE STRING "")
 CPMDeclarePackage (hibf
                    NAME hibf
                    GIT_TAG ${RAPTOR_HIBF_VERSION} # main
@@ -40,7 +40,7 @@ CPMDeclarePackage (seqan3
                    OPTIONS "INSTALL_SEQAN3 OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING"
 )
 # chopper
-set (RAPTOR_CHOPPER_VERSION e43249ab99f2549cc9534eb8efb5abd00f5e5a0b CACHE STRING "")
+set (RAPTOR_CHOPPER_VERSION 08658c9b14740550bcb3f5d1483733fabb705049 CACHE STRING "")
 CPMDeclarePackage (chopper
                    NAME chopper
                    GIT_TAG ${RAPTOR_CHOPPER_VERSION} # main
@@ -62,7 +62,7 @@ CPMDeclarePackage (benchmark
                            "CMAKE_MESSAGE_LOG_LEVEL WARNING" "CMAKE_CXX_STANDARD ${CMAKE_CXX_STANDARD}"
 )
 # googletest
-set (RAPTOR_GOOGLETEST_VERSION 1.17.0 CACHE STRING "")
+set (RAPTOR_GOOGLETEST_VERSION 1.18.0 CACHE STRING "")
 CPMDeclarePackage (GTest
                    NAME GTest
                    VERSION ${RAPTOR_GOOGLETEST_VERSION}
