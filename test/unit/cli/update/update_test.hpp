@@ -9,10 +9,15 @@
 
 #pragma once
 
+#include <array>
 #include <map>
+#include <random>
 #include <set>
 #include <string>
 #include <vector>
+
+#include <seqan3/alphabet/nucleotide/dna4.hpp>
+#include <seqan3/io/sequence_file/output.hpp>
 
 #include <raptor/test/cli_test.hpp>
 
@@ -54,10 +59,44 @@ struct update_test : public raptor_base
         return result;
     }
 
-    /*!\brief Computes a layout for `bin_file` and builds an index from it.
-     * \details The empty bin fraction is what makes the index updatable, see raptor::update_parsing.
+    /*!\brief Writes `count` FASTA files with deterministic content into `directory` and returns their paths.
+     * \details
+     * The four shipped bins are identical whenever repeated, so a merged bin covering many of them holds barely more
+     * distinct k-mers than a single one. Growing an index to several IBFs, and filling those IBFs, needs user bins
+     * that actually differ. `std::mt19937_64` is fully specified, so the files are the same on every platform.
      */
-    void build_index(std::string const & bin_file, std::string const & output, size_t const tmax = 64u)
+    static std::vector<std::string>
+    generate_bins(std::string const & directory, size_t const count, uint64_t const seed = 42u)
+    {
+        static constexpr std::array<size_t, 4u> lengths{500u, 1000u, 2000u, 4000u};
+
+        std::filesystem::create_directories(directory);
+        std::mt19937_64 rng{seed};
+        std::vector<std::string> paths{};
+        paths.reserve(count);
+
+        for (size_t i = 0; i < count; ++i)
+        {
+            std::string const id{"bin_" + std::to_string(i)};
+            std::string const path{directory + '/' + id + ".fa"};
+
+            std::vector<seqan3::dna4> sequence(lengths[rng() % lengths.size()]);
+            for (seqan3::dna4 & base : sequence)
+                base.assign_rank(rng() % seqan3::dna4::alphabet_size);
+
+            seqan3::sequence_file_output fout{path};
+            fout.emplace_back(sequence, id);
+
+            paths.push_back(path);
+        }
+
+        return paths;
+    }
+
+    void build_index(std::string const & bin_file,
+                     std::string const & output,
+                     size_t const tmax = 64u,
+                     std::string const & empty_bin_fraction = "0.1")
     {
         cli_test_result const layout = execute_app("raptor",
                                                    "layout",
@@ -67,7 +106,8 @@ struct update_test : public raptor_base
                                                    "--fpr 0.05",
                                                    "--hash 2",
                                                    "--disable-estimate-union",
-                                                   "--empty-bin-fraction 0.1",
+                                                   "--empty-bin-fraction",
+                                                   empty_bin_fraction,
                                                    "--tmax",
                                                    std::to_string(tmax),
                                                    "--input",
