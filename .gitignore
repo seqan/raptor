@@ -36,3 +36,5 @@
 
 # Build directory
 /build/
+/.claude/
+/.vscode/
