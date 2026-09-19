@@ -8,7 +8,7 @@
 # cmake-format: off
 
 # hibf
-set (RAPTOR_HIBF_VERSION 7887834a58cb4bf04ccb61ce9d43125aec40a3bb CACHE STRING "")
+set (RAPTOR_HIBF_VERSION 7f252fd53d7521a159cd453db01f586b1bfd19db CACHE STRING "")
 CPMDeclarePackage (hibf
                    NAME hibf
                    GIT_TAG ${RAPTOR_HIBF_VERSION} # main
@@ -82,7 +82,7 @@ CPMDeclarePackage (use_ccache
                    EXCLUDE_FROM_ALL TRUE
 )
 # doxygen-awesome
-set (RAPTOR_DOXYGEN_AWESOME_VERSION 2.4.2 CACHE STRING "")
+set (RAPTOR_DOXYGEN_AWESOME_VERSION 2.5.0 CACHE STRING "")
 CPMDeclarePackage (doxygen_awesome
                    NAME doxygen_awesome
                    VERSION ${RAPTOR_DOXYGEN_AWESOME_VERSION}
