@@ -27,7 +27,7 @@ namespace raptor
 inline long peak_ram_in_KiB()
 {
     rusage usage;
-#    if __APPLE__
+#    ifdef __APPLE__
     return getrusage(RUSAGE_SELF, &usage) == 0 ? (usage.ru_maxrss >> 10) : -1L;
 #    else
     return getrusage(RUSAGE_SELF, &usage) == 0 ? usage.ru_maxrss : -1L;
