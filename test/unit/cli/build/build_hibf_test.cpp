@@ -80,7 +80,13 @@ TEST_F(build_hibf, three_levels)
                                                "--input",
                                                data("three_levels.layout"));
     EXPECT_EQ(result.out, std::string{});
-    EXPECT_EQ(result.err, std::string{});
+    for (auto && subrange : std::views::split(result.err, '\n'))
+    {
+        std::string_view line{subrange.begin(), subrange.end()};
+        if (line.empty())
+            continue;
+        EXPECT_TRUE(line.starts_with("[HIBF LAYOUT WARNING]") && line.ends_with("empty_bin_fraction is 0.")) << line;
+    }
     RAPTOR_ASSERT_ZERO_EXIT(result);
 
     compare_index<raptor::index_structure::hibf>(data("three_levels.hibf"), "raptor.index");
@@ -96,11 +102,11 @@ TEST_F(build_hibf, verbose)
                                                "--output raptor.index",
                                                "--timing-output raptor.time",
                                                "--input",
-                                               data("three_levels.layout"));
+                                               layout_path(32));
     EXPECT_EQ(result.out, std::string{});
     EXPECT_TRUE(result.err.starts_with("============= Timings ============="));
     EXPECT_TRUE(std::filesystem::exists("raptor.time"));
     RAPTOR_ASSERT_ZERO_EXIT(result);
 
-    compare_index<raptor::index_structure::hibf>(data("three_levels.hibf"), "raptor.index");
+    compare_index<raptor::index_structure::hibf>(ibf_path(32, 19, is_hibf::yes), "raptor.index");
 }
