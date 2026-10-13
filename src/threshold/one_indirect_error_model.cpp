@@ -7,6 +7,7 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
+#include <algorithm>
 #include <random>
 
 #include <raptor/threshold/forward_strand_minimiser.hpp>
@@ -75,7 +76,9 @@ one_indirect_error_model(size_t const query_length, size_t const window_size, se
                                   ((error_position < i) || (i + kmer_size <= error_position)); // (2)
         }
 
-        ++result[affected_minimiser];
+        // Up to 2 * (w - k) k-mers next to the error can change, which exceeds w if w > 2 * k. This has not been
+        // observed in sampling, but would write out of bounds. Count it as w, the most the model accounts for.
+        ++result[std::min(affected_minimiser, window_size)];
     }
 
     // Convert counts to log probabilities
