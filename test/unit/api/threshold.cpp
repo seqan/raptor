@@ -4,9 +4,11 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <cmath>
 #include <utility>
 
+#include <raptor/argument_parsing/search_arguments.hpp>
 #include <raptor/threshold/logspace.hpp>
 #include <raptor/threshold/pascal_row.hpp>
 #include <raptor/threshold/threshold.hpp>
@@ -188,6 +190,28 @@ TEST(minimiser, precompute_correction)
                                        2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u,
                                        3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 4u, 4u, 4u, 4u, 4u, 4u, 0u};
     EXPECT_EQ(raptor::threshold::precompute_correction(parameters), expected);
+}
+
+TEST(minimiser, search_arguments)
+{
+    raptor::search_arguments arguments{};
+    arguments.window_size = 40u;
+    arguments.shape = seqan3::ungapped{20u};
+    arguments.query_length = 99u;
+    arguments.fpr = 0.02; // Differs from the defaults of search_arguments and threshold_parameters.
+
+    raptor::threshold::threshold_parameters const parameters = arguments.make_threshold_parameters();
+    EXPECT_EQ(parameters.fpr, arguments.fpr);
+    EXPECT_EQ(parameters.p_max, arguments.p_max);
+    EXPECT_EQ(parameters.tau, arguments.tau);
+
+    // With an FPR of 0, every correction would be 0.
+    std::vector<size_t> const correction = raptor::threshold::precompute_correction(parameters);
+    EXPECT_TRUE(std::ranges::any_of(correction,
+                                    [](size_t const value)
+                                    {
+                                        return value > 0u;
+                                    }));
 }
 
 TEST(minimiser, at_most_minimiser_count)
