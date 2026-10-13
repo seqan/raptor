@@ -19,7 +19,8 @@ namespace raptor::threshold
 one_indirect_error_model(size_t const query_length, size_t const window_size, seqan3::shape const shape)
 {
     uint8_t const kmer_size{shape.size()};
-    size_t const max_number_of_minimiser{query_length - window_size + 1};
+    // Minimisers can begin at any k-mer position.
+    size_t const number_of_kmers{query_length - kmer_size + 1};
     size_t const iterations{10'000};
 
     std::mt19937_64 gen{0x1D2B8284D988C4D0};
@@ -33,9 +34,9 @@ one_indirect_error_model(size_t const query_length, size_t const window_size, se
     std::vector<seqan3::dna4> sequence(query_length);
 
     // Minimiser begin positions of original sequence
-    std::vector<uint8_t> minimiser_positions(max_number_of_minimiser, false);
+    std::vector<uint8_t> minimiser_positions(number_of_kmers, false);
     // Minimiser begin positions after introducing one error into the sequence
-    std::vector<uint8_t> minimiser_positions_error(max_number_of_minimiser, false);
+    std::vector<uint8_t> minimiser_positions_error(number_of_kmers, false);
     // In the worst case, one error can indirectly affect w minimisers
     std::vector<double> result(window_size + 1, 0.0);
     forward_strand_minimiser fwd_minimiser{window{static_cast<uint32_t>(window_size)}, shape};
@@ -68,7 +69,7 @@ one_indirect_error_model(size_t const query_length, size_t const window_size, se
         // An error destroyed a minimiser indirectly iff
         // (1) A minimiser begin position changed and
         // (2) The error occurs before the window or after the window
-        for (size_t i = 0; i < max_number_of_minimiser; ++i)
+        for (size_t i = 0; i < number_of_kmers; ++i)
         {
             affected_minimiser += (minimiser_positions[i] != minimiser_positions_error[i]) && // (1)
                                   ((error_position < i) || (i + kmer_size < error_position)); // (2)

@@ -145,14 +145,9 @@ TEST(minimiser, logspace_substract)
                                                              .tau = 0.9999};
 
     raptor::threshold::threshold const threshold{parameters};
-    // results for pseudorandom generators are implementation-defined
-#ifdef _LIBCPP_VERSION
-    std::vector<size_t> const expected{1u, 1u, 1u, 1u, 1u, 2u, 2u, 2u, 2u, 2u,  2u,  2u, 2u,
-                                       2u, 3u, 3u, 4u, 5u, 6u, 6u, 7u, 8u, 10u, 11u, 11u};
-#else
-    std::vector<size_t> const expected{1u, 1u, 1u, 1u, 1u, 2u, 2u, 2u, 2u, 2u,  2u,  2u, 2u,
-                                       2u, 3u, 3u, 4u, 5u, 6u, 6u, 7u, 8u, 10u, 10u, 11u};
-#endif
+    // Results for pseudorandom generators are implementation-defined, but libc++ and libstdc++ agree here.
+    std::vector<size_t> const expected{1u, 1u, 1u, 1u, 1u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u,
+                                       2u, 2u, 2u, 3u, 4u, 4u, 5u, 6u, 7u, 8u, 9u, 10u};
     ASSERT_EQ(expected.size(), 37u - 12u);
     for (size_t i = 12u; i < 37u; ++i)
         EXPECT_EQ(threshold.get(i), expected[i - 12u]) << i;
@@ -169,14 +164,9 @@ TEST(minimiser, precompute_threshold)
                                                              .tau = 0.9999};
 
     // One entry per number of minimisers, from 6 (32 / 5) to 28 (50 - 23 + 1).
-    // results for pseudorandom generators are implementation-defined
-#ifdef _LIBCPP_VERSION
+    // Results for pseudorandom generators are implementation-defined, but libc++ and libstdc++ agree here.
     std::vector<size_t> const expected{0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
-                                       0u, 1u, 1u, 2u, 3u, 4u, 4u, 5u, 6u, 7u, 7u};
-#else
-    std::vector<size_t> const expected{0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
-                                       0u, 1u, 1u, 2u, 3u, 4u, 4u, 5u, 6u, 7u, 8u};
-#endif
+                                       0u, 0u, 1u, 2u, 2u, 3u, 4u, 4u, 5u, 6u, 7u};
     EXPECT_EQ(raptor::threshold::precompute_threshold(parameters), expected);
 }
 
