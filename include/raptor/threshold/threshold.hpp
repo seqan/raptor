@@ -44,6 +44,7 @@ protected:
     size_t minimal_number_of_minimizers{};
     size_t maximal_number_of_minimizers{};
     double threshold_percentage{};
+    uint8_t errors{};
 };
 
 } // namespace raptor::threshold

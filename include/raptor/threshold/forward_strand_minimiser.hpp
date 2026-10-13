@@ -114,10 +114,10 @@ public:
         minimiser_begin.push_back(min.position);
 
         // For the following windows, we remove the first window k-mer (is now not in window) and add the new k-mer
-        // that results from the window shifting.
-        for (uint64_t i = kmers_per_window; i < max_number_of_minimiser; ++i)
+        // that results from the window shifting. i is the position of the new k-mer.
+        for (uint64_t i = kmers_per_window; i < forward_hashes.size(); ++i)
         {
-            uint64_t const new_hash{forward_hashes[i + kmers_per_window - 1]}; // Already did kmers_per_window - 1 many
+            uint64_t const new_hash{forward_hashes[i]};
 
             // There are two conditions when we need to recompute the minimum:
             bool const minimiser_leaves_window = window_hashes.front() == min;
