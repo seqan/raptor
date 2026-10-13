@@ -20,7 +20,7 @@ namespace raptor::threshold
     std::vector<double> result(n + 1);
 
     for (size_t i = 1; i <= n; ++i)
-        result[i] = result[i - 1] + std::log((n + 1 - i) / i);
+        result[i] = result[i - 1] + std::log(static_cast<double>(n + 1 - i) / i);
 
     return result;
 }

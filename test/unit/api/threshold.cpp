@@ -4,6 +4,9 @@
 
 #include <gtest/gtest.h>
 
+#include <cmath>
+
+#include <raptor/threshold/pascal_row.hpp>
 #include <raptor/threshold/threshold.hpp>
 
 static inline raptor::threshold::threshold_parameters const default_parameters{.window_size = 32,
@@ -12,6 +15,34 @@ static inline raptor::threshold::threshold_parameters const default_parameters{.
                                                                                .p_max = 0.15,
                                                                                .fpr = 0.05,
                                                                                .tau = 0.9999};
+
+TEST(pascal_row, exact)
+{
+    std::vector<double> const row = raptor::threshold::pascal_row(19u);
+    std::vector<long long> const expected{1,     19,    171,   969,   3876,  11628, 27132, 50388, 75582, 92378,
+                                          92378, 75582, 50388, 27132, 11628, 3876,  969,   171,   19,    1};
+
+    ASSERT_EQ(row.size(), expected.size());
+    for (size_t i = 0; i < row.size(); ++i)
+        EXPECT_EQ(std::llround(std::exp(row[i])), expected[i]) << i;
+}
+
+TEST(pascal_row, lgamma)
+{
+    // The largest deviation for n <= 250 is about 6e-13.
+    for (size_t n = 0; n <= 250u; ++n)
+    {
+        std::vector<double> const row = raptor::threshold::pascal_row(n);
+        ASSERT_EQ(row.size(), n + 1u);
+
+        double const log_n_factorial = std::lgamma(n + 1.0);
+        for (size_t i = 0; i <= n; ++i)
+        {
+            double const expected = log_n_factorial - std::lgamma(i + 1.0) - std::lgamma(n - i + 1.0);
+            EXPECT_NEAR(row[i], expected, 1e-9) << n << ' ' << i;
+        }
+    }
+}
 
 TEST(kmer_lemma, no_error)
 {
@@ -77,7 +108,7 @@ TEST(minimiser, with_error)
 
     for (size_t i = min_count; i < max_count; ++i)
     {
-        if (i == 59u) // 47 vs 44
+        if (i == 59u) // 44 vs 41
             continue;
         EXPECT_LE(threshold.get(i), threshold.get(i + 1u)) << i;
     }
@@ -116,15 +147,53 @@ TEST(minimiser, logspace_substract)
     raptor::threshold::threshold const threshold{parameters};
     // results for pseudorandom generators are implementation-defined
 #ifdef _LIBCPP_VERSION
-    std::vector<size_t> const expected{1u,  1u,  1u,  1u,  2u,  4u,  5u,  6u,  7u,  8u,  9u,  9u, 10u,
-                                       11u, 12u, 13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 22u, 23u};
+    std::vector<size_t> const expected{1u, 1u, 1u, 1u, 1u, 2u, 2u, 2u, 2u, 2u,  2u,  2u, 2u,
+                                       2u, 3u, 3u, 4u, 5u, 6u, 6u, 7u, 8u, 10u, 11u, 11u};
 #else
-    std::vector<size_t> const expected{1u,  1u,  1u,  1u,  2u,  4u,  5u,  6u,  7u,  7u,  8u,  9u, 10u,
-                                       11u, 12u, 13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 22u, 23u};
+    std::vector<size_t> const expected{1u, 1u, 1u, 1u, 1u, 2u, 2u, 2u, 2u, 2u,  2u,  2u, 2u,
+                                       2u, 3u, 3u, 4u, 5u, 6u, 6u, 7u, 8u, 10u, 10u, 11u};
 #endif
     ASSERT_EQ(expected.size(), 37u - 12u);
     for (size_t i = 12u; i < 37u; ++i)
         EXPECT_EQ(threshold.get(i), expected[i - 12u]) << i;
+}
+
+TEST(minimiser, precompute_threshold)
+{
+    raptor::threshold::threshold_parameters const parameters{.window_size = 23,
+                                                             .shape = seqan3::ungapped{19u},
+                                                             .query_length = 50u,
+                                                             .errors = 1u,
+                                                             .p_max = 0.15,
+                                                             .fpr = 0.05,
+                                                             .tau = 0.9999};
+
+    // One entry per number of minimisers, from 6 (32 / 5) to 28 (50 - 23 + 1).
+    // results for pseudorandom generators are implementation-defined
+#ifdef _LIBCPP_VERSION
+    std::vector<size_t> const expected{0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
+                                       0u, 1u, 1u, 2u, 3u, 4u, 4u, 5u, 6u, 7u, 7u};
+#else
+    std::vector<size_t> const expected{0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
+                                       0u, 1u, 1u, 2u, 3u, 4u, 4u, 5u, 6u, 7u, 8u};
+#endif
+    EXPECT_EQ(raptor::threshold::precompute_threshold(parameters), expected);
+}
+
+TEST(minimiser, precompute_correction)
+{
+    raptor::threshold::threshold_parameters const parameters{.window_size = 40,
+                                                             .shape = seqan3::ungapped{20u},
+                                                             .query_length = 99u,
+                                                             .p_max = 0.15,
+                                                             .fpr = 0.05,
+                                                             .tau = 0.9999};
+
+    // One entry per number of minimisers, from 3 (80 / 21) to 60 (99 - 40 + 1).
+    std::vector<size_t> const expected{0u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 2u, 2u, 2u, 2u, 2u, 2u,
+                                       2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u,
+                                       3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 4u, 4u, 4u, 4u, 4u, 4u, 0u};
+    EXPECT_EQ(raptor::threshold::precompute_correction(parameters), expected);
 }
 
 TEST(percentage, 100)
