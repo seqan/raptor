@@ -35,6 +35,7 @@ template <typename... types>
 }
 
 //!\brief The log of a difference of two log terms. (log_x - log_y)
+// log(x - y) = log_x + log(1 - std::exp(difference))
 // expm1 is more accurate than using exp if the difference is close to 0.
 // std::log1p(-std::exp(difference)) = std::log(1 + (-std::exp(difference)))
 //                                   = std::log(1 - std::exp(difference))
@@ -43,7 +44,7 @@ template <typename... types>
 [[nodiscard]] inline double substract(double const log_x, double const log_y) noexcept
 {
     double const difference{log_y - log_x};
-    return log_x + difference > -ln_2 ? std::log(-std::expm1(difference)) : std::log1p(-std::exp(difference));
+    return log_x + (difference > -ln_2 ? std::log(-std::expm1(difference)) : std::log1p(-std::exp(difference)));
 }
 
 struct add_fn

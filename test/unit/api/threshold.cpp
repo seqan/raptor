@@ -5,7 +5,9 @@
 #include <gtest/gtest.h>
 
 #include <cmath>
+#include <utility>
 
+#include <raptor/threshold/logspace.hpp>
 #include <raptor/threshold/pascal_row.hpp>
 #include <raptor/threshold/threshold.hpp>
 
@@ -42,6 +44,18 @@ TEST(pascal_row, lgamma)
             EXPECT_NEAR(row[i], expected, 1e-9) << n << ' ' << i;
         }
     }
+}
+
+TEST(logspace, substract)
+{
+    // y / x above and below 1 / 2 selects the expm1 and the log1p branch, respectively.
+    std::vector<std::pair<double, double>> const
+        values{{1.0, 0.2}, {0.8, 0.2}, {3.0, 1.0}, {1e-3, 1e-9}, {0.5, 0.49}, {2.0, 1.5}, {1.0, 0.6}};
+    for (auto const & [x, y] : values)
+        EXPECT_NEAR(raptor::logspace::substract(std::log(x), std::log(y)), std::log(x - y), 1e-12) << x << ' ' << y;
+
+    EXPECT_DOUBLE_EQ(raptor::logspace::substract(std::log(0.8), raptor::logspace::negative_inf), std::log(0.8));
+    EXPECT_EQ(raptor::logspace::substract(std::log(0.8), std::log(0.8)), raptor::logspace::negative_inf);
 }
 
 TEST(kmer_lemma, no_error)
