@@ -88,21 +88,11 @@ TEST(minimiser, no_error)
     auto threshold_params = default_parameters;
     threshold_params.window_size = 50u;
     raptor::threshold::threshold threshold{threshold_params};
-    size_t const min_count{11u};  // 219 / 19
-    size_t const max_count{201u}; // 250 - 50 + 1
 
-    for (size_t i = 0; i < min_count; ++i)
-        EXPECT_EQ(threshold.get(i), threshold.get(min_count)) << i;
-
-    EXPECT_EQ(threshold.get(max_count), threshold.get(max_count + 1u));
-    EXPECT_EQ(threshold.get(max_count), threshold.get(1000u));
-
-    for (size_t i = min_count; i < max_count; ++i)
-    {
-        if (i == 59u) // 63 vs 60
-            continue;
-        EXPECT_LE(threshold.get(i), threshold.get(i + 1u)) << i;
-    }
+    // Without errors, every minimiser is required, also outside the precomputed range [11, 201].
+    EXPECT_EQ(threshold.get(0u), 1u);
+    for (size_t i = 1u; i <= 1000u; ++i)
+        EXPECT_EQ(threshold.get(i), i) << i;
 }
 
 TEST(minimiser, with_error)
@@ -198,6 +188,33 @@ TEST(minimiser, precompute_correction)
                                        2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u,
                                        3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 3u, 4u, 4u, 4u, 4u, 4u, 4u, 0u};
     EXPECT_EQ(raptor::threshold::precompute_correction(parameters), expected);
+}
+
+TEST(minimiser, at_most_minimiser_count)
+{
+    // With k = 2 and w = 3, one error affects so few minimisers that the correction can exceed them.
+    raptor::threshold::threshold_parameters const parameters{.window_size = 3,
+                                                             .shape = seqan3::ungapped{2u},
+                                                             .query_length = 60u,
+                                                             .errors = 1u,
+                                                             .p_max = 0.15,
+                                                             .fpr = 0.05,
+                                                             .tau = 0.9999};
+
+    raptor::threshold::threshold const threshold{parameters};
+    std::vector<size_t> const thresholds = raptor::threshold::precompute_threshold(parameters);
+    std::vector<size_t> const correction = raptor::threshold::precompute_correction(parameters);
+
+    // One entry per number of minimisers, from 29 (59 / 2) to 58 (60 - 3 + 1).
+    ASSERT_EQ(thresholds.size(), 58u - 29u + 1u);
+    size_t exceeding{};
+    for (size_t i = 0; i < thresholds.size(); ++i)
+    {
+        size_t const number_of_minimisers{29u + i};
+        exceeding += thresholds[i] + correction[i] > number_of_minimisers;
+        EXPECT_LE(threshold.get(number_of_minimisers), number_of_minimisers) << number_of_minimisers;
+    }
+    EXPECT_GT(exceeding, 0u); // Otherwise, this test does not exercise the limit.
 }
 
 TEST(percentage, 100)

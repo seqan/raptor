@@ -38,15 +38,18 @@ public:
     {
         assert(threshold_kind == threshold_kinds::probabilistic);
 
-        std::vector<size_t> result;
+        std::vector<size_t> result(maximal_number_of_minimizers - minimal_number_of_minimizers + 1u);
 
-        std::ranges::transform(precomp_thresholds,
-                               precomp_correction,
-                               std::back_inserter(result),
-                               [](size_t const threshold, size_t const correction)
-                               {
-                                   return std::max<size_t>(1u, threshold + correction);
-                               });
+        for (size_t index = 0; index < result.size(); ++index)
+        {
+            size_t const number_of_minimisers{minimal_number_of_minimizers + index};
+            // Without errors, every minimiser is required and nothing was precomputed. Otherwise, the correction must
+            // not require more minimisers than there are.
+            size_t const value{
+                errors == 0u ? number_of_minimisers
+                             : std::min(number_of_minimisers, precomp_thresholds[index] + precomp_correction[index])};
+            result[index] = std::max<size_t>(1u, value);
+        }
 
         return result;
     }
