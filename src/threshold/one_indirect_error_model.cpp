@@ -68,11 +68,11 @@ one_indirect_error_model(size_t const query_length, size_t const window_size, se
         size_t affected_minimiser{};
         // An error destroyed a minimiser indirectly iff
         // (1) A minimiser begin position changed and
-        // (2) The error occurs before the window or after the window
+        // (2) The k-mer does not cover the error, i.e., the error occurs before or after the k-mer
         for (size_t i = 0; i < number_of_kmers; ++i)
         {
-            affected_minimiser += (minimiser_positions[i] != minimiser_positions_error[i]) && // (1)
-                                  ((error_position < i) || (i + kmer_size < error_position)); // (2)
+            affected_minimiser += (minimiser_positions[i] != minimiser_positions_error[i]) &&  // (1)
+                                  ((error_position < i) || (i + kmer_size <= error_position)); // (2)
         }
 
         ++result[affected_minimiser];
