@@ -105,6 +105,11 @@ raptor build --input layout.txt --output hibf.index
 raptor build --input binning2.layout --kmer 16 --hash 3 --fpr 0.1 --output hibf2.index
 ## [03_index_snippet_9]
 
+## [03_index_snippet_10]
+raptor inspect --index hibf.index
+raptor inspect --index hibf.index --detailed --format json --output hibf.json
+## [03_index_snippet_10]
+
 ## [04_search_snippet_1]
 seq -f "example_data/64/bins/bin_%02g.fasta" 0 1 63 > all_bin_paths.txt
 raptor build --input all_bin_paths.txt --output raptor.index

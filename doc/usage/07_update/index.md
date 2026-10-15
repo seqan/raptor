@@ -34,6 +34,8 @@ layout using 'raptor layout' with --empty-bin-fraction greater than 0, and rebui
 ```
 
 There is no way to retrofit this onto an existing index; the layout has to be recomputed and the index rebuilt.
+To check whether an existing index can be updated, run `raptor inspect --index raptor.index` (\ref usage_inspect). An
+index that can be updated reports `## Track occupancy = true`.
 
 \note
 Only an HIBF can be updated, so a layout is always required (\ref hibf_vs_ibf).
@@ -137,6 +139,8 @@ query1	0,2
 The technical bins that a deleted user bin occupied are reclaimed and reused by later insertions, so deleting and
 re-inserting does not permanently grow the index.
 
+`raptor inspect --index updated.index --detailed` lists the deleted user bins (\ref usage_inspect_structure).
+
 # Limitations
 
 * The index must have been built from a layout with `--empty-bin-fraction` greater than `0`
@@ -146,4 +150,5 @@ re-inserting does not permanently grow the index.
 * `--kmer`, `--window`, `--fpr` and `--hash` are taken from the index and cannot be changed by an update.
 * Inserting many user bins into an index is not as good as computing a layout for all of them at once. If the index
   has grown far beyond its original size, rebuilding it with `raptor layout` and `raptor build` may produce a
-  smaller and faster index.
+  smaller and faster index. `raptor inspect` reports how far the index has grown since it was last built from a
+  layout (\ref usage_inspect).
