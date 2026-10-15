@@ -50,6 +50,7 @@ add_library ("raptor_lib" INTERFACE)
 target_link_libraries ("raptor_lib"
                        INTERFACE "raptor::argument_parsing"
                                  "raptor::build"
+                                 "raptor::inspect"
                                  "raptor::prepare"
                                  "raptor::search"
                                  "raptor::threshold"
@@ -73,6 +74,7 @@ set_source_files_properties (raptor.cpp
 
 add_subdirectory (argument_parsing)
 add_subdirectory (build)
+add_subdirectory (inspect)
 add_subdirectory (layout)
 add_subdirectory (search)
 add_subdirectory (prepare)
