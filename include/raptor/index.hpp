@@ -178,6 +178,17 @@ public:
         return original_number_of_ibfs_;
     }
 
+    /*!\brief The number of IBFs, including the ones retired by an update.
+     * \details
+     * Read from the resize bookkeeping, which raptor::raptor_index::sync_resized keeps as large as `ibf_.ibf_vector`.
+     * Unlike `ibf().ibf_vector.size()`, this is also available after raptor::raptor_index::load_parameters.
+     */
+    size_t number_of_ibfs() const
+        requires index_structure::is_hibf<data_t>
+    {
+        return was_resized_.size();
+    }
+
     //!\brief The number of IBFs that have been grown beyond the size their layout assigned to them.
     size_t number_of_resized_ibfs() const
         requires index_structure::is_hibf<data_t>
@@ -256,6 +267,9 @@ public:
      * \tparam archive_t Type of `archive`; must satisfy seqan3::cereal_input_archive.
      * \param[in] archive The archive being serialised from/to.
      * \param[in] version Index version.
+     * \details
+     * Reads everything that precedes `ibf_` in the archive. The resize bookkeeping is small: one integer and one bit
+     * per IBF.
      *
      * \attention These functions are never called directly.
      * \sa https://docs.seqan.de/seqan/3.2.0/group__io.html#serialisation
@@ -276,6 +290,8 @@ public:
                 archive(fpr_);
                 archive(is_hibf_);
                 archive(config_);
+                archive(original_number_of_ibfs_);
+                archive(was_resized_);
             }
             // GCOVR_EXCL_START
             catch (std::exception const & e)
