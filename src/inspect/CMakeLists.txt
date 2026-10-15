@@ -8,6 +8,6 @@ if (TARGET raptor::inspect)
     return ()
 endif ()
 
-add_library ("raptor_inspect" STATIC json_writer.cpp)
+add_library ("raptor_inspect" STATIC index_metadata.cpp json_writer.cpp raptor_inspect.cpp write_metadata.cpp)
 target_link_libraries ("raptor_inspect" PUBLIC "raptor::interface")
 add_library (raptor::inspect ALIAS raptor_inspect)

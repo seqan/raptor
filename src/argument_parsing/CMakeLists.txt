@@ -12,6 +12,7 @@ add_library ("raptor_argument_parsing" STATIC
              build_arguments.cpp
              build_parsing.cpp
              compute_bin_size.cpp
+             inspect_parsing.cpp
              parse_bin_path.cpp
              prepare_parsing.cpp
              search_arguments.cpp
