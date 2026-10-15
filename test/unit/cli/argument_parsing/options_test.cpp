@@ -80,7 +80,7 @@ TEST_F(argparse_main, no_subparser)
 {
     cli_test_result const result = execute_app("raptor", "foo");
     std::string const expected{"[Error] You specified an unknown subcommand! Available subcommands are: "
-                               "[build, layout, prepare, search, update, upgrade]. "
+                               "[build, inspect, layout, prepare, search, update, upgrade]. "
                                "Use -h/--help for more information.\n"};
     EXPECT_EQ(result.out, std::string{});
     EXPECT_EQ(result.err, expected);

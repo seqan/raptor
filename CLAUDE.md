@@ -52,7 +52,7 @@ Raptor is a pre-filter for approximate membership queries over large collections
 [sharg](https://github.com/seqan/sharg-parser) and [chopper](https://github.com/seqan/chopper), all pulled via CPM
 and pinned in `cmake/package-lock.cmake`.
 
-Subcommands (`src/raptor.cpp`): `build`, `layout`, `prepare`, `search`, `update`, `upgrade`.
+Subcommands (`src/raptor.cpp`): `build`, `inspect`, `layout`, `prepare`, `search`, `update`, `upgrade`.
 
 Two index types: the **IBF** (flat, `raptor build` straight from sequence files) and the **HIBF** (hierarchical,
 requires a layout from `raptor layout`). Workflow: `[prepare] → [layout] → build → search`.

@@ -269,3 +269,15 @@ $ ls -la
 \note
 For a more detailed explanation of the Hierarchical Interleaved Bloom Filter (HIBF), please refer to the
 `raptor::hierarchical_interleaved_bloom_filter` API.
+
+## Inspecting an index
+
+`raptor inspect` prints the parameters an index was built with. For example, to check the parameters of `hibf.index`
+from the last assignment, and to store its structure as JSON:
+
+\snippet script.sh 03_index_snippet_10
+
+The first call reports, among others, the shape, the number of hash functions, and the false positive rate, which
+`raptor build` took from `layout.txt`. It only reads the beginning of the index file and is fast even for very large
+indices. The second call additionally loads the whole index to report the structure of the HIBF. See \ref usage_inspect
+for a description of the output.
