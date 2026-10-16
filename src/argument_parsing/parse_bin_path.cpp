@@ -18,35 +18,26 @@ namespace raptor
 namespace detail
 {
 
-void parse_bin_path(std::filesystem::path const & bin_file,
-                    std::vector<std::vector<std::string>> & bin_path,
-                    bool const is_hibf)
+void parse_bin_path(std::filesystem::path const & bin_file, std::vector<std::vector<std::string>> & bin_path)
 {
     std::ifstream istrm{bin_file};
 
-    if (is_hibf)
-    {
-        bin_path = chopper::layout::read_filenames_from(istrm);
-    }
-    else
-    {
-        std::string line{};
-        std::string file_name{};
-        std::vector<std::string> tmp{};
+    std::string line{};
+    std::string file_name{};
+    std::vector<std::string> tmp{};
 
-        while (std::getline(istrm, line))
+    while (std::getline(istrm, line))
+    {
+        if (!line.empty())
         {
-            if (!line.empty())
-            {
-                tmp.clear();
-                std::stringstream sstream{line};
+            tmp.clear();
+            std::stringstream sstream{line};
 
-                while (std::getline(sstream, file_name, ' '))
-                    if (!file_name.empty())
-                        tmp.emplace_back(std::move(file_name));
+            while (std::getline(sstream, file_name, ' '))
+                if (!file_name.empty())
+                    tmp.emplace_back(std::move(file_name));
 
-                bin_path.emplace_back(std::move(tmp));
-            }
+            bin_path.emplace_back(std::move(tmp));
         }
     }
 
@@ -57,7 +48,8 @@ void parse_bin_path(std::filesystem::path const & bin_file,
 
 void parse_bin_path(build_arguments & arguments)
 {
-    raptor::detail::parse_bin_path(arguments.bin_file, arguments.bin_path, arguments.is_hibf);
+    assert(!arguments.is_hibf);
+    raptor::detail::parse_bin_path(arguments.bin_file, arguments.bin_path);
     arguments.bins = arguments.bin_path.size();
     std::filesystem::path first_bin_path = arguments.bin_path[0][0];
     arguments.input_is_minimiser = first_bin_path.extension() == ".minimiser";
@@ -65,7 +57,7 @@ void parse_bin_path(build_arguments & arguments)
 
 void parse_bin_path(prepare_arguments & arguments)
 {
-    raptor::detail::parse_bin_path(arguments.bin_file, arguments.bin_path, false);
+    raptor::detail::parse_bin_path(arguments.bin_file, arguments.bin_path);
 }
 
 } // namespace raptor
