@@ -26,7 +26,9 @@ namespace raptor
  * is retired, see raptor::detail::retire_ibf: their bit vectors are released, but their slots in `ibf_vector` are
  * kept so that the IBF indices stored throughout the index stay valid.
  *
- * User bin IDs are not reassigned, hence the IDs of the remaining user bins stay valid.
+ * User bin IDs are not reassigned, hence the IDs of the remaining user bins stay valid. A deleted user bin keeps its
+ * entry in the bin path until a full rebuild drops it and renumbers the remaining user bins, see
+ * raptor::insert_user_bin.
  */
 void delete_user_bins(update_arguments const & arguments, raptor_index<index_structure::hibf> & index);
 

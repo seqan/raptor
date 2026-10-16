@@ -84,7 +84,7 @@ index built from sequence files and vice versa, as long as they were preprocesse
 Unlike `raptor build`, insertion currently supports only **one file per user bin**. A line holding several paths is
 rejected with `Currently not supporting multiple files per UB for insert.`
 
-## -​-no-partial-rebuild
+## -​-no-partial-rebuild {#usage_update_insert_rebuild}
 
 Inserting degrades an index over time: bins fill up beyond their target false positive rate, and IBFs grow past the
 `tmax` their layout assumed. Raptor repairs this automatically, and there are two ways to do so:
@@ -99,7 +99,8 @@ is needed at all. It trades update time for index quality, which can pay off if 
 
 \note
 A full rebuild processes *all* user bins, including the ones of the current call that have not been inserted yet.
-Once it happens, the remaining insertions of that call are already covered by it.
+Once it happens, the remaining insertions of that call are already covered by it. Deleted user bins are dropped,
+which renumbers the remaining ones (\ref usage_update_ids).
 
 # raptor update delete
 
@@ -122,11 +123,10 @@ query1	0,2
 
 Pass the option once per user bin.
 
-## Effect on user bin IDs
+## Effect on user bin IDs {#usage_update_ids}
 
-Deleting does **not** renumber the remaining user bins: their IDs stay valid across updates, which is what makes it
-safe to keep a mapping of your own. The path of a deleted user bin therefore still appears in the header of a search
-result, but the bin is never reported as a hit:
+Deleting does **not** renumber the remaining user bins. The path of a deleted user bin therefore still appears in the
+header of a search result, but the bin is never reported as a hit:
 
 ```
 #0	/path/to/bin1.fa
@@ -138,6 +138,21 @@ query1	0,2
 
 The technical bins that a deleted user bin occupied are reclaimed and reused by later insertions, so deleting and
 re-inserting does not permanently grow the index.
+
+A full rebuild during `raptor update insert` (\ref usage_update_insert_rebuild) treats the index as if the deleted user
+bins never existed: it drops them and renumbers the remaining user bins in their order. In the example above,
+`bin3.fa` becomes user bin `1`:
+
+```
+#0	/path/to/bin1.fa
+#1	/path/to/bin3.fa
+#QUERY_NAME	USER_BINS
+query1	0,1
+```
+
+`raptor update insert` decides by itself whether a full rebuild is needed. Once an index contains deleted user bins,
+an ID from before an insertion may therefore refer to a different user bin afterwards. Identify user bins by their
+path, as listed in the header of a search result or by `raptor inspect --user-bins`, rather than by their ID.
 
 `raptor inspect --index updated.index --detailed` lists the deleted user bins (\ref usage_inspect_structure).
 
