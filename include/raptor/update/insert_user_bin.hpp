@@ -29,9 +29,14 @@ namespace raptor
  *   or fully if the bin lies in the top-level IBF.
  *
  * A partial rebuild recomputes the layout of one subtree, a full rebuild recomputes the whole index from all user
- * bins, including the ones not inserted yet. Consequently, a full rebuild finishes the insertion of every remaining
- * user bin, and this function returns right after it. Setting `arguments.disable_partial_rebuild` replaces every
- * partial rebuild by a full one.
+ * bins that have not been deleted, including the ones not inserted yet. Consequently, a full rebuild finishes the
+ * insertion of every remaining user bin, and this function returns right after it. Setting
+ * `arguments.disable_partial_rebuild` replaces every partial rebuild by a full one.
+ *
+ * A full rebuild drops deleted user bins from the bin path and renumbers the remaining ones in their order, as if
+ * the deleted user bins never existed.
+ *
+ * The rebuilds are counted in `arguments.partial_rebuilds` and `arguments.full_rebuilds`.
  */
 void insert_user_bin(update_arguments const & arguments, raptor_index<index_structure::hibf> & index);
 

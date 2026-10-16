@@ -285,29 +285,48 @@ void partial_rebuild(update_arguments const & arguments,
     index.sync_resized(true);
 }
 
-/*!\brief Rebuilds `index` from scratch from all user bins in its bin path.
+/*!\brief Rebuilds `index` from scratch from all user bins in `bin_path` that have not been deleted.
  * \param[in] arguments The update arguments.
+ * \param[in] bin_path The bin path of `index`, followed by the user bins that have not been inserted yet.
  * \param[in,out] index The index to rebuild.
  * \details
  * Computes a fresh layout with automatic tmax, overriding the tmax the index was built with: it should always
  * perform better, especially when many user bins were inserted since.
+ *
+ * The rebuilt index is the same as one built from the remaining user bins: deleted user bins are dropped from the
+ * bin path, and the remaining user bins are renumbered in their order. Until then, a deleted user bin keeps its ID
+ * and its entry in the bin path, see raptor::delete_user_bins, but no technical bin refers to it anymore.
  */
-void full_rebuild(update_arguments const & arguments, raptor_index<index_structure::hibf> & index)
+void full_rebuild(update_arguments const & arguments,
+                  std::vector<std::vector<std::string>> bin_path,
+                  raptor_index<index_structure::hibf> & index)
 {
-    auto bin_path = index.bin_path();
+    std::vector<std::vector<std::string>> remaining_bin_path = [&]()
+    {
+        robin_hood::unordered_flat_set<uint64_t> referenced_ub_ids{};
+        get_ubs(referenced_ub_ids, index, 0u);
+
+        // User bins beyond the bin path of `index` have not been inserted yet.
+        std::vector<std::vector<std::string>> result{};
+        for (size_t ub_id = 0; ub_id < bin_path.size(); ++ub_id)
+            if (ub_id >= index.bin_path().size() || referenced_ub_ids.contains(ub_id))
+                result.push_back(std::move(bin_path[ub_id]));
+        return result;
+    }();
+
     auto const shape = index.shape();
     auto const window_size = static_cast<uint32_t>(index.window_size());
 
-    auto input_fn = [&bin_path, shape, window_size](size_t const user_bin_id, seqan::hibf::insert_iterator it)
+    auto input_fn = [&remaining_bin_path, shape, window_size](size_t const user_bin_id, seqan::hibf::insert_iterator it)
     {
-        detail::hash_paths_into(bin_path[user_bin_id], it, shape, window_size);
+        detail::hash_paths_into(remaining_bin_path[user_bin_id], it, shape, window_size);
     };
 
     seqan::hibf::config config{index.config()};
     // Force auto-tmax, overriding user tmax. It should always perform better, especially when inserting many bins.
     config.tmax = 0u;
     config.input_fn = std::move(input_fn);
-    config.number_of_user_bins = bin_path.size();
+    config.number_of_user_bins = remaining_bin_path.size();
     config.threads = arguments.threads;
     config.validate_and_set_defaults();
 
@@ -316,7 +335,7 @@ void full_rebuild(update_arguments const & arguments, raptor_index<index_structu
     index = raptor_index<index_structure::hibf>{window{window_size},
                                                 shape,
                                                 1u,
-                                                std::move(bin_path),
+                                                std::move(remaining_bin_path),
                                                 config,
                                                 std::move(hibf)};
 }
@@ -456,10 +475,11 @@ void insert_user_bin(update_arguments const & arguments, raptor_index<index_stru
             break;
         case rebuild_kind::partial:
             partial_rebuild(arguments, decision.location, index);
+            ++arguments.partial_rebuilds;
             break;
         case rebuild_kind::full:
-            index.replace_bin_path(std::move(full_rebuild_bin_path));
-            full_rebuild(arguments, index);
+            full_rebuild(arguments, std::move(full_rebuild_bin_path), index);
+            ++arguments.full_rebuilds;
             return;
         }
     }

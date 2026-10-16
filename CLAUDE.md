@@ -148,7 +148,8 @@ update; check rather than assume.
   rejects unsuitable indices up front; `try_claim_bins` asserts the precondition.
 * An update never modifies its input; it writes a new index to `--output`, which must not already exist.
 * Deleting does not renumber user bins. Deleted entries keep their IDs and stay in the bin path list; their
-  technical bins are reclaimed by later insertions.
+  technical bins are reclaimed by later insertions. A full rebuild drops them from the bin path and renumbers the
+  remaining user bins in their order, as if they had never existed.
 * Emptying an IBF completely retires it and its subtree (`src/update/subtree.hpp`). IBFs are never erased from
   `ibf_vector` — that would invalidate every stored IBF index — but their data is released.
 * `ibf_bin_to_user_bin_id` is the single source of truth for whether a bin is merged. `next_ibf_id` is only read

@@ -17,6 +17,7 @@ add_library ("raptor_argument_parsing" STATIC
              prepare_parsing.cpp
              search_arguments.cpp
              search_parsing.cpp
+             update_arguments.cpp
              update_parsing.cpp
              upgrade_parsing.cpp
 )

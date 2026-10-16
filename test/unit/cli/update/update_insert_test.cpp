@@ -204,3 +204,49 @@ TEST_F(update_insert, does_not_report_everything)
     ASSERT_EQ(searched.user_bins.size(), 4u);
     expect_hits(searched, std::set<size_t>{0u, 1u, 2u});
 }
+
+// With the default empty bin fraction of 0.1, inserting bin4.fa requires a full rebuild; with 0.3, it does not.
+TEST_F(update_insert, stats)
+{
+    ASSERT_NO_FATAL_FAILURE(build_index(write_bin_file("bins.txt", bins(3u)), "raptor.index", 64u, "0.3"));
+
+    cli_test_result const result = execute_app("raptor",
+                                               "update",
+                                               "insert",
+                                               "--threads 1",
+                                               "--index raptor.index",
+                                               "--output updated.index",
+                                               "--stats",
+                                               "--insert",
+                                               data("bin4.fa"));
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err,
+              std::string{"Inserted User Bins: 1\n"
+                          "Full Rebuilds: 0\n"
+                          "Partial Rebuilds: 0\n"});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
+}
+
+// The workload of triggers_rebuild. A full rebuild covers all user bins that have not been inserted yet, hence there
+// is at most one per call.
+TEST_F(update_insert, stats_full_rebuild)
+{
+    std::vector<std::string> const initial = get_repeated_bins(4u) | std::ranges::to<std::vector<std::string>>();
+    ASSERT_NO_FATAL_FAILURE(build_index(write_bin_file("bins.txt", initial), "raptor.index"));
+    write_bin_file("insert.txt", initial);
+
+    cli_test_result const result = execute_app("raptor",
+                                               "update",
+                                               "insert",
+                                               "--threads 1",
+                                               "--index raptor.index",
+                                               "--output updated.index",
+                                               "--stats",
+                                               "--insert insert.txt");
+    EXPECT_EQ(result.out, std::string{});
+    EXPECT_EQ(result.err,
+              std::string{"Inserted User Bins: 16\n"
+                          "Full Rebuilds: 1\n"
+                          "Partial Rebuilds: 0\n"});
+    RAPTOR_ASSERT_ZERO_EXIT(result);
+}

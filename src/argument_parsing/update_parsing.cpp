@@ -68,6 +68,10 @@ void init_insert_parser(sharg::parser & parser, update_arguments & arguments)
                     sharg::config{.short_id = '\0',
                                   .long_id = "no-partial-rebuild",
                                   .description = "Do not perform partial rebuilds, only full rebuilds."});
+    parser.add_flag(arguments.stats,
+                    sharg::config{.short_id = '\0',
+                                  .long_id = "stats",
+                                  .description = "Print the number of inserted user bins and of rebuilds to stderr."});
 }
 
 bool is_sequence_file(std::filesystem::path const & file_path)
@@ -144,6 +148,9 @@ void update_parsing(sharg::parser & parser)
     }
 
     raptor_update(arguments);
+
+    if (arguments.stats)
+        arguments.print_stats();
 }
 
 } // namespace raptor

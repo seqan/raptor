@@ -168,7 +168,7 @@ user bin 1 from the example index with `raptor update delete --index raptor.inde
 | Technical bins              | The number of technical bins in use, summed over all IBFs.                                |
 | Size [bits]                 | The size of all IBFs. The index file additionally contains the metadata.                  |
 | Number of retired IBFs      | HIBF only. Deleting every user bin of a lower-level IBF retires it: its slot is kept, but it holds no data. `Retired IBFs` lists them. |
-| Number of deleted user bins | HIBF only. Deleted user bins keep their ID, but are no longer part of the index and are never reported by `raptor search`. `Deleted user bins` lists them. |
+| Number of deleted user bins | HIBF only. Deleted user bins keep their ID until a full rebuild drops them (\ref usage_update_ids), but are no longer part of the index and are never reported by `raptor search`. `Deleted user bins` lists them. |
 
 `Retired IBFs` and `Deleted user bins` are omitted if there are none.
 
