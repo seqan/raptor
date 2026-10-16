@@ -18,8 +18,7 @@ namespace raptor
 namespace detail
 {
 
-void parse_bin_path(std::filesystem::path const & bin_file,
-                    std::vector<std::vector<std::string>> & bin_path)
+void parse_bin_path(std::filesystem::path const & bin_file, std::vector<std::vector<std::string>> & bin_path)
 {
     std::ifstream istrm{bin_file};
 
