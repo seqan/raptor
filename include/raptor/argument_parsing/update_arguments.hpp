@@ -42,11 +42,23 @@ struct update_arguments
      *          subtree.
      */
     bool disable_partial_rebuild{false};
+    //!\brief Whether to print a summary of the insertion to stderr, see raptor::update_arguments::print_stats.
+    bool stats{false};
 
     //!\brief The IDs of the user bins to delete.
     std::vector<size_t> user_bins_to_delete{};
     //!\brief The user bins to insert, one entry per user bin.
     std::vector<std::vector<std::string>> user_bins_to_insert{};
+
+    //!\brief The number of partial rebuilds performed by raptor::insert_user_bin.
+    mutable size_t partial_rebuilds{};
+    /*!\brief The number of full rebuilds performed by raptor::insert_user_bin.
+     * \details At most one: a full rebuild covers all user bins that have not been inserted yet.
+     */
+    mutable size_t full_rebuilds{};
+
+    //!\brief Prints the number of inserted user bins and of the rebuilds they required to stderr.
+    void print_stats() const;
 };
 
 } // namespace raptor

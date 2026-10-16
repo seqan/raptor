@@ -102,6 +102,18 @@ A full rebuild processes *all* user bins, including the ones of the current call
 Once it happens, the remaining insertions of that call are already covered by it. Deleted user bins are dropped,
 which renumbers the remaining ones (\ref usage_update_ids).
 
+## -​-stats
+
+Prints a summary to stderr once the insertion has finished:
+
+```
+Inserted User Bins: 1000
+Full Rebuilds: 1
+Partial Rebuilds: 82
+```
+
+`Full Rebuilds` is at most `1`: a full rebuild covers every user bin of the call that has not been inserted yet.
+
 # raptor update delete
 
 ```bash

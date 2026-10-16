@@ -35,6 +35,8 @@ namespace raptor
  *
  * A full rebuild drops deleted user bins from the bin path and renumbers the remaining ones in their order, as if
  * the deleted user bins never existed.
+ *
+ * The rebuilds are counted in `arguments.partial_rebuilds` and `arguments.full_rebuilds`.
  */
 void insert_user_bin(update_arguments const & arguments, raptor_index<index_structure::hibf> & index);
 

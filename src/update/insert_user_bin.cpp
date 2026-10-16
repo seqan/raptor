@@ -475,9 +475,11 @@ void insert_user_bin(update_arguments const & arguments, raptor_index<index_stru
             break;
         case rebuild_kind::partial:
             partial_rebuild(arguments, decision.location, index);
+            ++arguments.partial_rebuilds;
             break;
         case rebuild_kind::full:
             full_rebuild(arguments, std::move(full_rebuild_bin_path), index);
+            ++arguments.full_rebuilds;
             return;
         }
     }
