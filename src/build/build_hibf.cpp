@@ -7,9 +7,9 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <chopper/layout/input.hpp>
-
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp>
+
+#include <chopper/layout/input.hpp>
 
 #include <raptor/build/build_hibf.hpp>
 #include <raptor/build/store_index.hpp>
@@ -33,9 +33,9 @@ void build_hibf(build_arguments const & arguments)
     for (size_t part{0}; part < arguments.parts; ++part)
     {
         if (!layout_stream.good())
-            throw std::runtime_error{"Expected " + std::to_string(arguments.parts) +
-                                     " layouts (given config) but there are only " + std::to_string(part) +
-                                     " layouts in file " + arguments.bin_file.string()};
+            throw std::runtime_error{"Expected " + std::to_string(arguments.parts)
+                                     + " layouts (given config) but there are only " + std::to_string(part)
+                                     + " layouts in file " + arguments.bin_file.string()};
 
         auto [bin_paths, config, layout] = chopper::layout::read_layout_file(layout_stream);
 
