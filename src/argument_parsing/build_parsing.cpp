@@ -69,6 +69,8 @@ inline void parse_chopper_config(sharg::parser & parser, build_arguments & argum
         arguments.window_size = config.window_size;
 
     validate_shape(parser, arguments);
+
+    arguments.parts = config.number_of_partitions; // update number of partitions for the HIBF
 }
 
 inline void parse_shape_from_minimiser(sharg::parser & parser, build_arguments & arguments)
@@ -176,11 +178,14 @@ void init_build_parser(sharg::parser & parser, build_arguments & arguments)
                                     .description = "The number of hash functions to use.",
                                     .default_message = std::to_string(arguments.hash) + ", or read from layout file",
                                     .validator = sharg::arithmetic_range_validator{1, 5}});
-    parser.add_option(arguments.parts,
-                      sharg::config{.short_id = '\0',
-                                    .long_id = "parts",
-                                    .description = "Splits the index in this many parts. Not available for the HIBF.",
-                                    .validator = power_of_two_validator{}});
+    parser.add_option(
+        arguments.parts,
+        sharg::config{
+            .short_id = '\0',
+            .long_id = "parts",
+            .description =
+                "Splits the index in this many parts. Not available for the HIBF. Needs to be set at layouting step.",
+            .validator = power_of_two_validator{}});
 
     // GCOVR_EXCL_START
     // Adding additional cwl information that currently aren't supported by sharg and tdl.
@@ -257,12 +262,12 @@ void build_parsing(sharg::parser & parser)
     arguments.is_hibf = input_is_pack_file(arguments.bin_file);
 
     if (arguments.is_hibf && arguments.parts != 1u)
-        throw sharg::parser_error{"The HIBF cannot yet be partitioned."};
+        throw sharg::parser_error{"The HIBF cannot yet be partitioned when building. Please set parts when layouting."};
 
     parse_bin_path(arguments);
 
     if (arguments.is_hibf)
-        parse_chopper_config(parser, arguments);
+        parse_chopper_config(parser, arguments); // :PHIBF Only checks first config, which is fine as they are the same
 
     if (!arguments.input_is_minimiser)
         validate_shape(parser, arguments);
