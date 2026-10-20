@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <future>
 #include <omp.h>
 #include <vector>
 
@@ -32,6 +33,23 @@ void do_parallel(algorithm_t && worker, size_t const num_records, size_t const t
         size_t const extent = i == (number_of_chunks - 1) ? num_records - i * chunk_size : chunk_size;
         std::invoke(worker, start, extent);
     }
+}
+
+template <typename algorithm_t>
+void do_parallel(algorithm_t && worker, size_t const num_records, size_t const threads, bool const output_results)
+{
+    std::vector<decltype(std::async(std::launch::async, worker, size_t{}, size_t{}, bool{}))> tasks;
+    size_t const records_per_thread = num_records / threads;
+
+    for (size_t i = 0; i < threads; ++i)
+    {
+        size_t const start = records_per_thread * i;
+        size_t const extent = i == (threads - 1) ? num_records - i * records_per_thread : records_per_thread;
+        tasks.emplace_back(std::async(std::launch::async, worker, start, extent, output_results));
+    }
+
+    for (auto && task : tasks)
+        task.get();
 }
 
 } // namespace raptor
