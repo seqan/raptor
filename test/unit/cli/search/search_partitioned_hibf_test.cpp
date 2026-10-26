@@ -58,6 +58,61 @@ struct search_partitioned_hibf :
         return sequence;
     }
 
+    //!\brief The user bins, generated once for all tests.
+    static inline std::vector<std::string> const user_bins = []()
+    {
+        std::mt19937_64 rng{bin_seed};
+        std::vector<std::string> result{};
+        size_t const number_of_user_bins{128};
+
+        for (size_t i = 0; i < number_of_user_bins; ++i)
+        {
+            result.push_back(random_sequence(rng, bin_length));
+        }
+
+        return result;
+    }();
+
+    //!\brief The queries for the user bins.
+    struct query_sets
+    {
+        //!\brief `zero_errors[i]` is cut from user bin `i`.
+        std::vector<std::string> zero_errors{};
+        //!\brief `one_error[i]` is `zero_errors[i]` with one substitution.
+        std::vector<std::string> one_error{};
+        //!\brief Random sequences; none is expected to be found.
+        std::vector<std::string> no_hits{};
+    };
+
+    /*!\brief The queries, generated once for all tests.
+     * \details
+     * Not a namespace-scope structured binding: referencing one from a function with OpenMP enabled crashes
+     * Clang 19 and icpx 2025.0 in `SemaOpenMP::isOpenMPCapturedDecl`.
+     */
+    static inline query_sets const queries = []()
+    {
+        std::mt19937_64 rng{bin_seed + 1u};
+        std::vector<std::string> result_0_errors{};
+        std::vector<std::string> result_1_errors{};
+        std::vector<std::string> result_no_hit{};
+
+        for (size_t i = 0; i < user_bins.size(); ++i)
+        {
+            size_t const offset = rng() % (bin_length - query_length + 1u);
+            std::string query = user_bins[i].substr(offset, query_length);
+
+            result_0_errors.push_back(query);
+
+            char & base = query[query_length / 2];
+            base = (base == 'A') ? 'C' : 'A';
+
+            result_1_errors.push_back(query);
+            result_no_hit.push_back(random_sequence(rng, query_length));
+        }
+
+        return query_sets{.zero_errors = result_0_errors, .one_error = result_1_errors, .no_hits = result_no_hit};
+    }();
+
     //!\brief Writes the user bin file for `raptor layout`, one path per line.
     void write_user_bins(std::filesystem::path const & filename, std::vector<std::string> const & bins)
     {
@@ -171,46 +226,6 @@ struct search_partitioned_hibf :
     }
 };
 
-// create global instance in order to generate sequences only once
-std::vector<std::string> const global_user_bins = []()
-{
-    std::mt19937_64 rng{search_partitioned_hibf::bin_seed};
-    std::vector<std::string> result{};
-    size_t const number_of_user_bins{128};
-
-    for (size_t i = 0; i < number_of_user_bins; ++i)
-    {
-        result.push_back(search_partitioned_hibf::random_sequence(rng, search_partitioned_hibf::bin_length));
-    }
-
-    return result;
-}();
-
-auto const [global_queries_0_errors, global_queries_1_error, global_queries_no_hit] = []()
-{
-    std::mt19937_64 rng{search_partitioned_hibf::bin_seed + 1u};
-    std::vector<std::string> result_0_errors{};
-    std::vector<std::string> result_1_errors{};
-    std::vector<std::string> result_no_hit{};
-
-    for (size_t i = 0; i < global_user_bins.size(); ++i)
-    {
-        size_t const offset =
-            rng() % (search_partitioned_hibf::bin_length - search_partitioned_hibf::query_length + 1u);
-        std::string query = global_user_bins[i].substr(offset, search_partitioned_hibf::query_length);
-
-        result_0_errors.push_back(query);
-
-        char & base = query[search_partitioned_hibf::query_length / 2];
-        base = (base == 'A') ? 'C' : 'A';
-
-        result_1_errors.push_back(query);
-        result_no_hit.push_back(search_partitioned_hibf::random_sequence(rng, search_partitioned_hibf::query_length));
-    }
-
-    return std::tuple{result_0_errors, result_1_errors, result_no_hit};
-}();
-
 TEST_P(search_partitioned_hibf, with_threshold)
 {
     auto const [parts, number_of_errors, approach] = GetParam();
@@ -220,12 +235,12 @@ TEST_P(search_partitioned_hibf, with_threshold)
     std::filesystem::path const index_filename = test_directory.path() / "raptor.index";
     std::filesystem::path const search_filename = test_directory.path() / "search.out";
 
-    write_user_bins(input_filename, global_user_bins);
+    write_user_bins(input_filename, user_bins);
 
     if (number_of_errors == 0)
-        write_queries(query_filename, global_queries_0_errors);
+        write_queries(query_filename, queries.zero_errors);
     else
-        write_queries(query_filename, global_queries_1_error);
+        write_queries(query_filename, queries.one_error);
 
     ASSERT_NO_FATAL_FAILURE(build_partitioned_index(input_filename, index_filename, parts, approach));
 
@@ -249,8 +264,8 @@ TEST_P(search_partitioned_hibf, with_threshold)
     ASSERT_TRUE(std::filesystem::exists(search_filename));
     search_result const result = parse_search_result(search_filename);
 
-    EXPECT_EQ(result.user_bins.size(), global_user_bins.size());
-    EXPECT_EQ(result.queries.size(), global_user_bins.size());
+    EXPECT_EQ(result.user_bins.size(), user_bins.size());
+    EXPECT_EQ(result.queries.size(), user_bins.size());
 
     for (size_t i = 0; i < result.queries.size(); ++i)
     {
@@ -279,8 +294,8 @@ TEST_P(search_partitioned_hibf, no_hits)
     std::filesystem::path const index_filename = test_directory.path() / "raptor.index";
     std::filesystem::path const search_filename = test_directory.path() / "search.out";
 
-    write_user_bins(input_filename, global_user_bins);
-    write_queries(query_filename, global_queries_no_hit);
+    write_user_bins(input_filename, user_bins);
+    write_queries(query_filename, queries.no_hits);
 
     ASSERT_NO_FATAL_FAILURE(build_partitioned_index(input_filename, index_filename, parts, approach));
 
@@ -305,15 +320,15 @@ TEST_P(search_partitioned_hibf, no_hits)
     ASSERT_TRUE(std::filesystem::exists(search_filename));
     search_result const result = parse_search_result(search_filename);
 
-    EXPECT_EQ(result.user_bins.size(), global_user_bins.size());
+    EXPECT_EQ(result.user_bins.size(), user_bins.size());
     for (auto const & user_bin : result.user_bins)
     {
         std::string const start = test_directory.path().string() + "/user_bin_";
         ASSERT_TRUE(user_bin.starts_with(start)) << user_bin;
-        EXPECT_LT(std::stoull(user_bin.substr(start.size())), global_user_bins.size()); // index is in correct range
+        EXPECT_LT(std::stoull(user_bin.substr(start.size())), user_bins.size()); // index is in correct range
     }
 
-    EXPECT_EQ(result.queries.size(), global_queries_no_hit.size());
+    EXPECT_EQ(result.queries.size(), queries.no_hits.size());
     for (size_t i = 0; i < result.queries.size(); ++i)
         EXPECT_TRUE(result.hits[i].empty()) << "Query: " << result.queries[i] << "is not empty";
 }
