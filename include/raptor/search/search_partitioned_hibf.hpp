@@ -131,11 +131,6 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
         for (int part = 0; part < arguments.parts - 1; ++part)
         {
             do_parallel(worker, records.size(), arguments.threads, false /*do not write results*/);
-            arguments.write_timings_to_file();
-            arguments.compute_minimiser_timer = {};
-            arguments.query_ibf_timer = {};
-            arguments.generate_results_timer = {};
-            arguments.load_index_timer = {};
             load_index(index, arguments, part + 1);
             if (first_chunk)
             {
@@ -152,7 +147,6 @@ void search_partitioned_hibf(search_arguments const & arguments, index_t && inde
             synced_out.write_header(arguments_copy, index.ibf().ibf_vector[0].hash_function_count());
         }
         do_parallel(worker, records.size(), arguments.threads, true /*write results*/);
-        arguments.write_timings_to_file();
 
         first_chunk = false;
         bin_path_index_offset = 0;
