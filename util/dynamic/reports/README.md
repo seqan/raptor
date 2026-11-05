@@ -6,8 +6,10 @@ SPDX-License-Identifier: CC-BY-4.0
 
 # Interactive Reports
 
-This directory contains the static HTML reports. You can either open the HTML files directly in your browser or serve
-the directory locally (recommended) so that relative links and assets work correctly.
+This directory contains the static HTML reports, which are also published at https://docs.seqan.de/dynamic.
+
+The reports are self-contained, so you can either open `index.html` directly in your browser or serve the directory
+locally.
 
 ## Quick start
 
@@ -26,8 +28,15 @@ python3 -m http.server --bind 127.0.0.1 8000
 
 Then open the reports at `http://127.0.0.1:8000` in your browser.
 
+## Updating reports
+
+After adding or regenerating a report, run `util/dynamic/reports/patch_reports.py`. It adds a licence header and a link
+back to `index.html` to each report and sets the page title to the file name. A new report also needs an entry in
+`index.html`.
+
 ## Troubleshooting
 
 - `Address already in use`: choose a different port, e.g., `8080`.
-- Missing assets or broken links: ensure you are serving the `util/dynamic/reports` directory (not a parent/child directory that lacks files).
+- Broken links: ensure you are serving the `util/dynamic/reports` directory (not a parent/child directory that lacks
+  files).
 - No `python3` command: try `python` instead of `python3` if your system's Python 3 is available as `python`.
