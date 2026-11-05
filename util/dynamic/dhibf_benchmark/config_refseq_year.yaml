@@ -1,0 +1,51 @@
+threads: 24
+repeat: 1
+
+workdir: "/home/mi/pirov/srv_data/dhibf_bench/refseq_year/"
+#input_files_list: ""
+initial_files: "/home/mi/pirov/srv_data/dhibf_bench/data/arc_bac_rs_cg_202410-202509/2026-10-14_15-15-11/filenames.txt"
+update_files_dir: "/home/mi/pirov/srv_data/dhibf_bench/data/arc_bac_rs_cg_202510-202609_weeks/"
+query_file: ""
+
+initial_batch: 0
+incremental_batch: 0
+max_batches: 0
+
+# size in bytes
+size_cmd: "du --bytes --dereference --summarize"
+report_unit: "GiB"  # "MiB"
+create_eval_file: False
+
+tools:
+  raptor: 
+    path: "/home/mi/pirov/code/raptor/build/bin/raptor"
+    fixed_args:
+      prepare: "--window 24 --kmer 20"
+      layout: "--window 24 --kmer 20 --fpr 0.05 --hash 2 --disable-estimate-union"
+      build: ""
+    args:
+      "--empty-bin-fraction": 0.1
+    query_args: "--threshold 0.8"
+  raptor_static: 
+    path: "/home/mi/pirov/code/raptor/build/bin/raptor"
+    fixed_args:
+      prepare: "--window 24 --kmer 20"
+      layout: "--window 24 --kmer 20 --fpr 0.05 --hash 2 --disable-estimate-union --empty-bin-fraction 0"
+      build: ""
+    args:
+    query_args: "--threshold 0.8"
+  cobs:
+    path: "cobs"
+    fixed_args: "--term-size 20 --false-positive-rate 0.05 --num-hashes 2"
+    args:
+    query_args: "--load-complete --threshold 0.8"
+  fulgor:
+    path: "fulgor"
+    fixed_args: "-k 24 -m 20 -g 512"
+    args:
+    query_args: ""
+  metagraph:
+    path: "metagraph"
+    fixed_args: "--kmer-length 20"
+    args:
+    query_args: "--min-kmers-fraction-label 0.8"

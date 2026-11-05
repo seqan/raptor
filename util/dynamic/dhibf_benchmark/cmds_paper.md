@@ -1,9 +1,3 @@
-<!--
-SPDX-FileCopyrightText: 2006-2026, Knut Reinert & Freie Universität Berlin
-SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
-SPDX-License-Identifier: BSD-3-Clause
--->
-
 # Simulated (even/RefSeq): k=20, w=20
 # HumanRNA 1%: k=20, w=24
 
@@ -29,10 +23,10 @@ metagraph query --min-kmers-fraction-label 0.8 -p 24 -i ${index} -a ${index} ${q
 ## raptor_dynamic
 ### initial build
 raptor layout --threads 24 --input ${input_fof} --output ${layout} --window ${w} --kmer ${k} --fpr 0.05 --hash 2 --disable-estimate-union --empty-bin-fraction 0.1
-raptor build --threads 24 --input ${layout} --output ${index}
+raptor build --threads 24 --input ${layout} --output ${index} 
 ### batch updates
 raptor update insert --threads 24 --index ${prev_output} --output ${index} --insert ${input_fof_batch}
-### query
+### query            
 raptor search --error 2 --query_length 250 --threads 24 --index ${index} --query ${query} --output ${results}
 
 ## raptor_static
@@ -46,9 +40,9 @@ raptor search --error 2 --query_length 250 --threads 24 --index ${index} --query
 ### initial build
 raptor prepare --threads 24 --input ${input_fof} --output ${prepare} --window 24 --kmer 20 --use-filesize-dependent-cutoff
 raptor layout --threads 24 --input ${prepare}/minimiser.list --output ${layout} --window 24 --kmer 20 --fpr 0.05 --hash 2 --disable-estimate-union --empty-bin-fraction 0.1
-raptor build --threads 24 --input ${layout} --output ${index}
+raptor build --threads 24 --input ${layout} --output ${index} 
 ### batch updates
 raptor prepare --threads 24 --input ${input_fof_batch} --output ${prepare_batch} --window 24 --kmer 20 --use-filesize-dependent-cutoff
 raptor update insert --threads 24 --index ${prev_output} --output ${index} --insert ${prepare_batch}/minimiser.list
-### query
+### query            
 raptor search --error 2 --query_length 250 --threads 24 --index ${index} --query ${query} --output ${results}

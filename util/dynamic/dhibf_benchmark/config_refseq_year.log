@@ -1,0 +1,460 @@
+nohup: ignoring input
+/home/mi/pirov/code/dhibf_benchmark/tools/raptor.smk:86: SyntaxWarning: invalid escape sequence '\('
+  # no prepare
+/home/mi/pirov/code/dhibf_benchmark/tools/raptor.smk:213: SyntaxWarning: invalid escape sequence '\('
+/home/mi/pirov/code/dhibf_benchmark/tools/cobs.smk:84: SyntaxWarning: invalid escape sequence '\*'
+/home/mi/pirov/code/dhibf_benchmark/tools/cobs.smk:134: SyntaxWarning: invalid escape sequence '\*'
+Assuming unrestricted shared filesystem usage.
+host: augustus
+Building DAG of jobs...
+Creating conda environment /home/mi/pirov/code/dhibf_benchmark/tools/../envs/metagraph.yaml...
+Downloading and installing remote packages.
+Cleaning up conda package tarballs.
+Environment for /home/mi/pirov/code/dhibf_benchmark/tools/../envs/metagraph.yaml created (location: .snakemake/conda/04d8eadfe0bcb32d028aa148a8338f1a_)
+Creating conda environment /home/mi/pirov/code/dhibf_benchmark/tools/../envs/cobs.yaml...
+Downloading and installing remote packages.
+Cleaning up conda package tarballs.
+Environment for /home/mi/pirov/code/dhibf_benchmark/tools/../envs/cobs.yaml created (location: .snakemake/conda/652e9321f794944f25231860b48457b7_)
+Using shell: /usr/bin/bash
+Provided cores: 50
+Rules claiming more threads will be scaled down.
+Job stats:
+job                       count
+----------------------  -------
+all                           1
+cobs_batch_update             1
+fulgor_batch_update           1
+metagraph_batch_update        1
+raptor_batch_update           1
+summarize                     4
+total                         9
+
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver, falling back to greedy scheduler. You likely have to fix your ILP solver installation. Error message: PULP_CBC_CMD: Not Available (check permissions on cbc)
+Execute 2 jobs...
+
+[Fri Oct 16 17:04:37 2026]
+localrule cobs_batch_update:
+    input: input_data/initial_files.txt, input_data/batches
+    output: cobs/default/bench.tsv
+    log: cobs/default/batch_update.log
+    jobid: 7
+    benchmark: cobs/default/batch_update.bench.tsv
+    reason: Missing output files: cobs/default/bench.tsv
+    wildcards: args=default
+    threads: 24
+    resources: tmpdir=/tmp
+Shell command: 
+        if [[ -z "" ]]; then
+            last_batch=$(ls input_data/batches/insert_batch_* | wc -l)
+        else
+            last_batch=
+        fi
+
+        for BATCH in $(seq 1 ${last_batch}); do
+            echo "${BATCH}" >> cobs/default/batch_update.log
+            
+            output="cobs/default/${BATCH}.index.cobs_compact"
+            cat input_data/initial_files.txt > cobs/default/${BATCH}.list
+            seq 1 ${BATCH} | xargs -I {} cat input_data/batches/insert_batch_{}.txt >> cobs/default/${BATCH}.list
+
+            # BUILD FROM SCRATCH
+            /usr/bin/time -f "${BATCH}	build	%E	%e	%M	%t	%I	%O	[%C]" -a -o cobs/default/bench.tsv cobs compact-construct --file-type list                         --threads 24                         --term-size 20 --false-positive-rate 0.05 --num-hashes 2                          cobs/default/${BATCH}.list "${output}"  >> cobs/default/batch_update.log 2>&1
+            xargs -I {} rm -f {}.cobs_cache < cobs/default/${BATCH}.list
+
+            #SIZE
+            du --bytes --dereference --summarize "${output}" | sed "s/^/${BATCH}	size	/" >> cobs/default/bench.tsv
+
+            # QUERY
+            if [[ -n "" ]]; then
+                /usr/bin/time -f "${BATCH}	query	%E	%e	%M	%t	%I	%O	[%C]" -a -o cobs/default/bench.tsv cobs query --load-complete --threshold 0.8                                                             --index "${output}"                                                             --file ""                                                             --threads 24 > "cobs/default/${BATCH}.query" 2>> cobs/default/batch_update.log
+                
+                # AVG. QUERY HITS
+                grep "^\*" "cobs/default/${BATCH}.query" | cut -f 2 | awk -v batch=${BATCH} '{s+=$1}END{print batch"	avg_query	"s/NR}' >> cobs/default/bench.tsv
+
+                # EVAL
+                if [[ "False" == "True" ]]; then
+                    awk '{if($1 ~ /^\*/){printf "\n"$1"\t"}else{printf $1"\t"}}END{print ""}' cobs/default/${BATCH}.query | tail -n+2 | tr -d '*' > cobs/default/${BATCH}.eval
+                    /home/mi/pirov/code/dhibf_benchmark/scripts/query_eval.py cobs/default/${BATCH}.eval 0 0 | sed "s/^/${BATCH}	/" >> cobs/default/bench.tsv
+                fi
+
+                rm "cobs/default/${BATCH}.query"
+            fi
+            
+            # Delete index
+            rm -f "${output}" cobs/default/${BATCH}.list
+        done
+        
+
+[Fri Oct 16 17:04:37 2026]
+localrule fulgor_batch_update:
+    input: input_data/initial_files.txt, input_data/batches
+    output: fulgor/default/bench.tsv
+    log: fulgor/default/batch_update.log
+    jobid: 9
+    benchmark: fulgor/default/batch_update.bench.tsv
+    reason: Missing output files: fulgor/default/bench.tsv
+    wildcards: args=default
+    threads: 24
+    resources: tmpdir=/tmp
+Shell command: 
+        if [[ -z "" ]]; then
+            last_batch=$(ls input_data/batches/insert_batch_* | wc -l)
+        else
+            last_batch=
+        fi
+
+        for BATCH in $(seq 1 ${last_batch}); do
+            echo "${BATCH}" >> fulgor/default/batch_update.log
+            
+            output="fulgor/default/${BATCH}.index"
+            cat input_data/initial_files.txt > fulgor/default/${BATCH}.list
+            seq 1 ${BATCH} | xargs -I {} cat input_data/batches/insert_batch_{}.txt >> fulgor/default/${BATCH}.list
+           
+            # BUILD FROM SCRATCH
+            /usr/bin/time -f "${BATCH}	build	%E	%e	%M	%t	%I	%O	[%C]" -a -o fulgor/default/bench.tsv fulgor build -d "fulgor/default"                                                         -l "fulgor/default/${BATCH}.list"                                                         -o "${output}"                                                         -t 24                                                         -k 24 -m 20 -g 512  >> fulgor/default/batch_update.log 2>&1
+
+            #SIZE
+            du --bytes --dereference --summarize "${output}.fur" | sed "s/^/${BATCH}	size	/" >> fulgor/default/bench.tsv
+
+            # QUERY
+            if [[ -n "" ]]; then
+                /usr/bin/time -f "${BATCH}	query	%E	%e	%M	%t	%I	%O	[%C]" -a -o fulgor/default/bench.tsv fulgor pseudoalign                                                                      -i "${output}.fur"                                                                     -q ""                                                                     -o fulgor/default/${BATCH}.query                                                                     -t 24 >> fulgor/default/batch_update.log 2>&1
+
+                # AVG. QUERY HITS
+                cut -f 2 "fulgor/default/${BATCH}.query" | awk -v batch=${BATCH} '{s+=$1}END{print batch"	avg_query	"s/NR}' >> fulgor/default/bench.tsv
+
+                # EVAL
+                if [[ "False" == "True" ]]; then
+                    awk -F"	" '{print $1"	"$3; for(i=4;i<=NF;i++) print $1"	"$i;}' fulgor/default/${BATCH}.query > fulgor/default/${BATCH}.eval
+                    /home/mi/pirov/code/dhibf_benchmark/scripts/query_eval.py fulgor/default/${BATCH}.eval 0 0 | sed "s/^/${BATCH}	/" >> fulgor/default/bench.tsv
+                fi
+
+                rm "fulgor/default/${BATCH}.query"
+            fi
+            
+            # Delete index
+            rm -f "${output}.fur" "fulgor/default/${BATCH}.list"
+        done
+        
+Activating conda environment: .snakemake/conda/652e9321f794944f25231860b48457b7_
+RuleException:
+CalledProcessError in file "/home/mi/pirov/code/dhibf_benchmark/tools/fulgor.smk", line 31:
+Command 'set -euo pipefail;  
+        if [[ -z "" ]]; then
+            last_batch=$(ls input_data/batches/insert_batch_* | wc -l)
+        else
+            last_batch=
+        fi
+
+        for BATCH in $(seq 1 ${last_batch}); do
+            echo "${BATCH}" >> fulgor/default/batch_update.log
+            
+            output="fulgor/default/${BATCH}.index"
+            cat input_data/initial_files.txt > fulgor/default/${BATCH}.list
+            seq 1 ${BATCH} | xargs -I {} cat input_data/batches/insert_batch_{}.txt >> fulgor/default/${BATCH}.list
+           
+            # BUILD FROM SCRATCH
+            /usr/bin/time -f "${BATCH}	build	%E	%e	%M	%t	%I	%O	[%C]" -a -o fulgor/default/bench.tsv fulgor build -d "fulgor/default"                                                         -l "fulgor/default/${BATCH}.list"                                                         -o "${output}"                                                         -t 24                                                         -k 24 -m 20 -g 512  >> fulgor/default/batch_update.log 2>&1
+
+            #SIZE
+            du --bytes --dereference --summarize "${output}.fur" | sed "s/^/${BATCH}	size	/" >> fulgor/default/bench.tsv
+
+            # QUERY
+            if [[ -n "" ]]; then
+                /usr/bin/time -f "${BATCH}	query	%E	%e	%M	%t	%I	%O	[%C]" -a -o fulgor/default/bench.tsv fulgor pseudoalign                                                                      -i "${output}.fur"                                                                     -q ""                                                                     -o fulgor/default/${BATCH}.query                                                                     -t 24 >> fulgor/default/batch_update.log 2>&1
+
+                # AVG. QUERY HITS
+                cut -f 2 "fulgor/default/${BATCH}.query" | awk -v batch=${BATCH} '{s+=$1}END{print batch"	avg_query	"s/NR}' >> fulgor/default/bench.tsv
+
+                # EVAL
+                if [[ "False" == "True" ]]; then
+                    awk -F"	" '{print $1"	"$3; for(i=4;i<=NF;i++) print $1"	"$i;}' fulgor/default/${BATCH}.query > fulgor/default/${BATCH}.eval
+                    /home/mi/pirov/code/dhibf_benchmark/scripts/query_eval.py fulgor/default/${BATCH}.eval 0 0 | sed "s/^/${BATCH}	/" >> fulgor/default/bench.tsv
+                fi
+
+                rm "fulgor/default/${BATCH}.query"
+            fi
+            
+            # Delete index
+            rm -f "${output}.fur" "fulgor/default/${BATCH}.list"
+        done' returned non-zero exit status 127.
+[Fri Oct 16 17:04:37 2026]
+Error in rule fulgor_batch_update:
+    message: None
+    jobid: 9
+    input: input_data/initial_files.txt, input_data/batches
+    output: fulgor/default/bench.tsv
+    log: fulgor/default/batch_update.log (check log file(s) for error details)
+    shell:
+        
+        if [[ -z "" ]]; then
+            last_batch=$(ls input_data/batches/insert_batch_* | wc -l)
+        else
+            last_batch=
+        fi
+
+        for BATCH in $(seq 1 ${last_batch}); do
+            echo "${BATCH}" >> fulgor/default/batch_update.log
+            
+            output="fulgor/default/${BATCH}.index"
+            cat input_data/initial_files.txt > fulgor/default/${BATCH}.list
+            seq 1 ${BATCH} | xargs -I {} cat input_data/batches/insert_batch_{}.txt >> fulgor/default/${BATCH}.list
+           
+            # BUILD FROM SCRATCH
+            /usr/bin/time -f "${BATCH}	build	%E	%e	%M	%t	%I	%O	[%C]" -a -o fulgor/default/bench.tsv fulgor build -d "fulgor/default"                                                         -l "fulgor/default/${BATCH}.list"                                                         -o "${output}"                                                         -t 24                                                         -k 24 -m 20 -g 512  >> fulgor/default/batch_update.log 2>&1
+
+            #SIZE
+            du --bytes --dereference --summarize "${output}.fur" | sed "s/^/${BATCH}	size	/" >> fulgor/default/bench.tsv
+
+            # QUERY
+            if [[ -n "" ]]; then
+                /usr/bin/time -f "${BATCH}	query	%E	%e	%M	%t	%I	%O	[%C]" -a -o fulgor/default/bench.tsv fulgor pseudoalign                                                                      -i "${output}.fur"                                                                     -q ""                                                                     -o fulgor/default/${BATCH}.query                                                                     -t 24 >> fulgor/default/batch_update.log 2>&1
+
+                # AVG. QUERY HITS
+                cut -f 2 "fulgor/default/${BATCH}.query" | awk -v batch=${BATCH} '{s+=$1}END{print batch"	avg_query	"s/NR}' >> fulgor/default/bench.tsv
+
+                # EVAL
+                if [[ "False" == "True" ]]; then
+                    awk -F"	" '{print $1"	"$3; for(i=4;i<=NF;i++) print $1"	"$i;}' fulgor/default/${BATCH}.query > fulgor/default/${BATCH}.eval
+                    /home/mi/pirov/code/dhibf_benchmark/scripts/query_eval.py fulgor/default/${BATCH}.eval 0 0 | sed "s/^/${BATCH}	/" >> fulgor/default/bench.tsv
+                fi
+
+                rm "fulgor/default/${BATCH}.query"
+            fi
+            
+            # Delete index
+            rm -f "${output}.fur" "fulgor/default/${BATCH}.list"
+        done
+        
+        (command exited with non-zero exit code)
+Removing output files of failed job fulgor_batch_update since they might be corrupted:
+fulgor/default/bench.tsv
+Select jobs to execute...
+Execute 1 jobs...
+
+[Fri Oct 16 17:04:38 2026]
+localrule metagraph_batch_update:
+    input: input_data/initial_files.txt, input_data/batches
+    output: metagraph/default/bench.tsv
+    log: metagraph/default/batch_update.log
+    jobid: 11
+    benchmark: metagraph/default/batch_update.bench.tsv
+    reason: Missing output files: metagraph/default/bench.tsv
+    wildcards: args=default
+    threads: 24
+    resources: tmpdir=/tmp
+Shell command: 
+        if [[ -z "" ]]; then
+            last_batch=$(ls input_data/batches/insert_batch_* | wc -l)
+        else
+            last_batch=
+        fi
+
+        for BATCH in $(seq 1 ${last_batch}); do
+            echo "${BATCH}" >> metagraph/default/batch_update.log
+
+            output="metagraph/default/${BATCH}.index.dbg"
+            cat input_data/initial_files.txt > metagraph/default/${BATCH}.list
+            seq 1 ${BATCH} | xargs -I {} cat input_data/batches/insert_batch_{}.txt >> metagraph/default/${BATCH}.list
+           
+            # BUILD
+            /usr/bin/time -f "${BATCH}	build	%E	%e	%M	%t	%I	%O	[%C]" -a -o metagraph/default/bench.tsv metagraph build                                                     -p 24 --kmer-length 20                                                     -o ${output}                                                     < metagraph/default/${BATCH}.list >> metagraph/default/batch_update.log 2>&1
+            # ANNOTATE
+            /usr/bin/time -f "${BATCH}	build	%E	%e	%M	%t	%I	%O	[%C]" -a -o metagraph/default/bench.tsv metagraph annotate -p 24 -i "${output}" -o metagraph/default/${BATCH}.column.annodbg --anno-filename < metagraph/default/${BATCH}.list >> metagraph/default/batch_update.log 2>&1
+
+            # SIZE
+            du --bytes --dereference --summarize "${output}" "metagraph/default/${BATCH}.column.annodbg" | sed "s/^/${BATCH}	size	/" >> metagraph/default/bench.tsv
+
+            # QUERY
+            if [[ -n "" ]]; then
+                /usr/bin/time -f "${BATCH}	query	%E	%e	%M	%t	%I	%O	[%C]" -a -o metagraph/default/bench.tsv metagraph query --min-kmers-fraction-label 0.8                                                                 -p 24                                                                 -i "${output}"                                                                 -a metagraph/default/${BATCH}.column.annodbg                                                                  > metagraph/default/${BATCH}.query 2>> metagraph/default/batch_update.log
+                # AVG. QUERY HITS
+                cut -f 3 "metagraph/default/${BATCH}.query" | awk -v batch=${BATCH} -F":" '{s+=NF}END{print batch"	avg_query	"s/NR}' >> metagraph/default/bench.tsv
+                
+                # EVAL
+                if [[ "False" == "True" ]]; then
+                    cut -f 2,- "metagraph/default/${BATCH}.query" | tr ':' '	' | awk -F"	" '{print $1"	"$2; for(i=3;i<=NF;i++) print $1"	"$i;}' | sed 's|/.*/||' > metagraph/default/${BATCH}.eval
+                    /home/mi/pirov/code/dhibf_benchmark/scripts/query_eval.py metagraph/default/${BATCH}.eval 0 0 | sed "s/^/${BATCH}	/" >> metagraph/default/bench.tsv
+                fi
+
+                rm "metagraph/default/${BATCH}.query"
+            fi
+            
+            # Delete tmp files
+            rm -f "${output}" metagraph/default/${BATCH}.column.annodbg metagraph/default/${BATCH}.list
+        done
+        
+        # Delete final index
+        rm -f "${output}"
+        
+Activating conda environment: .snakemake/conda/04d8eadfe0bcb32d028aa148a8338f1a_
+Select jobs to execute...
+[Sat Oct 17 13:34:21 2026]
+Finished jobid: 7 (Rule: cobs_batch_update)
+1 of 9 steps (11%) done
+Execute 2 jobs...
+
+[Sat Oct 17 13:34:21 2026]
+localrule summarize:
+    input: cobs/default/bench.tsv
+    output: cobs/default/summary.tsv
+    jobid: 6
+    reason: Missing output files: cobs/default/summary.tsv; Input files updated by another job: cobs/default/bench.tsv
+    wildcards: tool=cobs, args=default
+    resources: tmpdir=/tmp
+Shell command: 
+        python3 /home/mi/pirov/code/dhibf_benchmark/scripts/eval.py                 --input cobs/default/bench.tsv                 --output cobs/default/summary.tsv                 --unit GiB                 --label "cobs default"
+        
+
+[Sat Oct 17 13:34:21 2026]
+localrule raptor_batch_update:
+    input: input_data/initial_files.txt, input_data/batches
+    output: raptor/--empty-bin-fraction=0.1/bench.tsv
+    log: raptor/--empty-bin-fraction=0.1/batch_update.log
+    jobid: 2
+    benchmark: raptor/--empty-bin-fraction=0.1/batch_update.bench.tsv
+    reason: Missing output files: raptor/--empty-bin-fraction=0.1/bench.tsv
+    wildcards: args=--empty-bin-fraction=0.1
+    threads: 24
+    resources: tmpdir=/tmp
+Shell command: 
+        if [[ 0 -eq 0 ]]; then
+            BATCH=0
+            # prepare
+            #/usr/bin/time -f "${BATCH}	build	%E	%e	%M	%t	%I	%O	[%C]" -a -o raptor/--empty-bin-fraction=0.1/bench.tsv /home/mi/pirov/code/raptor/build/bin/raptor prepare --threads 24 --input input_data/initial_files.txt --output raptor/--empty-bin-fraction=0.1/${BATCH}_prepare --window 24 --kmer 20 > raptor/--empty-bin-fraction=0.1/batch_update.log 2>&1
+            #/usr/bin/time -f "${BATCH}	build	%E	%e	%M	%t	%I	%O	[%C]" -a -o raptor/--empty-bin-fraction=0.1/bench.tsv /home/mi/pirov/code/raptor/build/bin/raptor layout --threads 24 --input raptor/--empty-bin-fraction=0.1/${BATCH}_prepare/minimiser.list --output raptor/--empty-bin-fraction=0.1/${BATCH}.layout --window 24 --kmer 20 --fpr 0.05 --hash 2 --disable-estimate-union --empty-bin-fraction 0.1 >> raptor/--empty-bin-fraction=0.1/batch_update.log 2>&1
+            # prepare
+
+            # no prepare
+            /usr/bin/time -f "${BATCH}	build	%E	%e	%M	%t	%I	%O	[%C]" -a -o raptor/--empty-bin-fraction=0.1/bench.tsv /home/mi/pirov/code/raptor/build/bin/raptor layout --threads 24 --input input_data/initial_files.txt --output raptor/--empty-bin-fraction=0.1/${BATCH}.layout --window 24 --kmer 20 --fpr 0.05 --hash 2 --disable-estimate-union --empty-bin-fraction 0.1 >> raptor/--empty-bin-fraction=0.1/batch_update.log 2>&1
+            # no prepare
+            
+            /usr/bin/time -f "${BATCH}	build	%E	%e	%M	%t	%I	%O	[%C]" -a -o raptor/--empty-bin-fraction=0.1/bench.tsv /home/mi/pirov/code/raptor/build/bin/raptor build --threads 24 --input raptor/--empty-bin-fraction=0.1/${BATCH}.layout --output raptor/--empty-bin-fraction=0.1/${BATCH}.index  >> raptor/--empty-bin-fraction=0.1/batch_update.log 2>&1
+            du --bytes --dereference --summarize raptor/--empty-bin-fraction=0.1/${BATCH}.index | sed "s/^/${BATCH}	size	/" >> raptor/--empty-bin-fraction=0.1/bench.tsv
+            echo "${BATCH}	obs	Initial Build" >> raptor/--empty-bin-fraction=0.1/bench.tsv
+            rm raptor/--empty-bin-fraction=0.1/${BATCH}.layout
+            first_batch=1
+        else
+            first_batch=0
+        fi
+
+        if [[ -z "" ]]; then
+            last_batch=$(ls input_data/batches/insert_batch_* | wc -l)
+        else
+            last_batch=
+        fi
+
+        for BATCH in $(seq ${first_batch} ${last_batch}); do
+            echo "${BATCH}" >> raptor/--empty-bin-fraction=0.1/batch_update.log
+
+            input="raptor/--empty-bin-fraction=0.1/$((BATCH - 1)).index"
+            output="raptor/--empty-bin-fraction=0.1/${BATCH}.index"
+            
+            # UPDATE - delete
+            if [[ -f "input_data/batches/delete_batch_${BATCH}.txt" ]]; then
+                /usr/bin/time -f "${BATCH}	query	%E	%e	%M	%t	%I	%O	[%C]" -a -o raptor/--empty-bin-fraction=0.1/bench.tsv /home/mi/pirov/code/raptor/build/bin/raptor inspect --index "${input}"                                                                   --format json --user-bins |
+                                                          jq -r '.user_bins.paths | to_entries[] | "\(.value[0])	\(.key)"' > raptor/--empty-bin-fraction=0.1/$((BATCH - 1)).user_bins.tsv 2>> raptor/--empty-bin-fraction=0.1/batch_update.log
+
+                # Make list of ub to delete "--delete 0 --delete 1"                
+                to_delete=$(join <(sort "input_data/batches/delete_batch_${BATCH}.txt") <(sort raptor/--empty-bin-fraction=0.1/$((BATCH - 1)).user_bins.tsv) -o "2.2" | sed 's/^/--delete /' | tr '
+' ' ')
+                /usr/bin/time -f "${BATCH}	build	%E	%e	%M	%t	%I	%O	[%C]" -a -o raptor/--empty-bin-fraction=0.1/bench.tsv /home/mi/pirov/code/raptor/build/bin/raptor update delete --threads 24                                                                     --index "${input}"                                                                     --output "${output}_deleted"                                                                     ${to_delete} >> raptor/--empty-bin-fraction=0.1/batch_update.log 2>&1
+                rm -f "${input}" raptor/--empty-bin-fraction=0.1/$((BATCH - 1)).user_bins.tsv
+                input="${output}_deleted"
+            fi
+
+            # UPDATE - insert
+            # prepare
+            #/usr/bin/time -f "${BATCH}	build	%E	%e	%M	%t	%I	%O	[%C]" -a -o raptor/--empty-bin-fraction=0.1/bench.tsv /home/mi/pirov/code/raptor/build/bin/raptor prepare --threads 24 --input "input_data/batches/insert_batch_${BATCH}.txt" --output raptor/--empty-bin-fraction=0.1/${BATCH}_prepare --window 24 --kmer 20 >> raptor/--empty-bin-fraction=0.1/batch_update.log 2>&1
+            #message=$(/usr/bin/time -f "${BATCH}	build	%E	%e	%M	%t	%I	%O	[%C]" -a -o raptor/--empty-bin-fraction=0.1/bench.tsv /home/mi/pirov/code/raptor/build/bin/raptor update insert --threads 24 --index "${input}" --output "${output}" --insert raptor/--empty-bin-fraction=0.1/${BATCH}_prepare/minimiser.list --stats 2>&1)
+            # prepare
+
+            # no prepare
+            message=$(/usr/bin/time -f "${BATCH}	build	%E	%e	%M	%t	%I	%O	[%C]" -a -o raptor/--empty-bin-fraction=0.1/bench.tsv /home/mi/pirov/code/raptor/build/bin/raptor update insert --threads 24 --index "${input}" --output "${output}" --insert "input_data/batches/insert_batch_${BATCH}.txt" --stats 2>&1)
+            # no prepare
+
+            echo "${message}" >> raptor/--empty-bin-fraction=0.1/batch_update.log
+
+            has_partial_rebuild=false
+            has_full_rebuild=false
+            if grep "Partial Rebuilds: [1-9]" <<< "${message}"; then
+                has_partial_rebuild=true
+            fi
+            if grep "Full Rebuilds: [1-9]" <<< "${message}"; then
+                has_full_rebuild=true
+            fi
+            if ${has_partial_rebuild} && ${has_full_rebuild}; then
+                message="Mixed Rebuild"
+            elif ${has_partial_rebuild}; then
+                message="Partial Rebuild"
+            elif ${has_full_rebuild}; then
+                message="Full Rebuild"
+            else
+                message="Inplace"
+            fi
+
+            # OBS
+            echo "${BATCH}	obs	${message}" >> raptor/--empty-bin-fraction=0.1/bench.tsv
+
+            # SIZE
+            du --bytes --dereference --summarize "${output}" | sed "s/^/${BATCH}	size	/" >> raptor/--empty-bin-fraction=0.1/bench.tsv
+
+            # QUERY
+            if [[ -n "" ]]; then
+                /usr/bin/time -f "${BATCH}	query	%E	%e	%M	%t	%I	%O	[%C]" -a -o raptor/--empty-bin-fraction=0.1/bench.tsv /home/mi/pirov/code/raptor/build/bin/raptor search --threshold 0.8                                                                 --threads 24                                                                 --index "${output}"                                                                 --query ""                                                                 --output raptor/--empty-bin-fraction=0.1/${BATCH}.query >> raptor/--empty-bin-fraction=0.1/batch_update.log 2>&1
+
+                # AVG. QUERY HITS
+                grep -v "^#" "raptor/--empty-bin-fraction=0.1/${BATCH}.query" | cut -f 2 | awk -v batch=${BATCH} -F"," '{s+=NF}END{print batch"	avg_query	"s/NR}' >> raptor/--empty-bin-fraction=0.1/bench.tsv
+                
+                # EVAL
+                if [[ "False" == "True" ]]; then
+                    grep -v "^#" raptor/--empty-bin-fraction=0.1/${BATCH}.query | tr ',' '	' | awk -F"	" '{print $1"	"$2; for(i=3;i<=NF;i++) print $1"	"$i;}' > raptor/--empty-bin-fraction=0.1/${BATCH}.eval_tmp
+                    
+                    # Re-match user bin id with linked "file" id
+                    /home/mi/pirov/code/raptor/build/bin/raptor inspect --index "${output}"                                                  --format json --user-bins |
+                                                 jq -r '.user_bins.paths | to_entries[] | "\(.value[0])	\(.key)"' > raptor/--empty-bin-fraction=0.1/${BATCH}.user_bins.tsv 2>> raptor/--empty-bin-fraction=0.1/batch_update.log
+                    join -1 2 -2 2 <(sort -t$'	' -k 2,2 raptor/--empty-bin-fraction=0.1/${BATCH}.eval_tmp) <(sort -t$'	' -k 2,2 raptor/--empty-bin-fraction=0.1/${BATCH}.user_bins.tsv) -t$'	' -o "1.1,2.1" -a 1 | sed -e 's|/.*/bin_||' -e 's|.fa$||' > raptor/--empty-bin-fraction=0.1/${BATCH}.eval
+                    /home/mi/pirov/code/dhibf_benchmark/scripts/query_eval.py raptor/--empty-bin-fraction=0.1/${BATCH}.eval 0 0 | sed "s/^/${BATCH}	/" >> raptor/--empty-bin-fraction=0.1/bench.tsv
+                fi
+
+                rm -f "raptor/--empty-bin-fraction=0.1/${BATCH}.query" "raptor/--empty-bin-fraction=0.1/${BATCH}.eval" "raptor/--empty-bin-fraction=0.1/${BATCH}.eval_tmp"
+            fi
+
+            # Delete index
+            rm -f "${input}"
+        done
+        
+        # Delete final index
+        rm -f "${output}"
+        
+        # Delete minimisers (with prepare only)
+        # prepare
+        rm -rf raptor/--empty-bin-fraction=0.1/*_prepare
+        # prepare
+        
+[Sat Oct 17 13:34:22 2026]
+Finished jobid: 6 (Rule: summarize)
+2 of 9 steps (22%) done
+Partial Rebuilds: 91
+Full Rebuilds: 1
+[Sat Oct 17 15:34:20 2026]
+Finished jobid: 2 (Rule: raptor_batch_update)
+3 of 9 steps (33%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Sat Oct 17 15:34:20 2026]
+localrule summarize:
+    input: raptor/--empty-bin-fraction=0.1/bench.tsv
+    output: raptor/--empty-bin-fraction=0.1/summary.tsv
+    jobid: 1
+    reason: Missing output files: raptor/--empty-bin-fraction=0.1/summary.tsv; Input files updated by another job: raptor/--empty-bin-fraction=0.1/bench.tsv
+    wildcards: tool=raptor, args=--empty-bin-fraction=0.1
+    resources: tmpdir=/tmp
+Shell command: 
+        python3 /home/mi/pirov/code/dhibf_benchmark/scripts/eval.py                 --input raptor/--empty-bin-fraction=0.1/bench.tsv                 --output raptor/--empty-bin-fraction=0.1/summary.tsv                 --unit GiB                 --label "raptor --empty-bin-fraction=0.1"
+        
+[Sat Oct 17 15:34:20 2026]
+Finished jobid: 1 (Rule: summarize)
+4 of 9 steps (44%) done

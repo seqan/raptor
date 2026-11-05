@@ -1,0 +1,2 @@
+dependencies:
+ - bokeh==3.8.1

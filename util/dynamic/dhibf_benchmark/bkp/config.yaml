@@ -1,0 +1,17 @@
+  pac:
+    path: "/home/mi/pirov/code/PAC/PAC"
+    fixed_args: "-k 20"
+    args:
+  mantis: 
+    path: "/srv/public/seiler/dynamic_2025-12/mantis/build/src/mantis"
+    fixed_args: 
+      squeakr: "-e -k 20 -c 1 -n -t 1"
+      build: "-s 34"
+      query: "-k 20"
+    args:
+  kmindex:
+    path: "kmindex"
+    fixed_args: "--hard-min 1 --kmer-size 20 --bloom-size 25000" # max --minim-size is 15, but uses a lot of ram, default used (10)
+    args:
+    query_args: "--fast --threshold 0.8" # Shared k-mers threshold. in [0.0, 1.0]
+ 
