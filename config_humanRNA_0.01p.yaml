@@ -1,0 +1,54 @@
+threads: 24
+repeat: 1
+
+workdir: "/home/mi/pirov/srv_data/dhibf_bench/humanRNA_0.01p/"
+input_files_list: "/home/mi/pirov/srv_data/dhibf_bench/data/humanRNA_40k/0.01p_samples_shuf.txt"
+# SRR1264331.fastq.gz: 500M
+#query_file: "/home/mi/pirov/srv_data/dhibf_bench/data/humanRNA_40k/1k_samples/SRR1264331.fastq.gz"
+query_file: ""
+
+initial_batch: 1000
+incremental_batch: 100
+max_batches: 0
+
+first_batch: 51
+last_batch: 100
+
+# size in bytes
+size_cmd: "du --bytes --dereference --summarize"
+report_unit: "GiB"  # "MiB"
+create_eval_file: False
+
+tools:
+  raptor: 
+    path: "/home/mi/pirov/code/raptor/build/bin/raptor"
+    fixed_args:
+      prepare: "--window 24 --kmer 20"
+      layout: "--window 24 --kmer 20 --fpr 0.05 --hash 2 --disable-estimate-union"
+      build: ""
+    args:
+      "--empty-bin-fraction": 0.1
+    query_args: "--threshold 0.8"
+  raptor_static: 
+    path: "/home/mi/pirov/code/raptor/build/bin/raptor"
+    fixed_args:
+      prepare: "--window 24 --kmer 20"
+      layout: "--window 24 --kmer 20 --fpr 0.05 --hash 2 --disable-estimate-union --empty-bin-fraction 0"
+      build: ""
+    args:
+    query_args: "--threshold 0.8"
+  cobs:
+    path: "cobs"
+    fixed_args: "--term-size 20 --false-positive-rate 0.05 --num-hashes 2"
+    args:
+    query_args: "--load-complete --threshold 0.8"
+  fulgor:
+    path: "/home/mi/pirov/code/fulgor/build/fulgor"
+    fixed_args: "-k 24 -m 20 -g 512"
+    args:
+    query_args: "-r 0.8"
+  metagraph:
+    path: "metagraph"
+    fixed_args: "--kmer-length 20"
+    args:
+    query_args: "--min-kmers-fraction-label 0.8"

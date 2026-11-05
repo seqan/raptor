@@ -1,0 +1,29 @@
+threads: 24
+repeat: 1
+
+workdir: "/home/mi/pirov/srv_data/dhibf_bench/humanRNA/"
+input_files_list: "/home/mi/pirov/srv_data/dhibf_bench/data/humanRNA_40k/10k_filenames1234.txt"
+query_file: ""
+
+initial_batch: 1000
+incremental_batch: 100
+max_batches: 0
+
+first_batch: 380
+last_batch: 385
+
+# size in bytes
+size_cmd: "du --bytes --dereference --summarize"
+report_unit: "GiB"  # "MiB"
+create_eval_file: False
+
+tools:
+  raptor: 
+    path: "/home/mi/pirov/code/raptor/build/bin/raptor"
+    fixed_args:
+      prepare: "--window 24 --kmer 20 --use-filesize-dependent-cutoff"
+      layout: "--window 24 --kmer 20 --fpr 0.05 --hash 2 --disable-estimate-union"
+      build: ""
+    args:
+      "--empty-bin-fraction": 0.1
+    query_args: "--threshold 0.8"

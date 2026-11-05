@@ -1,0 +1,27 @@
+
+threads: 24
+repeat: 1
+
+workdir: "/home/mi/pirov/srv_data/dhibf_bench/batch_even_batches/"
+input_files_list: "/home/mi/pirov/srv_data/dhibf_bench/data/simulated/batch_even/100000/filenames.txt"
+query_file: "/home/mi/pirov/srv_data/dhibf_bench/data/simulated/batch_even/100000/reads_e2_250.fastq"
+
+initial_batch: 10000
+incremental_batch: 1000
+max_batches: 0
+
+# size in bytes
+size_cmd: "du --bytes --dereference --summarize"
+report_unit: "MiB"  # "GiB"
+create_eval_file: True
+
+tools:
+  raptor: 
+    path: "/home/mi/pirov/code/raptor/build/bin/raptor"
+    fixed_args:
+      prepare: "--window 20 --kmer 20" # not being used
+      layout: "--window 20 --kmer 20 --fpr 0.05 --hash 2 --disable-estimate-union"
+      build: ""
+    args:
+      "--empty-bin-fraction": 0.1 #[0.1, 0.2, 0.3]
+    query_args: "--error 2 --query_length 250"
