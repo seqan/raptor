@@ -1,0 +1,89 @@
+nohup: ignoring input
+/home/mi/pirov/code/dhibf_benchmark/tools/raptor.smk:86: SyntaxWarning: invalid escape sequence '\('
+  # no prepare
+/home/mi/pirov/code/dhibf_benchmark/tools/raptor.smk:213: SyntaxWarning: invalid escape sequence '\('
+/home/mi/pirov/code/dhibf_benchmark/tools/bifrost.smk:104: SyntaxWarning: invalid escape sequence '\s'
+/home/mi/pirov/code/dhibf_benchmark/tools/bifrost.smk:179: SyntaxWarning: invalid escape sequence '\s'
+Assuming unrestricted shared filesystem usage.
+host: augustus
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 30
+Rules claiming more threads will be scaled down.
+Job stats:
+job                     count
+--------------------  -------
+all                         1
+bifrost_batch_update        1
+summarize                   1
+total                       3
+
+Select jobs to execute...
+Execute 1 jobs...
+
+[Mon Oct 19 16:11:19 2026]
+localrule bifrost_batch_update:
+    input: input_data/initial_files.txt, input_data/batches
+    output: bifrost/default/bench.tsv
+    log: bifrost/default/batch_update.log
+    jobid: 5
+    benchmark: bifrost/default/batch_update.bench.tsv
+    reason: Missing output files: bifrost/default/bench.tsv
+    wildcards: args=default
+    threads: 24
+    resources: tmpdir=/tmp
+Shell command: 
+        if [[ 0 -eq 0 ]]; then
+            BATCH=0
+
+            /usr/bin/time -f "${BATCH}	build	%E	%e	%M	%t	%I	%O	[%C]" -a -o bifrost/default/bench.tsv /home/mi/pirov/code/bifrost/build/src/Bifrost build                                             --input-ref-file "input_data/initial_files.txt"                                             --output-file bifrost/default/${BATCH}.index                                             --threads 24                                             --verbose --colors --no-compress-out --kmer-length 20 --min-length 18  > bifrost/default/batch_update.log 2>&1
+
+            du --bytes --dereference --summarize bifrost/default/${BATCH}.index.* | sed "s/^/${BATCH}	size	/" >> bifrost/default/bench.tsv
+            echo "${BATCH}	obs	Initial Build" >> bifrost/default/bench.tsv
+            first_batch=1
+        else
+            first_batch=0
+        fi
+
+        if [[ -z "" ]]; then
+            last_batch=$(ls input_data/batches/insert_batch_* | wc -l)
+        else
+            last_batch=
+        fi
+
+        for BATCH in $(seq ${first_batch} ${last_batch}); do
+            echo "${BATCH}" >> bifrost/default/batch_update.log
+            
+            input="bifrost/default/$((BATCH - 1)).index"
+            output="bifrost/default/${BATCH}.index"
+            
+            /usr/bin/time -f "${BATCH}	build	%E	%e	%M	%t	%I	%O	[%C]" -a -o bifrost/default/bench.tsv /home/mi/pirov/code/bifrost/build/src/Bifrost update --input-graph-file "${input}.gfa"                                                 --input-color-file "${input}.color.bfg"                                                 --input-index-file "${input}.bfi"                                                 --input-ref-file "input_data/batches/insert_batch_${BATCH}.txt"                                                 --output-file "${output}"                                                 --threads 24                                                 --no-compress-out                                                 --verbose --no-compress-out --kmer-length 20 --min-length 18  >> bifrost/default/batch_update.log 2>&1
+
+            #SIZE
+            du --bytes --dereference --summarize ${output}.* | sed "s/^/${BATCH}	size	/" >> bifrost/default/bench.tsv
+
+            # QUERY
+            if [[ -n "/home/mi/pirov/srv_data/dhibf_bench/data/simulated/batch_even/100000/reads_e2_250.fastq" ]]; then
+                /usr/bin/time -f "${BATCH}	query	%E	%e	%M	%t	%I	%O	[%C]" -a -o bifrost/default/bench.tsv /home/mi/pirov/code/bifrost/build/src/Bifrost query --input-graph-file "${output}.gfa"                                                                  --input-color-file "${output}.color.bfg"                                                                  --input-index-file "${output}.bfi"                                                                  --input-query-file "/home/mi/pirov/srv_data/dhibf_bench/data/simulated/batch_even/100000/reads_e2_250.fastq"                                                                   --output-file "bifrost/default/${BATCH}.query"                                                                  --threads 24                                                                  --min_ratio-kmers 0.8 --verbose >> bifrost/default/batch_update.log 2>&1 
+
+                awk 'NR>1{m=0; for(i=1;i<=NF;i++){if($i==1){print $1"	"i-2; m=1}};if(m==0){print $1"	"}}' "bifrost/default/${BATCH}.query.tsv" > "bifrost/default/${BATCH}.eval"
+                
+                # AVG. QUERY HITS
+                total_queries=$(wc -l "/home/mi/pirov/srv_data/dhibf_bench/data/simulated/batch_even/100000/reads_e2_250.fastq"| cut -d' ' -f 1)
+                total_matches=$(cut -f 2 "bifrost/default/${BATCH}.eval" | sed -r '/^\s*$/d' | wc -l)
+                awk -v batch=${BATCH} -v q=${total_queries} -v m=${total_matches} 'BEGIN{print batch"	avg_query	"(m/(q/4))}' >> bifrost/default/bench.tsv
+
+                # EVAL
+                if [[ "True" == "True" ]]; then
+                    /home/mi/pirov/code/dhibf_benchmark/scripts/query_eval.py bifrost/default/${BATCH}.eval 10000 1000 | sed "s/^/${BATCH}	/" >> bifrost/default/bench.tsv
+                fi
+
+                #rm -rf "bifrost/default/${BATCH}.query" "bifrost/default/${BATCH}.eval"
+            fi
+            
+            # Delete index
+            #rm -f "${input}".*
+        done
+        # Delete final index
+        #rm -f "${output}".*
+        

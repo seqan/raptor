@@ -1,0 +1,55 @@
+
+threads: 24
+repeat: 1
+
+workdir: "/home/mi/pirov/srv_data/dhibf_bench/batch_refseq/"
+input_files_list: "/home/mi/pirov/srv_data/dhibf_bench/data/simulated/batch_refseq/100000/filenames.txt"
+query_file: "/home/mi/pirov/srv_data/dhibf_bench/data/simulated/batch_refseq/100000/reads_e2_250.fastq"
+
+initial_batch: 10000
+incremental_batch: 1000
+max_batches: 0
+
+# size in bytes
+size_cmd: "du --bytes --dereference --summarize"
+report_unit: "MiB"  # "GiB"
+create_eval_file: True
+
+tools:
+  raptor: 
+    path: "/home/mi/pirov/code/raptor/build/bin/raptor"
+    fixed_args:
+      prepare: "--window 20 --kmer 20"
+      layout: "--window 20 --kmer 20 --fpr 0.05 --hash 2 --disable-estimate-union"
+      build: ""
+    args:
+      "--empty-bin-fraction": 0.1 # [0.1, 0.2, 0.3]
+    query_args: "--error 2 --query_length 250"
+  raptor_static: 
+    path: "/home/mi/pirov/code/raptor/build/bin/raptor"
+    fixed_args:
+      prepare: "--window 20 --kmer 20"
+      layout: "--window 20 --kmer 20 --fpr 0.05 --hash 2 --disable-estimate-union --empty-bin-fraction 0"
+      build: ""
+    args:
+    query_args: "--error 2 --query_length 250"
+  cobs:
+    path: "cobs"
+    fixed_args: "--term-size 20 --num-hashes 2 --false-positive-rate 0.05"
+    args:
+    # threshold in percentage of terms in query matching
+    query_args: "--load-complete --threshold 0.8"
+  fulgor:
+    path: "fulgor"
+    fixed_args: "-k 20 -m 20 -g 512"
+    args:
+    # -r Threshold for threshold_union algorithm. It must be a float in (0.0,1.0]., 
+    # using threshold 0.8 worked but generated some wrong results (reads matching everywhere)
+    query_args: ""
+  metagraph:
+    path: "metagraph"
+    fixed_args: "--kmer-length 20"
+    args:
+    # --fwd-and-reverse skipped, generated doubled results, not sure if necessary
+    # --min-kmers-fraction-label [FLOAT]   min fraction of k-mers from the query required to be present in a label
+    query_args: "--min-kmers-fraction-label 0.8" 
