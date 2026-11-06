@@ -924,7 +924,25 @@ Bokeh.set_log_level("info");
 </script>
   </head>
   <body>
-<div id="report-nav" style="padding: 6px 8px"><a href="index.html" style="font: 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #0066cc; text-decoration: none">&larr; Index</a></div>
+<div id="report-nav" style="padding: 6px 8px">
+  <a href="index.html" style="font: 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #0066cc; text-decoration: none">&larr; Index</a>
+  <a href="#" id="save-svg" style="font: 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #0066cc; text-decoration: none; margin-left: 16px">Save SVG</a>
+  <script>
+    document.getElementById('save-svg').addEventListener('click', event => {
+      event.preventDefault();
+      const plot = Bokeh.documents[0].roots()[0].children[0];
+      const svg = Bokeh.index.find_one(plot).export('svg', false).ctx.get_svg();
+      // Bokeh places the rasterised legend markers at their device pixel size.
+      for (const image of svg.querySelectorAll('image')) {
+        for (const side of ['width', 'height']) image.setAttribute(side, image.getAttribute(side) / devicePixelRatio);
+      }
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)], {type: 'image/svg+xml'}));
+      link.download = `${document.title}.svg`;
+      link.click();
+    });
+  </script>
+</div>
     <div id="f20b9e6f-75c1-453c-a81b-8cfbcf2b26f8" data-root-id="p1095" style="display: contents;"><div class="bk-Column"></div></div>
   
     <script type="application/json" id="d80ffc64-1e36-4ecf-ad97-4d3a79053ea4">

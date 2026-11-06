@@ -30,9 +30,9 @@ Then open the reports at `http://127.0.0.1:8000` in your browser.
 
 ## Updating reports
 
-After adding or regenerating a report, run `util/dynamic/reports/patch_reports.py`. It adds a licence header and a link
-back to `index.html` to each report and sets the page title to the file name. A new report also needs an entry in
-`index.html`.
+After adding or regenerating a report, run `util/dynamic/reports/patch_reports.py`. It adds a licence header, a link
+back to `index.html` and a `Save SVG` link to each report and sets the page title to the file name. A new report also
+needs an entry in `index.html`.
 
 ## Troubleshooting
 

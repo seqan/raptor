@@ -4,8 +4,8 @@
 # SPDX-FileCopyrightText: 2016-2026 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Adds a licence header and a link to index.html to every report next to this script and sets its page title to the
-file name.
+"""Adds a licence header, a link to index.html and a link that saves the plot as SVG to every report next to this script
+and sets its page title to the file name.
 
 Run this after adding or regenerating a report. Reports that are already patched stay byte-identical.
 """
@@ -26,16 +26,37 @@ SPDX-License-Identifier: BSD-3-Clause
 """
 # REUSE-IgnoreEnd
 
-NAV = (
-    '<div id="report-nav" style="padding: 6px 8px">'
-    '<a href="index.html" style="font: 14px -apple-system, BlinkMacSystemFont, \'Segoe UI\', Arial, sans-serif; '
-    'color: #0066cc; text-decoration: none">&larr; Index</a></div>\n'
+LINK_STYLE = (
+    "font: 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #0066cc; text-decoration: none"
 )
+
+SAVE_SVG = """
+    document.getElementById('save-svg').addEventListener('click', event => {
+      event.preventDefault();
+      const plot = Bokeh.documents[0].roots()[0].children[0];
+      const svg = Bokeh.index.find_one(plot).export('svg', false).ctx.get_svg();
+      // Bokeh places the rasterised legend markers at their device pixel size.
+      for (const image of svg.querySelectorAll('image')) {
+        for (const side of ['width', 'height']) image.setAttribute(side, image.getAttribute(side) / devicePixelRatio);
+      }
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)], {type: 'image/svg+xml'}));
+      link.download = `${document.title}.svg`;
+      link.click();
+    });
+  """
+
+NAV = f"""<div id="report-nav" style="padding: 6px 8px">
+  <a href="index.html" style="{LINK_STYLE}">&larr; Index</a>
+  <a href="#" id="save-svg" style="{LINK_STYLE}; margin-left: 16px">Save SVG</a>
+  <script>{SAVE_SVG}</script>
+</div>
+"""
 
 OLD_LICENSE_HEADER = re.compile(r'\A<!--\nSPDX-.*?-->\n\n', re.DOTALL)
 # Line-anchored, because the inlined BokehJS bundle contains "<body" as well.
 BODY_TAG = re.compile(r'^[ \t]*<body>[ \t]*\n', re.MULTILINE)
-OLD_NAV = re.compile(r'^<div id="report-nav".*\n', re.MULTILINE)
+OLD_NAV = re.compile(r'^<div id="report-nav".*?</div>\n', re.MULTILINE | re.DOTALL)
 # The first match is the one in <head>, which precedes the bundle.
 TITLE = re.compile(r'<title>.*?</title>')
 
