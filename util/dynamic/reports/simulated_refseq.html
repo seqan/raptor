@@ -932,6 +932,8 @@ Bokeh.set_log_level("info");
       event.preventDefault();
       const plot = Bokeh.documents[0].roots()[0].children[0];
       const svg = Bokeh.index.find_one(plot).export('svg', false).ctx.get_svg();
+      // Bokeh also strokes each text with an invisible outline, which turns into Type 3 fonts in a PDF.
+      svg.querySelectorAll('text[fill="none"][stroke-opacity="0"]').forEach(text => text.remove());
       // Bokeh places the rasterised legend markers at their device pixel size.
       for (const image of svg.querySelectorAll('image')) {
         for (const side of ['width', 'height']) image.setAttribute(side, image.getAttribute(side) / devicePixelRatio);
