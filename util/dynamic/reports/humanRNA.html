@@ -955,6 +955,21 @@ Bokeh.set_log_level("info");
         group.append(...ctx.get_svg().childNodes);
         image.replaceWith(group);
       });
+      // A legend wider than the plot extends beyond the exported area. Only then, enlarge the area to include it.
+      if (legend.visible) {
+        const margin = legend.border_line_width / 2;
+        const {x0, y0, x1, y1} = legend_view.bbox;
+        const [svg_width, svg_height] = ['width', 'height'].map(side => Number(svg.getAttribute(side)));
+        const left = Math.min(0, Math.floor(x0 - margin));
+        const top = Math.min(0, Math.floor(y0 - margin));
+        const right = Math.max(svg_width, Math.ceil(x1 + margin));
+        const bottom = Math.max(svg_height, Math.ceil(y1 + margin));
+        if (left < 0 || top < 0 || right > svg_width || bottom > svg_height) {
+          svg.setAttribute('viewBox', `${left} ${top} ${right - left} ${bottom - top}`);
+          svg.setAttribute('width', right - left);
+          svg.setAttribute('height', bottom - top);
+        }
+      }
       const link = document.createElement('a');
       link.href = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)], {type: 'image/svg+xml'}));
       link.download = `${document.title}.svg`;
