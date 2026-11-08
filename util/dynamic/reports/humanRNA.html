@@ -931,13 +931,30 @@ Bokeh.set_log_level("info");
     document.getElementById('save-svg').addEventListener('click', event => {
       event.preventDefault();
       const plot = Bokeh.documents[0].roots()[0].children[0];
-      const svg = Bokeh.index.find_one(plot).export('svg', false).ctx.get_svg();
+      const plot_view = Bokeh.index.find_one(plot);
+      const layer = plot_view.export('svg', false);
+      const svg = layer.ctx.get_svg();
       // Bokeh also strokes each text with an invisible outline, which turns into Type 3 fonts in a PDF.
       svg.querySelectorAll('text[fill="none"][stroke-opacity="0"]').forEach(text => text.remove());
-      // Bokeh places the rasterised legend markers at their device pixel size.
-      for (const image of svg.querySelectorAll('image')) {
-        for (const side of ['width', 'height']) image.setAttribute(side, image.getAttribute(side) / devicePixelRatio);
-      }
+      // The legend markers are bitmaps in legend order. Draw them again as vectors, the same way Bokeh draws them.
+      const legend = plot.above.find(model => model.constructor.__name__ === 'Legend');
+      const legend_view = plot_view.views.find_one(legend);
+      const {glyph_width: width, glyph_height: height} = legend;
+      svg.querySelectorAll('image').forEach((image, index) => {
+        const {item, label} = legend_view.entries[index];
+        const field = item.get_field_from_label_prop();
+        const marker = new layer.constructor('svg', false);
+        marker.resize(width, height);
+        const ctx = marker.prepare();
+        for (const renderer of item.renderers) {
+          plot_view.views.find_one(renderer)?.draw_legend(ctx, 0, width, 0, height, field, label, item.index);
+        }
+        marker.finish();
+        const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        group.setAttribute('transform', image.getAttribute('transform'));
+        group.append(...ctx.get_svg().childNodes);
+        image.replaceWith(group);
+      });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)], {type: 'image/svg+xml'}));
       link.download = `${document.title}.svg`;
