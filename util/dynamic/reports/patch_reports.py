@@ -4,8 +4,8 @@
 # SPDX-FileCopyrightText: 2016-2026 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Adds a licence header and a link to index.html to every report next to this script and sets its page title to the
-file name.
+"""Adds a licence header, a link to index.html and a link that saves the plot as SVG to every report next to this script
+and sets its page title to the file name.
 
 Run this after adding or regenerating a report. Reports that are already patched stay byte-identical.
 """
@@ -26,16 +26,71 @@ SPDX-License-Identifier: BSD-3-Clause
 """
 # REUSE-IgnoreEnd
 
-NAV = (
-    '<div id="report-nav" style="padding: 6px 8px">'
-    '<a href="index.html" style="font: 14px -apple-system, BlinkMacSystemFont, \'Segoe UI\', Arial, sans-serif; '
-    'color: #0066cc; text-decoration: none">&larr; Index</a></div>\n'
+LINK_STYLE = (
+    "font: 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; color: #0066cc; text-decoration: none"
 )
+
+SAVE_SVG = """
+    document.getElementById('save-svg').addEventListener('click', event => {
+      event.preventDefault();
+      const plot = Bokeh.documents[0].roots()[0].children[0];
+      const plot_view = Bokeh.index.find_one(plot);
+      const layer = plot_view.export('svg', false);
+      const svg = layer.ctx.get_svg();
+      // Bokeh also strokes each text with an invisible outline, which turns into Type 3 fonts in a PDF.
+      svg.querySelectorAll('text[fill="none"][stroke-opacity="0"]').forEach(text => text.remove());
+      // The legend markers are bitmaps in legend order. Draw them again as vectors, the same way Bokeh draws them.
+      const legend = plot.above.find(model => model.constructor.__name__ === 'Legend');
+      const legend_view = plot_view.views.find_one(legend);
+      const {glyph_width: width, glyph_height: height} = legend;
+      svg.querySelectorAll('image').forEach((image, index) => {
+        const {item, label} = legend_view.entries[index];
+        const field = item.get_field_from_label_prop();
+        const marker = new layer.constructor('svg', false);
+        marker.resize(width, height);
+        const ctx = marker.prepare();
+        for (const renderer of item.renderers) {
+          plot_view.views.find_one(renderer)?.draw_legend(ctx, 0, width, 0, height, field, label, item.index);
+        }
+        marker.finish();
+        const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        group.setAttribute('transform', image.getAttribute('transform'));
+        group.append(...ctx.get_svg().childNodes);
+        image.replaceWith(group);
+      });
+      // A legend wider than the plot extends beyond the exported area. Only then, enlarge the area to include it.
+      if (legend.visible) {
+        const margin = legend.border_line_width / 2;
+        const {x0, y0, x1, y1} = legend_view.bbox;
+        const [svg_width, svg_height] = ['width', 'height'].map(side => Number(svg.getAttribute(side)));
+        const left = Math.min(0, Math.floor(x0 - margin));
+        const top = Math.min(0, Math.floor(y0 - margin));
+        const right = Math.max(svg_width, Math.ceil(x1 + margin));
+        const bottom = Math.max(svg_height, Math.ceil(y1 + margin));
+        if (left < 0 || top < 0 || right > svg_width || bottom > svg_height) {
+          svg.setAttribute('viewBox', `${left} ${top} ${right - left} ${bottom - top}`);
+          svg.setAttribute('width', right - left);
+          svg.setAttribute('height', bottom - top);
+        }
+      }
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)], {type: 'image/svg+xml'}));
+      link.download = `${document.title}.svg`;
+      link.click();
+    });
+  """
+
+NAV = f"""<div id="report-nav" style="padding: 6px 8px">
+  <a href="index.html" style="{LINK_STYLE}">&larr; Index</a>
+  <a href="#" id="save-svg" style="{LINK_STYLE}; margin-left: 16px">Save SVG</a>
+  <script>{SAVE_SVG}</script>
+</div>
+"""
 
 OLD_LICENSE_HEADER = re.compile(r'\A<!--\nSPDX-.*?-->\n\n', re.DOTALL)
 # Line-anchored, because the inlined BokehJS bundle contains "<body" as well.
 BODY_TAG = re.compile(r'^[ \t]*<body>[ \t]*\n', re.MULTILINE)
-OLD_NAV = re.compile(r'^<div id="report-nav".*\n', re.MULTILINE)
+OLD_NAV = re.compile(r'^<div id="report-nav".*?</div>\n', re.MULTILINE | re.DOTALL)
 # The first match is the one in <head>, which precedes the bundle.
 TITLE = re.compile(r'<title>.*?</title>')
 
