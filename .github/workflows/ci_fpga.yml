@@ -5,17 +5,8 @@
 name: FPGA
 
 on:
-  push:
-    branches:
-      - 'main'
-  pull_request:
-    types:
-      - unlabeled
+  workflow_call:
   workflow_dispatch:
-
-concurrency:
-  group: fpga-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name != 'push' }}
 
 env:
   SHARG_NO_VERSION_CHECK: 1
