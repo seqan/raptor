@@ -8,7 +8,7 @@
 # cmake-format: off
 
 # hibf
-set (RAPTOR_HIBF_VERSION 5da24dd57cdd69be7918a4bb40a8a4b1a6a342f4 CACHE STRING "")
+set (RAPTOR_HIBF_VERSION 9b2ddfa192b096c816af06ba863d92b582e49a19 CACHE STRING "")
 CPMDeclarePackage (hibf
                    NAME hibf
                    GIT_TAG ${RAPTOR_HIBF_VERSION} # main
@@ -40,7 +40,7 @@ CPMDeclarePackage (seqan3
                    OPTIONS "INSTALL_SEQAN3 OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING"
 )
 # chopper
-set (RAPTOR_CHOPPER_VERSION 2a6e902973c84fb65ac55fdbf9d5fb29740a70e9 CACHE STRING "")
+set (RAPTOR_CHOPPER_VERSION e0cd1b7596933576cf030946dfb1cdd25e700044 CACHE STRING "")
 CPMDeclarePackage (chopper
                    NAME chopper
                    GIT_TAG ${RAPTOR_CHOPPER_VERSION} # main
